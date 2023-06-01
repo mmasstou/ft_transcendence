@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  databases:
+    build: databases/
+    image: databases
+    volumes:
+      - ./databases/data:/var/lib/postgresql/data
+  
+  backend:
+    build: backend/
+    image: backend
+    ports:
+      - 3000:3000
+   
+    
+  chat:
+    build: chat/
+    image: chat
+    
