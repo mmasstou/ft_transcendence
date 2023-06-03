@@ -35,19 +35,11 @@ model User {
   is_active    Boolean        @default(false)
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt
-  UserMessages UserMessages[]
   Members      Members[]
   Messages     Messages[]
 }
 
-model UserMessages {
-  id       String     @id @default(uuid())
-  user     User       @relation(fields: [userId], references: [id])
-  RoomId   Rooms      @relation(fields: [roomsId], references: [id])
-  messages Messages[]
-  userId   String
-  roomsId  String
-}
+
 
 model Rooms {
   id           String         @id @default(uuid())
@@ -55,7 +47,6 @@ model Rooms {
   type         RoomType       @default(PUBLIC)
   members      Members[]
   messages     Messages[]
-  UserMessages UserMessages[]
 }
 
 model Members {
@@ -71,11 +62,7 @@ model Messages {
   content String
   id      String @id @default(uuid())
   sender  User   @relation(fields: [senderId], references: [id])
-  // receiver User   @relation(fields: [receiverId], references: [id])
   roomId  Rooms  @relation(fields: [roomsId], references: [id])
-
-  UserMessages   UserMessages? @relation(fields: [userMessagesId], references: [id])
-  userMessagesId String?
   senderId       String
   roomsId        String
 }
