@@ -1,4 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Prisma, Rooms } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateRoomDto } from './dtos/UpdateRoomDto';
@@ -8,11 +14,17 @@ export class RoomsService {
   constructor(private prisma: PrismaService) {}
 
   async findOne(params: { name: string }): Promise<Rooms> {
-    const { name } = params;
-    console.log('++findOne++>', name);
-    return await this.prisma.rooms.findUnique({
-      where: { name },
-    });
+    try {
+      const { name } = params;
+      console.log('++findOne++>', name);
+      const room = await this.prisma.rooms.findUnique({
+        where: { name },
+      });
+      if (!room) throw new Error('');
+      return room;
+    } catch (error) {
+      throw new NotFoundException();
+    }
   }
 
   async findAll(): Promise<Rooms[]> {
@@ -20,9 +32,22 @@ export class RoomsService {
   }
 
   async create(data: Prisma.RoomsCreateInput): Promise<Rooms> {
-    return await this.prisma.rooms.create({
-      data,
-    });
+    try {
+      return await this.prisma.rooms.create({
+        data,
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: 'This Room Duplicated',
+        },
+        HttpStatus.FORBIDDEN,
+        {
+          cause: error,
+        },
+      );
+    }
   }
 
   async update(params: { id: string; data: UpdateRoomDto }): Promise<Rooms> {
@@ -41,5 +66,60 @@ export class RoomsService {
     return await this.prisma.rooms.delete({
       where: { id },
     });
+  }
+
+  async AddMessage(dep: {
+    roomId: string;
+    content: string;
+    userId: string;
+  }): Promise<Rooms> {
+    try {
+      const User = await this.prisma.user.findUnique({
+        where: { id: dep.userId },
+      });
+
+      const roomIId = await this.prisma.rooms.findUnique({
+        where: { id: dep.roomId },
+      });
+      console.log('User :', User);
+      console.log('roomIId :', roomIId);
+
+      const message = await this.prisma.messages.create({
+        data: {
+          content: dep.content,
+          sender: {
+            connect: { id: User.id },
+          },
+          roomId: {
+            connect: { id: roomIId.id },
+          },
+        },
+      });
+
+      console.log('message :', message);
+      const room = this.prisma.rooms.update({
+        where: { id: dep.roomId },
+        data: {
+          messages: {
+            connect: { id: message.id },
+          },
+        },
+        include: {
+          messages: true,
+        },
+      });
+      return room;
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          error: "CAN'T CREATE THIS MESSAGE",
+        },
+        HttpStatus.CONFLICT,
+        {
+          cause: error,
+        },
+      );
+    }
   }
 }
