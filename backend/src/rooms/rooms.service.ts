@@ -27,7 +27,12 @@ export class RoomsService {
   }
 
   async findAll(): Promise<Rooms[]> {
-    return this.prisma.rooms.findMany();
+    return this.prisma.rooms.findMany({
+      include: {
+        members: true,
+        messages: true,
+      },
+    });
   }
 
   async create(data: Prisma.RoomsCreateInput): Promise<Rooms> {
