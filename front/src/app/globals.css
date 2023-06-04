@@ -2,3 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* .blue__gradient {
+    background: linear-gradient(180deg, rgba(17, 187, 203, 0) 0%, #161F1E 100%);
+    filter: blur(123px);
+  }
+  
+  .pink__gradient {
+    background: linear-gradient(90deg, #89ffdd 0%, #4ec9b7 100%);
+    filter: blur(900px);
+  }
+  
+  .white__gradient {
+    background: rgba(255, 255, 255, 0.6);
+    filter: blur(750px);
+  } */
