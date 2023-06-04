@@ -10,10 +10,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
-import { CreatemessageDto } from 'src/Dtos/CreatemessageDto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UpdateMessageDto } from 'src/Dtos/UpdateMessageDto';
-import { Prisma } from '@prisma/client';
 import { Request } from 'express';
 
 @Controller('messages')
