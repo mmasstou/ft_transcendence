@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Messages, Prisma, User } from '@prisma/client';
+import { Messages } from '@prisma/client';
 import { UpdateMessageDto } from 'src/Dtos/UpdateMessageDto';
 import { PrismaService } from 'src/prisma.service';
 
