@@ -59,7 +59,6 @@ export class RoomsController {
   ) {
     const userIds: any = request.user;
     const userId: string = userIds.sub;
-    console.log('content :', content);
     return this.roomsService.AddMessage({ roomId, content, userId });
   }
 
@@ -67,15 +66,16 @@ export class RoomsController {
   UpdateMessage(
     @Param('roomId') roomId: string,
     @Param('messageId') messageId: string,
+    @Body('content') content: string,
   ) {
-    return '';
+    return this.roomsService.UpdateMessage({ messageId, content });
   }
   @Delete(':roomId/:messageId')
   DeleteMessage(
     @Param('roomId') roomId: string,
     @Param('messageId') messageId: string,
   ) {
-    return '';
+    return this.roomsService.DeleteMessage({ messageId });
   }
   // members
 }

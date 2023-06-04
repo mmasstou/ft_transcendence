@@ -1,11 +1,10 @@
 import {
   Injectable,
   NotFoundException,
-  ConflictException,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Prisma, Rooms } from '@prisma/client';
+import { Messages, Prisma, Rooms } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateRoomDto } from './dtos/UpdateRoomDto';
 
@@ -77,7 +76,6 @@ export class RoomsService {
       const User = await this.prisma.user.findUnique({
         where: { id: dep.userId },
       });
-
       const roomIId = await this.prisma.rooms.findUnique({
         where: { id: dep.roomId },
       });
@@ -103,6 +101,9 @@ export class RoomsService {
           messages: {
             connect: { id: message.id },
           },
+          members: {
+            connect: { id: User.id },
+          },
         },
         include: {
           messages: true,
@@ -116,6 +117,52 @@ export class RoomsService {
           error: "CAN'T CREATE THIS MESSAGE",
         },
         HttpStatus.CONFLICT,
+        {
+          cause: error,
+        },
+      );
+    }
+  }
+
+  async UpdateMessage(params: {
+    messageId: string;
+    content: string;
+  }): Promise<Messages> {
+    try {
+      const message = await this.prisma.messages.update({
+        where: {
+          id: params.messageId,
+        },
+        data: { content: params.content },
+      });
+      return message;
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: "CAN'T EDIT THIS MESSAGE",
+        },
+        HttpStatus.FORBIDDEN,
+        {
+          cause: error,
+        },
+      );
+    }
+  }
+
+  async DeleteMessage(params: { messageId: string }): Promise<Messages> {
+    try {
+      const message = await this.prisma.messages.delete({
+        where: { id: params.messageId },
+      });
+      return message;
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'NO MESSAGE WIDTH THIS ID',
+        },
+        HttpStatus.NOT_FOUND,
         {
           cause: error,
         },

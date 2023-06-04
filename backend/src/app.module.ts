@@ -7,9 +7,10 @@ import { ConfigModule } from '@nestjs/config';
 import { UserService } from './users/user.service';
 import { PrismaService } from './prisma.service';
 import { RoomsModule } from './rooms/rooms.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
-  imports: [AuthModule, UserModule, ConfigModule.forRoot(), RoomsModule],
+  imports: [AuthModule, UserModule, ConfigModule.forRoot(), RoomsModule, MessagesModule],
   controllers: [AppController],
   providers: [AppService, UserService, PrismaService],
   exports: [UserService, PrismaService],
