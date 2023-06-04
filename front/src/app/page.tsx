@@ -6,7 +6,7 @@ import Showcase from "@/components/Showcase";
 
 export default function Home() {
     return (
-        <div className="bg-[#161F1E] h-screen overflow-scroll z-0">
+        <div className="bg-[#161F1E] h-screen overflow-scroll z-0 w-full ">
             <Home_Header />
             <Hero />
             <About />
