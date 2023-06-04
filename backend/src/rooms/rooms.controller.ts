@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { UpdateRoomDto } from './dtos/UpdateRoomDto';
-import { CreateRoomDto } from './dtos/CreateRoomDto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
 
@@ -21,8 +20,10 @@ export class RoomsController {
 
   @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createUserDto: CreateRoomDto) {
-    return this.roomsService.create(createUserDto);
+  create(@Body('name') name: string, @Req() request: Request) {
+    const User_payload: any = request.user;
+    const userId: any = User_payload.sub;
+    return this.roomsService.create({ name, userId });
   }
 
   @UseGuards(AuthGuard)
@@ -60,6 +61,14 @@ export class RoomsController {
     const userIds: any = request.user;
     const userId: string = userIds.sub;
     return this.roomsService.AddMessage({ roomId, content, userId });
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('join')
+  JoinUser(@Body('roomId') roomId: string, @Req() request: Request) {
+    const User: any = request.user;
+    const userId: any = User.sub;
+    return this.roomsService.JoinUser({ userId, roomId });
   }
 
   @Patch(':roomId/:messageId')

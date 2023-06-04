@@ -9,7 +9,6 @@ import { PrismaService } from './prisma.service';
 import { RoomsModule } from './rooms/rooms.module';
 import { MessagesModule } from './messages/messages.module';
 import { MembersModule } from './members/members.module';
-
 @Module({
   imports: [
     AuthModule,

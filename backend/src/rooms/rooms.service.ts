@@ -4,13 +4,17 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Messages, Prisma, Rooms } from '@prisma/client';
+import { Messages, Rooms } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateRoomDto } from './dtos/UpdateRoomDto';
+import { MembersService } from 'src/members/members.service';
 
 @Injectable()
 export class RoomsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private membersservice: MembersService,
+  ) {}
 
   async findOne(params: { name: string }): Promise<Rooms> {
     try {
@@ -35,16 +39,33 @@ export class RoomsService {
     });
   }
 
-  async create(data: Prisma.RoomsCreateInput): Promise<Rooms> {
+  async create(data: { name: string; userId: string }): Promise<Rooms> {
     try {
-      return await this.prisma.rooms.create({
-        data,
+      const room: Rooms = await this.prisma.rooms.create({
+        data: { name: data.name },
+      });
+
+      const mumber: any = this.membersservice.create({
+        type: 'ADMIN',
+        user: data.userId,
+        roomId: room.id,
+      });
+
+      return await this.prisma.rooms.update({
+        where: {
+          id: room.id,
+        },
+        data: {
+          members: {
+            connect: { id: mumber.id },
+          },
+        },
       });
     } catch (error) {
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
-          error: 'This Room Duplicated',
+          error: "CAN'T CREATE ROOM",
         },
         HttpStatus.FORBIDDEN,
         {
@@ -129,6 +150,45 @@ export class RoomsService {
     }
   }
 
+  async JoinUser(params: { userId: string; roomId: string }) {
+    try {
+      // const User = await this.prisma.user.findUnique({
+      //   where: { id: params.userId },
+      // });
+      const Member = await this.prisma.members.create({
+        data: {
+          user: {
+            connect: { id: params.userId },
+          },
+          RoomId: {
+            connect: { id: params.roomId },
+          },
+          type: 'USER',
+        },
+      });
+      return await this.prisma.rooms.update({
+        data: {
+          members: {
+            connect: { id: Member.id },
+          },
+        },
+        where: {
+          id: params.roomId,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: "CAN'T EDIT THIS MESSAGE",
+        },
+        HttpStatus.FORBIDDEN,
+        {
+          cause: error,
+        },
+      );
+    }
+  }
   async UpdateMessage(params: {
     messageId: string;
     content: string;
