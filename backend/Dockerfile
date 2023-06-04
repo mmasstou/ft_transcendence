@@ -1,15 +1,15 @@
 FROM node:buster
 
-WORKDIR /backend
+WORKDIR /app
 
 COPY ./package.json ./
 
 
 RUN npm i
 
-COPY . ./
+COPY . .
 
 
 ENTRYPOINT [ "sh", "tools/init.sh" ]
-
-CMD [ "npm", "run start:dev" ]
+# ENTRYPOINT [ "npm run start:dev" ]
+# CMD [ "npm run start:dev" ]
