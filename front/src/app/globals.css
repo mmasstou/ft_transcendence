@@ -2,17 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-/* .blue__gradient {
-    background: linear-gradient(180deg, rgba(17, 187, 203, 0) 0%, #161F1E 100%);
+.blue__gradient {
+    background: linear-gradient(180deg, rgba(135, 248, 218, 0) 0%, #2bedd7 100%);
     filter: blur(123px);
   }
   
   .pink__gradient {
-    background: linear-gradient(90deg, #89ffdd 0%, #4ec9b7 100%);
+    background: linear-gradient(90deg, #89ffdd 0%, #26ffe6 100%);
     filter: blur(900px);
   }
   
   .white__gradient {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 228, 167, 0.6);
     filter: blur(750px);
-  } */
+  }
+
+.gradient {
+  background: #4CA1AF;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #C4E0E5, #4CA1AF);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #C4E0E5, #4CA1AF); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.bg-blue-gradient {
+  background: linear-gradient(
+    157.81deg,
+    #d1fdf8 -43.27%,
+    #b8f9f2 -21.24%,
+    #49ffea 12.19%,
+    #5ac4ba 29.82%,
+    #35a799 51.94%,
+    #36716a 90.29%
+  );
+}
+
+/* .bg-black-gradient {
+  background: linear-gradient(
+    144.39deg,
+    #ffffff -278.56%,
+    #6d6d6d -78.47%,
+    #11101d 91.61%
+  );
+}
+
+.bg-black-gradient-2 {
+  background: linear-gradient(
+    -168.39deg,
+    #ffffff -278.56%,
+    #6d6d6d -78.47%,
+    #11101d 91.61%
+  );
+} */

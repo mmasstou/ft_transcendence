@@ -3,12 +3,19 @@ import Image from "next/image";
 import styles from "./style";
 import Button from "./Button";
 import about  from "../../public/about.svg";
+import { motion } from "framer-motion";
 
 const About = () => {
+  const AnimatedImage = motion(Image);
     return (
-        <section className={` ${styles.paddingY} ${styles.flexCenter} flex-1 flex-col md:p-5 
-                        lg:flex-row-reverse xl:flex-row-reverse  mt-10`}>
-            <div className={` ${styles.flexCenter} pl-4 flex-col text-center z-1`}>
+        <section className={` ${styles.paddingY} ${styles.flexCenter}  flex-col md:p-5 
+                        lg:flex-row-reverse xl:flex-row-reverse  mt-10 z-10`}>
+            <motion.div
+              initial={{ opacity: 0}}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 1.5}} 
+              className={` ${styles.flexCenter} pl-4 flex-col text-center`}
+            >
                 <h1 className={` ${styles.heading} md:text-[45px] mb-4`}>
                 About Game
                 </h1>
@@ -18,14 +25,25 @@ const About = () => {
                 </p>
                 <Button login={false} style="text-secondary bg-transparent border border-secondary 
                         hover:bg-secondary hover:text-btn" title="Let’t play now" />
-            </div>
+            </motion.div>
     
-            <div className={`${styles.flexStart} mr-10 lg:pr-10`}>
-            <Image
-              className="object-cover p-0 m-4"
+            <div className={`${styles.flexStart} mr-10 lg:pr-10 relative`}>
+            <AnimatedImage
+              initial={{
+                x:-200,
+                opacity: 0,
+            }}
+            transition={{ duration: 1.2 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true}}
+              width={600}
+              height={500}
+              className="object-cover p-0 m-4 z-[5] ml-5 pl-5"
               src={about}
               alt="ping pong tabe image"
             />
+            <div className="absolute z-[3] -left-1/2 top-0 w-[50%] h-[50%] rounded-full white__gradient" />
+            <div className="absolute z-[0] -left-1/2 bottom-0 w-[50%] h-[50%] rounded-full pink__gradient" />
             </div>
         </section>
       )
