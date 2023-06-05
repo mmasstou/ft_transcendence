@@ -42,8 +42,8 @@ const Showcase = () => {
           width={600}
           height={500}
         />
-         <div className="absolute z-[3] -right-20 top-0 w-[50%] h-[50%] rounded-full white__gradient" />
-            <div className="absolute z-[0] -right-20 bottom-20 w-[50%] h-[50%] rounded-full pink__gradient" />
+         <div className="absolute z-[3] right-20 top-0 w-[50%] h-[50%] rounded-full white__gradient" />
+            <div className="absolute z-[0] right-20 bottom-20 w-[50%] h-[50%] rounded-full pink__gradient" />
         </div>
     </section>
     </div>

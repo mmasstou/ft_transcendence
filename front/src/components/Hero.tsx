@@ -8,14 +8,14 @@ import BackgroundCircles from './BackgroundCircles';
 
 const Hero = () => {
   return (
-    <section className={`flex ${styles.paddingY}  flex-col lg:flex-row  
+    <section className={`flex ${styles.paddingY}  flex-col lg:flex-row   items-center justify-center
               md:p-5 sm:mt-10 mt-10 lg:mt-0 z-10`}>
         <motion.div 
           initial={{ opacity: 0}}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1.5}} 
-          className={`lg:py-[200px] ${styles.flexStart} flex-1 flex-col text-center ml-5
-          lg:ml-[60px] xl:ml-[80px] `} >
+          className={`lg:py-[200px] ${styles.flexCenter} text-center flex-col  ml-5
+          lg:ml-[60px] xl:ml-[80px] ${styles.paddingX}`} >
             <h1 className={` ${styles.heading} md:text-[45px] mb-4`}>
                 Get Your Paddle <br/>Ready
             </h1>
@@ -25,9 +25,10 @@ const Hero = () => {
             </p>
             <Button login={false} style="text-btn hover:text-white bg-secondary " title="Get Started Now" />
         </motion.div>
-
-          <BackgroundCircles />
-          <div className="relative lg:m-[100px] xl:m-[120px]">
+          <div className="flex justify-center items-center ">
+            <BackgroundCircles />
+          </div>
+          <div className="relative lg:m-[100px] xl:m-[120px] flex items-center justify-center">
           <Image
           className="object-fit z-[5]"
             src={table}
@@ -35,8 +36,8 @@ const Hero = () => {
             width={500}
             height={500}
           />
-          <div className="absolute z-[1] w-[80%] h-[80%] rounded-full bottom-30 white__gradient " />
-          <div className="absolute z-[0] w-[50%] h-[50%] right-20 bottom-20 blue__gradient " />
+          <div className="absolute z-[1] w-[80%] h-[80%] rounded-full bottom-30 white__gradient overfolw-hidden" />
+          <div className="absolute z-[0] w-[50%] h-[50%] right-20 bottom-20 blue__gradient overfolw-hidden" />
           </div>
     </section>
   )
