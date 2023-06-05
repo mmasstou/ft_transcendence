@@ -6,9 +6,10 @@ import table from '../../public/table.svg'
 import { motion } from 'framer-motion';
 import BackgroundCircles from './BackgroundCircles';
 
+
 const Hero = () => {
   return (
-    <section className={`flex ${styles.paddingY}  flex-col lg:flex-row   items-center justify-center
+    <section className={`${styles.paddingY} ${styles.flexCenter} flex-col lg:flex-row  
               md:p-5 sm:mt-10 mt-10 lg:mt-0 z-10`}>
         <motion.div 
           initial={{ opacity: 0}}
@@ -16,7 +17,7 @@ const Hero = () => {
           transition={{ duration: 1.5}} 
           className={`lg:py-[200px] ${styles.flexCenter} text-center flex-col  ml-5
           lg:ml-[60px] xl:ml-[80px] ${styles.paddingX}`} >
-            <h1 className={` ${styles.heading} md:text-[45px] mb-4`}>
+            <h1 className={` ${styles.heading} md:text-[45px] mb-4 `}>
                 Get Your Paddle <br/>Ready
             </h1>
             <p className={`${styles.paragraph} md:text-[18px] mb-4`}>
