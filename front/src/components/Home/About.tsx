@@ -2,7 +2,7 @@
 import Image from "next/image";
 import styles from "./style";
 import Button from "./Button";
-import about  from "../../public/about.svg";
+import about  from "../../../public/about.svg";
 import { motion } from "framer-motion";
 
 const About = () => {

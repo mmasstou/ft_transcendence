@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Button from './Button'
 import styles from './style';
-import table from '../../public/table.svg'
+import table from '../../../public/table.svg'
 import { motion } from 'framer-motion';
 import BackgroundCircles from './BackgroundCircles';
 

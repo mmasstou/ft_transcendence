@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 .blue__gradient {
     background: linear-gradient(180deg, rgba(135, 248, 218, 0) 0%, #2bedd7 100%);
     filter: blur(123px);
@@ -19,8 +20,8 @@
 
 .gradient {
   background: #4CA1AF;  /* fallback for old browsers */
-background: -webkit-linear-gradient(to right, #C4E0E5, #4CA1AF);  /* Chrome 10-25, Safari 5.1-6 */
-background: linear-gradient(to right, #C4E0E5, #4CA1AF); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+background: -webkit-linear-gradient(to right, #C4E0E5, #4CA1AF);
+background: linear-gradient(to right, #C4E0E5, #4CA1AF); 
 
 }
 
@@ -36,20 +37,11 @@ background: linear-gradient(to right, #C4E0E5, #4CA1AF); /* W3C, IE 10+/ Edge, F
   );
 }
 
-/* .bg-black-gradient {
-  background: linear-gradient(
-    144.39deg,
-    #ffffff -278.56%,
-    #6d6d6d -78.47%,
-    #11101d 91.61%
-  );
+@media (max-width: 767px) {
+  .small-device {
+    display: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
-
-.bg-black-gradient-2 {
-  background: linear-gradient(
-    -168.39deg,
-    #ffffff -278.56%,
-    #6d6d6d -78.47%,
-    #11101d 91.61%
-  );
-} */

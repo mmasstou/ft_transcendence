@@ -2,7 +2,7 @@
 import Image from "next/image";
 import styles from "./style";
 import Button from "./Button";
-import show  from "../../public/show.svg";
+import show  from "../../../public/show.svg";
 import { motion } from "framer-motion";
 
 const Showcase = () => {
