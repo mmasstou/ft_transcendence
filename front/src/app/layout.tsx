@@ -25,7 +25,10 @@ export default function RootLayout({ children, }: { children: React.ReactNode;})
 {
     return (
         <html lang="en" >
-            <body className= {`${changa.variable} ${lato.variable}`} suppressHydrationWarning={true}>{children}</body>
+            <body className= {`${changa.variable} ${lato.variable}`} suppressHydrationWarning={true}>
+				{children}
+            </body>
+            
         </html>
     );
 }

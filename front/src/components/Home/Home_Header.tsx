@@ -1,6 +1,6 @@
 'use client'
 import Image from "next/image";
-import logo from "../../public/logo.svg"
+import logo from "../../../public/logo.svg"
 import Button from "./Button";
 import { motion } from "framer-motion";
 
@@ -26,6 +26,7 @@ const Home_Header = () => {
             src={logo} 
             alt="pong game logo"
             priority={true}
+            
         />
       </motion.div>
       <motion.div
