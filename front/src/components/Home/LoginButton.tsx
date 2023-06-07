@@ -21,7 +21,7 @@ const LoginButton = ({label, outline} : ButtonProps) => {
         transition
         w-full
         xl:w-3/4 gl:w-3/4
-        ${outline ? 'bg-white' : 'bg-[#00BABC]'}
+        ${outline ? 'bg-white' : 'bg-[#48ecee]'}
 
       `}
     >
