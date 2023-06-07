@@ -9,7 +9,7 @@ interface ILogin {
 
 
 const LoginHook = create<ILogin>((set) => ({
-    IsOpen: true,
+    IsOpen: false,
     selectedItem: null,
     onOpen: () => set({ IsOpen: true }),
     onClose: () => set({ IsOpen: false }),

@@ -19,7 +19,7 @@ const ChatMain = () => {
     const params = useSearchParams()
     let currentQuery: string | null = ''
     if (params) {
-        currentQuery = params?.get('message')
+        currentQuery = params?.get('room')
     }
 
     isMounted && window.addEventListener('resize', () => setW(window.innerWidth))
@@ -43,7 +43,7 @@ const ChatMain = () => {
 
     return <div className={`border border-orange-300 h-full ${onLineUser.IsOpen ? 'hidden' : ''} sm:flex`}>
         <DirectOLdMessages />
-        {currentQuery  && <Messages message={currentQuery} />}
+        {currentQuery  && <Messages roomid={currentQuery} />}
     </div>
 }
 

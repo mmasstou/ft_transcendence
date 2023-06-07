@@ -86,5 +86,10 @@ export class RoomsController {
   ) {
     return this.roomsService.DeleteMessage({ messageId });
   }
+  @UseGuards(AuthGuard)
+  @Get('messages/:messageId')
+  getaLLmessages( @Param('messageId') messageId: string){
+    return this.roomsService.getaLLmessages(messageId)
+  }
   // members
 }
