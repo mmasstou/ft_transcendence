@@ -27,7 +27,7 @@ services:
     networks:
       - APInetwork
     volumes:
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data:ro
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
   
 
 networks:

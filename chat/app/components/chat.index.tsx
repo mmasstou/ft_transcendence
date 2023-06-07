@@ -4,10 +4,15 @@ import { OLdMessages as OLdMessagesType } from "../types/types"
 import OLdMessages from "../hooks/OLdMessages"
 import { useEffect, useState } from "react"
 import OnlineUsers from "../hooks/OnlineUsers"
+import LoginHook from "../hooks/login"
+import Login from "../modaL/Login"
+import Cookies from "js-cookie"
 
 const Chat = () => {
     const oLdMessages = OLdMessages()
     const onLineUser = OnlineUsers()
+    const loginHook  = LoginHook()
+
     const [onLineUserStats, setonLineUserStats] = useState(false)
     const [windowresize, setwindowresize] = useState(0)
     const [isMounted, setisMounted] = useState(false)
@@ -37,11 +42,15 @@ const Chat = () => {
     // }, [windowresize])
 
     useEffect(() => {
+
         //  if (windowresize <= 1158 && oLdMessages.IsOpen)
         //     oLdMessages.onClose()
+        // const token = Cookies.get('token')
+        (Cookies.get('token') !==  undefined  ) ? (loginHook.IsOpen && loginHook.onClose()) : loginHook.onOpen()
         setwindowresize(window.innerWidth)
         setisMounted(true)
     }, [])
+    
     return <div className=" relative chat-box border border-orange-600 h-full max-h-[98vh] w-full max-w flex flex-col gap-4">
         <ChatBody />
     </div>

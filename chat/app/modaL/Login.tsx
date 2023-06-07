@@ -1,15 +1,20 @@
 'use client'
 import { useState } from "react";
+import Cookies from 'js-cookie';
 import Input from "../components/Input";
 import Modal from "./modaL"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import { HiOutlineLogin } from "react-icons/hi"
 import LoginHook from "../hooks/login";
+import { useRouter } from "next/navigation";
+
+
+
 const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const loginHook = LoginHook()
-
+    const router = useRouter()
     const {
         register,
         handleSubmit,
@@ -28,16 +33,26 @@ const Login = () => {
 
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {
 
-      
+
         console.log("Data :", data)
-        const token = await fetch(`${process.env.BACKEND_PATH}/auth/login`, {
+        const API_PATH = process.env.API_URL
+        console.log("API_PATH :", API_PATH)
+        const token = await fetch(`http://127.0.0.1/auth/login`, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
-              Connection: "keep-alive",
+                "Content-Type": "application/json",
+                Connection: "keep-alive",
             },
             body: JSON.stringify(data),
         })
+        if (token.status === 200){
+
+            loginHook.onClose()
+            console.log("token :", token)
+            const user_token = await token.json()
+            Cookies.set("token", user_token.access_token)
+            router.refresh()
+        }
     }
     const bodyContent = (
         <div className="flex flex-col gap-4 w-full sm:w-[440px]  sm:h-[260px] bg-[#243230] p-4">
@@ -67,7 +82,7 @@ const Login = () => {
         </div>
 
     );
-    return <Modal  IsOpen={loginHook.IsOpen} body={bodyContent} />
+    return <Modal IsOpen={loginHook.IsOpen} body={bodyContent} />
 }
 
 export default Login

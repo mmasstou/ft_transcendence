@@ -12,7 +12,14 @@ export class UserService {
     const { login } = params;
     console.log('++findOne++>', login);
     return await this.prisma.user.findUnique({
-      where: { login },
+      where: { id :login },
+    });
+  }
+  async findOneID(params: { login: string }): Promise<User> {
+    const { login } = params;
+    console.log('++findOne++>', login);
+    return await this.prisma.user.findUnique({
+      where: {login },
     });
   }
 

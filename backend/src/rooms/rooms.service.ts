@@ -234,4 +234,26 @@ export class RoomsService {
       );
     }
   }
+  async getaLLmessages(messageId : string) {
+    try {
+      const message = await this.prisma.rooms.findUnique({
+        where: { id: messageId },
+        select : {
+          messages :true
+        }
+      });
+      return message;
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'NO MESSAGE WIDTH THIS ID',
+        },
+        HttpStatus.NOT_FOUND,
+        {
+          cause: error,
+        },
+      );
+    }
+  }
 }
