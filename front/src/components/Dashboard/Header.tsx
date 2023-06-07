@@ -9,10 +9,11 @@ const Header = () => {
   return (
     <>
       <div className=" ml-5 md:ml-10 lg:ml-10 xl:ml-10">
-        <Image className="flex justify-center lg:w-[150px] xl:w-[150px] md:w-[150px]"
+        <Image
+          className="flex justify-center lg:w-[150px] xl:w-[150px] md:w-[150px] "
           src={logo}
-          width={79}
           height={32}
+          width={79}
           alt="Picture of the author"
         />
       </div>
