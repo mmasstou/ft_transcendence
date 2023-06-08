@@ -1,7 +1,7 @@
 .dashboard {
     display: grid;
     height: 100vh;
-    grid-template-columns: 0.6fr 3fr;
+    grid-template-columns: 0.4fr 3fr;
     grid-template-rows: 0.2fr 3fr;
     grid-template-areas: "header header "
                     "Sidebar main "
@@ -20,7 +20,6 @@ main {
 }
 
 #Sidebar {
-    background-color: blueviolet;
     grid-area: Sidebar;
 }
 
@@ -31,7 +30,7 @@ main {
     .dashboard{
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: 0.15fr 2fr 0.25fr;
+        grid-template-rows: 0.15fr 4fr 0.25fr; 
         grid-template-areas: "header "
                     "main "
                     "Sidebar";
