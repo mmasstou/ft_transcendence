@@ -39,8 +39,10 @@ const About = () => {
               width={600}
               height={500}
               className="object-cover p-0 m-4 z-[5] ml-5 pl-5"
+              style={{ width: '600px', height: '500px' }}
               src={about}
               alt="ping pong tabe image"
+              priority={false}
             />
             <div className="absolute z-[3] -left-1/2 top-0 w-[50%] h-[50%] rounded-full white__gradient" />
             <div className="absolute z-[0] -left-1/2 bottom-0 w-[50%] h-[50%] rounded-full pink__gradient" />

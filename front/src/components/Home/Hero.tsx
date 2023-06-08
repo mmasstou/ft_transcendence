@@ -36,6 +36,7 @@ const Hero = () => {
             alt="ping pong tabe image"
             width={500}
             height={500}
+            priority={false}
           />
           <div className="absolute z-[1] w-[80%] h-[80%] rounded-full bottom-30 white__gradient overfolw-hidden" />
           <div className="absolute z-[0] w-[50%] h-[50%] right-20 bottom-20 blue__gradient overfolw-hidden" />

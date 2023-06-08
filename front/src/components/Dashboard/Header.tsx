@@ -15,6 +15,7 @@ const Header = () => {
           height={32}
           width={79}
           alt="Picture of the author"
+          priority={false}
         />
       </div>
       <nav className="flex justify-center mr-5 md:mr-10 lg:mr-10 xl:mr-10">

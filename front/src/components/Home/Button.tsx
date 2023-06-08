@@ -44,6 +44,7 @@ const Button = ({login, style, title}: Btn) => {
               width={250}
               height={500}
               alt="Login vector"
+              priority={true}
             />
             <p className={`${styles.paragraph} text-[11px] lg:text[16px] p-2`}>
               You can login via these option :
