@@ -6,7 +6,7 @@ import OLdMessages from "../hooks/OLdMessages"
 import { messagesType } from "../types/types"
 import Message from "./chat.message"
 import Cookies from "js-cookie"
-
+import { Socket, io } from 'socket.io-client';
 
 interface MessagesProps {
     roomid: string
@@ -19,6 +19,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
     const params = useSearchParams()
     const [isMounted, setisMounted] = useState(false)
     const [_messages, setmessages]: any = useState([])
+    const [socket, setSocket] = useState<Socket | null>(null);
 
     let currentQuery: string | null = ''
     if (params) {
@@ -34,6 +35,23 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
 
     useEffect(() => {
         setisMounted(true)
+    
+    const socket: Socket = io("http://localhost:80");
+    setSocket(socket);
+
+    console.log("Socket :", socket)
+    socket && socket.emit("message", 'hello from client side');
+    // async function getMessage() {
+    //   const Meassagedata = await getMessages(boxMessage.data.data.name);
+    //   Meassagedata && console.log("getMessage :", Meassagedata);
+    //   Meassagedata && setMessages([...Meassagedata]);
+    // }
+    // getMessage();
+
+    return () => {
+      socket && socket.disconnect();
+    };
+       
     }, [])
 
     const token = Cookies.get('token')
@@ -47,7 +65,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
             console.log("_OLd_rooms :", _OLd_rooms.messages)
             setmessages(_OLd_rooms.messages)
         })();
-       
+
     }, [roomid, token])
 
     if (!isMounted)
@@ -56,8 +74,8 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
     console.log("_messages :", _messages)
 
     return <div className={` flex flex-col border-2 w-full m-auto h-full `}>
-        <div className="flex flex-col gap-2">
-            {_messages.length && _messages.map((item: messagesType, index: number) => (
+        <div className="flex flex-col gap-2 p-2 md:p-5 m-2 ">
+            {_messages && _messages.length && _messages.map((item: messagesType, index: number) => (
                 <Message key={index} content={item.content} id={item.id} senderId={item.senderId} roomsId={item.roomsId} created_at={item.created_at} updated_at={item.updated_at} />
             ))
             }

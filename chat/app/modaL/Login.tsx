@@ -46,12 +46,9 @@ const Login = () => {
             body: JSON.stringify(data),
         })
         if (token.status === 200){
-
             loginHook.onClose()
-            console.log("token :", token)
             const user_token = await token.json()
             Cookies.set("token", user_token.access_token)
-            router.refresh()
         }
     }
     const bodyContent = (

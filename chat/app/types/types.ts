@@ -27,3 +27,18 @@ export type RoomsType = {
   members: membersType[];
   messages: Message[];
 };
+
+
+export type userType ={
+    id: string,
+    login: string,
+    email: string,
+    password: string,
+    first_name: string,
+    last_name: string,
+    kind: string,
+    image: string,
+    is_active: boolean,
+    created_at: string,
+    updated_at: string
+}
