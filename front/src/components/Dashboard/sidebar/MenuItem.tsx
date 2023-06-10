@@ -10,10 +10,10 @@ interface Props {
 }
 
 const MenuItem : React.FC<Props> = ({isActive, icon: Icon, href}) => {
-  return  <li className='md:py-5 lg:py-5 xl:py-5 2xl:py-5'>
+  return  <li className=''>
         <Link href={href}>
-            <div className= {`relative ${isActive ? 'text-secondary border-2 border-secondary rounded-lg p-[5px] ' : 'text-white'} `} >
-                <Icon className={`w-[42px] h-[42px]  xl:w-[46px] xl:h-[46px] 2xl:w-[46px] 2xl:h-[46px]
+            <div className= {`relative ${isActive ? 'text-secondary  rounded-lg ' : 'text-white'} `} >
+                <Icon className={`w-full h-[42px] md:h-[46px] xl:h-[48px]  2xl:h-[54px]
                     
                 `}/>
             </div>

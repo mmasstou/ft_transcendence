@@ -10,15 +10,13 @@ const DesktopSidebar = () => {
     const router = usePathname();
 
   return (
-      <nav className="flex flex-col justify-between items-center">
-            <div className="">
-                <ul className="mt-10">
-                    <MenuItem isActive={router === '/profile'} href='/profile' icon={CgProfile}/>
-                    <MenuItem isActive={router === '/chat'} href='/chat' icon={AiFillWechat}/>
-                    <MenuItem isActive={router === '/users'} href='/users' icon={FaUsers}/>
-                    <MenuItem isActive={router === '/game'} href='/game' icon={IoLogoGameControllerB}/>
-                </ul>
-            </div>
+      <nav className="flex flex-col justify-between items-center h-full p-1">
+            <ul className="flex flex-col justify-center items-center gap-12 w-full h-full">
+                <MenuItem isActive={router === '/profile'} href='/profile' icon={CgProfile}/>
+                <MenuItem isActive={router === '/chat'} href='/chat' icon={AiFillWechat}/>
+                <MenuItem isActive={router === '/users'} href='/users' icon={FaUsers}/>
+                <MenuItem isActive={router === '/game'} href='/game' icon={IoLogoGameControllerB}/>
+            </ul>
         </nav>
   )
 }
