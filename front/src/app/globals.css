@@ -47,3 +47,12 @@ background: linear-gradient(to right, #C4E0E5, #4CA1AF);
   }
 }
 
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* For IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

@@ -1,7 +1,6 @@
 'use client'
 
 import OnlineUsers from "../hooks/OnlineUsers"
-import Modal from "./modaL"
 
 const OnlineUsersModaL = () => {
     const onLineUser = OnlineUsers()
