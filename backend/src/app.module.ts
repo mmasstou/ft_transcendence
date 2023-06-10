@@ -9,6 +9,7 @@ import { PrismaService } from './prisma.service';
 import { RoomsModule } from './rooms/rooms.module';
 import { MessagesModule } from './messages/messages.module';
 import { MembersModule } from './members/members.module';
+import { ChatGateway } from './chat.gateway';
 @Module({
   imports: [
     AuthModule,
@@ -19,7 +20,7 @@ import { MembersModule } from './members/members.module';
     MembersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UserService, PrismaService],
+  providers: [AppService, UserService, PrismaService, ChatGateway],
   exports: [UserService, PrismaService],
 })
 export class AppModule {}
