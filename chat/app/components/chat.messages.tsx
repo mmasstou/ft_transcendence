@@ -35,23 +35,17 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
 
     useEffect(() => {
         setisMounted(true)
-    
-    const socket: Socket = io("http://localhost:80");
-    setSocket(socket);
+        const socket: Socket = io("http://localhost:80/chat");
+        setSocket(socket);
 
-    console.log("Socket :", socket)
-    socket && socket.emit("message", 'hello from client side');
-    // async function getMessage() {
-    //   const Meassagedata = await getMessages(boxMessage.data.data.name);
-    //   Meassagedata && console.log("getMessage :", Meassagedata);
-    //   Meassagedata && setMessages([...Meassagedata]);
-    // }
-    // getMessage();
+        socket && socket.emit("message", 'hello from client side');
+        console.log("Socket :", socket.id)
+        
 
-    return () => {
-      socket && socket.disconnect();
-    };
-       
+        return () => {
+            socket && socket.disconnect();
+        };
+
     }, [])
 
     const token = Cookies.get('token')
