@@ -1,8 +1,8 @@
 .dashboard {
     display: grid;
     height: 100vh;
-    grid-template-columns: 0.4fr 3fr;
-    grid-template-rows: 0.2fr 3fr;
+    grid-template-columns: 6rem auto;
+    grid-template-rows: 6vh auto;
     grid-template-areas: "header header "
                     "Sidebar main "
                     "Sidebar main ";
@@ -15,7 +15,7 @@ header {
 }
 
 main {
-    background-color: blue;
+    border: 2px solid rgb(135, 135, 240);
     grid-area: main;
 }
 
@@ -30,7 +30,7 @@ main {
     .dashboard{
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: 0.15fr 4fr 0.25fr; 
+        grid-template-rows: 6vh auto 4vh; 
         grid-template-areas: "header "
                     "main "
                     "Sidebar";
