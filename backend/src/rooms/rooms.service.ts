@@ -19,7 +19,7 @@ export class RoomsService {
   async findOne(params: { name: string }): Promise<Rooms> {
     try {
       const { name } = params;
-      console.log('++findOne++>', name);
+      // console.log('++findOne++>', name);
       const room = await this.prisma.rooms.findUnique({
         where: { name },
       });
@@ -77,7 +77,7 @@ export class RoomsService {
 
   async update(params: { id: string; data: UpdateRoomDto }): Promise<Rooms> {
     const { id, data } = params;
-    console.log('++update++>', id);
+    // console.log('++update++>', id);
 
     return await this.prisma.rooms.update({
       data,
@@ -86,7 +86,7 @@ export class RoomsService {
   }
 
   async remove(id: string): Promise<Rooms> {
-    console.log('++remove++>', id);
+    // console.log('++remove++>', id);
 
     return await this.prisma.rooms.delete({
       where: { id },
@@ -105,8 +105,8 @@ export class RoomsService {
       const roomIId = await this.prisma.rooms.findUnique({
         where: { id: dep.roomId },
       });
-      console.log('User :', User);
-      console.log('roomIId :', roomIId);
+      // console.log('User :', User);
+      // console.log('roomIId :', roomIId);
 
       const message = await this.prisma.messages.create({
         data: {
@@ -120,7 +120,7 @@ export class RoomsService {
         },
       });
 
-      console.log('message :', message);
+      // console.log('message :', message);
       const room = this.prisma.rooms.update({
         where: { id: dep.roomId },
         data: {

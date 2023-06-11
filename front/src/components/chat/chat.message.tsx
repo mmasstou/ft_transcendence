@@ -32,23 +32,23 @@ const Message = (props: messagesType) => {
     //     updated_at: ""
     // })
     const [create_At, setcreate_At] = useState("")
-    // console.log("props :", props)
+    // // console.log("props :", props)
 
 
     useEffect(() => {
         const token = Cookies.get("token");
         (async function getsenderInfo() {
-            console.log("props.senderId :", props.senderId)
-             await fetch(`http://127.0.0.1/users/${props.senderId}`, {
+            // console.log("props.senderId :", props.senderId)
+             await fetch(`http://10.12.10.15/users/${props.senderId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             }).then(res => res.json()).then((data : userType) => setsenderInfo(data))
-            // console.log("props.senderId :", _OLd_rooms.messages)
+            // // console.log("props.senderId :", _OLd_rooms.messages)
             // setmessages(_OLd_rooms.messages)
         })();
         // (async function getsenderInfo() {
-        //      await fetch(`http://127.0.0.1/users/${props.roomsId}`, {
+        //      await fetch(`http://10.12.10.15/users/${props.roomsId}`, {
         //         headers: {
         //             Authorization: `Bearer ${token}`,
         //         },

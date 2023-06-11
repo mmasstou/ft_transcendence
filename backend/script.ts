@@ -11,7 +11,7 @@ async function main() {
       is_active: true,
     },
   });
-  console.log(user);
+  // console.log(user);
 }
 
 main()

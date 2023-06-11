@@ -23,7 +23,7 @@ const ChatMain = () => {
     }
 
     isMounted && window.addEventListener('resize', () => setW(window.innerWidth))
-    console.log("currentQuery :", currentQuery)
+    // console.log("currentQuery :", currentQuery)
     // useEffect(() => {
     //     const { query } = router;
 
