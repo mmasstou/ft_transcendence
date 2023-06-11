@@ -7,7 +7,7 @@ import { messagesType } from "@/types/types"
 import Message from "./chat.message"
 import Cookies from "js-cookie"
 import { Socket, io } from 'socket.io-client';
-
+import {messageSocket} from "@/types/types"
 interface MessagesProps {
     roomid: string
 }
@@ -18,6 +18,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
 
     const params = useSearchParams()
     const [isMounted, setisMounted] = useState(false)
+    const [input, setInputValue] = useState("")
     const [_messages, setmessages]: any = useState([])
     const [socket, setSocket] = useState<Socket | null>(null);
 
@@ -38,7 +39,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
         const socket: Socket = io("http://localhost:80/chat");
         setSocket(socket);
 
-        socket && socket.emit("message", 'hello from client side');
+        socket && socket.emit("sendMessage", 'hello from client side');
        
         
 
@@ -47,6 +48,8 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
         };
 
     }, [])
+
+
 
     const token = Cookies.get('token')
     useEffect(() => {
@@ -62,7 +65,28 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
 
     }, [roomid, token])
 
-    if (!isMounted)
+    useEffect(() =>{
+         console.log("socket.on")
+        socket && socket.on('message', (data : any) => {
+            console.log("socket.on('message', (data : any) => :", data)
+            // setmessages(data)
+        })
+    }, [socket])
+
+    const handleSubmit = (e: any) => {
+        e.preventDefault();
+        const messageSocket : messageSocket = {
+            
+        }
+        // if (message) {
+        //   console.log("----+>", message);
+        //   socket && socket.emit("sendMessage", message, () => setMessage(""));
+        // }
+        console.log(`Message sended .. |${e.target.value}`)
+        setInputValue("");
+      };
+
+    if (!isMounted) 
         return null
 
     console.log("_messages :", _messages)
@@ -75,7 +99,20 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
             }
         </div>
         <div className="absolute bottom-3 md:bottom-1 sm:bottom-0 left-0 w-full ">
-            <input className=" w-full h-[42px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded" placeholder={`Message @'mmasstou'`} type="search" name="" id="" />
+            <input 
+            className=" w-full h-[42px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded" 
+            onSubmit={handleSubmit}
+            onKeyDown={(event) =>
+                event.key === "Enter" ? handleSubmit(event) : null
+              }
+            onChange={(event) => {
+                setInputValue(event.target.value);
+              }}
+            value={input} 
+            placeholder={`Message @'mmasstou'`} 
+            type="search" 
+            name="" 
+            id="" />
         </div>
     </div>
 }

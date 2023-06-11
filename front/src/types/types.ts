@@ -18,6 +18,7 @@ export type messagesType = {
   created_at: string;
   updated_at: string;
 };
+
 export type RoomsType = {
   id: string;
   name: string;
@@ -41,4 +42,9 @@ export type userType ={
     is_active: boolean,
     created_at: string,
     updated_at: string
+}
+
+export type messageSocket = {
+  roomId: string,
+  messageContent: string,
 }
