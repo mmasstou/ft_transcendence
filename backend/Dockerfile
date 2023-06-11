@@ -4,12 +4,14 @@ WORKDIR /app
 
 COPY ./package.json ./
 
+RUN npm install -g prisma
+
 
 RUN npm i
 
 COPY . .
 
 
-ENTRYPOINT [ "sh", "tools/init.sh" ]
+ENTRYPOINT [ "sh", "/app/tools/init.sh" ]
 # ENTRYPOINT [ "npm run start:dev" ]
-# CMD [ "npm run start:dev" ]
+CMD [ "npx prisma studio" ]

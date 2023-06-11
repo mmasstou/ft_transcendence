@@ -1,27 +1,38 @@
 version: '3'
 services:
-  # backend:
-  #   build: backend/
-  #   container_name: backend
-  #   env_file:
-  #     - backend/.env
-  #   ports:
-  #     - 6000:6000
-  #   networks:
-  #     - APInetwork
-  #   volumes:
-  #     - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
+  frontend:
+    build: front/
+    container_name: frontend
+    ports:
+      - 3000:3000
+      - 5430:5430
+    networks:
+      - APInetwork
+    depends_on:
+      - backend
+      - database
+    volumes:
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/src:/frontend/src:rw
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
+  backend:
+    build: backend/
+    container_name: backend
+    env_file:
+      - backend/.env
+    ports:
+      - 80:80
+    networks:
+      - APInetwork
+    depends_on:
+      - database
+    volumes:
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
     image: postgres:13
     container_name: database
     env_file:
       - backend/.env
-    environment:
-      POSTGRES_PASSWORD: "mmasstou_012345"
-      POSTGRES_USER: "mmasstou"
-      POSTGRES_DB: "db_chat"
-      POSTGRES_HOST: "localhost"
-      POSTGRES_PORT: 5432
     ports:
       - 5432:5432
     networks:
@@ -29,7 +40,6 @@ services:
     volumes:
       - /Users/mmasstou/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
   
-
 networks:
   APInetwork:
     driver: bridge
