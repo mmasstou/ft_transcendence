@@ -10,14 +10,14 @@ export class UserService {
 
   async findOne(params: { login: string }): Promise<User> {
     const { login } = params;
-    console.log('++findOne++>', login);
+    // console.log('++findOne++>', login);
     return await this.prisma.user.findUnique({
       where: { id :login },
     });
   }
   async findOneID(params: { login: string }): Promise<User> {
     const { login } = params;
-    console.log('++findOne++>', login);
+    // console.log('++findOne++>', login);
     return await this.prisma.user.findUnique({
       where: {login },
     });
@@ -40,7 +40,7 @@ export class UserService {
 
   async update(params: { id: string; data: UpdateUserDto }): Promise<User> {
     const { id, data } = params;
-    console.log('++update++>', id);
+    // console.log('++update++>', id);
 
     return await this.prisma.user.update({
       data,
@@ -49,7 +49,7 @@ export class UserService {
   }
 
   async remove(id: string): Promise<User> {
-    console.log('++remove++>', id);
+    // console.log('++remove++>', id);
 
     return await this.prisma.user.delete({
       where: { id },

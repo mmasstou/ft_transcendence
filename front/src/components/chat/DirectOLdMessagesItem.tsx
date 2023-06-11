@@ -29,7 +29,7 @@ const DirectOLdMessagesItem = (props : {data : RoomsType , isActive : boolean,  
             <div className={`content flex flex-col  w-full`}>
                 <div className="heading flex flex-row  justify-between items-center">
                     <h2>{props.data.name}</h2>
-                    <span className="text-[10px]">{props.data.created_at}</span>
+                    {/* <span className="text-[10px]">{props.data.created_at}</span> */}
                 </div>
                 <div className="Last.Message  text-[12px] text-[#C4C4C4]">{props.data.messages.length && props.data.messages[props.data.messages.length - 1].content} </div>
             </div>

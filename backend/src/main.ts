@@ -10,7 +10,7 @@ async function bootstrap() {
   });
   app.useWebSocketAdapter(new SocketAdapter(app));
   await app.listen(_PORT, () => {
-    console.log(`backend start on the port ${_PORT}`);
+    // console.log(`backend start on the port ${_PORT}`);
   });
 }
 bootstrap();

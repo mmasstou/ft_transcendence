@@ -14,7 +14,7 @@ export class MembersService {
   async findOne(params: { id: string }): Promise<Members> {
     try {
       const { id } = params;
-      console.log('++findOne||++>', id);
+      // console.log('++findOne||++>', id);
       const message = await this.prisma.members.findUnique({
         where: { id },
       });
@@ -67,7 +67,7 @@ export class MembersService {
     type: Prisma.EnumUserTypeFieldUpdateOperationsInput;
   }): Promise<Members> {
     const { id, type } = params;
-    console.log('++update++>', id);
+    // console.log('++update++>', id);
 
     return await this.prisma.members.update({
       data: { type },
@@ -76,7 +76,7 @@ export class MembersService {
   }
 
   async remove(id: string): Promise<Members> {
-    console.log('++remove++>', id);
+    // console.log('++remove++>', id);
 
     return await this.prisma.members.delete({
       where: { id },
