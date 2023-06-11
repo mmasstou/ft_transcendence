@@ -9,7 +9,7 @@ import Modal from "@/components/modals/Modal";
 export default function Home() {
     return (
         <>
-        <div className="bg-[#161F1E] h-screen overflow-scroll ">
+        <div className="bg-[#161F1E] h-screen overflow-auto  scroll-smooth">
             <Head>
                 <title>Transcendence</title>
             </Head>

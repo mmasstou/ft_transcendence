@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react";
-import SidebarMobile from "./SidebarMobile";
-import DesktopSidebar from "../DesktopSidebar";
+import SidebarMobile from "./sidebar/SidebarMobile";
+import DesktopSidebar from "./sidebar/DesktopSidebar";
 
 const Sidebar = () => {
     const [isMobile, setIsMobile] = useState(false);

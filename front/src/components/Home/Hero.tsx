@@ -8,6 +8,8 @@ import BackgroundCircles from './BackgroundCircles';
 
 
 const Hero = () => {
+  const AnimatedImage = motion(Image);
+
   return (
     <section className={`${styles.paddingY} ${styles.flexCenter} flex-col lg:flex-row  
               md:p-5 sm:mt-10 mt-10 lg:mt-0 z-10`}>
@@ -30,9 +32,13 @@ const Hero = () => {
             <BackgroundCircles />
           </div>
           <div className="relative lg:m-[100px] xl:m-[120px] flex items-center justify-center">
-          <Image
+          <AnimatedImage
           className="object-fit z-[5]"
             src={table}
+            initial={{opacity: 0, x: 1}}
+            animate={{opacity: 1, x: 0, x1: -50, x2: 0}}
+
+            transition={{duration: 1.5}}
             alt="ping pong tabe image"
             width={500}
             height={500}

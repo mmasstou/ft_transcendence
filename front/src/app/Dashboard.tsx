@@ -1,7 +1,7 @@
 import { ReactElement } from 'react'
 import  './dashboard.css'
 import Header from '@/components/Dashboard/Header'
-import Sidebar from '@/components/Dashboard/sidebar/Sidebar'
+import Sidebar from '@/components/Dashboard/Sidebar'
 interface Props {
     children: React.ReactNode,
 }
@@ -14,11 +14,11 @@ const Dashboard = ({children} : Props) => {
        <Header/>
       </header>
 
-      <main className="">
+      <main>
         {children}
       </main>
 
-      <div id="Sidebar" className="">
+      <div id="Sidebar">
         <Sidebar />
       </div>
 

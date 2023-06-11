@@ -45,5 +45,8 @@ background: linear-gradient(to right, #C4E0E5, #4CA1AF);
     left: 50%;
     transform: translate(-50%, -50%);
   }
+  .banner {
+    height: 200px;
+  }
 }
 

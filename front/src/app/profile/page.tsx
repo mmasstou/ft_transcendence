@@ -1,9 +1,11 @@
+import ImageUpload from '@/components/profile/ImageUpload'
 import Dashboard from '../Dashboard'
+
 
 const Profile = () => {
   return (
     <Dashboard>
-      Main content
+      <ImageUpload />
     </Dashboard>
   )
 }

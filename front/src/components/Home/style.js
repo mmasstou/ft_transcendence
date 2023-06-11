@@ -8,8 +8,8 @@ const styles = {
                  w-full xl:leading-[55px font-changa",
     flexCenter: "flex justify-center items-center",
     flexStart: "flex justify-start items-start",
-    paragraph: "text-tertiary mt-5 text-[15px] font-lato ml-5 mr-5 leading-6 \
-                font-normal max-w-[470px] lg:text-start lg:ml-0 lg:mr-0 font-lato",
+    paragraph: "text-tertiary mt-5 text-[15px]  ml-5 mr-5 leading-6 \
+                font-normal max-w-[470px] lg:text-start lg:ml-0 lg:mr-0 ",
 }
 
 export default styles;
