@@ -18,6 +18,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
 
     const params = useSearchParams()
     const [isMounted, setisMounted] = useState(false)
+    const [userId, setuserId] = useState("")
     const [_messages, setmessages]: any = useState([])
     const [socket, setSocket] = useState<Socket | null>(null);
 
@@ -25,22 +26,31 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
     if (params) {
         currentQuery = params?.get('room')
     }
-    currentQuery && console.log("currentQuery :", currentQuery)
+    // currentQuery &&  console.log("currentQuery :", currentQuery)
     // useEffect(() => {
     //     const { query } = router;
 
     //     // Access specific query parameters
     //     const id = query.message as string;
     // }, [router])
-
+    
+    const token = Cookies.get('token')
     useEffect(() => {
         setisMounted(true)
         const socket: Socket = io("http://localhost:80/chat");
         setSocket(socket);
 
         socket && socket.emit("message", 'hello from client side');
-        console.log("Socket :", socket.id)
-        
+        // console.log("Socket :", socket.id)
+        (async function getLoginId() {
+            const userId = await fetch(`http://10.12.10.15/user/login`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }).then(res => res.json())
+            // console.log("_OLd_rooms :", _OLd_rooms.messages)
+            setuserId(userId)
+        })();
 
         return () => {
             socket && socket.disconnect();
@@ -48,15 +58,14 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
 
     }, [])
 
-    const token = Cookies.get('token')
     useEffect(() => {
         (async function getOLdMessages() {
-            const _OLd_rooms = await fetch(`http://127.0.0.1/rooms/messages/${roomid}`, {
+            const _OLd_rooms = await fetch(`http://10.12.10.15/rooms/messages/${roomid}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             }).then(res => res.json())
-            console.log("_OLd_rooms :", _OLd_rooms.messages)
+            // console.log("_OLd_rooms :", _OLd_rooms.messages)
             setmessages(_OLd_rooms.messages)
         })();
 
@@ -65,7 +74,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
     if (!isMounted)
         return null
 
-    console.log("_messages :", _messages)
+    // console.log("_messages :", _messages)
 
     return <div className={` flex flex-col border-2 w-full m-auto h-full `}>
         <div className="flex flex-col gap-2 p-2 md:p-5 m-2 ">

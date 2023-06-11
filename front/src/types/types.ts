@@ -45,6 +45,7 @@ export type userType ={
 }
 
 export type messageSocket = {
+  userId: string,
   roomId: string,
   messageContent: string,
 }

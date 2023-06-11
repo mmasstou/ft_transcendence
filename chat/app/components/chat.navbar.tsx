@@ -34,11 +34,11 @@ const ChatNavbar = () => {
             <div  >
                 {oLdMessages.IsOpen
                     ? <BsReverseLayoutSidebarInsetReverse onClick={()=>{
-                        console.log('oLdMessages.onClose()')
+                        // console.log('oLdMessages.onClose()')
                         oLdMessages.onClose()
                     }} className="flex" size={24} />
                     : <BsLayoutSidebarInset onClick={() => {
-                        console.log("btn clicked !")
+                        // console.log("btn clicked !")
                         oLdMessages.onOpen(InitOLdMessages)
                         onLineUser.IsOpen && onLineUser.onClose()
                     }} className="flex z-10" size={24} />

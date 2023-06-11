@@ -34,10 +34,10 @@ const Login = () => {
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {
 
 
-        console.log("Data :", data)
+        // console.log("Data :", data)
         const API_PATH = process.env.API_URL
-        console.log("API_PATH :", API_PATH)
-        const token = await fetch(`http://127.0.0.1/auth/login`, {
+        // console.log("API_PATH :", API_PATH)
+        const token = await fetch(`http://10.12.10.15/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

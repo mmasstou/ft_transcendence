@@ -25,7 +25,7 @@ const Chat = () => {
                 image: ''
             }
         ]
-        // console.log("window.innerWidth :", windowresize)
+        // // console.log("window.innerWidth :", windowresize)
         if (windowresize >= 1158 && !oLdMessages.default && !oLdMessages.IsOpen) {
             oLdMessages.onOpen(InitOLdMessages)
             oLdMessages.setDefault(!oLdMessages.default)
