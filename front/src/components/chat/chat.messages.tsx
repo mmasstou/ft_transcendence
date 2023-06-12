@@ -1,7 +1,7 @@
 'use client'
 import { useSearchParams } from "next/navigation"
 import OnlineUsers from "@/hooks/OnlineUsers"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import OLdMessages from "@/hooks/OLdMessages"
 import { messagesType } from "@/types/types"
 import Message from "./chat.message"
@@ -21,8 +21,11 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
     const [userId, setuserId] = useState("")
     const [input, setInputValue] = useState("")
     const [_messages, setmessages]: any = useState([])
+    const [message, setMessage] = useState("");
+
     const [socket, setSocket] = useState<Socket | null>(null);
     const token = Cookies.get('token')
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     let currentQuery: string | null = ''
     if (params) {
@@ -55,7 +58,11 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
         })();
 
 
-        const socket: Socket = io("http://localhost:80/chat");
+        const socket: Socket = io("http://localhost:80/chat", {
+            auth: {
+                token: `${token}`
+            }
+        });
         setSocket(socket);
 
         socket && socket.emit("sendMessage", 'hello from client side');
@@ -72,7 +79,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
 
     useEffect(() => {
         (async function getOLdMessages() {
-            const _OLd_rooms = await fetch(`http://10.12.10.15/rooms/messages/${roomid}`, {
+            const _OLd_rooms = await fetch(`http://10.12.9.12/rooms/messages/${roomid}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -88,37 +95,51 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
     useEffect(() => {
         // console.log("socket.on")
         socket && socket.on('message', (data: any) => {
-            console.log("socket.on('message', (data : any) => :", data)
-            // setmessages(data)
+            console.log("socket.on('message', (data : any) => :", [data])
+            setmessages([..._messages, data])
         })
-    }, [socket])
+    }, [socket, _messages, message])
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
 
-        console.log("userId :", userId)
-        const messageSocket: messageSocket = {
-            userId: userId,
-            roomId: roomid,
-            messageContent: e.target.value
-        }
-        // if (message) {
+        if (message) {
+            console.log("userId :", userId)
+            const messageSocket: messageSocket = {
+                roomId: roomid,
+                messageContent: message
+            }
+            // if (message) {
 
-        socket && socket.emit("sendMessage", messageSocket);
-        // }
-        // console.log(`Message sended .. |${e.target.value}`)
-        setInputValue("");
+            socket && socket.emit("sendMessage", messageSocket, () => setmessages(""));
+            // }
+            // console.log(`Message sended .. |${e.target.value}`)
+            setInputValue("");
+        }
     };
+
+    useEffect(() => {
+        if (scrollRef.current) {
+          const scrollableContent = scrollRef.current;
+          scrollableContent.scrollTop = (scrollableContent.scrollHeight - scrollableContent.clientHeight);
+          console.log("scrollableContent.scrollTop :", scrollableContent.scrollTop)
+          console.log("scrollableContent.scrollHeight :", scrollableContent.scrollHeight)
+          console.log("scrollableContent.clientHeight :", scrollableContent.clientHeight)
+        }
+      }, [_messages]);
 
     if (!isMounted)
         return null
 
     // console.log("_messages :", _messages)
     // socket && console.log("Socket :", socket.id)
-    console.log("+2+| userId :", userId)
+    console.log("+>| message :", message)
+    console.log("+>| message :", message)
 
     return <div className={`relative flex flex-col border-2 w-full m-auto   h-full `}>
-        <div className=" relative flex flex-col gap-2 p-2 md:p-5 md:pb-0 m-2 max-h-[81vh] md:max-h-[85vh] overflow-x-scroll">
+        <div 
+        ref={scrollRef}
+        className="relative flex flex-col gap-2 p-2 md:p-5 md:pb-2 m-2 h-[81vh] md:h-[85vh] overflow-x-scroll overflow-y-auto" >
             {_messages && _messages.length && _messages.map((item: messagesType, index: number) => (
                 <Message key={index} content={item.content} id={item.id} senderId={item.senderId} roomsId={item.roomsId} created_at={item.created_at} updated_at={item.updated_at} />
             ))
@@ -127,12 +148,19 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
         <div className="absolute bottom-3 md:bottom-1 sm:bottom-0 left-0 w-full ">
             <input
                 className=" w-full h-[42px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
-                onSubmit={handleSubmit}
+                onSubmit={(event : any) => {
+                    handleSubmit(event)
+                    setMessage(event.target.value);
+                    // setMessage((event.target.value)
+                }
+                }
                 onKeyDown={(event) =>
                     event.key === "Enter" ? handleSubmit(event) : null
+
                 }
                 onChange={(event) => {
                     setInputValue(event.target.value);
+                    setMessage(event.target.value);
                 }}
                 value={input}
                 placeholder={`Message @'mmasstou'`}

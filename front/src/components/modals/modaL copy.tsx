@@ -27,6 +27,7 @@ interface ModalProps {
     Disabled?: boolean;
     secondaryAction?: () => void;
     secondaryActionLable?: string;
+    overlay?:boolean
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -44,6 +45,7 @@ const Modal: React.FC<ModalProps> = ({
     Disabled,
     secondaryAction,
     secondaryActionLable,
+    overlay
 }) => {
 
     const handlOnSubmit = useCallback(() => {
@@ -56,7 +58,7 @@ const Modal: React.FC<ModalProps> = ({
         return null
 
     return (
-        <div className=" top-0 right-0  absolute w-screen h-screen  bg-[#243230] dark:bg-[#292c33ed] z-50 flex flex-col gap-3 justify-center items-center">
+        <div className={` top-0 right-0  absolute w-screen h-screen ${overlay && ' bg-[#243230] dark:bg-[#292c33ed]'} z-50 flex flex-col gap-3 justify-center items-center`}>
             <div className="flex flex-col gap-4  p-8 sm:p-20 justify-center items-center h-full w-full" >
               {body}
             </div>

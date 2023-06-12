@@ -31,13 +31,13 @@ const Login = () => {
         }
     });
 
-    const onSubmit: SubmitHandler<FieldValues> = async (data : any) => {
+    const onSubmit: SubmitHandler<FieldValues> = async (data: any) => {
 
 
         // console.log("Data :", data)
         const API_PATH = process.env.API_URL
         // console.log("API_PATH :", API_PATH)
-        const token = await fetch(`http://10.12.10.15/auth/login`, {
+        const token = await fetch(`http://10.12.9.12/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -45,7 +45,7 @@ const Login = () => {
             },
             body: JSON.stringify(data),
         })
-        if (token.status === 200){
+        if (token.status === 200) {
             loginHook.onClose()
             const user_token = await token.json()
             Cookies.set("token", user_token.access_token)
@@ -55,6 +55,7 @@ const Login = () => {
         <div className="flex flex-col gap-4 w-full sm:w-[440px]  sm:h-[260px] bg-[#243230] p-4">
             <div className="flex flex-col gap-4">
                 <Input
+                    onChange={() => { }}
                     id='username'
                     lable="username"
                     disabled={isLoading}
@@ -63,6 +64,7 @@ const Login = () => {
                     required
                 />
                 <Input
+                    onChange={() => { }}
                     id='password'
                     lable="password"
                     type="password"

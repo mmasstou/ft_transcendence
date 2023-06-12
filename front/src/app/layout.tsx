@@ -2,6 +2,7 @@
 import Login from '@/components/modals/Login';
 import './globals.css';
 import { Changa, Lato } from 'next/font/google';
+import NewMessage from '@/components/modals/NewMessage';
 
 
 const changa = Changa({ 
@@ -27,6 +28,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode;})
     return (
         <html lang="en" >
             <Login />
+            <NewMessage />
             <body className= {`${changa.variable} ${lato.variable}`} suppressHydrationWarning={true}>
 				{children}
             </body>
