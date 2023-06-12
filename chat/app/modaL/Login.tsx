@@ -37,7 +37,7 @@ const Login = () => {
         // console.log("Data :", data)
         const API_PATH = process.env.API_URL
         // console.log("API_PATH :", API_PATH)
-        const token = await fetch(`http://10.12.10.15/auth/login`, {
+        const token = await fetch(`http://10.12.9.12/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -45,7 +45,7 @@ const Login = () => {
             },
             body: JSON.stringify(data),
         })
-        if (token.status === 200){
+        if (token.status === 200) {
             loginHook.onClose()
             const user_token = await token.json()
             Cookies.set("token", user_token.access_token)
