@@ -43,7 +43,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
         socket && socket.emit("message", 'hello from client side');
         // console.log("Socket :", socket.id)
         (async function getLoginId() {
-            const userId = await fetch(`http://10.12.10.15/user/login`, {
+            const userId = await fetch(`http://10.12.9.12/user/login`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -60,7 +60,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
 
     useEffect(() => {
         (async function getOLdMessages() {
-            const _OLd_rooms = await fetch(`http://10.12.10.15/rooms/messages/${roomid}`, {
+            const _OLd_rooms = await fetch(`http://10.12.9.12/rooms/messages/${roomid}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

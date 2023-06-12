@@ -10,7 +10,8 @@ interface InputProps {
     disabled?: boolean
     required?: boolean
     register: UseFormRegister<FieldValues>
-    errors: FieldErrors
+    errors: FieldErrors,
+    onChange : (event : any) => void;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -20,7 +21,8 @@ const Input: React.FC<InputProps> = ({
     disabled,
     required,
     register,
-    errors
+    errors,
+    onChange
 }) => {
     const [inputValue, setInputValue] = useState("");
     return (
@@ -31,7 +33,10 @@ const Input: React.FC<InputProps> = ({
                 placeholder=" "
                 type={type}
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={(e) => {
+                    setInputValue(e.target.value)
+                    onChange(e)
+                }}
                 disabled={disabled}
                 className={`
              peer w-full p-2 pt-6 text-xl bg-transparent text-[var(--white)] focus:bg-transparent font-light border rounded-md outline-none transition disabled:opacity-70 disabled:cursor-not-allowed
