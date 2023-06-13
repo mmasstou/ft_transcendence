@@ -9,6 +9,8 @@ import OLdMessages from "@/hooks/OLdMessages"
 import { useSearchParams } from "next/navigation"
 import qs from 'query-string'
 import {Message as MessageType} from "@/types/types"
+import { Socket, io } from "socket.io-client"
+import Cookies from "js-cookie"
 
 const ChatMain = () => {
     const [messages, setmessages] : MessageType[] | any[] = useState([])
@@ -17,6 +19,9 @@ const ChatMain = () => {
     const onLineUser = OnlineUsers()
     const oLdMessages = OLdMessages()
     const params = useSearchParams()
+    const token = Cookies.get('token')
+    const [socket, setSocket] = useState<Socket | null>(null);
+
     let currentQuery: string | null = ''
     if (params) {
         currentQuery = params?.get('room')
@@ -31,8 +36,27 @@ const ChatMain = () => {
     //     const id = query.message as string;
     // }, [router])
     useEffect(() => {
-       
-    }, [currentQuery])
+        const socket: Socket = io("http://localhost:80/chat", {
+            auth: {
+                token: `${token}`
+            }
+        });
+        setSocket(socket);
+
+        // const messageSocket: messageSocket = {
+        //     roomId: roomid,
+        //     messageContent: message
+        // }
+        // // if (message) {
+
+        // socket && socket.emit("sendMessage", messageSocket, () => setmessages(""));
+
+
+
+        return () => {
+            socket && socket.disconnect();
+        };
+    }, [])
 
     useEffect(() => {
         setisMounted(true)
@@ -42,7 +66,7 @@ const ChatMain = () => {
         return null
 
     return <div className={`border border-orange-300 h-full ${onLineUser.IsOpen ? 'hidden' : ''} sm:flex`}>
-        <DirectOLdMessages />
+        {socket && <DirectOLdMessages socket={socket} />}
         {currentQuery  && <Messages roomid={currentQuery} />}
     </div>
 }
