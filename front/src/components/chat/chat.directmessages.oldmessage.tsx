@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation"
 import OnlineUsers from "@/hooks/OnlineUsers"
 import OLdMessages from "@/hooks/OLdMessages"
 import { RoomsType } from "@/types/types"
+import { Socket } from "socket.io-client"
 
 const OldMessages = [
     {
@@ -25,7 +26,7 @@ const OldMessages = [
     }
 ]
 
-const DirectOLdMessages = () => {
+const DirectOLdMessages = (props : {socket : Socket}) => {
     const [isMounted, setisMounted] = useState(false)
     const [WindowsSize, setWindowsSize] = useState(0)
     const [OLdrooms, setOLdRooms] = useState([])
@@ -55,7 +56,7 @@ const DirectOLdMessages = () => {
             // console.log("_OLd_rooms :", _OLd_rooms)
             setOLdRooms(_OLd_rooms)
          })();
-    }, [token])
+    }, [token, currentQuery])
 
     useEffect(() => {
         setisMounted(true);
@@ -70,9 +71,12 @@ const DirectOLdMessages = () => {
 
     `}>
         <div className="w-full">
-            {OLdrooms.length && OLdrooms.map((item : RoomsType, index) =>(
+            {OLdrooms.length 
+            ? OLdrooms.map((item : RoomsType, index) =>(
                 <DirectOLdMessagesItem key={index} OnClick={handleClick} isActive={currentQuery === item.id} image={"/avatar.jpg"} data={item}  />
-            ))}
+            ))
+            : <div>No contacts</div>
+        }
             
         </div>
     </div>

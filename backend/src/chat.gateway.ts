@@ -53,6 +53,16 @@ export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
+  @SubscribeMessage('joinroom')
+  async joinRoom(
+    @MessageBody() data: { roomId: string; messageContent: string },
+  ) {
+    try {
+      console.log('+++++++++joinroom++++++++++|> MessageBody :', data);
+      console.log('+++++++++joinroom++++++++++|> sendMessage :', _User);
+    } catch (error) {}
+  }
+
   @SubscribeMessage('sendMessage')
   async handleEvent(
     @MessageBody() data: { roomId: string; messageContent: string },

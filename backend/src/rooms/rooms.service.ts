@@ -8,12 +8,18 @@ import { Messages, Rooms } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateRoomDto } from './dtos/UpdateRoomDto';
 import { MembersService } from 'src/members/members.service';
+import { MessagesService } from 'src/messages/messages.service';
 
+enum RoomType {
+  PUBLIC = 'PUBLIC',
+  PRIVATE = 'PRIVATE',
+}
 @Injectable()
 export class RoomsService {
   constructor(
     private prisma: PrismaService,
     private membersservice: MembersService,
+    private messageservice: MessagesService,
   ) {}
 
   async findOne(params: { name: string }): Promise<Rooms> {
@@ -39,17 +45,29 @@ export class RoomsService {
     });
   }
 
-  async create(data: { name: string; userId: string }): Promise<Rooms> {
+  async create(data: {
+    name: string;
+    userId: string;
+    type: string;
+  }): Promise<Rooms> {
     try {
+      const _type: any =
+        data.type === RoomType.PRIVATE ? RoomType.PRIVATE : RoomType.PUBLIC;
       const room: Rooms = await this.prisma.rooms.create({
-        data: { name: data.name },
+        data: { name: data.name, type: _type },
       });
-
-      const mumber: any = this.membersservice.create({
+      const mumber: any = await this.membersservice.create({
         type: 'ADMIN',
         user: data.userId,
         roomId: room.id,
       });
+
+      const _message = await this.messageservice.create({
+        content: `welcome to private channel ! admin : ${mumber.user}`,
+        userId: data.userId,
+        roomId: room.id,
+      });
+      console.log('Ana Hana :', mumber);
 
       return await this.prisma.rooms.update({
         where: {
@@ -58,6 +76,9 @@ export class RoomsService {
         data: {
           members: {
             connect: { id: mumber.id },
+          },
+          messages: {
+            connect: { id: _message.id },
           },
         },
       });
@@ -86,11 +107,46 @@ export class RoomsService {
   }
 
   async remove(id: string): Promise<Rooms> {
-    // console.log('++remove++>', id);
+    console.log('++remove++>', id);
 
-    return await this.prisma.rooms.delete({
-      where: { id },
-    });
+    try {
+      const room = await this.prisma.rooms.findUnique({
+        where: { id },
+        include: { members: true },
+      });
+
+      if (!room) {
+        throw new NotFoundException(`Room with ID ${id} not found`);
+      }
+
+      // Delete all associated Members entities first
+      const mmrs = await this.prisma.members.deleteMany({
+        where: { roomsId: id },
+      });
+      console.log('mmrs :', mmrs);
+
+      // Delete all associated Members entities first
+      const rms = await this.prisma.messages.deleteMany({
+        where: { roomsId: id },
+      });
+      console.log('rms :', rms);
+
+      return await this.prisma.rooms.delete({
+        where: { id },
+      });
+    } catch (error) {
+      console.log('+++> error :', error);
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: `CAN'T ROMOVE ROOM ${id}`,
+        },
+        HttpStatus.FORBIDDEN,
+        {
+          cause: error,
+        },
+      );
+    }
   }
 
   async AddMessage(dep: {
@@ -234,13 +290,13 @@ export class RoomsService {
       );
     }
   }
-  async getaLLmessages(messageId : string) {
+  async getaLLmessages(messageId: string) {
     try {
       const message = await this.prisma.rooms.findUnique({
         where: { id: messageId },
-        select : {
-          messages :true
-        }
+        select: {
+          messages: true,
+        },
       });
       return message;
     } catch (error) {

@@ -83,9 +83,12 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-            }).then(res => res.json())
+            })
+            if (_OLd_rooms.status === 200){
+                const _rroms = await _OLd_rooms.json()
+                _rroms.messages.length && setmessages(_rroms.messages)
+            }
             // console.log("_OLd_rooms :", _OLd_rooms.messages)
-            setmessages(_OLd_rooms.messages)
         })();
 
 
@@ -140,9 +143,11 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
         <div 
         ref={scrollRef}
         className="relative flex flex-col gap-2 p-2 md:p-5 md:pb-2 m-2 h-[81vh] md:h-[85vh] overflow-x-scroll overflow-y-auto" >
-            {_messages && _messages.length && _messages.map((item: messagesType, index: number) => (
+            {_messages && _messages.length 
+            ? _messages.map((item: messagesType, index: number) => (
                 <Message key={index} content={item.content} id={item.id} senderId={item.senderId} roomsId={item.roomsId} created_at={item.created_at} updated_at={item.updated_at} />
             ))
+            : <div>No Data</div>
             }
         </div>
         <div className="absolute bottom-3 md:bottom-1 sm:bottom-0 left-0 w-full ">
