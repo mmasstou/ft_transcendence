@@ -48,13 +48,18 @@ const DirectOLdMessages = (props : {socket : Socket}) => {
     const token = Cookies.get('token')
     useEffect(() => {
          (async function getOLdMessages() {
-            const _OLd_rooms = await fetch(`http://10.12.9.12/rooms`,{
+            const response = await fetch(`http://10.12.9.12/rooms/users/`,{
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },
-              }).then(res => res.json())
-            // console.log("_OLd_rooms :", _OLd_rooms)
-            setOLdRooms(_OLd_rooms)
+              })
+            if (response.ok){
+                const _OLd_rooms = await response.json()
+                setOLdRooms(_OLd_rooms.Rooms)
+            }
+            else{
+                console.log("Can't fetch data")
+            }
          })();
     }, [token, currentQuery])
 
@@ -73,7 +78,7 @@ const DirectOLdMessages = (props : {socket : Socket}) => {
         <div className="w-full">
             {OLdrooms.length 
             ? OLdrooms.map((item : RoomsType, index) =>(
-                <DirectOLdMessagesItem key={index} OnClick={handleClick} isActive={currentQuery === item.id} image={"/avatar.jpg"} data={item}  />
+                <DirectOLdMessagesItem key={index} OnClick={handleClick} isActive={currentQuery === item.id} image={"/avatar.jpg"} data={item} socket={props.socket}  />
             ))
             : <div>No contacts</div>
         }

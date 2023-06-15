@@ -9,10 +9,11 @@ import Cookies from "js-cookie"
 import { Socket, io } from 'socket.io-client';
 import { messageSocket } from "@/types/types"
 interface MessagesProps {
-    roomid: string
+    roomid: string;
+    socket: Socket
 }
 
-const Messages: React.FC<MessagesProps> = ({ roomid }) => {
+const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
     const onLineUser = OnlineUsers()
     const oLdMessages = OLdMessages()
 
@@ -23,7 +24,6 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
     const [_messages, setmessages]: any = useState([])
     const [message, setMessage] = useState("");
 
-    const [socket, setSocket] = useState<Socket | null>(null);
     const token = Cookies.get('token')
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -41,38 +41,6 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
 
     useEffect(() => {
         setisMounted(true);
-
-        (async function getLoginId() {
-            console.log("(async function getLoginId()")
-            const resp = await fetch(`http://localhost/users/login`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            const userId = await resp.json()
-
-            userId && console.log("UserId :", userId)
-            // userId && setuserId(userId)
-            // console.log("_OLd_rooms :", _OLd_rooms.messages)
-
-        })();
-
-
-        const socket: Socket = io("http://localhost:80/chat", {
-            auth: {
-                token: `${token}`
-            }
-        });
-        setSocket(socket);
-
-        socket && socket.emit("sendMessage", 'hello from client side');
-
-
-
-        return () => {
-            socket && socket.disconnect();
-        };
-
     }, [])
 
 
@@ -107,12 +75,12 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
         e.preventDefault();
 
         if (message) {
-            console.log("userId :", userId)
             const messageSocket: messageSocket = {
                 roomId: roomid,
                 messageContent: message
             }
             // if (message) {
+                console.log("sendMessage :", messageSocket)
 
             socket && socket.emit("sendMessage", messageSocket, () => setmessages(""));
             // }
