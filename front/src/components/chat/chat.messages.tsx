@@ -47,7 +47,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
 
     useEffect(() => {
         (async function getOLdMessages() {
-            const _OLd_rooms = await fetch(`http://10.12.9.12/rooms/messages/${roomid}`, {
+            const _OLd_rooms = await fetch(`http://10.12.9.7/rooms/messages/${roomid}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -63,13 +63,10 @@ const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
 
     }, [roomid, token])
 
-    useEffect(() => {
-        // console.log("socket.on")
-        socket && socket.on('message', (data: any) => {
-            console.log("socket.on('message', (data : any) => :", [data])
-            setmessages([..._messages, data])
-        })
-    }, [socket, _messages, message])
+    // useEffect(() => {
+    //     // console.log("socket.on")
+        
+    // }, [socket, _messages, message])
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
@@ -82,7 +79,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
             // if (message) {
                 console.log("sendMessage :", messageSocket)
 
-            socket && socket.emit("sendMessage", messageSocket, () => setmessages(""));
+            socket && socket.emit("sendMessage", messageSocket, () => setMessage(""));
             // }
             // console.log(`Message sended .. |${e.target.value}`)
             setInputValue("");
@@ -107,6 +104,10 @@ const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
     console.log("+>| message :", message)
     console.log("+>| message :", message)
 
+    socket && socket.on('message', (data: any) => {
+        console.log("socket.on('message', (data : any) => :", [data])
+        setmessages([..._messages, data])
+    })
     return <div className={`relative flex flex-col border-2 w-full m-auto   h-full `}>
         <div 
         ref={scrollRef}
