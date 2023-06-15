@@ -1,6 +1,7 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   SubscribeMessage,
@@ -25,6 +26,7 @@ export class ChatGateway implements OnGatewayConnection {
     private roomservice: RoomsService,
     private messageservice: MessagesService,
   ) {}
+
   async handleConnection(socket: Socket) {
     const { token } = socket.handshake.auth; // Extract the token from the auth object
     let payload: any = '';
@@ -48,28 +50,46 @@ export class ChatGateway implements OnGatewayConnection {
     // Proceed with the connection handling
     // ...
   }
+
   @WebSocketServer()
   server: Server;
 
   @SubscribeMessage('joinroom')
-  async joinRoom(client: Socket, @MessageBody() data: { roomId: string }) {
+  async joinRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { roomId: string },
+  ) {
     try {
-      console.log('+++++++++++++++++++++++++++++++++');
+      console.log('++++++++++++++++++data.roomId+++++++++++++++', data.roomId);
+      console.log('++++++++++++++++++client.id+++++++++++++++', client.id);
 
-      console.log('+++++++++joinroom++++++++++|> MessageBody :', data);
-      console.log(`client with socket ${client.id} joined room ${data.roomId}`);
+      // console.log(`client with socket ${client.id} joined room ${data.roomId}`);
       await client.join(data.roomId);
-      client.emit('message', data.roomId);
-    } catch (error) {}
+      const messages = await this.messageservice.create({
+        roomId: data.roomId,
+        content: `userId : ${client.id} has connected`,
+        userId: _User.id,
+      });
+      client.emit('message', messages);
+      console.log('+++++++++joinroom++++++++++|> MessageBody :', data);
+    } catch (error) {
+      console.log('eroooooor:', error);
+    }
   }
 
   @SubscribeMessage('leaveroom')
   async LeaveRoom(
-    client: Socket,
+    @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: string; messageContent: string },
   ) {
     try {
       console.log('+++++++++LeaveRoom++++++++++|> MessageBody :', data);
+      const messages = await this.messageservice.create({
+        roomId: data.roomId,
+        content: `userId : ${client.id} has Leave room`,
+        userId: _User.id,
+      });
+      client.emit('message', messages);
       client.leave(data.roomId);
     } catch (error) {}
   }
@@ -94,7 +114,7 @@ export class ChatGateway implements OnGatewayConnection {
       // console.log(`${user.name} [${user.id}] join to room : ${user.roomId}`);
       // console.log("we are emmiting the message to room")
       this.server.to(data.roomId).emit('message', messages);
-
+      console.log('messages :', messages);
       // this.server.emit('message', messages);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {

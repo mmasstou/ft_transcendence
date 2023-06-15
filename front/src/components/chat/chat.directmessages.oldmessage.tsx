@@ -48,7 +48,7 @@ const DirectOLdMessages = (props : {socket : Socket}) => {
     const token = Cookies.get('token')
     useEffect(() => {
          (async function getOLdMessages() {
-            const response = await fetch(`http://10.12.9.12/rooms/users/`,{
+            const response = await fetch(`http://10.12.9.7/rooms/users/`,{
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },

@@ -37,7 +37,7 @@ const Login = () => {
         // console.log("Data :", data)
         const API_PATH = process.env.API_URL
         // console.log("API_PATH :", API_PATH)
-        const token = await fetch(`http://10.12.9.12/auth/login`, {
+        const token = await fetch(`http://10.12.9.7/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
