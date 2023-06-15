@@ -8,12 +8,12 @@ import NoMessageToShow from "./chat.nomessage"
 import OLdMessages from "@/hooks/OLdMessages"
 import { useSearchParams } from "next/navigation"
 import qs from 'query-string'
-import {Message as MessageType} from "@/types/types"
+import { Message as MessageType } from "@/types/types"
 import { Socket, io } from "socket.io-client"
 import Cookies from "js-cookie"
 
 const ChatMain = () => {
-    const [messages, setmessages] : MessageType[] | any[] = useState([])
+    const [messages, setmessages]: MessageType[] | any[] = useState([])
     const [isMounted, setisMounted] = useState(false)
     const [_w, setW] = useState(0)
     const onLineUser = OnlineUsers()
@@ -67,7 +67,7 @@ const ChatMain = () => {
 
     return <div className={`border border-orange-300 h-full ${onLineUser.IsOpen ? 'hidden' : ''} sm:flex`}>
         {socket && <DirectOLdMessages socket={socket} />}
-        {currentQuery  && <Messages roomid={currentQuery} />}
+        {(currentQuery && socket) && <Messages roomid={currentQuery} socket={socket} />}
     </div>
 }
 

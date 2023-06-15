@@ -4,7 +4,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Messages, Rooms } from '@prisma/client';
+import { Messages, Rooms, UserType } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateRoomDto } from './dtos/UpdateRoomDto';
 import { MembersService } from 'src/members/members.service';
@@ -45,48 +45,105 @@ export class RoomsService {
     });
   }
 
+  async findAlLForUser(userId: string) {
+    return this.prisma.user.findFirst({
+      where: { id: userId },
+      select: { Rooms: true },
+    });
+  }
+
   async create(data: {
     name: string;
     userId: string;
     type: string;
   }): Promise<Rooms> {
     try {
+      // create room :
       const _type: any =
         data.type === RoomType.PRIVATE ? RoomType.PRIVATE : RoomType.PUBLIC;
-      const room: Rooms = await this.prisma.rooms.create({
-        data: { name: data.name, type: _type },
-      });
-      const mumber: any = await this.membersservice.create({
-        type: 'ADMIN',
-        user: data.userId,
-        roomId: room.id,
-      });
-
-      const _message = await this.messageservice.create({
-        content: `welcome to private channel ! admin : ${mumber.user}`,
-        userId: data.userId,
-        roomId: room.id,
-      });
-      console.log('Ana Hana :', mumber);
-
-      return await this.prisma.rooms.update({
-        where: {
-          id: room.id,
-        },
+      const newRoom = await this.prisma.rooms.create({
         data: {
-          members: {
-            connect: { id: mumber.id },
-          },
-          messages: {
-            connect: { id: _message.id },
-          },
+          name: data.name,
+          type: _type,
         },
       });
+      const result = await this.prisma.$transaction(async (prisma) => {
+        const existingUser = await prisma.user.findUnique({
+          where: { id: data.userId },
+        });
+
+        if (!existingUser) {
+          throw new HttpException(
+            {
+              status: HttpStatus.FORBIDDEN,
+              error: `User with id ${data.userId} not found`,
+            },
+            HttpStatus.FORBIDDEN,
+          );
+        }
+        console.log('Ana Hna :', newRoom.id);
+        const receive: any = await this.prisma.user.update({
+          where: { login: data.name },
+          data: {
+            Rooms: {
+              connect: {
+                id: newRoom.id,
+              },
+            },
+          },
+        });
+        await this.prisma.user.update({
+          where: { id: data.userId },
+          data: {
+            Rooms: {
+              connect: {
+                id: newRoom.id,
+              },
+            },
+          },
+        });
+        const __L = [];
+
+        const mumber: any = await this.membersservice.create({
+          type: 'ADMIN',
+          user: data.userId,
+          roomId: newRoom.id,
+        });
+        __L.push(mumber.id);
+        const mumber1: any = await this.membersservice.create({
+          type: 'USER',
+          user: receive.id,
+          roomId: newRoom.id,
+        });
+        __L.push(mumber1.id);
+
+        const _message = await this.messageservice.create({
+          content: `welcome to private channel ! admin : ${mumber.login}`,
+          userId: data.userId,
+          roomId: newRoom.id,
+        });
+
+        return await this.prisma.rooms.update({
+          where: {
+            id: newRoom.id,
+          },
+          data: {
+            members: {
+              connect: __L.map((id: string) => ({ id })),
+            },
+            messages: {
+              connect: { id: _message.id },
+            },
+          },
+        });
+      });
+
+      return result;
     } catch (error) {
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
-          error: "CAN'T CREATE ROOM",
+          error: error,
         },
         HttpStatus.FORBIDDEN,
         {
@@ -298,6 +355,7 @@ export class RoomsService {
           messages: true,
         },
       });
+      console.log('message :', message);
       return message;
     } catch (error) {
       throw new HttpException(
@@ -311,5 +369,21 @@ export class RoomsService {
         },
       );
     }
+  }
+
+  async addMemberToRoom(
+    userId: string,
+    roomId: string,
+    userType: UserType = 'USER',
+  ) {
+    const newMember = await this.prisma.members.create({
+      data: {
+        user: { connect: { id: userId } },
+        RoomId: { connect: { id: roomId } },
+        type: userType,
+      },
+    });
+
+    return newMember;
   }
 }

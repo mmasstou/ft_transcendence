@@ -34,7 +34,6 @@ export class UserController {
   getLoginUser(@Req() request: Request) {
     const User_payload: any = request.user;
     const userId: any = User_payload.sub;
-    console.log('Server : UserID|>', userId);
     return userId;
   }
   @Get(':username')

@@ -37,6 +37,14 @@ export class RoomsController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('users')
+  findAlLForUser(@Req() request: Request) {
+    const userIds: any = request.user;
+    const userId: string = userIds.sub;
+    return this.roomsService.findAlLForUser(userId);
+  }
+
+  @UseGuards(AuthGuard)
   @Get(':name')
   findOne(@Param('name') name: string) {
     return this.roomsService.findOne({ name });
