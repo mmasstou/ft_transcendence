@@ -14,6 +14,8 @@ import { error } from 'console';
 import { RoomsService } from './rooms/rooms.service';
 import { MessagesService } from './messages/messages.service';
 
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+
 export let _User: User | null = null;
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway implements OnGatewayConnection {
@@ -25,8 +27,6 @@ export class ChatGateway implements OnGatewayConnection {
   ) {}
   async handleConnection(socket: Socket) {
     const { token } = socket.handshake.auth; // Extract the token from the auth object
-    console.log('Received token:', token);
-    console.log('socket id:', socket.id);
     let payload: any = '';
     try {
       if (!token) {
@@ -37,10 +37,8 @@ export class ChatGateway implements OnGatewayConnection {
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      console.log('payload :', payload);
       const login: string = payload.sub;
       _User = await this.usersService.findOne({ login });
-      console.log('user :', _User);
     } catch {
       console.log('+>', error);
     }
@@ -54,12 +52,25 @@ export class ChatGateway implements OnGatewayConnection {
   server: Server;
 
   @SubscribeMessage('joinroom')
-  async joinRoom(
+  async joinRoom(client: Socket, @MessageBody() data: { roomId: string }) {
+    try {
+      console.log('+++++++++++++++++++++++++++++++++');
+
+      console.log('+++++++++joinroom++++++++++|> MessageBody :', data);
+      console.log(`client with socket ${client.id} joined room ${data.roomId}`);
+      await client.join(data.roomId);
+      client.emit('message', data.roomId);
+    } catch (error) {}
+  }
+
+  @SubscribeMessage('leaveroom')
+  async LeaveRoom(
+    client: Socket,
     @MessageBody() data: { roomId: string; messageContent: string },
   ) {
     try {
-      console.log('+++++++++joinroom++++++++++|> MessageBody :', data);
-      console.log('+++++++++joinroom++++++++++|> sendMessage :', _User);
+      console.log('+++++++++LeaveRoom++++++++++|> MessageBody :', data);
+      client.leave(data.roomId);
     } catch (error) {}
   }
 
@@ -69,14 +80,26 @@ export class ChatGateway implements OnGatewayConnection {
   ) {
     try {
       console.log('+++++++++++++++++++|> MessageBody :', data);
-      console.log('+++++++++++++++++++|> sendMessage :', _User);
       const messages = await this.messageservice.create({
         roomId: data.roomId,
         content: data.messageContent,
         userId: _User.id,
       });
+      console.log(`------------room id: ${data.roomId}`);
 
-      this.server.emit('message', messages);
-    } catch (error) {}
+      // const numClients = this.server.sockets.adapter.rooms.get(
+      //   data.roomId,
+      // ).size;
+      // console.log(`Number of clients in myRoom: ${numClients}`);
+      // console.log(`${user.name} [${user.id}] join to room : ${user.roomId}`);
+      // console.log("we are emmiting the message to room")
+      this.server.to(data.roomId).emit('message', messages);
+
+      // this.server.emit('message', messages);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        console.log('Error: ', error);
+      }
+    }
   }
 }
