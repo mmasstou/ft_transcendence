@@ -10,12 +10,12 @@ import { PrismaService } from 'src/prisma.service';
 export class DirectMessageService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(params: { name: string }) {
+  async findOne(params: { id: string }) {
     try {
-      const { name } = params;
+      const { id } = params;
       // console.log('++findOne++>', name);
       const room = await this.prisma.directMessage.findUnique({
-        where: { name },
+        where: { id },
       });
       if (!room) throw new Error('');
       return room;
@@ -83,6 +83,23 @@ export class DirectMessageService {
           cause: error,
         },
       );
+    }
+  }
+
+  async getMessaages(params: { id: string }) {
+    try {
+      const { id } = params;
+      // console.log('++findOne++>', name);
+      const room = await this.prisma.directMessage.findUnique({
+        where: { id },
+        select: {
+          messages: true,
+        },
+      });
+      if (!room) throw new Error('');
+      return room;
+    } catch (error) {
+      throw new NotFoundException();
     }
   }
 }

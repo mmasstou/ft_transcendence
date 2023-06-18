@@ -10,7 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from './users/user.service';
-import { User } from '@prisma/client';
+import { User, Messages } from '@prisma/client';
 import { error } from 'console';
 import { RoomsService } from './rooms/rooms.service';
 import { MessagesService } from './messages/messages.service';
@@ -96,15 +96,26 @@ export class ChatGateway implements OnGatewayConnection {
 
   @SubscribeMessage('sendMessage')
   async handleEvent(
-    @MessageBody() data: { roomId: string; messageContent: string },
+    @MessageBody()
+    data: any,
   ) {
+    let messages: any;
     try {
+      const { roomId, messageContent, type } = data;
       console.log('+++++++++++++++++++|> MessageBody :', data);
-      const messages = await this.messageservice.create({
-        roomId: data.roomId,
-        content: data.messageContent,
-        userId: _User.id,
-      });
+      if (type) {
+        messages = await this.messageservice.create({
+          directMessageId: roomId,
+          content: messageContent,
+          userId: _User.id,
+        });
+      } else {
+        messages = await this.messageservice.create({
+          roomId: data.roomId,
+          content: data.messageContent,
+          userId: _User.id,
+        });
+      }
       console.log(`------------room id: ${data.roomId}`);
 
       // const numClients = this.server.sockets.adapter.rooms.get(
