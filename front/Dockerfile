@@ -2,12 +2,13 @@ FROM node:buster
 
 WORKDIR /frontend
 
-COPY ./package.json ./
+RUN npm install -g next
+COPY ./package.json /frontend
 
 
 RUN npm i
 
-COPY . ./
+COPY . /frontend
 
 # Expose the port on which your Next.js application listens
 EXPOSE 3000

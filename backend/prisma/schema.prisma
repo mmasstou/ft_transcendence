@@ -24,20 +24,21 @@ enum RoomType {
 
 // models :
 model User {
-  id         String     @id @default(uuid())
-  login      String     @unique
-  email      String     @unique
-  password   String?
-  first_name String?
-  last_name  String?
-  kind       String?
-  image      String?
-  is_active  Boolean    @default(false)
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  Members    Members[]
-  Messages   Messages[]
-  Rooms      Rooms[]
+  id            String          @id @default(uuid())
+  login         String          @unique
+  email         String          @unique
+  password      String?
+  first_name    String?
+  last_name     String?
+  kind          String?
+  image         String?
+  is_active     Boolean         @default(false)
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+  Members       Members[]
+  Messages      Messages[]
+  Rooms         Rooms[]
+  DirectMessage DirectMessage[]
 }
 
 model Rooms {
@@ -49,6 +50,14 @@ model Rooms {
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt
   User       User[]
+}
+
+model DirectMessage {
+  id       String     @id @default(uuid())
+  name     String     @unique
+  receiver User       @relation(fields: [userId], references: [id])
+  userId   String
+  messages Messages[]
 }
 
 model Members {
@@ -63,12 +72,14 @@ model Members {
 }
 
 model Messages {
-  content    String
-  id         String   @id @default(uuid())
-  sender     User     @relation(fields: [senderId], references: [id])
-  roomId     Rooms    @relation(fields: [roomsId], references: [id])
-  senderId   String
-  roomsId    String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  content         String
+  id              String         @id @default(uuid())
+  sender          User           @relation(fields: [senderId], references: [id])
+  roomId          Rooms?          @relation(fields: [roomsId], references: [id])
+  senderId        String
+  roomsId         String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+  DirectMessage   DirectMessage? @relation(fields: [directMessageId], references: [id])
+  directMessageId String?
 }

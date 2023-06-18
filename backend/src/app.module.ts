@@ -13,6 +13,7 @@ import { ChatGateway } from './chat.gateway';
 import { RoomsService } from './rooms/rooms.service';
 import { MembersService } from './members/members.service';
 import { MessagesService } from './messages/messages.service';
+import { DirectMessageModule } from './direct-message/direct-message.module';
 @Module({
   imports: [
     AuthModule,
@@ -21,6 +22,7 @@ import { MessagesService } from './messages/messages.service';
     RoomsModule,
     MessagesModule,
     MembersModule,
+    DirectMessageModule,
   ],
   controllers: [AppController],
   providers: [

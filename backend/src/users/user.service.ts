@@ -28,6 +28,7 @@ export class UserService {
       where: { kind },
       include: {
         Rooms: true,
+        DirectMessage: true,
       },
     });
   }
@@ -57,5 +58,16 @@ export class UserService {
     return await this.prisma.user.delete({
       where: { id },
     });
+  }
+
+  async getUserDirectMessages(userId: string) {
+    // Add your logic to fetch the direct messages for the user from the database or any other source
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        DirectMessage: true,
+      },
+    });
+    return user;
   }
 }

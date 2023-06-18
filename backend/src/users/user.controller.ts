@@ -52,4 +52,15 @@ export class UserController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
+
+  // auther :
+  @Get('direct-messages')
+  async getUserDirectMessages(@Req() request: Request) {
+    const User_payload: any = request.user;
+    const userId: any = User_payload.sub;
+    const directMessages = await this.usersService.getUserDirectMessages(
+      userId,
+    );
+    return directMessages;
+  }
 }
