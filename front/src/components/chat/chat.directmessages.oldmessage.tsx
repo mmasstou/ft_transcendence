@@ -26,7 +26,7 @@ const OldMessages = [
     }
 ]
 
-const DirectOLdMessages = (props : {socket : Socket}) => {
+const DirectOLdMessages = (props: { socket: Socket }) => {
     const [isMounted, setisMounted] = useState(false)
     const [WindowsSize, setWindowsSize] = useState(0)
     const [OLdrooms, setOLdRooms] = useState([])
@@ -37,35 +37,37 @@ const DirectOLdMessages = (props : {socket : Socket}) => {
     }
     const onLineUser = OnlineUsers()
     const oLdMessages = OLdMessages()
-    const handleClick = (value : string) => {
-        const __windowsSize : number = window.innerWidth
+    const handleClick = (value: string) => {
+        const __windowsSize: number = window.innerWidth
         // console.log("value :", __windowsSize)
-        if (__windowsSize <= 768){
+        if (__windowsSize <= 768) {
             oLdMessages.onClose()
         }
     }
-    
+
     const token = Cookies.get('token')
     useEffect(() => {
-         (async function getOLdMessages() {
-            const response = await fetch(`http://10.12.9.7/rooms/users/`,{
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              })
-            if (response.ok){
-                const _OLd_rooms = await response.json()
-                setOLdRooms(_OLd_rooms.Rooms)
-            }
-            else{
-                console.log("Can't fetch data")
-            }
-         })();
+        (async function getOLdMessages() {
+                console.log("Ana Hna !")
+                const response = await fetch(`http://10.12.9.12/users/direct-messages`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                if (response.ok) {
+                    const _OLd_rooms = await response.json()
+                    console.log("_OLd_rooms :", _OLd_rooms)
+                    setOLdRooms(_OLd_rooms.DirectMessage)
+                }
+                else {
+                    console.log("Can't fetch data")
+                }
+            })();
     }, [token, currentQuery])
 
     useEffect(() => {
         setisMounted(true);
-      
+
     }, [])
 
     if (!oLdMessages.IsOpen)
@@ -76,13 +78,13 @@ const DirectOLdMessages = (props : {socket : Socket}) => {
 
     `}>
         <div className="w-full">
-            {OLdrooms.length 
-            ? OLdrooms.map((item : RoomsType, index) =>(
-                <DirectOLdMessagesItem key={index} OnClick={handleClick} isActive={currentQuery === item.id} image={"/avatar.jpg"} data={item} socket={props.socket}  />
-            ))
-            : <div>No contacts</div>
-        }
-            
+            {OLdrooms.length
+                ? OLdrooms.map((item: RoomsType, index) => (
+                    <DirectOLdMessagesItem key={index} OnClick={handleClick} isActive={currentQuery === item.id} image={"/avatar.jpg"} data={item} socket={props.socket} />
+                ))
+                : <div>No contacts</div>
+            }
+
         </div>
     </div>
 }

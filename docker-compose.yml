@@ -12,6 +12,7 @@ services:
       - backend
       - database
     volumes:
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/node_modules:/frontend/node_modules:rw
       - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/src:/frontend/src:rw
       - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
   backend:
@@ -26,6 +27,7 @@ services:
     depends_on:
       - database
     volumes:
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/node_modules:/app/node_modules:rw
       - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
       - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:

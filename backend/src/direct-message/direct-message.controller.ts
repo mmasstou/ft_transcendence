@@ -16,9 +16,9 @@ export class DirectMessageController {
   constructor(private readonly directMessage: DirectMessageService) {}
 
   @UseGuards(AuthGuard)
-  @Get()
-  findOne(@Param('name') name: string) {
-    return this.directMessage.findOne({ name });
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.directMessage.findOne({ id });
   }
 
   @UseGuards(AuthGuard)
@@ -27,5 +27,11 @@ export class DirectMessageController {
     const User_payload: any = request.user;
     const userId: any = User_payload.sub;
     return this.directMessage.create({ receiverId, userId });
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('messages/:directMessageId')
+  getMessaages(@Param('directMessageId') id: string) {
+    return this.directMessage.getMessaages({ id });
   }
 }
