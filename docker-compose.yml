@@ -12,9 +12,9 @@ services:
       - backend
       - database
     volumes:
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/node_modules:/frontend/node_modules:rw
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/src:/frontend/src:rw
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
+      - /Users/mohamed/DocumentsProjects/ft_transcendence/front/node_modules:/frontend/node_modules:rw
+      - /Users/mohamed/Documents/Projects/ft_transcendence/backend/src:/frontend/src:rw
+      - /Users/mohamed/DocumentsProjects/ft_transcendence/front/public:/frontend/public:rw
   backend:
     build: backend/
     container_name: backend
@@ -27,9 +27,9 @@ services:
     depends_on:
       - database
     volumes:
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/node_modules:/app/node_modules:rw
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
+      - /Users/mohamed/DocumentsProjects/ft_transcendence/backend/node_modules:/app/node_modules:rw
+      - /Users/mohamed/DocumentsProjects/ft_transcendence/backend/src:/app/src:rw
+      - /Users/mohamed/DocumentsProjects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
     image: postgres:13
     container_name: database
@@ -40,7 +40,7 @@ services:
     networks:
       - APInetwork
     volumes:
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
+      - /Users/mohamed/DocumentsProjects/ft_transcendence/databases/data:/var/lib/postgresql/data
   
 networks:
   APInetwork:
