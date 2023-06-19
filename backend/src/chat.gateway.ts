@@ -103,19 +103,12 @@ export class ChatGateway implements OnGatewayConnection {
     try {
       const { roomId, messageContent, type } = data;
       console.log('+++++++++++++++++++|> MessageBody :', data);
-      if (type) {
-        messages = await this.messageservice.create({
-          directMessageId: roomId,
-          content: messageContent,
-          userId: _User.id,
-        });
-      } else {
-        messages = await this.messageservice.create({
-          roomId: data.roomId,
-          content: data.messageContent,
-          userId: _User.id,
-        });
-      }
+
+      messages = await this.messageservice.create({
+        roomId: data.roomId,
+        content: data.messageContent,
+        userId: _User.id,
+      });
       console.log(`------------room id: ${data.roomId}`);
 
       // const numClients = this.server.sockets.adapter.rooms.get(

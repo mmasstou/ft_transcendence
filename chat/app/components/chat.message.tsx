@@ -39,7 +39,7 @@ const Message = (props: messagesType) => {
         const token = Cookies.get("token");
         (async function getsenderInfo() {
             // console.log("props.senderId :", props.senderId)
-             await fetch(`http://10.12.9.12/users/${props.senderId}`, {
+             await fetch(`http://127.0.0.1/users/${props.senderId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -48,7 +48,7 @@ const Message = (props: messagesType) => {
             // setmessages(_OLd_rooms.messages)
         })();
         // (async function getsenderInfo() {
-        //      await fetch(`http://10.12.9.12/users/${props.roomsId}`, {
+        //      await fetch(`http://127.0.0.1/users/${props.roomsId}`, {
         //         headers: {
         //             Authorization: `Bearer ${token}`,
         //         },

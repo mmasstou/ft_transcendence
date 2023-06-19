@@ -47,7 +47,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
 
     useEffect(() => {
         (async function getOLdMessages() {
-            const _OLd_rooms = await fetch(`http://10.12.9.12/users/direct-message/`, {
+            const _OLd_rooms = await fetch(`http://127.0.0.1/users/direct-message/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

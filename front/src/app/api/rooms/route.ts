@@ -1,9 +1,9 @@
 export async function POST(req: Request) {
   const { userId, token } = await req.json();
   // get user info :
-  const User = await fetch(`http://10.12.9.12/users/${userId}`).then(res => res.json())
+  const User = await fetch(`http://127.0.0.1/users/${userId}`).then(res => res.json())
   console.log("User :", User)
-  const Room = await fetch(`http://10.12.9.12/rooms/`, {
+  const Room = await fetch(`http://127.0.0.1/rooms/`, {
     method : 'POST',
     headers: {
         Authorization: `${token}`,
