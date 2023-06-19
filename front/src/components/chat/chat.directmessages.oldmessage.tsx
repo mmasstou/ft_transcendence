@@ -49,7 +49,7 @@ const DirectOLdMessages = (props: { socket: Socket }) => {
     useEffect(() => {
         (async function getOLdMessages() {
                 console.log("Ana Hna !")
-                const response = await fetch(`http://10.12.9.12/users/direct-messages`, {
+                const response = await fetch(`http://127.0.0.1/users/direct-messages`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

@@ -11,14 +11,6 @@ async function main() {
       is_active: true,
     },
   });
-  await prisma.user.create({
-    data: {
-      login: 'user01',
-      email: 'user01@prisma.io',
-      password: 'mmasstou012345_',
-      is_active: true,
-    },
-  });
   // console.log(user);
 }
 

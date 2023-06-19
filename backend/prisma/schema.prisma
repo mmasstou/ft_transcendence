@@ -21,7 +21,6 @@ enum RoomType {
   PUBLIC
   PROTACTED
 }
-
 // models :
 model User {
   id            String          @id @default(uuid())

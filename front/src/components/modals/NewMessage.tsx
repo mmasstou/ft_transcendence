@@ -19,7 +19,7 @@ const NewMessage = () => {
     const [InputValue, setInputValue] = useState("")
 
     useEffect(() => {
-        fetch('http://10.12.9.12/users', {
+        fetch('http://127.0.0.1/users', {
             headers: { Authorization: `Bearer ${token}`, },
         }).then((resp) => resp.json()).then(data => setfriends(data))
     }, [])
@@ -69,7 +69,7 @@ const NewMessage = () => {
         // console.log("ana Hana!")
         // try {
         //     console.log("+> ", UserId)
-        //     const response = await fetch(`http://10.12.9.12/users/${UserId}`, {
+        //     const response = await fetch(`http://127.0.0.1/users/${UserId}`, {
         //         method: 'GET',
         //         headers: {
         //             Authorization: `Bearer ${token}`,
