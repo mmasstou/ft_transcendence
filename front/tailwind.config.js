@@ -20,6 +20,7 @@ module.exports = {
                 secondary: '#1EF0AE',
                 tertiary: '#D9D9D9',
                 btn: '#161F1E',
+                'container': '#3E504D'
             },
         },
     },
