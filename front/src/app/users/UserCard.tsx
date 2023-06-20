@@ -13,8 +13,8 @@ const UserCard: FC<UserCardProps> = ({
   return (
     <div className=" bg-container rounded-xl my-2 p-2 lg:p-4 flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <div className="h-10 w-10 bg-black rounded-full"></div>
-        <h3>{username}</h3>
+        <div className="h-10 w-10 xl:w-14 xl:h-14 bg-black rounded-full"></div>
+        <h3 className="xl:text-lg">{username}</h3>
       </div>
       <div className="flex items-center text-xs xl:text-sm gap-2">
         <button className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors">
