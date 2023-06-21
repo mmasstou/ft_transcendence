@@ -11,7 +11,7 @@ const UserCard: FC<UserCardProps> = ({
   invite,
 }) => {
   return (
-    <div className=" bg-container rounded-xl my-2 p-2 lg:p-4 flex items-center justify-between">
+    <div className=" bg-container rounded-xl my-3 p-2 xl:p-3 flex items-center justify-between">
       <div className="flex items-center gap-2">
         <div className="h-10 w-10 xl:w-14 xl:h-14 bg-black rounded-full"></div>
         <h3 className="xl:text-lg">{username}</h3>
