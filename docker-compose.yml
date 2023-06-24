@@ -4,17 +4,14 @@ services:
     build: front/
     container_name: frontend
     ports:
-      - 3000:3000
-      - 5430:5430
+      - 8080:8080
     networks:
       - APInetwork
     depends_on:
       - backend
-      - database
     volumes:
-      - /Users/mohamed/DocumentsProjects/ft_transcendence/front/node_modules:/frontend/node_modules:rw
-      - /Users/mohamed/Documents/Projects/ft_transcendence/backend/src:/frontend/src:rw
-      - /Users/mohamed/DocumentsProjects/ft_transcendence/front/public:/frontend/public:rw
+      - /Users/mohamed/Documents/Projects/ft_transcendence/front/src:/frontend/src:rw
+    restart: always
   backend:
     build: backend/
     container_name: backend
@@ -26,10 +23,9 @@ services:
       - APInetwork
     depends_on:
       - database
+    restart: always
     volumes:
-      - /Users/mohamed/DocumentsProjects/ft_transcendence/backend/node_modules:/app/node_modules:rw
       - /Users/mohamed/DocumentsProjects/ft_transcendence/backend/src:/app/src:rw
-      - /Users/mohamed/DocumentsProjects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
     image: postgres:13
     container_name: database
@@ -39,6 +35,7 @@ services:
       - 5432:5432
     networks:
       - APInetwork
+    restart: always
     volumes:
       - /Users/mohamed/DocumentsProjects/ft_transcendence/databases/data:/var/lib/postgresql/data
   

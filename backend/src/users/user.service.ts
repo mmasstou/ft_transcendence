@@ -28,7 +28,7 @@ export class UserService {
       where: { kind },
       include: {
         Rooms: true,
-        DirectMessage: true,
+        directMessage: true,
       },
     });
   }
@@ -65,7 +65,7 @@ export class UserService {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
-        DirectMessage: true,
+        directMessage: true,
       },
     });
     return user;

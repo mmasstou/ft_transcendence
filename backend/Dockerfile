@@ -11,8 +11,7 @@ RUN npm i
 
 COPY . .
 
-EXPOSE 5430
 EXPOSE 80
 RUN chmod 0777 /app/tools/init.sh
 ENTRYPOINT [ "sh", "/app/tools/init.sh" ]
-CMD [ "npm" , "run start:dev" ]
+CMD [ "" ]

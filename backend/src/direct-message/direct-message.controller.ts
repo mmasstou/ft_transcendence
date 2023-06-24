@@ -16,6 +16,12 @@ export class DirectMessageController {
   constructor(private readonly directMessage: DirectMessageService) {}
 
   @UseGuards(AuthGuard)
+  @Get()
+  findAll() {
+    return this.directMessage.findAll();
+  }
+
+  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.directMessage.findOne({ id });
@@ -23,10 +29,13 @@ export class DirectMessageController {
 
   @UseGuards(AuthGuard)
   @Post()
-  create(@Body('receiverId') receiverId: string, @Req() request: Request) {
+  async create(
+    @Body('receiverId') receiverId: string,
+    @Req() request: Request,
+  ) {
     const User_payload: any = request.user;
     const userId: any = User_payload.sub;
-    return this.directMessage.create({ receiverId, userId });
+    return await this.directMessage.create({ receiverId, userId });
   }
 
   @UseGuards(AuthGuard)
