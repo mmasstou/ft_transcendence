@@ -4,7 +4,9 @@ import Dashboard from '../Dashboard';
 const page = () => {
   return (
     <Dashboard>
-        game page
+      <div className='flex w-full h-full justify-center items-center bg-white'>
+      game page
+      </div>
    </Dashboard>
   )
 }

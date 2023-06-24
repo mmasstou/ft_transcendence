@@ -33,10 +33,24 @@ export class MessagesService {
   async create(data: {
     content: string;
     userId: string;
-    roomId: string;
+    roomId?: string;
+    DirectMessage?: string;
   }): Promise<Messages> {
     // const user =
     try {
+      if (data.DirectMessage) {
+        return await this.prisma.messages.create({
+          data: {
+            content: data.content,
+            sender: {
+              connect: { id: data.userId },
+            },
+            DirectMessage: {
+              connect: { id: data.DirectMessage },
+            },
+          },
+        });
+      }
       return await this.prisma.messages.create({
         data: {
           content: data.content,

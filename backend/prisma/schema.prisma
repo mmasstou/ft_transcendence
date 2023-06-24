@@ -14,6 +14,8 @@ datasource db {
 enum UserType {
   ADMIN
   USER
+  SENDER
+  RECEIVER
 }
 
 enum RoomType {
@@ -21,6 +23,16 @@ enum RoomType {
   PUBLIC
   PROTACTED
 }
+
+model UserSocket {
+  id         String   @id @default(uuid())
+  socketId   String
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
 // models :
 model User {
   id            String          @id @default(uuid())
@@ -37,7 +49,8 @@ model User {
   Members       Members[]
   Messages      Messages[]
   Rooms         Rooms[]
-  DirectMessage DirectMessage[]
+  directMessage DirectMessage[]
+  UserSocket    UserSocket[]
 }
 
 model Rooms {
@@ -52,29 +65,34 @@ model Rooms {
 }
 
 model DirectMessage {
-  id       String     @id @default(uuid())
-  name     String     @unique
-  receiver User       @relation(fields: [userId], references: [id])
-  userId   String
-  messages Messages[]
+  id         String     @id @default(uuid())
+  name       String     @unique
+  members    Members[]
+  messages   Messages[]
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  User       User?      @relation(fields: [userId], references: [id])
+  userId     String?
 }
 
 model Members {
-  id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id])
-  RoomId     Rooms    @relation(fields: [roomsId], references: [id])
-  type       UserType @default(USER)
-  userId     String
-  roomsId    String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id              String         @id @default(uuid())
+  user            User           @relation(fields: [userId], references: [id])
+  RoomId          Rooms?         @relation(fields: [roomsId], references: [id])
+  DirectMessage   DirectMessage? @relation(fields: [directmessageId], references: [id])
+  type            UserType       @default(USER)
+  userId          String
+  roomsId         String?
+  directmessageId String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
 }
 
 model Messages {
   content         String
   id              String         @id @default(uuid())
   sender          User           @relation(fields: [senderId], references: [id])
-  roomId          Rooms?          @relation(fields: [roomsId], references: [id])
+  roomId          Rooms?         @relation(fields: [roomsId], references: [id])
   senderId        String
   roomsId         String?
   created_at      DateTime       @default(now())

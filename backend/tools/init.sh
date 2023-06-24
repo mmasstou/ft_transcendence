@@ -1,11 +1,14 @@
 #!/bin/bash
 
 
-sleep 5
-npx prisma migrate dev --name init --skip-generate
+sleep 10
+npx prisma migrate dev --name init 
 
-npx prisma generate
-npx ts-node script.ts
+# npx prisma generate
+# npx ts-node script.ts
+
+npm run start:dev
+
+# tail -f
 
 exec "$@"
-

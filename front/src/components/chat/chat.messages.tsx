@@ -52,7 +52,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
                     Authorization: `Bearer ${token}`,
                 },
             })
-            if (_OLd_rooms.status === 200){
+            if (_OLd_rooms.status === 200 && _OLd_rooms){
                 const _rroms = await _OLd_rooms.json()
                 _rroms.messages.length && setmessages(_rroms.messages)
             }

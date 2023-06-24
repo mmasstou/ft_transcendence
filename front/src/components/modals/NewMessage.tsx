@@ -43,13 +43,13 @@ const NewMessage = () => {
 
         
         // create private room :
+        console.log("+onSubmit+ +> UserId :", UserId)
 
 
         try {
-            const resp = await fetch('/api/rooms', {
+            const resp = await fetch('/api/directMessage', {
                 method : 'POST',
                 headers: {
-                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -60,35 +60,12 @@ const NewMessage = () => {
             if (resp.ok){
                 const __data = await resp.json()
                 console.log("__data :", __data)
-                route.push(`/chat?room=${__data.id}`)
+                route.push(`/chat?direct-message=${__data.id}`)
                 contacthook.onClose()
             }
         } catch (error) {
             console.error('Error creating room:', error);
         }
-        // console.log("ana Hana!")
-        // try {
-        //     console.log("+> ", UserId)
-        //     const response = await fetch(`http://127.0.0.1/users/${UserId}`, {
-        //         method: 'GET',
-        //         headers: {
-        //             Authorization: `Bearer ${token}`,
-        //             'Content-Type': 'application/json',
-        //         }
-        //     });
-
-        //     if (response.ok) {
-        //         console.log('Room created successfully!');
-        //         const userdata = await response.json()
-        //         console.log("userdata :", userdata)
-        //     } else {
-        //         console.error('Failed to create room.');
-        //     }
-        // } catch (error) {
-        //     console.error('Error creating room:', error);
-        // }
-
-
     }
     const bodyContent = (
         <div className=" max-w-[798px] w-full md:min-w-[420px] bg-[#243230] max-h-[867px] rounded-sm p-4 flex flex-col gap-4">
