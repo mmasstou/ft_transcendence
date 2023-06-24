@@ -32,7 +32,8 @@ export class MembersService {
   async create(data: {
     type: any | Prisma.EnumUserTypeFieldUpdateOperationsInput;
     user: string;
-    roomId: string;
+    roomId?: string;
+    directMessageId?: string;
   }): Promise<Members> {
     // const user =
     try {

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Cookies from 'js-cookie';
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
@@ -8,12 +8,15 @@ import { useRouter } from "next/navigation";
 import Input from "../chat/Input";
 import Modal from "./modaL copy";
 import LoginHook from "@/hooks/login";
+import { Socket, io } from "socket.io-client";
 
 
 
 const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
+    const [socket, setSocket] = useState<Socket | null>(null);
     const loginHook = LoginHook()
+    const token = Cookies.get("token")
     const router = useRouter()
     const {
         register,
@@ -31,10 +34,37 @@ const Login = () => {
         }
     });
 
+    useEffect(() => {
+
+        const socket: Socket = io("http://localhost:80/User", {
+            auth: {
+                token: `${token}`
+            }
+        });
+        setSocket(socket);
+
+        // const messageSocket: messageSocket = {
+        //     roomId: roomid,
+        //     messageContent: message
+        // }
+        // // if (message) {
+
+        // socket && socket.emit("sendMessage", messageSocket, () => setmessages(""));
+        socket && socket.on("connected", (data) => {
+            console.log("data :", data)
+        })
+
+
+        return () => {
+            socket && socket.disconnect();
+        };
+       
+    }, [])
+
     const onSubmit: SubmitHandler<FieldValues> = async (data: any) => {
 
 
-        // console.log("Data :", data)
+        console.log("Data :", data)
         const API_PATH = process.env.API_URL
         // console.log("API_PATH :", API_PATH)
         const token = await fetch(`http://127.0.0.1/auth/login`, {
@@ -49,6 +79,7 @@ const Login = () => {
             loginHook.onClose()
             const user_token = await token.json()
             Cookies.set("token", user_token.access_token)
+            Cookies.set("_id", user_token._id)
         }
     }
     const bodyContent = (

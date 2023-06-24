@@ -49,7 +49,8 @@ const DirectOLdMessages = (props: { socket: Socket }) => {
     useEffect(() => {
         (async function getOLdMessages() {
                 console.log("Ana Hna !")
-                const response = await fetch(`http://127.0.0.1/users/direct-messages`, {
+                const response = await fetch(`http://127.0.0.1/direct-message`, {
+                    method: 'GET',
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -57,7 +58,7 @@ const DirectOLdMessages = (props: { socket: Socket }) => {
                 if (response.ok) {
                     const _OLd_rooms = await response.json()
                     console.log("_OLd_rooms :", _OLd_rooms)
-                    setOLdRooms(_OLd_rooms.DirectMessage)
+                    setOLdRooms(_OLd_rooms)
                 }
                 else {
                     console.log("Can't fetch data")
