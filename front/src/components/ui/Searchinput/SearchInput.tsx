@@ -1,16 +1,17 @@
 import { InputProps } from '@/types/InputTypes';
 import { FC } from 'react';
+import { BiSearch } from 'react-icons/bi';
 
-const Input: FC<InputProps> = ({ label, icon, ...props }) => {
+const SearchInput: FC<InputProps> = ({ label, ...props }) => {
   return (
     <div className=" flex flex-col bg-container outline-none border-none focus:outline-secondary rounded-2xl">
       {label && <label htmlFor="name">Name</label>}
       <div className="flex px-2 p-1 items-center gap-2">
-        {icon && <div className="">{icon}</div>}
-        <input className="bg-transparent outline-none " {...props} />
+        <BiSearch className="fill-gray-300" size={18} />
+        <input className="bg-transparent outline-none w-full" {...props} />
       </div>
     </div>
   );
 };
 
-export default Input;
+export default SearchInput;
