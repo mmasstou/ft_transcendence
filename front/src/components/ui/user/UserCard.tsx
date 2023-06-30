@@ -17,22 +17,24 @@ const UserCard: FC<UserCardProps> = ({
         <h3 className="xl:text-lg">{username}</h3>
       </div>
       <div className="flex items-center text-xs xl:text-sm gap-2">
-        <button className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors">
-          {addRequest ? (
-            <TiUserAdd
-              className="mr-1 fill-sky-500 group-hover:fill-container"
-              size={16}
-            />
-          ) : (
-            invite && (
-              <BiJoystick
+        {addRequest || invite ? (
+          <button className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors">
+            {addRequest ? (
+              <TiUserAdd
                 className="mr-1 fill-sky-500 group-hover:fill-container"
                 size={16}
               />
-            )
-          )}
-          {addRequest ? 'Add Friend' : invite && 'Invite'}
-        </button>
+            ) : (
+              invite && (
+                <BiJoystick
+                  className="mr-1 fill-sky-500 group-hover:fill-container"
+                  size={16}
+                />
+              )
+            )}
+            {addRequest ? 'Add Friend' : invite && 'Invite'}
+          </button>
+        ) : null}
         <div
           className={`border flex gap-1 items-center p-1 px-2 xl:px-3 rounded-xl ${
             inGame
