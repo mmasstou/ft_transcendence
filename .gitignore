@@ -43,3 +43,6 @@ backend/prisma/migrations
 
 # front:
 front/package-lock.json
+
+# database:
+databases/data/*
