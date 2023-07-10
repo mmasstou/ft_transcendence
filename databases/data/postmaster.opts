@@ -1,1 +1,1 @@
-/usr/lib/postgresql/13/bin/postgres
+/usr/lib/postgresql/13/bin/postgres "-D" "/var/lib/postgresql/data" "-c" "listen_addresses=" "-p" "5432"

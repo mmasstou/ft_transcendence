@@ -45,4 +45,4 @@ backend/prisma/migrations
 front/package-lock.json
 
 # database:
-databases/data/*
+databases/data/

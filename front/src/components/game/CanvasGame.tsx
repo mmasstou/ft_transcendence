@@ -1,4 +1,4 @@
-"use client"
+ "use client"
 import { LegacyRef, RefObject, createContext, useContext, useEffect, useRef, useState } from "react";
 // import { loadImage } from 'canvas';
 import classNames from 'classnames';
@@ -45,9 +45,9 @@ function drawBackground(canvas: HTMLCanvasElement | null) {
         backgroundCtx.beginPath();
         backgroundCtx.fillStyle = "#AAD9A5";
         if (is_vertical)
-            backgroundCtx.fillRect(0, 0, canvas.width - canvas.width * 0.12, canvas.height);
+            backgroundCtx.fillRect(0, 0, canvas.width - canvas.width * 0.15, canvas.height);
         else
-            backgroundCtx.fillRect(0, 0, canvas.width, canvas.height - canvas.height * 0.12);
+            backgroundCtx.fillRect(0, 0, canvas.width, canvas.height - canvas.height * 0.15);
 
         draw_line(backgroundCtx, canvas, is_vertical);
     }
@@ -69,7 +69,7 @@ function drawScore(canvas: HTMLCanvasElement | null, images: { img1: CanvasImage
         ScoreCtx.fillStyle = "#808080";
         if (is_vertical){
             // ScoreCtx.fillRect(canvas.width - canvas.width * 0.12, 0, canvas.width, canvas.height);
-            const str = canvas.width / 20 + "px Arial";
+            const str = canvas.width / 25 + "px Arial";
             ScoreCtx && (ScoreCtx.fillStyle = '#fff') && (ScoreCtx.font = str);
             images.img1 && ScoreCtx.drawImage(images.img1, (canvas.width - canvas.width * 0.12), 0, canvas.width * 0.12, canvas.width * 0.12);
             images.img2 && ScoreCtx.drawImage(images.img2, (canvas.width - canvas.width * 0.12), canvas.height - canvas.width * 0.12, canvas.width * 0.12, canvas.width * 0.12);
@@ -78,7 +78,7 @@ function drawScore(canvas: HTMLCanvasElement | null, images: { img1: CanvasImage
         }
         else {
             // ScoreCtx.fillRect(0, canvas.height - (canvas.height * 0.12), canvas.width, canvas.height);
-            const str = canvas.width / 20 + "px Arial";
+            const str = canvas.width / 25 + "px Arial";
             ScoreCtx && (ScoreCtx.fillStyle = '#fff') && (ScoreCtx.font = str);
             images.img1 && ScoreCtx.drawImage(images.img1,0, canvas.height - (canvas.height * 0.12), canvas.height * 0.12, canvas.height * 0.12);
             images.img2 && ScoreCtx.drawImage(images.img2,canvas.width - (canvas.height * 0.12), canvas.height - canvas.height * 0.12, canvas.height * 0.12, canvas.height * 0.12);
