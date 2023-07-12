@@ -18,12 +18,9 @@ const lato = Lato({
     variable: '--font-lato',
  });
 
-const metadata = {
-    title: 'Transcendence',
-    description: 'Online Pong Game',
-};
 
-export default function RootLayout({ children, }: { children: React.ReactNode;})
+
+export default function RootLayout({ children }: { children: React.ReactNode;})
 
 {
     return (

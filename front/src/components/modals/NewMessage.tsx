@@ -19,7 +19,7 @@ const NewMessage = () => {
     const [InputValue, setInputValue] = useState("")
 
     useEffect(() => {
-        fetch('http://127.0.0.1/users', {
+        fetch('http://127.0.0.1/api/users', {
             headers: { Authorization: `Bearer ${token}`, },
         }).then((resp) => resp.json()).then(data => setfriends(data))
     }, [])

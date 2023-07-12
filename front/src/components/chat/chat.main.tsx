@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import OnlineUsers from "@/hooks/OnlineUsers"
+import OnlineUsers from "@/hooks/RightSidebarHook"
 import DirectOLdMessages from "./chat.directmessages.oldmessage"
 import Messages from "./chat.messages"
 import NoMessageToShow from "./chat.nomessage"
-import OLdMessages from "@/hooks/OLdMessages"
+import OLdMessages from "@/hooks/LeftSidebarHook"
 import { useSearchParams } from "next/navigation"
 import qs from 'query-string'
 import { Message as MessageType } from "@/types/types"

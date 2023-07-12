@@ -5,7 +5,7 @@ import ChatNavbar from "./chat.navbar"
 import OnlineUsersModaL from "@/components/modals/OnlineUsersModaL"
 
 const ChatBody = () => <div className=" relative  h-full flex flex-col gap-2">
-    <ChatNavbar />
+   
 
     <div className="flex flex-row justify-between h-full w-full">
         <div className=" w-full h-full "><ChatMain /></div>

@@ -3,11 +3,11 @@ import ChatBody from "./chat.body"
 import { useEffect, useState } from "react"
 
 import Cookies from "js-cookie"
-import OLdMessages from "@/hooks/OLdMessages"
-import OnlineUsers from "@/hooks/OnlineUsers"
+import OLdMessages from "@/hooks/LeftSidebarHook"
+import OnlineUsers from "@/hooks/RightSidebarHook"
 import LoginHook from "@/hooks/login"
 import {OLdMessages as OLdMessagesType} from "@/types/types"
-const Chat = () => {
+const Chats = () => {
     const oLdMessages = OLdMessages()
     const onLineUser = OnlineUsers()
     const loginHook  = LoginHook()
@@ -55,4 +55,4 @@ const Chat = () => {
     </div>
 }
 
-export default Chat
+export default Chats

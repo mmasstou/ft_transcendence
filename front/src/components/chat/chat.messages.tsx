@@ -1,8 +1,8 @@
 'use client'
 import { useSearchParams } from "next/navigation"
-import OnlineUsers from "@/hooks/OnlineUsers"
+import OnlineUsers from "@/hooks/RightSidebarHook"
 import { useEffect, useRef, useState } from "react"
-import OLdMessages from "@/hooks/OLdMessages"
+import OLdMessages from "@/hooks/LeftSidebarHook"
 import { messagesType } from "@/types/types"
 import Message from "./chat.message"
 import Cookies from "js-cookie"
@@ -47,7 +47,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
 
     useEffect(() => {
         (async function getOLdMessages() {
-            const _OLd_rooms = await fetch(`http://127.0.0.1/users/direct-message/`, {
+            const _OLd_rooms = await fetch(`http://127.0.0.1/api/users/direct-message/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

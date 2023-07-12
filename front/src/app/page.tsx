@@ -6,6 +6,10 @@ import Footer from "@/components/Home/Footer";
 import Head from "next/head";
 import Modal from "@/components/modals/Modal";
 
+const metadata = {
+    title: 'Transcendence',
+    description: 'Online Pong Game',
+};
 export default function Home() {
     return (
         <>
