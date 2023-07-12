@@ -1,6 +1,6 @@
 'use client'
 import Image from "next/image"
-import OLdMessages from "@/hooks/OLdMessages";
+import OLdMessages from "@/hooks/LeftSidebarHook";
 import {OLdMessages as OLdMessagesType, RoomsType} from "@/types/types"
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";

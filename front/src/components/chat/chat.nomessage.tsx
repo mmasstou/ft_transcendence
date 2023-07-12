@@ -1,5 +1,5 @@
 'use client'
-import OnlineUsers from "@/hooks/OnlineUsers"
+import OnlineUsers from "@/hooks/RightSidebarHook"
 
 
 const NoMessageToShow = () => {
