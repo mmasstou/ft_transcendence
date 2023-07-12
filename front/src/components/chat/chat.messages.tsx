@@ -109,7 +109,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
                 setInputValue(event.target.value);
               }}
             value={input} 
-            placeholder={`Message @'mmasstou'`} 
+            placeholder={`Message @'aboulhaj'`} 
             type="search" 
             name="" 
             id="" />

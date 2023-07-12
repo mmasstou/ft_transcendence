@@ -1,10 +1,21 @@
  "use client"
 import { LegacyRef, RefObject, createContext, useContext, useEffect, useRef, useState } from "react";
-// import { loadImage } from 'canvas';
-import classNames from 'classnames';
+import {io} from 'socket.io-client';
+import {Player, Ball} from 'G_Class/class';
+
+
+var table_obj = {
+    player1: new Player(),
+    player2: new Player(),
+    id1: '',
+    id2: '',
+    // ball: new Ball(),
+}
+
 
 var image1 = "AvatarGame.png";
 var image2 = "avatarGame2.png";
+const IPmachine = '10.13.1.5';
 var imageLoad = 0;
 
 function draw_line(backgroundCtx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, is_vertical: any) {
@@ -92,13 +103,15 @@ function drawScore(canvas: HTMLCanvasElement | null, images: { img1: CanvasImage
 
 function pongFunc(divRef: RefObject<HTMLDivElement>) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [isMounted, setIsMounted] = useState(false);
+    const [socket, setSocket] = useState<SocketIOClient.Socket | null>(null);
     const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
     const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null }>({
         img1: null,
         img2: null,
       });
-    const [Player1, setPlayer1] = useState(0);
-    const [Player2, setPlayer2] = useState(0);
+    const [Player1, setPlayer1] = useState(table_obj.player1.position);
+    const [Player2, setPlayer2] = useState(table_obj.player2.position);
     const [BallObj, setBallObj] = useState({
         x: 50,
         y: 50,
@@ -108,6 +121,28 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         width: 0,
         height: 0,
     });
+
+    function keyFunction(e: KeyboardEvent) {
+        var position1 = Player1;
+        var position2 = Player2;
+        if (e.keyCode == 37 || e.keyCode == 39) {
+            if (e.keyCode == 37){
+              if (socket.id == table_obj.id1 && position1 >= 2)
+                setPlayer1(position1 - 2)
+              else if (socket.id == table_obj.id2 && position2 >= 2)
+                setPlayer2(position2 - 2);
+            }
+            else if (e.keyCode == 39){
+              if (socket.id == table_obj.id1 && position1 <= 88)
+                setPlayer1(position1 + 2)
+                // console.log("id1: ", table_obj.id1, "id2: ",table_obj.id2);
+              else if (socket.id == table_obj.id2 && position2 <= 88)
+                setPlayer2(position2 + 2)
+            }
+            // console.log("id1: ", table_obj.id1, "id2: ",table_obj.id2);
+          }
+        }
+
     function Player1Draw(canvas: HTMLCanvasElement | null) {
         const playerLayer = document.createElement('canvas');
         const playerCtx = playerLayer.getContext('2d');
@@ -203,7 +238,10 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
             height: height,
         })
     }
+
     useEffect(() => {
+        setSocket(io(IPmachine));
+        setIsMounted(true);
         const img1 = new Image();
         const img2 = new Image();
         function checkImageLoaded() {
@@ -220,8 +258,8 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         img1.src = image1;
         img2.src = image2;
         handleResize();
-        setPlayer1(45)
-        setPlayer2(45)
+        // setPlayer1(45)
+        // setPlayer2(45)
         if (canvasRef.current) {
             setCanvas(canvasRef.current);
         }
@@ -268,13 +306,13 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     useEffect(() => {
         const obj = Player2Draw(canvas);
 
-        // window.addEventListener("keydown", keyFunction);
+        window.addEventListener("keydown", keyFunction);
         // window.addEventListener("mousemove", MouseFunction);
         // isMounted &&  socket.emit("setPlayer1", Player1);
         return () => {
             obj && obj.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && obj && canvas.parentNode.removeChild(obj.playerLayer);
-            //   window.removeEventListener("keydown", keyFunction);
+              window.removeEventListener("keydown", keyFunction);
             //   window.removeEventListener("mousemove", MouseFunction);
         }
     }, [canvasSize, Player1, Player2])
@@ -299,7 +337,11 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         //   // canvas.removeEventListener("mousemove", MouseFunction);
         }
       }, [BallObj, canvasSize])
-
+      isMounted && socket.on('update', (updateObj: any) => {
+        // console.log("emiting from server: ", updateObj.table_obj.id1);
+        table_obj.id1 = updateObj.table_obj.id1;
+        table_obj.id2 = updateObj.table_obj.id2;
+      })
     return <canvas ref={canvasRef} width={canvasSize.width} height={canvasSize.height} />;
 }
 

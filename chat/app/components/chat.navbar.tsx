@@ -23,7 +23,7 @@ const ChatNavbar = () => {
     const data = [
         {
             id: '0db1da9c-1a55-4dee-9e99-1f0d36a4c7a3',
-            login: 'mmasstou',
+            login: 'aboulhaj',
             status: 'ADMIN'
         }
     ]

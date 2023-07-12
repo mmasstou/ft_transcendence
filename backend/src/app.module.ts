@@ -10,6 +10,8 @@ import { RoomsModule } from './rooms/rooms.module';
 import { MessagesModule } from './messages/messages.module';
 import { MembersModule } from './members/members.module';
 import { ChatGateway } from './chat.gateway';
+import { GameModule } from './game/game.module';
+import { GatewayModule } from './game/gateway/gateway.module';
 @Module({
   imports: [
     AuthModule,
@@ -18,6 +20,8 @@ import { ChatGateway } from './chat.gateway';
     RoomsModule,
     MessagesModule,
     MembersModule,
+    GameModule,
+    GatewayModule,
   ],
   controllers: [AppController],
   providers: [AppService, UserService, PrismaService, ChatGateway],

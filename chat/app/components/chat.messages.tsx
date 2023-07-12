@@ -75,7 +75,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid }) => {
             }
         </div>
         <div className="flex h-full items-end w-full">
-            <input className="m-2 w-full h-[42px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded" placeholder={`Message @'mmasstou'`} type="search" name="" id="" />
+            <input className="m-2 w-full h-[42px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded" placeholder={`Message @'aboulhaj'`} type="search" name="" id="" />
         </div>
     </div>
 }
