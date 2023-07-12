@@ -60,7 +60,7 @@ export class UserGateway implements OnGatewayConnection {
       //   console.log('User result', result);
       socket.emit('connected', { UserSocketId: result });
     } catch {
-      console.log('+>', error);
+      console.log('+hna>', error);
     }
   }
 }

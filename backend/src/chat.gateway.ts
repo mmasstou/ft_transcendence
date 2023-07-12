@@ -43,7 +43,7 @@ export class ChatGateway implements OnGatewayConnection {
       console.log('user : %s |socket', payload.username, socket.id);
       _User = await this.usersService.findOne({ login });
     } catch {
-      console.log('+ -error- +>', error);
+      console.log('+ ->error- +>', error);
     }
     // Perform any necessary validation or authorization checks with the token
     // ...

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react"
 import DirectOLdMessagesItem from "./DirectOLdMessagesItem"
 import Cookies from "js-cookie"
 import { useSearchParams } from "next/navigation"
-import OnlineUsers from "@/hooks/OnlineUsers"
-import OLdMessages from "@/hooks/OLdMessages"
+import OnlineUsers from "@/hooks/RightSidebarHook"
+import OLdMessages from "@/hooks/LeftSidebarHook"
 import { RoomsType } from "@/types/types"
 import { Socket } from "socket.io-client"
 
@@ -49,7 +49,7 @@ const DirectOLdMessages = (props: { socket: Socket }) => {
     useEffect(() => {
         (async function getOLdMessages() {
                 console.log("Ana Hna !")
-                const response = await fetch(`http://127.0.0.1/direct-message`, {
+                const response = await fetch(`http://127.0.0.1/api/direct-message`, {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${token}`,
