@@ -20,7 +20,7 @@ import ContactHook from "@/hooks/contactHook"
 
 
 export default function ChatNavbar({ children }: { children: React.ReactNode; }) {
-    return <div className="navbar.box border border-white max-h-[3vh] w-full flex items-center justify-between sm:px-2 py-1">
+    return <div className="ChatNavbar border border-white max-h-[3vh] w-full flex items-center justify-between sm:px-2 py-1">
         <div className="navbar.content flex justify-between items-center w-full">
             {children}
         </div>

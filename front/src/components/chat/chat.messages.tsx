@@ -20,8 +20,8 @@ const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
     const params = useSearchParams()
     const [isMounted, setisMounted] = useState(false)
     const [userId, setuserId] = useState("")
-    const [input, setInputValue] = useState("")
     const [_messages, setmessages]: any = useState([])
+    const [input, setInputValue] = useState("")
     const [message, setMessage] = useState("");
 
     const token = Cookies.get('token')
