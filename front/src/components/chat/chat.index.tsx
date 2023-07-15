@@ -1,5 +1,4 @@
 'use client'
-import ChatBody from "./chat.body"
 import { useEffect, useState } from "react"
 
 import Cookies from "js-cookie"
@@ -7,6 +6,7 @@ import OLdMessages from "@/hooks/LeftSidebarHook"
 import OnlineUsers from "@/hooks/RightSidebarHook"
 import LoginHook from "@/hooks/login"
 import {OLdMessages as OLdMessagesType} from "@/types/types"
+import ChanneLNavbar from "./channel/channel.navbar"
 const Chats = () => {
     const oLdMessages = OLdMessages()
     const onLineUser = OnlineUsers()
@@ -50,8 +50,10 @@ const Chats = () => {
         setisMounted(true)
     }, [])
     
-    return <div className=" relative chat-box border border-orange-600 h-full w-full flex flex-col gap-4">
-        <ChatBody />
+    return <div className=" text-white relative chat-box border border-orange-600 h-full w-full flex flex-col gap-4">
+        <ChanneLNavbar />
+        {/* <ChatBody /> */}
+        chat home page
     </div>
 }
 
