@@ -67,26 +67,30 @@ const Message = (props: messagesType) => {
         }))
 
     }, [props])
-    return <div className="flex flex-col gap-1 bg-[#24323044] p-3 rounded">
+    return <div className=" relative">
+        <div className="flex flex-col gap-1 bg-[#24323044] p-3 rounded mb-4">
         <div className="message-body flex flex-row items-center gap-4">
-            <div className="image  min-w-[32px] rounded-full overflow-hidden "> <Image src={"/avatar.jpg"} alt={"avatar"} width={32} height={32} /></div>
+            <div className="image  min-w-[28px] rounded-full overflow-hidden "> <Image src={"/avatar.jpg"} alt={"avatar"} width={28} height={28} /></div>
             <div className="message-box flex flex-col gap-1">
                 <div className="header flex flex-row justify-between">
                     <div className="User-info flex flex-row gap-4 items-center">
-                        <h1 className="text-[1.3rem] font-bold text-[#FFFFFF]">{senderInfo && senderInfo.login}</h1>
-                        <span className="text-[.75rem] text-end text-[#D9D9D9]">{create_At}</span>
+                        <h1 className="text-base font-bold text-[#FFFFFF]">{senderInfo && senderInfo.login}</h1>
+                        <span className="text-sm text-end text-[#D9D9D9]">{create_At}</span>
                     </div>
                     {/* <div><BsCheck2All /></div> */}
                 </div>
                 <div className="body  text-[1.1rem] text-[#65656B]">{props.content}</div>
             </div>
         </div>
-        {/* <div className="reaction flex justify-start w-full gap-2 text-[#1EF0AE]">
-            <BsEmojiLaughing size={21} fill="#65656B" className="" />
-            <BsEmojiWink size={21} fill="#65656B" />
-            <BsEmojiDizzy size={21} fill="#65656B" />
-            <BsEmojiSmile size={21}  />
+        
+        {/* <div className="reaction flex justify-end w-full gap-2 text-[#1EF0AE]">
+            <BsEmojiLaughing size={18} fill="#65656B" className="" />
+            <BsEmojiWink size={18} fill="#65656B" />
+            <BsEmojiDizzy size={18} fill="#65656B" />
+            <BsEmojiSmile size={18}  />
         </div> */}
+    </div>
+    <div className=" absolute bottom-0 left-11 rounded-full"> <BsEmojiLaughing size={18} fill="#65656B" className="" /></div>
     </div>
 }
 

@@ -30,7 +30,7 @@ const ChanneLNavbar = () => {
     ]
 
     return <ChatNavbar>
-        <div className=" text-white" >
+        <div className="ChanneLNavbar text-white" >
             {leftSidebar.IsOpen
                 ? <BsReverseLayoutSidebarInsetReverse onClick={() => {
                     // console.log('leftSidebar.onClose()') 
@@ -44,8 +44,18 @@ const ChanneLNavbar = () => {
             }
         </div>
         <div className="flex flex-row justify-around gap-4">
-            <ChatNavbarLink to="/chat/directmessage" label="direct Message" icon={HiChatBubbleLeftRight} active={router.includes('directmessage')} />
-            <ChatNavbarLink to="/chat/channels" label="channeL" icon={FaUsers} active={router.includes('channels')} />
+            <ChatNavbarLink
+                to="/chat/directmessage"
+                label="direct Message"
+                icon={HiChatBubbleLeftRight}
+                active={router.includes('directmessage')}
+            />
+            <ChatNavbarLink
+                to="/chat/channels"
+                label="channeL"
+                icon={FaUsers}
+                active={router.includes('channels')}
+            />
         </div>
         <div className=" text-white flex gap-1 ">
             <FiUsers className="cursor-pointer" onClick={() => {

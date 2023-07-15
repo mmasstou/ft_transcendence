@@ -5,7 +5,7 @@ interface ChanneLsInter {
     children: ReactNode
 }
 const ChanneLs: React.FC<ChanneLsInter> = ({ children }) => {
-    return <div className=" relative  h-full flex flex-col gap-2">
+    return <div className="ChanneLs relative  h-full flex flex-col gap-2">
         {children}
     </div>
 }
