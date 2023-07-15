@@ -11,6 +11,7 @@
 }
 
 header {
+    border: 2px solid rgb(91, 238, 224);
     grid-area: header;
 }
 
@@ -20,23 +21,21 @@ main {
 }
 
 #Sidebar {
+    border: 2px solid rgb(212, 104, 239);
     grid-area: Sidebar;
 }
-
-
 
 
 @media (max-width: 767px) {
     .dashboard{
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: 6vh auto 4vh; 
+        grid-template-rows: 6vh auto 5vh; 
         grid-template-areas: "header "
                     "main "
                     "Sidebar";
     }
     #Sidebar {
-        margin-top: 10px;
         background-color: transparent;
     }
   }

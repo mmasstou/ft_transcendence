@@ -1,6 +1,4 @@
 "use client";
-import { ReactNode } from "react";
-import styles from "../Home/style";
 import { IoMdClose } from "react-icons/io";
 
 interface Props {

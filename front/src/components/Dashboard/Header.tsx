@@ -8,7 +8,7 @@ import { RiSettingsLine, RiNotification2Fill } from 'react-icons/ri';
 const Header = () => {
   return (
     <>
-      <div className="">
+      <div className="flex justify-center items-center">
         <Image
           className="flex justify-center lg:w-[150px] xl:w-[150px] md:w-[150px] "
           src={logo}
@@ -18,8 +18,8 @@ const Header = () => {
           priority={false}
         />
       </div>
-      <nav className="flex justify-center ">
-        <ul className="flex flex-row items-center  gap-5 ">
+      <nav className="flex justify-center items-center">
+        <ul className="flex items-center  gap-5 ">
           <li >
             <button className="">
               <RiSettingsLine
