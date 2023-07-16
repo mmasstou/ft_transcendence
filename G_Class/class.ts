@@ -23,4 +23,17 @@ class Ball {
     }
 }
 
-export {Player, Ball}
+class ballSpeed {
+    x: number;
+    y: number;
+    constructor() {
+        this.x = 0.3;
+        this.y = 0.3;
+    }
+    setBallSpeed(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+export {Player, Ball, ballSpeed}
