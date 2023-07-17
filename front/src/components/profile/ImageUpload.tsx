@@ -32,7 +32,7 @@ const ImageUpload = () => {
   const uploadInputRef = React.createRef<HTMLInputElement>();
 
   return (
-   <section className="">
+   <section className="bg-[#243230]">
      <div
       className="relative flex flex-col justify-center items-center h-[333px]  w-full cursor-pointer 
                   border-2 hover:opacity-70 hover:border-2 hover:border-dashed hover:rounded-lg transition banner"

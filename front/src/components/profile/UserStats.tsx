@@ -14,7 +14,7 @@ const Stat: FC<Props> = (info): JSX.Element => {
                 <h2 className='font-bold text-[1em]'>{info.total}</h2>
             </div>
             { info.line &&
-                <div className='border-r-[1px] h-[51px] left-4'></div>
+                <div className='border-r-[1px] h-[51px] left-4 border-[#3D4042]'></div>
             }
     </div>
   )
@@ -23,11 +23,11 @@ const Stat: FC<Props> = (info): JSX.Element => {
 
 export const UserStats = () => {
   return (
-    <div className='text-white flex items-center justify-evenly py-8'>
-        <Stat title="Total game" total={125} line={true} />
+    <div className='text-white flex items-center justify-evenly py-8 overflow-hidden'>
+        <Stat title="Total game" total={122} line={true} />
         <Stat title='Wins' total={75} line={true} />
-        <Stat title='Loses' total={50} line={true} />
-        <Stat title='Rank' total={15} line={false} />
+        <Stat title='Loses' total={464} line={true} />
+        <Stat title='Rank' total={144} line={false} />
     </div>
   )
 }

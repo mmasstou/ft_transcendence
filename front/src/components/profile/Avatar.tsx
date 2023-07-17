@@ -5,7 +5,7 @@ import style from '@/components/Home/style'
 import profile from '../../../public/profile.png'
 
 const AvatarProfile: React.FC = () => (
-  <div className='relative flex'>
+  <div className='relative flex '>
     <Avatar.Root className={`${style.flexCenter} flex-inline align-middle overflow-hidden select-none
                     w-[100px] h-[100px] rounded-full absolute top-[-7vh] left-7`}>
       <Avatar.Image
