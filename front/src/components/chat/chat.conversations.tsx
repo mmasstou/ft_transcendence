@@ -10,13 +10,14 @@ import ConversationsMessages from "./chat.conversations.messages";
 import RightSidebarHook from "@/hooks/RightSidebarHook";
 import LeftSidebarHook from "@/hooks/LeftSidebarHook";
 import { Socket } from "socket.io-client";
-import RightsideModal from "../modals/LeftsideModal";
+import RightsideModal from "../../modals/LeftsideModal";
 import Message from "./chat.message";
 import ConversationsTitlebar from "./chat.conversations.titlebar";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 
-export default function Conversations({ children }: { children: React.ReactNode }) {
+export default function Conversations({ children }: { children?: React.ReactNode }) {
 
     const rightSidebar = RightSidebarHook()
     const leftSidebar = LeftSidebarHook()
@@ -25,7 +26,7 @@ export default function Conversations({ children }: { children: React.ReactNode 
     const params = useSearchParams()
     const room = params.get('r')
     console.log("               +> room : ", room)
-    
+
     useEffect(() => {
         room ? sethasparam(true) : sethasparam(false)
         console.log("               +> room : ", room)
@@ -33,6 +34,22 @@ export default function Conversations({ children }: { children: React.ReactNode 
 
     const content = (
         <div className="flex flex-col gap-3">
+            <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} />
+            <Message content={"hello"} id={""} senderId={""} roomsId={""} created_at={""} updated_at={""} />
+            <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} />
+            <Message content={"hello"} id={""} senderId={""} roomsId={""} created_at={""} updated_at={""} />
+            <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} />
+            <Message content={"hello"} id={""} senderId={""} roomsId={""} created_at={""} updated_at={""} />
+            <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} />
+            <Message content={"hello"} id={""} senderId={""} roomsId={""} created_at={""} updated_at={""} />
+            <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} />
+            <Message content={"hello"} id={""} senderId={""} roomsId={""} created_at={""} updated_at={""} />
+            <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} />
+            <Message content={"hello"} id={""} senderId={""} roomsId={""} created_at={""} updated_at={""} />
+            <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} />
+            <Message content={"hello"} id={""} senderId={""} roomsId={""} created_at={""} updated_at={""} />
+            <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} />
+            <Message content={"hello"} id={""} senderId={""} roomsId={""} created_at={""} updated_at={""} />
             <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} />
             <Message content={"hello"} id={""} senderId={""} roomsId={""} created_at={""} updated_at={""} />
         </div>
@@ -44,7 +61,6 @@ export default function Conversations({ children }: { children: React.ReactNode 
     md:h-[90vh]
     w-full 
     flex flex-col
-      
      -orange-300
     ${rightSidebar.IsOpen ? 'hidden' : ''} 
     sm:flex`}>
@@ -61,6 +77,8 @@ export default function Conversations({ children }: { children: React.ReactNode 
                     }}
                 />
             </>
-                : <div className="flex flex-col justify-center items-center h-full w-full">No conversations</div>}
+                : <div className="flex flex-col justify-center items-center h-full w-full">
+                    <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
+                </div>}
     </div>
 }

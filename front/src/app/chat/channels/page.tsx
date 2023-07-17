@@ -5,9 +5,9 @@ import Dashboard from '@/app/Dashboard';
 import Chat from '@/components/chat';
 import ChanneLs from '@/components/chat/channel/channel.index';
 import ChanneLNavbar from '@/components/chat/channel/channel.navbar';
-import OnlineUsersModaL from '@/components/modals/RightsideModal';
+import OnlineUsersModaL from '@/modals/RightsideModal';
 import Conversations from '@/components/chat/chat.conversations';
-import LefttsideModal from '@/components/modals/LeftsideModal';
+import LefttsideModal from '@/modals/LeftsideModal';
 import ChanneLroom from '@/components/chat/channel/channel.room';
 import { RoomsType } from '@/types/types';
 import { useRouter } from 'next/navigation';
@@ -50,11 +50,7 @@ export default function page() {
           <ChanneLNavbar />
           <div className="flex flex-row justify-between h-full max-h-[91vh] w-full">
             <LefttsideModal childern={LeftSide} />
-            <Conversations >
-              <div>
-                conversations
-              </div>
-            </Conversations>
+            <Conversations />
             <OnlineUsersModaL />
           </div>
         </ChanneLs>
