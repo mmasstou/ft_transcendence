@@ -4,7 +4,7 @@ import Hero from "@/components/Home/Hero";
 import Showcase from "@/components/Home/Showcase";
 import Footer from "@/components/Home/Footer";
 import Head from "next/head";
-import Modal from "@/components/modals/Modal";
+import Modal from "@/modals/Modal";
 
 const metadata = {
     title: 'Transcendence',
