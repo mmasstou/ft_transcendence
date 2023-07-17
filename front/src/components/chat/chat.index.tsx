@@ -50,7 +50,7 @@ const Chats = () => {
         setisMounted(true)
     }, [])
     
-    return <div className=" text-white relative chat-box border border-orange-600 h-full w-full flex flex-col gap-4">
+    return <div className=" text-white relative chat-box    -orange-600 h-full w-full flex flex-col gap-4">
         <ChanneLNavbar />
         {/* <ChatBody /> */}
         chat home page

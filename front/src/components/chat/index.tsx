@@ -54,7 +54,7 @@ const Chat : React.FC<ChatInter> = ({children}) => {
         setisMounted(true)
     }, [])
     
-    return <div className="Chat relative chat-box border border-orange-600 h-full max-h-[94rem] w-full flex flex-col gap-4">
+    return <div className="Chat relative chat-box    -orange-600 h-full max-h-[94rem] w-full flex flex-col gap-4">
         {children}
     </div>
 }

@@ -39,8 +39,8 @@ const Input: React.FC<InputProps> = ({
                 }}
                 disabled={disabled}
                 className={`
-             peer w-full p-2 pt-6 text-xl bg-transparent text-[var(--white)] focus:bg-transparent font-light border rounded-md outline-none transition disabled:opacity-70 disabled:cursor-not-allowed
-             ${errors[id] ? 'border-rose-500 focus:border-rose-500' : 'border-neutral-300 focus:border-teal-500'}`}
+             peer w-full p-2 pt-6 text-xl bg-transparent border text-[var(--white)] focus:bg-transparent font-light   rounded-md outline-none transition disabled:opacity-70 disabled:cursor-not-allowed
+             ${errors[id] ? ' border-rose-500 focus: -rose-500' : ' border-neutral-300 focus:border-teal-500'}`}
             />
             <label htmlFor=""
                 className={`
