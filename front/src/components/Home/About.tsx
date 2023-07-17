@@ -23,7 +23,7 @@ const About = () => {
                 Ping pong, also known as table tennis, is a sport in which two or four players hit a lightweight ball back and forth over a table divided by 
                 a net.
                 </p>
-                <Button login={false} style="text-secondary bg-transparent border border-secondary 
+                <Button login={false} style="text-secondary bg-transparent    -secondary 
                         hover:bg-secondary hover:text-btn" title="Let’t play now" />
             </motion.div>
     

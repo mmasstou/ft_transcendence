@@ -1,5 +1,5 @@
 "use client"
-import { BsJournalMinus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from "react-icons/bs"
+import { BsJournalMinus, BsJournalPlus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from "react-icons/bs"
 import { FiUsers } from "react-icons/fi"
 import { HiChatBubbleLeftRight } from "react-icons/hi2"
 
@@ -14,10 +14,16 @@ import RightSidebarHook from "@/hooks/RightSidebarHook"
 import LeftSidebarHook from "@/hooks/LeftSidebarHook"
 import ChatNavbar from "../chat.navbar"
 
+// icons :
+import { GrChannel } from "react-icons/gr"
+import { TiContacts } from "react-icons/ti"
+import { IoCreateOutline } from "react-icons/io5"
+import ChanneLcreatemodaLHook from "@/hooks/channel.create.hook"
 const ChanneLNavbar = () => {
     const rightSidebar = RightSidebarHook()
     const leftSidebar = LeftSidebarHook()
     const contacthook = ContactHook()
+    const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
     const router = usePathname();
 
     let InitOLdMessages: OLdMessagesType[] = [{ name: '', LastMessage: '', create_At: '', image: '' }]
@@ -58,11 +64,13 @@ const ChanneLNavbar = () => {
             />
         </div>
         <div className=" text-white flex gap-1 ">
+            {/* <IoCreateOutline className="cursor-pointer" onClick={() => {}} size={24} /> */}
+            {/* <GrChannel className="cursor-pointer" onClick={() => {}} size={21} /> */}
+            <BsJournalPlus className="cursor-pointer" onClick={() => channeLcreatemodaLHook.onOpen()} size={21} />
             <FiUsers className="cursor-pointer" onClick={() => {
                 !rightSidebar.IsOpen ? rightSidebar.onOpen(data) : rightSidebar.onClose()
             }} size={24} />
-            {/* <TiContacts className="cursor-pointer" onClick={() => contacthook.onOpen()}  size={26} /> */}
-            <BsJournalMinus className="cursor-pointer" onClick={() => contacthook.onOpen()} size={21} />
+            
         </div>
     </ChatNavbar>
 

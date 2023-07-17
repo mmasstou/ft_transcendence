@@ -21,7 +21,6 @@ export class RoomsService {
     private membersservice: MembersService,
     private messageservice: MessagesService,
   ) {}
-
   async findOne(params: { name: string }): Promise<Rooms> {
     try {
       const { name } = params;

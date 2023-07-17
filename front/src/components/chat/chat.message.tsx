@@ -2,8 +2,13 @@ import { useEffect, useState } from "react"
 import { messagesType, userType } from "@/types/types"
 import Cookies from "js-cookie";
 import Image from "next/image"
-import { BsCheck2All, BsEmojiDizzy, BsEmojiLaughing, BsEmojiSmile, BsEmojiWink } from "react-icons/bs";
-
+import { BsCheck2All, BsEmojiDizzy, BsEmojiFrownFill, BsEmojiLaughing, BsEmojiSmile, BsEmojiWink } from "react-icons/bs";
+import { UserAvatar } from "./chat.userAvater";
+import { HiArrowUturnLeft } from "react-icons/hi2";
+import { MdAddReaction } from "react-icons/md";
+import { AiFillMessage } from "react-icons/ai";
+import { ChannelReactions } from "./channel/channel.reaction";
+import { ChannelReplys } from "./channel/channel.replys";
 const Message = (props: messagesType) => {
     const [senderInfo, setsenderInfo] = useState({
         id: "",
@@ -38,22 +43,22 @@ const Message = (props: messagesType) => {
     useEffect(() => {
         const token = Cookies.get("token");
         (async function getsenderInfo() {
-            // console.log("props.senderId :", props.senderId)
-             await fetch(`http://127.0.0.1/api/users/${props.senderId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }).then(res => res.json()).then((data : userType) => setsenderInfo(data))
-            // // console.log("props.senderId :", _OLd_rooms.messages)
-            // setmessages(_OLd_rooms.messages)
+            if (props.senderId !== undefined && props.senderId !== null && props.senderId !== "") {
+                console.log("props.senderId :", props.senderId)
+                console.log("props :", props)
+                const response = await fetch(`http://127.0.0.1/api/users/${props.senderId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                if (!response.ok) {
+                    return
+                }
+                const _userInfo = await response.json()
+                setsenderInfo(_userInfo);
+            }
         })();
-        // (async function getsenderInfo() {
-        //      await fetch(`http://127.0.0.1/api/users/${props.roomsId}`, {
-        //         headers: {
-        //             Authorization: `Bearer ${token}`,
-        //         },
-        //     }).then(res => res.json()).then((data : userType) => setreciverInfo(data))
-        // })();
+
         const date = new Date(props.created_at);
 
         setcreate_At(date.toLocaleString('en-US', {
@@ -67,30 +72,26 @@ const Message = (props: messagesType) => {
         }))
 
     }, [props])
-    return <div className=" relative">
-        <div className="flex flex-col gap-1 bg-[#24323044] p-3 rounded mb-4">
-        <div className="message-body flex flex-row items-center gap-4">
-            <div className="image  min-w-[28px] rounded-full overflow-hidden "> <Image src={"/avatar.jpg"} alt={"avatar"} width={28} height={28} /></div>
-            <div className="message-box flex flex-col gap-1">
-                <div className="header flex flex-row justify-between">
-                    <div className="User-info flex flex-row gap-4 items-center">
-                        <h1 className="text-base font-bold text-[#FFFFFF]">{senderInfo && senderInfo.login}</h1>
-                        <span className="text-sm text-end text-[#D9D9D9]">{create_At}</span>
+    return <div className=" relative flex flex-col ">
+        <div className="flex flex-row justify-between  items-center">
+            <div className="MessagesenderInfo w-full boredr-2  -green-500 flex flex-row items-center p-1 gap-1">
+                <UserAvatar size={18} image={"/avatar.jpg"} />
+                <h3 className="text-base font-light text-[#FFFFFF]">mmasstou</h3>
+            </div>
+            <span className="text-[.5rem] text-end text-[#D9D9D9] min-w-max">{create_At}</span>
+        </div>
+        <div className="flex flex-col gap-1 bg-[#24323044] rounded-bl-[21px] rounded-r-[21px] p-2  mb-4">
+            <div className="message-body flex flex-row items-center gap-4">
+                <div className="message-box flex flex-col gap-1 w-full">
+                    <div className="header flex flex-row justify-end ">
+                        <div><BsCheck2All /></div>
                     </div>
-                    {/* <div><BsCheck2All /></div> */}
+                    <div className="body  text-base text-[#65656B]">{props.content}</div>
                 </div>
-                <div className="body  text-[1.1rem] text-[#65656B]">{props.content}</div>
             </div>
         </div>
-        
-        {/* <div className="reaction flex justify-end w-full gap-2 text-[#1EF0AE]">
-            <BsEmojiLaughing size={18} fill="#65656B" className="" />
-            <BsEmojiWink size={18} fill="#65656B" />
-            <BsEmojiDizzy size={18} fill="#65656B" />
-            <BsEmojiSmile size={18}  />
-        </div> */}
-    </div>
-    <div className=" absolute bottom-0 left-11 rounded-full"> <BsEmojiLaughing size={18} fill="#65656B" className="" /></div>
+        {/* <ChannelReactions /> */}
+        {/* <ChannelReplys /> */}
     </div>
 }
 

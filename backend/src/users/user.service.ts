@@ -8,16 +8,18 @@ import { UpdateUserDto } from './dtos/UpdateUserDto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(params: { login: string }): Promise<User> {
+  async findOne(params: { login: string }): Promise<any> {
     const { login } = params;
     // console.log('++findOne++>', login);
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id: login },
     });
+    if (!user) return {};
+    return user;
   }
-  async findOneID(params: { login: string }): Promise<User> {
+  async findOneLogin(params: { login: string }): Promise<User> {
     const { login } = params;
-    // console.log('++findOne++>', login);
+    console.log('+USER+findOne++>', login);
     return await this.prisma.user.findUnique({
       where: { login },
     });

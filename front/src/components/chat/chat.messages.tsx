@@ -108,7 +108,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
         console.log("socket.on('message', (data : any) => :", [data])
         setmessages([..._messages, data])
     })
-    return <div className={`relative flex flex-col border-2 w-full m-auto   h-full `}>
+    return <div className={`relative flex flex-col  -2 w-full m-auto   h-full `}>
         <div 
         ref={scrollRef}
         className="relative flex flex-col gap-2 p-2 md:p-5 md:pb-2 m-2 h-[81vh] md:h-[85vh] overflow-x-scroll overflow-y-auto" >
@@ -121,7 +121,7 @@ const Messages: React.FC<MessagesProps> = ({ roomid, socket}) => {
         </div>
         <div className="absolute bottom-3 md:bottom-1 sm:bottom-0 left-0 w-full ">
             <input
-                className=" w-full h-[42px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
+                className=" w-full h-[42px] text-white text-base  font-semibold px-2 outline bg-[#243230]  -transparent focus: -transparent rounded"
                 onSubmit={(event : any) => {
                     handleSubmit(event)
                     setMessage(event.target.value);

@@ -39,6 +39,8 @@ services:
     networks:
       - APInetwork
     restart: always
+    ports:
+      - 5432:5432
     # volumes:
       # - /Users/mohamed/Documents/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
   

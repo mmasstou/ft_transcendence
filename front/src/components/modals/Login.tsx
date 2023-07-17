@@ -6,7 +6,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { HiOutlineLogin } from "react-icons/hi"
 import { useRouter } from "next/navigation";
 import Input from "../chat/Input";
-import Modal from "./modaL copy";
+import Modal from "./channel.modaL";
 import LoginHook from "@/hooks/login";
 import { Socket, io } from "socket.io-client";
 
@@ -38,7 +38,8 @@ const Login = () => {
 
         const socket: Socket = io("http://localhost:80/User", {
             auth: {
-                token: `${token}`
+                token: `${token}`,
+                id: `${Cookies.get("_id")}`
             }
         });
         setSocket(socket);
