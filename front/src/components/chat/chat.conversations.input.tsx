@@ -10,7 +10,7 @@ interface ConversationsInputInterface{
 export default function ConversationsInput( {messageTo, OnSubmit} : ConversationsInputInterface ) {
     const [input, setInputValue] = useState("")
     const [message, setMessage] = useState("");
-    return <div className="w-full ">
+    return <div className="w-full m-[2px]">
         <input
             className="ConversationsInput w-full h-[4vh]  text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
             onSubmit={(event : any) => {
