@@ -1,6 +1,6 @@
 "use client"
 import ContactHook from "@/hooks/contactHook"
-import Modal from "./modaL copy"
+import Modal from "./channel.modaL"
 import { TiArrowMinimise } from "react-icons/ti"
 import Input from "../chat/Input"
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler } from "react-hook-form"
@@ -19,9 +19,11 @@ const NewMessage = () => {
     const [InputValue, setInputValue] = useState("")
 
     useEffect(() => {
-        fetch('http://127.0.0.1/api/users', {
+       (async function getFriends() {
+        await fetch('http://127.0.0.1/api/users', {
             headers: { Authorization: `Bearer ${token}`, },
         }).then((resp) => resp.json()).then(data => setfriends(data))
+       })();
     }, [])
 
     useEffect(() => {
@@ -89,8 +91,6 @@ const NewMessage = () => {
 
         </div>
     )
-
-
     console.log("friends :", friends)
     return <Modal IsOpen={contacthook.IsOpen} body={bodyContent} />
 }

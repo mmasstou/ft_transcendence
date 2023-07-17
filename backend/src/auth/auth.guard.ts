@@ -34,7 +34,9 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const User = await this.usersService.findOne({ login: payload.username });
+    const User = await this.usersService.findOne({ login: payload.sub });
+    console.log('payload.username', payload.sub);
+    console.log('++User++>', User);
     if (User && !User.is_active) throw new ForbiddenException();
 
     return true;

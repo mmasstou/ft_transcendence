@@ -2,10 +2,7 @@ import LeftSidebarHook from "@/hooks/LeftSidebarHook"
 import RightSidebarHook from "@/hooks/RightSidebarHook"
 import React, { ReactNode } from "react"
 
-interface RightsideModalInterface {
-    childern ?: ReactNode
-}
-const RightsideModal : React.FC<RightsideModalInterface> = ({childern}) => {
+export default function LefttsideModa({childern} :{childern ?: ReactNode} ) {
 
     const rightSidebar = RightSidebarHook()
     const leftSidebar = LeftSidebarHook()
@@ -15,7 +12,7 @@ const RightsideModal : React.FC<RightsideModalInterface> = ({childern}) => {
 
     if (!leftSidebar.IsOpen)
         return null
-    return <div className={` relative flex justify-center   h-full w-full  border border-green-500 overflow-y-scroll 
+    return <div className={` relative flex justify-center   h-full w-full border-r  border-black overflow-y-scroll mr-1  bg-[#24323044]
         ${leftSidebar.IsOpen ? ' max-w-full lg:max-w-[320px]' : 'max-w-full md:max-w-[320px]'}
     
         `}>
@@ -26,4 +23,3 @@ const RightsideModal : React.FC<RightsideModalInterface> = ({childern}) => {
     </div>
 }
 
-export default RightsideModal

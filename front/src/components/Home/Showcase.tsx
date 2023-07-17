@@ -23,7 +23,7 @@ const Showcase = () => {
             Experience the thrill of table tennis with our fast-paced, hyper-realistic game. 
             Compete with friends and climb the leader boards to become a champion.
             </p>
-            <Button login={false} style="text-secondary bg-transparent border border-secondary 
+            <Button login={false} style="text-secondary bg-transparent    -secondary 
                         hover:bg-secondary hover:text-btn" title="Let’t play now"/>
         </motion.div>
 

@@ -1,6 +1,6 @@
 "use client"
 import ConnectionHook from "@/hooks/connection.alert.hook"
-import Modal from "./modaL copy"
+import Modal from "./channel.modaL"
 
 
 const ConnectionAlert = ()=>{
