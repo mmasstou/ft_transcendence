@@ -13,7 +13,7 @@ export default function LefttsideModa({childern} :{childern ?: ReactNode} ) {
     if (!leftSidebar.IsOpen)
         return null
     return <div className={` relative flex justify-center   h-full w-full border-r  border-black overflow-y-scroll  bg-[#24323044]
-        ${leftSidebar.IsOpen ? ' max-w-full lg:max-w-[320px]' : 'max-w-full md:max-w-[320px]'}
+        ${rightSidebar.IsOpen ? ' max-w-full lg:max-w-[320px]' : 'max-w-full md:max-w-[320px]'}
     
         `}>
         <div className="w-full">

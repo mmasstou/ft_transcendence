@@ -2,7 +2,6 @@
 import Login from '@/modals/Login';
 import './globals.css';
 import { Changa, Lato } from 'next/font/google';
-import NewMessage from '@/modals/NewMessage';
 import ConnectionAlert from '@/modals/connection.alert.modal';
 import ChanneLCreateModaL from '@/modals/channel/channel.create.modaL';
 import ChanneLAddFriendsModaL from '@/modals/channel/channel.add.friends.modaL';
@@ -28,7 +27,6 @@ export default function RootLayout({ children }: { children: React.ReactNode;})
     return (
         <html lang="en" >
             <Login />
-            <NewMessage />
             <ChanneLCreateModaL />
             <ChanneLAddFriendsModaL />
             <ConnectionAlert />
