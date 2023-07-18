@@ -48,16 +48,18 @@ export const Navbar = () => {
                 </ul>
             </nav>
         </div>
-        {
-            (url === "http://localhost:3000/profile" || url === "http://localhost:3000/profile#Statistics") && <Statistics />
-        }
+        <div >
+            {
+                (url === "http://localhost:3000/profile" || url === "http://localhost:3000/profile#Statistics") && <Statistics />
+            }
 
-        {
-            (url === "http://localhost:3000/profile#History") && <Historique />
-        } 
-        {
-            (url === "http://localhost:3000/profile#Friend") && <Friend />
-        }
+            {
+                (url === "http://localhost:3000/profile#History") && <Historique />
+            } 
+            {
+                (url === "http://localhost:3000/profile#Friend") && <Friend />
+            }
+        </div>
     </>
   )
 }

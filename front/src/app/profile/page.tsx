@@ -1,6 +1,6 @@
 import ImageUpload from '@/components/profile/ImageUpload'
 import Dashboard from '../Dashboard'
-import AvatarProfile from '@/components/profile/Avatar'
+import AvatarProfile from '@/components/profile/AvatarProfile'
 import { countries } from 'country-flag-icons'
 import { UserInfo } from '@/components/profile/UserInfo'
 import { UserStats } from '@/components/profile/UserStats'
