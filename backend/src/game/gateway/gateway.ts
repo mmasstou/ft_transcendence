@@ -32,6 +32,7 @@ function check_col(){
     var ball_rad = (table_obj.SizeCanvas.width + table_obj.SizeCanvas.height) / 120;
     // console.log("player1 ", player1,"player2", player2, "ball_x", ball_x, "ball_y", ball_y, "ball_rad", ball_rad, "player_width", player_width, "player_height",player_height, "is_vertical", is_vertical);
 
+
     // console.log(player1, " - ", player2, " -- ", ball_x, ball_y);
 
 
@@ -39,16 +40,26 @@ function check_col(){
         table_obj.ball_speed.y = -table_obj.ball_speed.y;
     else if (is_vertical && (((ball_x + ball_rad) >= table_obj.SizeCanvas.width) || (ball_x - ball_rad) <= 0)) //// colleg with wall V
         table_obj.ball_speed.y = -table_obj.ball_speed.y;
-    else if (is_vertical && (((table_obj.SizeCanvas.height * 44/45) - ball_y) < (ball_rad + table_obj.SizeCanvas.height / 90)) && ((ball_x - player2 - player_width) >= 0 || (ball_x - player1) > 0)) {
-        // console.log((ball_x - ball_rad) - player1, (ball_x - ball_rad), player1);
+    // console.log(player1 , player1 + player_width, table_obj.SizeCanvas.width);
+    // else if (is_vertical && (ball_x - ball_rad > player1) && (ball_x + ball_rad < player1 + player_width) && (ball_y + ball_rad > table_obj.SizeCanvas.height - player_height))
+    //     table_obj.ball_speed.x = -table_obj.ball_speed.x;
+    else if ( is_vertical && (ball_x - ball_rad) >= player1 && (ball_x + ball_rad) <= player1 + player_width && (ball_y + ball_rad > table_obj.SizeCanvas.height - player_height) && (ball_y + ball_rad < (table_obj.SizeCanvas.height * 44/45))) {
+        console.log((ball_x - ball_rad),  player1 ,(ball_x - (player1 + player_width)));
         table_obj.ball_speed.x = -table_obj.ball_speed.x;
     }
+    else if (is_vertical && ((ball_y - (table_obj.SizeCanvas.height / 45)) < (ball_rad + table_obj.SizeCanvas.height / 90))) {
+        // console.log(ball_x - player1 ,(ball_x - (player1 + player_width)));
+        table_obj.ball_speed.x = -table_obj.ball_speed.x;
+    }
+    // console.log(player1, table_obj.SizeCanvas.width);
+ //     else if (is_vertical && (((table_obj.SizeCanvas.height * 44/45) - ball_y) < (ball_rad + table_obj.SizeCanvas.height / 90)) && ((ball_x - player2 - player_width) >= 0 || (ball_x - player1) > 0)) {
+        // console.log((ball_x - ball_rad) - player1, (ball_x - ball_rad), player1);
+
 
     // else if (is_vertical && (((ball_y + ball_rad) - player_height) > 0 ) && (ball_x + ball_rad) < player1 + player_width) {  ////// player 1 V
     //     // console.log(ball_y);
     //     table_obj.ball_speed.x = -table_obj.ball_speed.x;
 
-    
     // }
 
 
@@ -74,6 +85,7 @@ function check_col(){
     // }
     // // return ball_speed
 }
+
 
 function moveBall(){
     // BallObj: { x: number; y: number; },
@@ -102,11 +114,12 @@ function moveBall(){
       table_obj.ball.x = 50;
     //   table_obj.ball.y = 50;
     }
+    
     // return ballPos;
   }
  
 @WebSocketGateway()
-export class MyGateway implements OnModuleInit {
+class MyGateway implements OnModuleInit {
     @WebSocketServer()
     server: Server;
     
@@ -142,40 +155,41 @@ export class MyGateway implements OnModuleInit {
         });
     }
     
-    @SubscribeMessage('moveBall')
-    MoveBall() {
-        clearInterval(current);
-        if (table_obj.Status) {
-            current = setInterval(() => {
-                check_col();
-                moveBall();
-                this.server.emit('setBall', table_obj.ball);
-            }, 15);
-        }
-    }
-
+    // @SubscribeMessage('moveBall')
+    // MoveBall() {
+    //     clearInterval(current);
+    //     if (table_obj.Status) {
+    //         current = setInterval(() => {
+    //             check_col();
+    //             moveBall();
+    //             this.server.emit('setBall', table_obj.ball);
+    //         }, 15);
+    //     }
+    // }
+    
     @SubscribeMessage('setPlayer1')
     SetPlayer1(client: any, data: any) {
         table_obj.player1.position = data;
-        this.server.emit('update', table_obj);
+        // this.server.emit('update', table_obj);
         this.server.emit('setPlayer1', data);
         // this.server.to(body.room).emit('message', {titile: 'new message from the server', content: body})
     }
 
+
     @SubscribeMessage('setPlayer2')
     SetPlayer2(client: any, data: any) {
         table_obj.player2.position = data;
-        this.server.emit('update', table_obj);
+        // this.server.emit('update', table_obj);
         this.server.emit('setPlayer2', data);
     }
 
-    @SubscribeMessage('setBall')
-    SetBall(client: any, data: any) {
-        // console.log('data :', data);
-        table_obj.ball = data;
-        // this.server.emit('update', table_obj);
-        this.server.emit('setBall', data);
-    }
+    // @SubscribeMessage('setBall')
+    // SetBall(client: any, data: any) {
+    //     // console.log('data :', data);
+    //     // table_obj.ball = data;
+    //     // this.server.emit('update', table_obj);
+    //     this.server.emit('setBall', table_obj);
+    // }
     
     @SubscribeMessage('setStatus')
     SetStatus(client:any, data: boolean) {
@@ -188,5 +202,34 @@ export class MyGateway implements OnModuleInit {
         table_obj.SizeCanvas = data;
     }
 }
+
+@WebSocketGateway({namespace: 'ball'})
+class BallGateway implements OnModuleInit {
+    @WebSocketServer()
+    server: Server;
+    
+    onModuleInit() {
+        this.server.on('connection', (socket) => {
+            console.log('ballConnected', socket.id);
+        });
+    }
+
+        @SubscribeMessage('moveBall')
+        MoveBall() {
+            // console.log('moveBall', table_obj.Status);
+            clearInterval(current);
+            if (table_obj.Status) {
+                current = setInterval(() => {
+                    check_col();
+                    moveBall();
+                    this.server.emit('setBall', table_obj.ball);
+                }, 15);
+            }
+        }
+}
+
+export {MyGateway, BallGateway}
+
 // /app/dist/src/game/gateway/gateway.js
+
 

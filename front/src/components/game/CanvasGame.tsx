@@ -22,16 +22,17 @@ var lineColor = "#ffff55";
 var ballColor = "#ffff55";
 var player1Color = "#ffff55";
 var player2Color = "#ffff55";
-const IPmachine = '10.13.4.16';
+const IPmachine = '10.13.1.11';
+const IPmachineBall = '10.13.1.11/ball';
 var imageLoad = 0;
 
-function draw_line(backgroundCtx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, is_vertical: any) {
+function draw_line(backgroundCtx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, canvasSize: {width:number, height: number}, is_vertical: any) {
     backgroundCtx.strokeStyle = lineColor;
     backgroundCtx.beginPath();
     let x = 0;
     if (is_vertical) {
         backgroundCtx.lineWidth = canvas.width / 1000;
-        while (x + 10 <= canvas.width - canvas.width * 0.15) {
+        while (x + 10 <= canvasSize.width) {
             backgroundCtx.moveTo(x, canvas.height / 2);
             backgroundCtx.lineTo(x + 10, canvas.height / 2);
             backgroundCtx.stroke();
@@ -40,7 +41,7 @@ function draw_line(backgroundCtx: CanvasRenderingContext2D, canvas: HTMLCanvasEl
     }
     else {
         backgroundCtx.lineWidth = canvas.height / 1000;
-        while (x + 10 <= canvas.height - canvas.height * 0.15) {
+        while (x + 10 <= canvasSize.height) {
             backgroundCtx.moveTo(canvas.width / 2, x);
             backgroundCtx.lineTo(canvas.width / 2, x + 10);
             backgroundCtx.stroke();
@@ -48,7 +49,7 @@ function draw_line(backgroundCtx: CanvasRenderingContext2D, canvas: HTMLCanvasEl
         }
     }
 }
-function drawBackground(canvas: HTMLCanvasElement | null, background: CanvasImageSource | null) {
+function drawBackground(canvas: HTMLCanvasElement | null, canvasSize: {width:number, height: number}, background: CanvasImageSource | null) {
     const backgroundLayer = document.createElement('canvas');
     const backgroundCtx = backgroundLayer.getContext('2d');
     const is_vertical = canvas && canvas.height > canvas.width ? true : false;
@@ -63,14 +64,14 @@ function drawBackground(canvas: HTMLCanvasElement | null, background: CanvasImag
         backgroundCtx.fillStyle = "#AAD9A5";
         if (is_vertical) {
             // backgroundCtx.fillRect(0, 0, canvas.width - canvas.width * 0.15, canvas.height);
-            background && backgroundCtx.drawImage(background, 0, 0, canvas.width - canvas.width * 0.15, canvas.height);
+            background && backgroundCtx.drawImage(background, 0, 0, canvasSize.width, canvasSize.height);
         }
         else {
             // backgroundCtx.fillRect(0, 0, canvas.width, canvas.height - canvas.height * 0.15);
-            background && backgroundCtx.drawImage(background, 0, 0, canvas.width, canvas.height - canvas.height * 0.15);
+            background && backgroundCtx.drawImage(background, 0, 0, canvasSize.width, canvasSize.height);
         }
 
-        draw_line(backgroundCtx, canvas, is_vertical);
+        draw_line(backgroundCtx, canvas, canvasSize, is_vertical);
     }
     return { backgroundCtx, backgroundLayer }
 }
@@ -84,7 +85,7 @@ function drawScore(canvas: HTMLCanvasElement | null, images: { img1: CanvasImage
         ScoreLayer.width = canvas.width;
         ScoreLayer.height = canvas.height;
         ScoreLayer.style.position = 'absolute';
-        ScoreLayer.style.zIndex = '0';
+        ScoreLayer.style.zIndex = '1';
         canvas.parentNode && canvas.parentNode.insertBefore(ScoreLayer, canvas);
         ScoreCtx.beginPath();
         ScoreCtx.fillStyle = "#808080";
@@ -117,6 +118,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     const [Status, setStatus] = useState(false);
     const intervalRef = useRef<number>(0);
     const [socket, setSocket] = useState<SocketIOClient.Socket | null>(null);
+    const [ballSocket, setBallSocket] = useState<SocketIOClient.Socket | null>(null);
     const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
     const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, background: HTMLImageElement | null }>({
         img1: null,
@@ -149,26 +151,59 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         }
       }
 
+      function MouseFunction(event: { clientX: number; clientY: number; }) {
+        var updatePlayer;
+        if (isMounted && canvas) {
+          const rect = canvas.getBoundingClientRect();
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+          if (x >= 0 && y >= 0 && x <= rect.width && y <= rect.height) {
+            var position1 = Player1;
+            var position2 = Player2;
+            var is_vertical = canvas.height > canvas.width ? true : false;
+            if (is_vertical && isMounted && socket.id == table_obj.id1) {
+              updatePlayer = position1 >= 0 && position1 <= 90 && (x / canvas.width) * 100 <= 90 && (x / canvas.width) * 100 >= 0 ? (x / canvas.width) * 100 : position1;
+              console.log((x / canvas.width) * 100);
+              setPlayer1(updatePlayer)
+              }
+            else if (is_vertical && isMounted && socket.id == table_obj.id2) {
+              updatePlayer = position2 >= 0 && position2 <= 90 && (x / canvas.width) * 100 <= 90 && (x / canvas.width) * 100 >= 0 ? (x / canvas.width) * 100 : position2;
+              console.log((x / canvas.width) * 100);
+              setPlayer2(updatePlayer)
+              }
+            else if (!is_vertical && isMounted && socket.id == table_obj.id1) {
+              updatePlayer = position1 >= 0 && position1 <= 90 && (y / canvas.height) * 100 <= 90 && (y / canvas.height) * 100 >= 0 ? (y / canvas.height) * 100 : position1;
+              setPlayer1(updatePlayer)
+              }
+            else if (!is_vertical && isMounted && socket.id == table_obj.id2) {
+              updatePlayer = position2 >= 0 && position2 <= 90 && (y / canvas.height) * 100 <= 90 && (y / canvas.height) * 100 >= 0 ? (y / canvas.height) * 100 : position2;
+              setPlayer2(updatePlayer)
+              }
+          }
+        }
+      }
+
     function keyFunction(e: KeyboardEvent) {
         var position1 = Player1;
         var position2 = Player2;
         if ((e.keyCode == 37 || e.keyCode == 39)) {
             if (e.keyCode == 37){
               if (socket.id == table_obj.id1 && position1 >= 2)
-                setPlayer1(position1 - 4)
+                setPlayer1(position1 - 2)
                 // moveVariable1 = position1 - 2;
               else if (socket.id == table_obj.id2 && position2 >= 2)
-                setPlayer2(position2 - 4);
+                setPlayer2(position2 - 2);
                 // moveVariable2 = position2 - 2;
             }
             else if (e.keyCode == 39){
-              if (socket && socket.id == table_obj.id1 && position1 <= 98)
-                setPlayer1(position1 + 4)
+              if (socket && socket.id == table_obj.id1 && position1 < 90)
+                setPlayer1(position1 + 2)
                 // moveVariable1 = position1 + 2;
-              else if (socket.id == table_obj.id2 && position2 <= 98)
-                setPlayer2(position2 + 4)
+              else if (socket.id == table_obj.id2 && position2 < 90)
+                setPlayer2(position2 + 2)
             //   moveVariable2 = position2 + 2;
             }
+            // console.log(Player1);
             // console.log("id1: ", table_obj.id1, "id2: ",table_obj.id2);
           }
         }
@@ -181,17 +216,17 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
             playerLayer.width = canvas.width;
             playerLayer.height = canvas.height;
             playerLayer.style.position = 'absolute';
-            playerLayer.style.zIndex = '1';
+            playerLayer.style.zIndex = '2';
             canvas.parentNode && canvas.parentNode.insertBefore(playerLayer, canvas);
             playerCtx.beginPath();
             const first = socket.id == table_obj.id1 ? Player1 : Player2;
             if (is_vertical) {
                 playerCtx.fillStyle = player1Color;
-                playerCtx.fillRect((((canvas.width - canvas.width * 0.25) * first) / 100), canvas.height - ((canvas.height / 150) + canvas.height / 45), canvas.width / 10, canvas.height / 90)
+                playerCtx.fillRect(((canvasSize.width * first) / 100), canvasSize.height - ((canvasSize.height / 150) + canvasSize.height / 45), canvasSize.width / 10, canvasSize.height / 90)
             }
             else {
                 playerCtx.fillStyle = player1Color;
-                playerCtx.fillRect(canvas.width - ((canvas.width / 150) + canvas.width / 45), ((canvas.height - (canvas.height * 0.25)) * first) / 100, canvas.width / 90, canvas.height / 10)
+                playerCtx.fillRect(canvasSize.width - ((canvasSize.width / 150) + canvasSize.width / 45), (canvasSize.height * first) / 100, canvasSize.width / 90, canvasSize.height / 10)
             }
             return { playerLayer, playerCtx }
         }
@@ -205,17 +240,17 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
             playerLayer.width = canvas.width;
             playerLayer.height = canvas.height;
             playerLayer.style.position = 'absolute';
-            playerLayer.style.zIndex = '1';
+            playerLayer.style.zIndex = '2';
             canvas.parentNode && canvas.parentNode.insertBefore(playerLayer, canvas);
             playerCtx.beginPath();
             const second = socket.id == table_obj.id1 ? Player2 : Player1;
             if (is_vertical) {
                 playerCtx.fillStyle = player2Color;
-                playerCtx.fillRect((((canvas.width - (canvas.width * 0.25)) * second) / 100), canvas.height / 45, canvas.width / 10, canvas.height / 90)
+                playerCtx.fillRect(((canvasSize.width * second) / 100), canvasSize.height / 45, canvasSize.width / 10, canvasSize.height / 90)
             }
             else {
                 playerCtx.fillStyle = player2Color;
-                playerCtx.fillRect(canvas.width / 45, ((canvas.height - (canvas.height * 0.25)) * second) / 100, canvas.width / 90, canvas.height / 10)
+                playerCtx.fillRect(canvasSize.width / 45, (canvasSize.height * second) / 100, canvasSize.width / 90, canvasSize.height / 10)
             }
             return { playerLayer, playerCtx }
         }
@@ -237,15 +272,15 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
             ballLayer.width = canvas.width;
             ballLayer.height = canvas.height;
             ballLayer.style.position = 'absolute';
-            ballLayer.style.zIndex = '2';
+            ballLayer.style.zIndex = '3';
             canvas.parentNode && canvas.parentNode.insertBefore(ballLayer, canvas);
             if (ballCtx) {
                 ballCtx.beginPath();
                 ballCtx.fillStyle = ballColor;
                 if (is_vertical)
-                ballCtx.arc(((canvas.width - canvas.width * 0.15) * ball.y) / 100, (canvas.height * ball.x) / 100, ball_rad, 0,Math.PI * 2);
+                ballCtx.arc(((canvasSize.width) * ball.y) / 100, (canvasSize.height * ball.x) / 100, ball_rad, 0,Math.PI * 2);
                 else
-                ballCtx.arc((canvas.width * ball.x) / 100, ((canvas.height - canvas.height * 0.15) * ball.y) / 100, ball_rad, 0,Math.PI * 2);
+                ballCtx.arc((canvasSize.width * ball.x) / 100, ((canvasSize.height) * ball.y) / 100, ball_rad, 0,Math.PI * 2);
                 ballCtx.fill();
             }
         }
@@ -264,14 +299,23 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
             height = (dashboardRect.height - headerHeight) * 0.9;
             width = (dashboardRect.width - sideBarwidth) * 0.9;
         }
-        SetCanvasSize({
-            width: width,
-            height: height,
-        })
+        if (height > width) {
+            SetCanvasSize({
+                width: (width - (width * 0.15)),
+                height: height,
+            })
+        }
+        else {
+            SetCanvasSize({
+                width: width,
+                height: (height - (height * 0.15)),
+            })
+        }
     }
 
     useEffect(() => {
         setSocket(io(IPmachine));
+        setBallSocket(io(IPmachineBall));
         setIsMounted(true);
         const img1 = new Image();
         const img2 = new Image();
@@ -293,8 +337,8 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         img2.src = image2;
         background.src = backgroundSrc;
         handleResize();
-        setPlayer1(50)
-        setPlayer2(50)
+        setPlayer1(46)
+        setPlayer2(46)
         setBallObj({
             x:table_obj.ball.x,
             y:table_obj.ball.y,
@@ -310,8 +354,10 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
 
     // useEffect for background
     useEffect(() => {
-        const obj = drawBackground(canvas, images.background);
-        table_obj.SizeCanvas = canvasSize;
+        if (socket && socket.id === table_obj.id1)
+            table_obj.SizeCanvas = canvasSize;
+        // console.log(table_obj.SizeCanvas);
+        const obj = drawBackground(canvas, canvasSize, images.background);
         isMounted && socket.emit('setSize', table_obj.SizeCanvas);
         return () => {
             obj.backgroundCtx && obj.backgroundCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
@@ -322,7 +368,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     // useEffect for Score
     useEffect(() => {
         const obj = drawScore(canvas, images);
-        socket && console.log(socket.id, "|>", table_obj.id1, table_obj.id2);
+        // socket && console.log(socket.id, "|>", table_obj.id1, table_obj.id2);
         return () => {
             obj.ScoreCtx && obj.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ScoreLayer);
@@ -332,14 +378,14 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     // useEffect for Player1
     useEffect(() => {
         const obj = Player1Draw(canvas);
-        window.addEventListener("keydown", keyFunction);
-        // window.addEventListener("mousemove", MouseFunction);
+        // window.addEventListener("keydown", keyFunction);
+        window.addEventListener("mousemove", MouseFunction);
         isMounted &&  socket.emit("setPlayer1", Player1);
         return () => {
             obj && obj.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && obj && canvas.parentNode.removeChild(obj.playerLayer);
-              window.removeEventListener("keydown", keyFunction);
-            //   window.removeEventListener("mousemove", MouseFunction);
+            //   window.removeEventListener("keydown", keyFunction);
+              window.removeEventListener("mousemove", MouseFunction);
         }
     }, [canvasSize, Player1, Player2])
 
@@ -347,15 +393,15 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     useEffect(() => {
         const obj = Player2Draw(canvas);
 
-        window.addEventListener("keydown", keyFunction);
-        // window.addEventListener("mousemove", MouseFunction);
+        // window.addEventListener("keydown", keyFunction);
+        window.addEventListener("mousemove", MouseFunction);
         isMounted &&  socket.emit("setPlayer2", Player2);
 
         return () => {
             obj && obj.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && obj && canvas.parentNode.removeChild(obj.playerLayer);
-              window.removeEventListener("keydown", keyFunction);
-            //   window.removeEventListener("mousemove", MouseFunction);
+            //   window.removeEventListener("keydown", keyFunction);
+              window.removeEventListener("mousemove", MouseFunction);
 
         }
     }, [canvasSize, Player1, Player2])
@@ -365,28 +411,17 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     // useEffect for ball
     useEffect(() => {
         const obj = drawingBall(canvas, BallObj);
-
-        // if (socket && socket.id === table_obj.id1 && Status) {
-        //   intervalRef.current = requestAnimationFrame(() => {
-        //     table_obj.ball_speed = check_col(table_obj, BallObj, canvas, table_obj.ball_speed);
-        //     var ballPos = moveBall(BallObj, canvas, table_obj.ball_speed);
-        //     // console.log(ballPos);
-        //     setBallObj(ballPos);
-        //     // socket.emit('setBall', ballPos);
-        //   });
-        // }
         window.addEventListener("keydown", StartPause);
         return () => {
         //   cancelAnimationFrame(intervalRef.current);
           obj.ballCtx && obj.ballCtx.clearRect(0, 0,  canvasSize.width, canvasSize.height);
           canvas?.parentNode && canvas.parentNode.removeChild(obj.ballLayer);
           window.removeEventListener("keydown", StartPause);
-        //   // canvas.removeEventListener("mousemove", MouseFunction);
         }
       }, [BallObj, canvasSize, Status])
 
     useEffect(() => {
-            socket && socket.emit('moveBall');
+            ballSocket && ballSocket.emit('moveBall');
     }, [Status])
 
       // emit from the server
@@ -394,18 +429,22 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         table_obj = updateObj;
       })
       isMounted && socket.on('setPlayer1', (player1: number) => {
-            setPlayer1(player1);
+        setPlayer1(player1);
       })
       isMounted && socket.on('setPlayer2', (player2: number) => {
         setPlayer2(player2);
         })
-      isMounted && socket.on('setBall', (ballPos: any) => {
+      isMounted && ballSocket  .on('setBall', (ballPos: any) => {
         setBallObj(ballPos);
         })
         // isMounted && socket.on('disconnect', () => {
         //     console.log('disconnect');
         // })
-    return <canvas ref={canvasRef} width={canvasSize.width} height={canvasSize.height} />;
+        if (canvasSize.width < canvasSize.height)
+            var isvertical = true;
+        else
+            var isvertical = false;
+    return <canvas ref={canvasRef} width={isvertical ? canvasSize.width * 1.15 : canvasSize.width} height={isvertical ? canvasSize.height : canvasSize.height * 1.15} />;
 }
 
 export default function CanvasGame() {
