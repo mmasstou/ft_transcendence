@@ -28,6 +28,10 @@ const ChanneLCreateModaL = () => {
 
     let users: any[] = []
     useEffect(() => {
+        const token: any = Cookies.get('token');
+        console.log("token :", token)
+        if (!token)
+            return;
         (async function getFriends() {
             await fetch('http://127.0.0.1/api/users', {
                 headers: { Authorization: `Bearer ${token}`, },

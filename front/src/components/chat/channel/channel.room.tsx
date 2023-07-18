@@ -8,7 +8,7 @@ export default function ChanneLroom(
 
   return <button onClick={() => {
     console.log('room btn clicked room.id : ', room.name)
-    router.push(`/chat/channels?r=${room.name}`)
+    router.push(`/chat/channels?r=${room.id.substring(0, 8)}`)
   }} className={`
   flex flex-row gap-3 justify-start items-center
   ${is_active ? ' text-white' : ''}

@@ -19,6 +19,9 @@ const NewMessage = () => {
     const [InputValue, setInputValue] = useState("")
 
     useEffect(() => {
+        const token = Cookies.get('token');
+        if (!token)
+            return;
        (async function getFriends() {
         await fetch('http://127.0.0.1/api/users', {
             headers: { Authorization: `Bearer ${token}`, },
