@@ -11,7 +11,7 @@ interface btnProps {
 
 const Button: React.FC<btnProps> = (props) => {
   return (
-    <button className={`bg-transparen text-[10px] md:text-[16px w-[70px] sm:w-[80px] px-2 border 
+    <button className={`bg-transparen text-[10px] md:text-[16px] w-[70px] sm:w-[80px] px-2 border 
             ${props.style} rounded-full ${props.cursor} flex justify-between items-center gap-1`}>
         {(props.status === 'ONLINE') && <RiRadioButtonLine />}
         {(props.status === 'IN GAME' || props.status === 'INVITE') && <IoLogoGameControllerB />}
@@ -28,7 +28,7 @@ const FriendCard : React.FC= () => {
     let status: string = 'IN GAME';
   return (
     <div className='bg-[#3E504D] hover:opacity-40 w-full h-[47px] flex mx-2 my-2 justify-between rounded-md 
-            overflow-auto cursor-pointer ' >
+             cursor-pointer ' >
         <div className='flex overflow-hidden items-center'>
             <div className='w-[37px] h-[37px] mx-2'>
                 <MyAvatar/>

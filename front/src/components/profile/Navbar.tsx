@@ -32,7 +32,7 @@ export const Navbar = () => {
     <>
         <div className='bg-[#243230]'>
             <div className='flex justify-center items-center'>
-                <div className='border-[1px] w-[300px] border-[#3D4042]'></div>
+                <div className='border-[1px] w-full mx-5 border-[#3D4042]'></div>
             </div>
             <nav className="flex items-center justify-start px-5 py-2">
                 <ul className="flex items-center gap-5 text-white">
@@ -48,7 +48,7 @@ export const Navbar = () => {
                 </ul>
             </nav>
         </div>
-        <div >
+        <div className=''>
             {
                 (url === "http://localhost:3000/profile" || url === "http://localhost:3000/profile#Statistics") && <Statistics />
             }
