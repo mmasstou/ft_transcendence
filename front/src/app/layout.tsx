@@ -26,11 +26,11 @@ export default function RootLayout({ children }: { children: React.ReactNode;})
 {
     return (
         <html lang="en" >
-            <Login />
+            {/* <Login />
             <ChanneLCreateModaL />
             <ChanneLAddFriendsModaL />
-            <ConnectionAlert />
-            <body className= {`${changa.variable} ${lato.variable}`} suppressHydrationWarning={true}>
+            <ConnectionAlert /> */}
+            <body className= {` ${lato.variable}`} suppressHydrationWarning={true}>
 				{children}
             </body>
             
