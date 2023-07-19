@@ -15,7 +15,7 @@ class Ball {
     y: number;
     constructor() {
         this.x = 50.0;
-        this.y = 70.0;
+        this.y = 50.0;
     }
     setBall(x: number, y: number) {
         this.x = x;

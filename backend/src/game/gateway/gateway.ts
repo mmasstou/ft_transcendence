@@ -3,10 +3,6 @@ import { OnModuleInit } from "@nestjs/common";
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server } from "socket.io";
 import {Player, Ball, ballSpeed} from 'G_Class/class';
-import e from "express";
-// import { useRef } from "react";
-
-// var player = new Player();
 
 var table_obj = {
     player1: new Player(),
@@ -19,105 +15,29 @@ var table_obj = {
     Status: false,
 }
 var current: NodeJS.Timeout;
-// const intervalRef = useRef<number>(0);
 
 function check_col(){
-    var is_vertical = table_obj.SizeCanvas.height > table_obj.SizeCanvas.width ? true : false;
-    var player_width = is_vertical ? (table_obj.SizeCanvas.width / 10) : (table_obj.SizeCanvas.height / 10);
-    var player_height = is_vertical ? ((table_obj.SizeCanvas.height / 90) + (table_obj.SizeCanvas.height / 45)) : ((table_obj.SizeCanvas.width / 90) + (table_obj.SizeCanvas.width / 45));
-    var player1 = is_vertical ? ((table_obj.SizeCanvas.width * table_obj.player1.position) / 100) : (table_obj.SizeCanvas.height * table_obj.player1.position) / 100;
-    var player2 = is_vertical ? ((table_obj.SizeCanvas.width * table_obj.player2.position) / 100) : ((table_obj.SizeCanvas.height * table_obj.player2.position) / 100);
-    var ball_x = is_vertical ? ((table_obj.SizeCanvas.width * table_obj.ball.y) / 100) : ((table_obj.SizeCanvas.width * table_obj.ball.x) / 100);
-    var ball_y = is_vertical ? ((table_obj.SizeCanvas.height * table_obj.ball.x) / 100) : (table_obj.SizeCanvas.height * table_obj.ball.y) / 100;
-    var ball_rad = (table_obj.SizeCanvas.width + table_obj.SizeCanvas.height) / 120;
-    // console.log("player1 ", player1,"player2", player2, "ball_x", ball_x, "ball_y", ball_y, "ball_rad", ball_rad, "player_width", player_width, "player_height",player_height, "is_vertical", is_vertical);
-
-
-    // console.log(player1, " - ", player2, " -- ", ball_x, ball_y);
-
-
-    if (!is_vertical && ((ball_y + ball_rad) >= table_obj.SizeCanvas.height || ball_y - ball_rad <= 0)) //// colleg with wall H
-        table_obj.ball_speed.y = -table_obj.ball_speed.y;
-    else if (is_vertical && (((ball_x + ball_rad) >= table_obj.SizeCanvas.width) || (ball_x - ball_rad) <= 0)) //// colleg with wall V
-        table_obj.ball_speed.y = -table_obj.ball_speed.y;
-    // console.log(player1 , player1 + player_width, table_obj.SizeCanvas.width);
-    // else if (is_vertical && (ball_x - ball_rad > player1) && (ball_x + ball_rad < player1 + player_width) && (ball_y + ball_rad > table_obj.SizeCanvas.height - player_height))
-    //     table_obj.ball_speed.x = -table_obj.ball_speed.x;
-    else if ( is_vertical && (ball_x - ball_rad) >= player1 && (ball_x + ball_rad) <= player1 + player_width && (ball_y + ball_rad > table_obj.SizeCanvas.height - player_height) && (ball_y + ball_rad < (table_obj.SizeCanvas.height * 44/45))) {
-        console.log((ball_x - ball_rad),  player1 ,(ball_x - (player1 + player_width)));
+    if (table_obj.ball.y == 2 || table_obj.ball.y == 98) // colleg with wall
+            table_obj.ball_speed.y = -table_obj.ball_speed.y;
+    else if (table_obj.ball.x == 95.5 && table_obj.ball.y >= table_obj.player1.position && table_obj.ball.y <= (table_obj.player1.position + 16)) // colleg with player1
+            table_obj.ball_speed.x = -table_obj.ball_speed.x;
+    else if (table_obj.ball.x == 4.5 && table_obj.ball.y >= table_obj.player2.position && table_obj.ball.y <= (table_obj.player2.position + 16)) // colleg with player2
         table_obj.ball_speed.x = -table_obj.ball_speed.x;
-    }
-    else if (is_vertical && ((ball_y - (table_obj.SizeCanvas.height / 45)) < (ball_rad + table_obj.SizeCanvas.height / 90))) {
-        // console.log(ball_x - player1 ,(ball_x - (player1 + player_width)));
-        table_obj.ball_speed.x = -table_obj.ball_speed.x;
-    }
-    // console.log(player1, table_obj.SizeCanvas.width);
- //     else if (is_vertical && (((table_obj.SizeCanvas.height * 44/45) - ball_y) < (ball_rad + table_obj.SizeCanvas.height / 90)) && ((ball_x - player2 - player_width) >= 0 || (ball_x - player1) > 0)) {
-        // console.log((ball_x - ball_rad) - player1, (ball_x - ball_rad), player1);
-
-
-    // else if (is_vertical && (((ball_y + ball_rad) - player_height) > 0 ) && (ball_x + ball_rad) < player1 + player_width) {  ////// player 1 V
-    //     // console.log(ball_y);
-    //     table_obj.ball_speed.x = -table_obj.ball_speed.x;
-
-    // }
-
-
-    // else if (is_vertical && ((ball_y + ball_rad + player_height) > table_obj.SizeCanvas.height) && (ball_x + ball_rad) < player1 + player_width) {  ////// player 1 V
-    //     console.log(ball_y);
-    //     table_obj.ball_speed.x = -table_obj.ball_speed.x;
-    // }
-    // else if (is_vertical && ((ball_y - (ball_rad + player_height)) < 0) && ball_x > player1 && (ball_x < player1 + player_width)) { //// player 2 V
-    //     // console.log("col V");
-    //     table_obj.ball_speed.x = -table_obj.ball_speed.x;
-    //     // table_obj.ball_speed.x += table_obj.ball_speed.x > 0 ? 0.05 : -0.05
-    //     // table_obj.ball_speed.y += table_obj.ball_speed.y > 0 ? 0.05 : -0.05
-    // }
-    // else if (!is_vertical && (ball_x - (ball_rad + player_height + table_obj.SizeCanvas.width / 45) < 0) && (ball_y) > player2 && (ball_y < player2 + player_width)) { ////// player 2 H
-    //     table_obj.ball_speed.x = -table_obj.ball_speed.x;
-    //     // table_obj.ball_speed.x += table_obj.ball_speed.x > 0 ? 0.05 : -0.05
-    //     // table_obj.ball_speed.y += table_obj.ball_speed.y > 0 ? 0.05 : -0.05
-    // }
-    // else if (!is_vertical && (ball_x + (ball_rad + player_height + table_obj.SizeCanvas.width / 45) > table_obj.SizeCanvas.width) && ball_y > player1 && ball_y < player1 + player_width) { //////// player 1 H
-    //     table_obj.ball_speed.x = -table_obj.ball_speed.x;
-    //     // table_obj.ball_speed.x += table_obj.ball_speed.x > 0 ? 0.05 : -0.05
-    //     // table_obj.ball_speed.y += table_obj.ball_speed.y > 0 ? 0.05 : -0.05
-    // }
-    // // return ball_speed
 }
 
-
 function moveBall(){
-    // BallObj: { x: number; y: number; },
-    // canvas: HTMLCanvasElement | null,
-    // ball_speed: { x: number; y: number; }) {
-        // if (!canvas || !ball_speed)
-        //     return BallObj
-    var is_vertical = table_obj.SizeCanvas.height > table_obj.SizeCanvas.width ? true : false;
-    // var ballPos = {
-    //   x:table_obj.ball.x,
-    //   y:table_obj.ball.y
-    // }
-    if (is_vertical && table_obj.ball.x > 0 && table_obj.ball.x < 100 && table_obj.ball.y > 0 && table_obj.ball.y < 100) {
-      table_obj.ball.x += table_obj.ball_speed.x;
-      table_obj.ball.y += table_obj.ball_speed.y;
-    }
-    else if (!is_vertical && table_obj.ball.x >= 0 && table_obj.ball.x <= 100 && table_obj.ball.y >= 0 && table_obj.ball.y <= 100) {
+    if (table_obj.ball.x > 0 && table_obj.ball.x < 100 && table_obj.ball.y > 0 && table_obj.ball.y < 100) {
       table_obj.ball.x += table_obj.ball_speed.x;
       table_obj.ball.y += table_obj.ball_speed.y;
     }
     else {
       table_obj.ball_speed.x = -table_obj.ball_speed.x;
       table_obj.ball_speed.y = -table_obj.ball_speed.y;
-    //   table_obj.ball_speed.x -= table_obj.ball_speed.x > 0.2 ? 0.1 : -0.1
-    //   table_obj.ball_speed.y -= table_obj.ball_speed.y > -0.2 ? 0.1 : -0.1
       table_obj.ball.x = 50;
-    //   table_obj.ball.y = 50;
     }
-    
-    // return ballPos;
   }
- 
+
+
 @WebSocketGateway()
 class MyGateway implements OnModuleInit {
     @WebSocketServer()
@@ -175,6 +95,12 @@ class MyGateway implements OnModuleInit {
         // this.server.to(body.room).emit('message', {titile: 'new message from the server', content: body})
     }
 
+    @SubscribeMessage('getData')
+    GetData(client: any, data: any) {
+        this.server.emit('getData', table_obj);
+    }
+
+
 
     @SubscribeMessage('setPlayer2')
     SetPlayer2(client: any, data: any) {
@@ -206,14 +132,15 @@ class MyGateway implements OnModuleInit {
 @WebSocketGateway({namespace: 'ball'})
 class BallGateway implements OnModuleInit {
     @WebSocketServer()
-    server: Server;
-    
+    server: Server;    
     onModuleInit() {
         this.server.on('connection', (socket) => {
+            socket.on('disconnect', () => {
+                table_obj.Status = false;
+            });
             console.log('ballConnected', socket.id);
         });
     }
-
         @SubscribeMessage('moveBall')
         MoveBall() {
             // console.log('moveBall', table_obj.Status);
@@ -223,13 +150,12 @@ class BallGateway implements OnModuleInit {
                     check_col();
                     moveBall();
                     this.server.emit('setBall', table_obj.ball);
+                    if (table_obj.Status == false)
+                        clearInterval(current);
                 }, 15);
             }
         }
 }
 
 export {MyGateway, BallGateway}
-
-// /app/dist/src/game/gateway/gateway.js
-
 
