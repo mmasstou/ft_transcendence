@@ -17,7 +17,7 @@ export default function page() {
   const [_ChanneLsActiveID, setChanneLsActive] = React.useState<string | null>(null)
   const params = useSearchParams()
 
-
+  document.title = "Transcendence - Chat"
   
   useEffect(() => {
     setIsMounted(true)
