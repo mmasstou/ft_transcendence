@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import getChannels from '@/actions/channels/getChanneLs';
 import Cookies from 'js-cookie';
 import ChanneLIndex from './components/channel.index';
+import LoginHook from '@/hooks/auth/login';
 const metadata = {
   title: 'Transcendence',
   description: 'Online Pong Game',
@@ -16,10 +17,13 @@ export default function page() {
   const [_ChanneLs, setChannel] = React.useState<RoomsType[] | null>(null)
   const [_ChanneLsActiveID, setChanneLsActive] = React.useState<string | null>(null)
   const params = useSearchParams()
-
+  const loginhook = LoginHook()
   document.title = "Transcendence - Chat/channeL"
   
   useEffect(() => {
+    const token: any = Cookies.get('token');
+    if (!token)
+      loginhook.onOpen()
     setIsMounted(true)
   }, [])
 
