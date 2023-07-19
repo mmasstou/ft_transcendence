@@ -26,7 +26,7 @@ export class RoomsService {
       const { name } = params;
       // console.log('++findOne++>', name);
       const room = await this.prisma.rooms.findUnique({
-        where: { name },
+        where: { id: name },
       });
       if (!room) throw new Error('');
       return room;
