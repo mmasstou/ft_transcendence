@@ -28,15 +28,17 @@ const ChanneLIndex: FC<ChannelIndexProps> = () => {
             <div className=" grid grid-flow-row-dense grid-cols-4 justify-between items-center text-white px-2 py-1">
                 <div>
                     {leftSidebarHook.IsOpen
-                        ? <BsReverseLayoutSidebarInsetReverse onClick={() => {
+                        ? <button type="button"><BsReverseLayoutSidebarInsetReverse onClick={() => {
                             // console.log('leftSidebarHook.onClose()') 
                             leftSidebarHook.onClose()
-                        }} className="flex" size={24} />
-                        : <BsLayoutSidebarInset onClick={() => {
+                        }} className="flex" size={24} /></button>
+                        : <button type="button">
+                            <BsLayoutSidebarInset onClick={() => {
                             // console.log("btn clicked !")
                             leftSidebarHook.onOpen([])
                             rightSidebarHook.IsOpen && rightSidebarHook.onClose()
                         }} className="flex z-10" size={24} />
+                        </button>
                     }
                 </div>
                 <div className="channeLnavbar col-span-2 flex justify-center  sm:justify-around gap-4 w-full ">
