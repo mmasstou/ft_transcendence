@@ -1,6 +1,5 @@
 import React from 'react'
 import Dashboard from '../Dashboard'
-import Chat from '@/components/chat/chat.index'
 
 const metadata = {
   title: 'Transcendence',
@@ -9,7 +8,7 @@ const metadata = {
 export default function page() {
   return (
     <Dashboard>
-    <Chat />
+    chat
   </Dashboard>
   )
 }
