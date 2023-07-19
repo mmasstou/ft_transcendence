@@ -17,6 +17,7 @@ import { FaUsers } from "react-icons/fa";
 import { BsJournalPlus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from "react-icons/bs";
 import { FiUsers } from "react-icons/fi";
 import Conversations from "./channel.conversations";
+import ChanneLcreatemodaLHook from "../hooks/channel.create.hook";
 
 interface ChannelIndexProps { }
 
@@ -26,6 +27,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = () => {
     const [IsLoading, setIsLoading] = useState(false)
     const router = usePathname();
     const leftSidebarHook = LeftSidebarHook();
+    const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
 
 
     useEffect(() => { setIsMounted(true) }, [])
@@ -72,7 +74,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = () => {
                         icon={BsJournalPlus}
                         small
                         outline
-                        onClick={() => { }}
+                        onClick={() => {channeLcreatemodaLHook.onOpen([]) }}
                     />
                     <Button
                         icon={FiUsers}
