@@ -5,10 +5,10 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import { HiOutlineLogin } from "react-icons/hi"
 import { useRouter } from "next/navigation";
-import Input from "../components/chat/Input";
 import Modal from "./channel.modaL";
 import LoginHook from "@/hooks/login";
 import { Socket, io } from "socket.io-client";
+import Input from "@/components/Input";
 
 
 
