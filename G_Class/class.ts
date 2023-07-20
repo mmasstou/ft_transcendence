@@ -2,11 +2,16 @@
 
 class Player {
     position: number;
+    score: number;
     constructor() {   //////////// max 90%
-        this.position = 45
+        this.position = 45,
+        this.score = 0
     }
     SetPlayer (position: number) {
         this.position = position
+    }
+    setScore (score: number) {
+        this.score = score
     }
 }
 

@@ -78,10 +78,16 @@ function drawBackground(canvas: HTMLCanvasElement | null, canvasSize: {width:num
     return { backgroundCtx, backgroundLayer }
 }
 
-function drawScore(canvas: HTMLCanvasElement | null, images: { img1: CanvasImageSource | null; img2: CanvasImageSource | null; }){
+function drawScore(
+    canvas: HTMLCanvasElement | null,
+    images: { img1: CanvasImageSource | null; img2: CanvasImageSource | null;},
+    socket?: SocketIOClient.Socket | null,
+    ){
     const ScoreLayer = document.createElement('canvas');
     const ScoreCtx = ScoreLayer.getContext('2d');
     const is_vertical = canvas && canvas.height > canvas.width ? true : false;
+    const first = socket && images.img1 && images.img2 && socket.id == table_obj.id1 ? {score: table_obj.player1.score, img: images.img1} : {score: table_obj.player2.score, img: images.img2};
+    const second = socket && images.img1 && images.img2 && socket.id == table_obj.id1 ? {score: table_obj.player2.score, img: images.img2} : {score: table_obj.player1.score, img: images.img1};
 
     if (canvas && ScoreCtx) {
         ScoreLayer.width = canvas.width;
@@ -92,22 +98,20 @@ function drawScore(canvas: HTMLCanvasElement | null, images: { img1: CanvasImage
         ScoreCtx.beginPath();
         ScoreCtx.fillStyle = "#808080";
         if (is_vertical){
-            // ScoreCtx.fillRect(canvas.width - canvas.width * 0.12, 0, canvas.width, canvas.height);
             const str = canvas.width / 25 + "px Arial";
             ScoreCtx && (ScoreCtx.fillStyle = '#fff') && (ScoreCtx.font = str);
-            images.img1 && ScoreCtx.drawImage(images.img1, (canvas.width - canvas.width * 0.12), 0, canvas.width * 0.12, canvas.width * 0.12);
-            images.img2 && ScoreCtx.drawImage(images.img2, (canvas.width - canvas.width * 0.12), canvas.height - canvas.width * 0.12, canvas.width * 0.12, canvas.width * 0.12);
-            ScoreCtx && ScoreCtx.fillText('15', canvas.width - (canvas.width * 0.07), canvas.height / 4);
-            ScoreCtx && ScoreCtx.fillText('3', canvas.width - (canvas.width * 0.07), canvas.height - canvas.height / 4);
+            first.img && ScoreCtx.drawImage(first.img, (canvas.width - canvas.width * 0.12), 0, canvas.width * 0.12, canvas.width * 0.12);
+            second.img && ScoreCtx.drawImage(second.img, (canvas.width - canvas.width * 0.12), canvas.height - canvas.width * 0.12, canvas.width * 0.12, canvas.width * 0.12);
+            ScoreCtx && ScoreCtx.fillText(first.score, canvas.width - (canvas.width * 0.07), canvas.height / 4);
+            ScoreCtx && ScoreCtx.fillText(second.score, canvas.width - (canvas.width * 0.07), canvas.height - canvas.height / 4);
         }
         else {
-            // ScoreCtx.fillRect(0, canvas.height - (canvas.height * 0.12), canvas.width, canvas.height);
             const str = canvas.width / 25 + "px Arial";
             ScoreCtx && (ScoreCtx.fillStyle = '#fff') && (ScoreCtx.font = str);
-            images.img1 && ScoreCtx.drawImage(images.img1,0, canvas.height - (canvas.height * 0.12), canvas.height * 0.12, canvas.height * 0.12);
-            images.img2 && ScoreCtx.drawImage(images.img2,canvas.width - (canvas.height * 0.12), canvas.height - canvas.height * 0.12, canvas.height * 0.12, canvas.height * 0.12);
-            ScoreCtx && ScoreCtx.fillText('15', canvas.width / 4, canvas.height - canvas.height * 0.04);
-            ScoreCtx && ScoreCtx.fillText('3', canvas.width - canvas.width / 4, canvas.height - canvas.height * 0.04);
+            first.img && ScoreCtx.drawImage(first.img,0, canvas.height - (canvas.height * 0.15), canvas.height * 0.14, canvas.height * 0.14);
+            second.img && ScoreCtx.drawImage(second.img,canvas.width - (canvas.height * 0.12), canvas.height - canvas.height * 0.12, canvas.height * 0.12, canvas.height * 0.12);
+            ScoreCtx && ScoreCtx.fillText(first.score, canvas.width / 4, canvas.height - canvas.height * 0.04);
+            ScoreCtx && ScoreCtx.fillText(second.score, canvas.width - canvas.width / 4, canvas.height - canvas.height * 0.04);
         }
     }
     return {ScoreCtx, ScoreLayer};
@@ -133,6 +137,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         x: 0,
         y: 0,
     });
+    const [Score, setScore] = useState({first: table_obj.player1.score, second: table_obj.player2.score});
 
     const [canvasSize, SetCanvasSize] = useState({
         width: 0,
@@ -141,7 +146,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
 
     function StartPause(e: KeyboardEvent) {
         if (e.keyCode == 32 && Status == false) {
-            setStatus(true);
             socket.emit('setStatus', true);
         }
       }
@@ -277,7 +281,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
             if (socket && socket.id === table_obj.id2)
                 ball.x = 100 - ball.x;
             var is_vertical = canvas.height > canvas.width ? true : false;
-            console.log("x: ",ball.x, "y: ",ball.y);
             ballLayer.width = canvas.width;
             ballLayer.height = canvas.height;
             ballLayer.style.position = 'absolute';
@@ -379,12 +382,12 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
 
     // useEffect for Score
     useEffect(() => {
-        const obj = drawScore(canvas, images);
+        const obj = drawScore(canvas, images, socket);
         return () => {
             obj.ScoreCtx && obj.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ScoreLayer);
         }
-    }, [canvasSize, images]) 
+    }, [canvasSize, images, Score]) 
 
     // useEffect for Player1
     useEffect(() => {
@@ -453,12 +456,20 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
             setBallObj(data.ball);
         }
       })
-      isMounted && ballSocket  .on('setBall', (ballPos: any) => {
+      isMounted && ballSocket.on('setBall', (ballPos: any) => {
         setBallObj(ballPos);
         })
-        // isMounted && socket.on('disconnect', () => {
-        //     console.log('disconnect');
-        // })
+      isMounted && socket.on('setStatus', (status: boolean) => {
+        setStatus(status);
+        })
+      isMounted && ballSocket.on('setScore1', (score: number) => {
+        table_obj.player1.score = score;
+        setScore({first: score, second: table_obj.player2.score});
+      })
+        isMounted && ballSocket.on('setScore2', (score: number) => {
+        table_obj.player2.score = score;
+        setScore({first: table_obj.player1.score, second: score});
+        })
         if (canvasSize.width < canvasSize.height)
             var isvertical = true;
         else

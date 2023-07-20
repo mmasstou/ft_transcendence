@@ -17,27 +17,53 @@ var table_obj = {
 var current: NodeJS.Timeout;
 
 function check_col(){
-    if (table_obj.ball.y == 2 || table_obj.ball.y == 98) // colleg with wall
+    if (table_obj.ball.y <= 2 || table_obj.ball.y >= 98) // colleg with wall
             table_obj.ball_speed.y = -table_obj.ball_speed.y;
-    else if (table_obj.ball.x == 95.5 && table_obj.ball.y >= table_obj.player1.position && table_obj.ball.y <= (table_obj.player1.position + 16)) // colleg with player1
-            table_obj.ball_speed.x = -table_obj.ball_speed.x;
-    else if (table_obj.ball.x == 4.5 && table_obj.ball.y >= table_obj.player2.position && table_obj.ball.y <= (table_obj.player2.position + 16)) // colleg with player2
-        table_obj.ball_speed.x = -table_obj.ball_speed.x;
+    else if (table_obj.ball.x >= 95.3 && table_obj.ball.y > table_obj.player1.position && table_obj.ball.y < (table_obj.player1.position + 16)) // colleg with player1
+    {
+        var centerPlayer = table_obj.player1.position + 8;
+        var ballOffset = table_obj.ball.y - centerPlayer;
+        var ballPositionOnPaddle = ballOffset / 16;
+        var maxAngle = Math.PI * 0.9;
+        var angle = ballPositionOnPaddle * maxAngle;
+        table_obj.ball_speed.x = -Math.cos(angle);
+        table_obj.ball_speed.y = Math.sin(angle);
+    }
+    else if (table_obj.ball.x <= 4.2 && table_obj.ball.y > table_obj.player2.position && table_obj.ball.y < (table_obj.player2.position + 16)) // colleg with player2
+    {
+        var centerPlayer = table_obj.player2.position + 8;
+        var ballOffset = table_obj.ball.y - centerPlayer;
+        var ballPositionOnPaddle = ballOffset / 16;
+        var maxAngle = Math.PI * 0.9;
+        var angle = ballPositionOnPaddle * maxAngle;
+        table_obj.ball_speed.x = Math.cos(angle);
+        table_obj.ball_speed.y = Math.sin(angle);
+    }
 }
 
-function moveBall(){
+function moveBall(server: Server){
     if (table_obj.ball.x > 0 && table_obj.ball.x < 100 && table_obj.ball.y > 0 && table_obj.ball.y < 100) {
       table_obj.ball.x += table_obj.ball_speed.x;
       table_obj.ball.y += table_obj.ball_speed.y;
     }
     else {
-      table_obj.ball_speed.x = -table_obj.ball_speed.x;
-      table_obj.ball_speed.y = -table_obj.ball_speed.y;
-      table_obj.ball.x = 50;
+        table_obj.ball_speed.x = -table_obj.ball_speed.x;
+        table_obj.ball_speed.y = -table_obj.ball_speed.y;
+        if (table_obj.ball.x >= 100) {
+            table_obj.player1.score += 1;
+            table_obj.ball.x = 50;
+            server.emit('setScore1', table_obj.player1.score);
+        }
+        else {
+            table_obj.player2.score += 1;
+            table_obj.ball.x = 50;
+            server.emit('setScore2', table_obj.player2.score);
+        }
     }
+    // return 0;
   }
 
-
+  
 @WebSocketGateway()
 class MyGateway implements OnModuleInit {
     @WebSocketServer()
@@ -57,12 +83,10 @@ class MyGateway implements OnModuleInit {
             console.log('connected', socket.id);
             if (table_obj.id1 == '') {
                 table_obj.id1 = socket.id;
-                // console.log('table_obj.id1 :', table_obj.id1);
                 this.server.emit('update', table_obj);
             }
             else if (table_obj.id2 == '') {
                 table_obj.id2 = socket.id;
-                // console.log('table_obj.id2 :', table_obj.id2);
                 this.server.emit('update', table_obj);
             }
             else {
@@ -71,26 +95,12 @@ class MyGateway implements OnModuleInit {
                 table_obj.id2 = '';
                 this.server.emit('update', table_obj);
             }
-            // console.log("id1: ", table_obj.id1, "id2: ", table_obj.id2)
         });
     }
-    
-    // @SubscribeMessage('moveBall')
-    // MoveBall() {
-    //     clearInterval(current);
-    //     if (table_obj.Status) {
-    //         current = setInterval(() => {
-    //             check_col();
-    //             moveBall();
-    //             this.server.emit('setBall', table_obj.ball);
-    //         }, 15);
-    //     }
-    // }
     
     @SubscribeMessage('setPlayer1')
     SetPlayer1(client: any, data: any) {
         table_obj.player1.position = data;
-        // this.server.emit('update', table_obj);
         this.server.emit('setPlayer1', data);
         // this.server.to(body.room).emit('message', {titile: 'new message from the server', content: body})
     }
@@ -120,6 +130,7 @@ class MyGateway implements OnModuleInit {
     @SubscribeMessage('setStatus')
     SetStatus(client:any, data: boolean) {
         table_obj.Status = data;
+        this.server.emit('setStatus', data);
         // console.log(data, table_obj);
     }
 
@@ -128,6 +139,7 @@ class MyGateway implements OnModuleInit {
         table_obj.SizeCanvas = data;
     }
 }
+
 
 @WebSocketGateway({namespace: 'ball'})
 class BallGateway implements OnModuleInit {
@@ -143,12 +155,16 @@ class BallGateway implements OnModuleInit {
     }
         @SubscribeMessage('moveBall')
         MoveBall() {
-            // console.log('moveBall', table_obj.Status);
             clearInterval(current);
             if (table_obj.Status) {
                 current = setInterval(() => {
                     check_col();
-                    moveBall();
+                    moveBall(this.server);
+                    // var check = moveBall();
+                    // if (check == 1)
+                    //     this.server.emit('setScore1', table_obj.player1.score);
+                    // else if (check == 2)
+                    //     this.server.emit('setScore2', table_obj.player2.score);
                     this.server.emit('setBall', table_obj.ball);
                     if (table_obj.Status == false)
                         clearInterval(current);
@@ -156,6 +172,7 @@ class BallGateway implements OnModuleInit {
             }
         }
 }
+
 
 export {MyGateway, BallGateway}
 
