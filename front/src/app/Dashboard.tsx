@@ -11,7 +11,7 @@ const Dashboard = ({children} : Props) => {
   return (
     < >
     <div className= "dashboard bg-primary ">
-      <header  className="bg-[#243230] flex items-center justify-between px-5 ">
+      <header  className="flex items-center justify-between px-5 ">
        <Header/>
       </header>
 

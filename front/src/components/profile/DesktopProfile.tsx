@@ -18,7 +18,7 @@ export const DesktopProfile = () : JSX.Element => {
     
     return (
       <div className='flex flex-col gap-10 mx-[20px]'>
-          <div className='bg-[#243230] relative'>
+          <div className='bg-[#243230] relative rounded-md'>
             <ImageUpload />
             <AvatarProfile position="left-[41vw] bottom-[7vh] z-10" />
             <div className='absolute bg-[#161F1E] bg-opacity-90

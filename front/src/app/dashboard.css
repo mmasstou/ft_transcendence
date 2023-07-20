@@ -11,17 +11,17 @@
 }
 
 header {
-    border: 2px solid rgb(91, 238, 224);
+    /* border: 2px solid rgb(91, 238, 224); */
     grid-area: header;
 }
 
 main {
-    border: 2px solid rgb(135, 135, 240);
+    /* border: 2px solid rgb(135, 135, 240); */
     grid-area: main;
 }
 
 #Sidebar {
-    border: 2px solid rgb(212, 104, 239);
+    /* border: 2px solid rgb(212, 104, 239); */
     grid-area: Sidebar;
 }
 

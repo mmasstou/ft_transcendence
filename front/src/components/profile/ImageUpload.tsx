@@ -32,13 +32,13 @@ const ImageUpload = () => {
   const uploadInputRef = React.createRef<HTMLInputElement>();
 
   return (
-   <section className="bg-[#243230]">
+   <section className="rounded-md">
      <div
       className="relative flex flex-col justify-center items-center h-[333px]  w-full cursor-pointer 
           hover:opacity-70 hover:border-2 hover:border-dashed hover:rounded-lg transition banner"
       onClick={handleDivClick}
     >
-      {createObjectURL && <img src={createObjectURL} alt="Uploaded File" className="w-full h-full border-2 rounded-lg border-transparent" />}
+      {createObjectURL && <img src={createObjectURL} alt="Uploaded File" className="w-full h-full rounded-lg border-transparent" />}
       <input
         type="file"
         name="Image"
