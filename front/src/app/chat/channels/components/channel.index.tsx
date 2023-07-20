@@ -18,16 +18,20 @@ import { BsJournalPlus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse
 import { FiUsers } from "react-icons/fi";
 import Conversations from "./channel.conversations";
 import ChanneLcreatemodaLHook from "../hooks/channel.create.hook";
+import { Socket } from "socket.io-client";
 
-interface ChannelIndexProps { }
+interface ChannelIndexProps {
+    socket : Socket | null
+ }
 
-const ChanneLIndex: FC<ChannelIndexProps> = () => {
+const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
 
     const [IsMounted, setIsMounted] = useState(false)
     const [IsLoading, setIsLoading] = useState(false)
     const router = usePathname();
     const leftSidebarHook = LeftSidebarHook();
     const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
+ // console.log("ChannelIndex socket :", socket?.id )
 
 
     useEffect(() => { setIsMounted(true) }, [])
@@ -84,10 +88,8 @@ const ChanneLIndex: FC<ChannelIndexProps> = () => {
                     />
                 </div>
             </div>
-            <ChanneLbody>
-                <Conversations>
-
-                </Conversations>
+            <ChanneLbody socket={socket}>
+                <Conversations socket={socket} />
             </ChanneLbody>
 
         </div>

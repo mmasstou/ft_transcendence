@@ -5,13 +5,15 @@ import { RoomsType } from "@/types/types";
 import { useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import getChannels from "@/actions/channels/getChanneLs";
+import { Socket } from "socket.io-client";
 
 
-export default function ChanneLbody({ children }: { children: React.ReactNode; }) {
+export default function ChanneLbody({ children , socket }: { children: React.ReactNode; socket : Socket | null }) {
     const [IsMounted, setIsMounted] = React.useState(false)
     const [ChanneLs, setChannel] = React.useState<RoomsType[] | null>(null)
     const [ChanneLsActiveID, setChanneLsActive] = React.useState<string | null>(null)
     const params = useSearchParams()
+ // console.log("ChannelBody socket :", socket?.id )
 
 
     useEffect(() => {
@@ -24,10 +26,10 @@ export default function ChanneLbody({ children }: { children: React.ReactNode; }
             const resp = await getChannels(token)
             if (resp && resp.ok) {
                 const data = await resp.json()
-                console.log("data :", data)
+             // console.log("data :", data)
                 setChannel(data);
             }
-            console.log("resp :", resp)
+         // console.log("resp :", resp)
         }
         )();
     }, [])
@@ -35,8 +37,8 @@ export default function ChanneLbody({ children }: { children: React.ReactNode; }
     useEffect(() => { if (params) {
         setChanneLsActive(params.get('r'))
     }}, [params])
-    const LeftsideContent = ChanneLs?.map((room) => (
-        <ChanneLSidebarItem room={room} active={room.id === ChanneLsActiveID} />
+    const LeftsideContent = ChanneLs?.map((room, key) => (
+        <ChanneLSidebarItem key={key} room={room} socket={socket} active={room.id === ChanneLsActiveID} />
     ))
 
     useEffect(() => {

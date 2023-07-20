@@ -25,14 +25,14 @@ const ChanneLCreateModaL = () => {
     let users: any[] = []
     useEffect(() => {
         const token: any = Cookies.get('token');
-        console.log("token :", token)
+     // console.log("token :", token)
         if (!token)
             return;
         (async function getFriends() {
             await fetch('http://127.0.0.1/api/users', {
                 headers: { Authorization: `Bearer ${token}`, },
             }).then((resp) => resp.json()).then(data => {
-                console.log("++++++++++*****data :", data)
+             // console.log("++++++++++*****data :", data)
                 setfriends(data)
             })
         })();
@@ -61,7 +61,7 @@ const ChanneLCreateModaL = () => {
 
 
     if (channeLcreatemodaLHook.selectedFriends && channeLcreatemodaLHook.selectedFriends.length && !watch('friends').length) {
-        console.log("channeLcreatemodaLHook.selectedFriends :", channeLcreatemodaLHook.selectedFriends)
+     // console.log("channeLcreatemodaLHook.selectedFriends :", channeLcreatemodaLHook.selectedFriends)
         setValue('friends', channeLcreatemodaLHook.selectedFriends)
     }
     const friends = watch('friends')
@@ -77,7 +77,7 @@ const ChanneLCreateModaL = () => {
 
     const onSubmit: SubmitHandler<FieldValues> = async (UserId: any) => {
         // create private room :
-        console.log("+onSubmit+ +> UserId :", UserId)
+     // console.log("+onSubmit+ +> UserId :", UserId)
         reset();
         setInputValue("");
 
@@ -116,7 +116,7 @@ const ChanneLCreateModaL = () => {
             </div>
         </div>
     )
-    console.log("-----              --friends :", friends)
+ // console.log("-----              --friends :", friends)
     return <ChanneLModal IsOpen={channeLcreatemodaLHook.IsOpen} title={"create channel"} children={bodyContent} onClose={channeLcreatemodaLHook.onClose} />
         // IsOpen={channeLcreatemodaLHook.IsOpen}
         // body={bodyContent} />

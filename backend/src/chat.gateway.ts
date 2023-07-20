@@ -40,10 +40,10 @@ export class ChatGateway implements OnGatewayConnection {
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       const login: string = payload.sub;
-      console.log('user : %s |socket', payload.username, socket.id);
+      console.log('Chat-> :%s |socket', payload.username, socket.id);
       _User = await this.usersService.findOne({ login });
     } catch {
-      console.log('+ ->error- +>', error);
+      console.log('Chat-> error- +>', error);
     }
     // Perform any necessary validation or authorization checks with the token
     // ...
@@ -56,25 +56,22 @@ export class ChatGateway implements OnGatewayConnection {
   server: Server;
 
   @SubscribeMessage('joinroom')
-  async joinRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomId: string },
-  ) {
+  async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     try {
-      console.log('++++++++++++++++++data.roomId+++++++++++++++', data.roomId);
-      console.log('++++++++++++++++++client.id+++++++++++++++', client.id);
-
-      // console.log(`client with socket ${client.id} joined room ${data.roomId}`);
-      await client.join(data.roomId);
-      const messages = await this.messageservice.create({
-        roomId: data.roomId,
-        content: `userId : ${client.id} has connected`,
-        userId: _User.id,
-      });
-      client.emit('message', messages);
-      console.log('+++++++++joinroom++++++++++|> MessageBody :', data);
+      console.log(`client with socket ${client.id} joined room ${data.id}`);
+      console.log('socket +data.id-> :%s', data.id);
+      console.log('socket +client.id-> :%s', client.id);
+      console.log('socket +User.id-> :%s', _User.id);
+      if (!client.rooms.has(data.id)) {
+        await client.join(data.id);
+        await this.messageservice.create({
+          roomId: data.id,
+          content: `userId : ${client.id} has connected`,
+          userId: _User.id,
+        });
+      }
     } catch (error) {
-      console.log('eroooooor:', error);
+      console.log('Chat-> error- +>', error);
     }
   }
 
@@ -84,7 +81,6 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() data: { roomId: string; messageContent: string },
   ) {
     try {
-      console.log('+++++++++LeaveRoom++++++++++|> MessageBody :', data);
       const messages = await this.messageservice.create({
         roomId: data.roomId,
         content: `userId : ${client.id} has Leave room`,
@@ -96,34 +92,22 @@ export class ChatGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('sendMessage')
-  async handleEvent(
-    @MessageBody()
-    data: any,
-  ) {
+  async handleEvent(@MessageBody() data: any) {
     let messages: any;
     try {
-      const { directMessage, messageContent, type } = data;
-      console.log('+++++++++++++++++++|> MessageBody :', data);
-
-      messages = await this.messageservice.create({
-        DirectMessage: directMessage,
-        content: messageContent,
-        userId: _User.id,
-      });
-      console.log(`------------room id: ${data.roomId}`);
+      console.table(data);
 
       // const numClients = this.server.sockets.adapter.rooms.get(
       //   data.roomId,
       // ).size;
       // console.log(`Number of clients in myRoom: ${numClients}`);
       // console.log(`${user.name} [${user.id}] join to room : ${user.roomId}`);
-      // console.log("we are emmiting the message to room")
-      this.server.to(data.roomId).emit('message', messages);
-      console.log('messages :', messages);
+      console.log('we are emmiting the message to room :', data.roomsId);
+      this.server.to(data.roomsId).emit('message', "ddfdf");
       // this.server.emit('message', messages);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        console.log('Error: ', error);
+        console.log('Chat-> error- +>', error);
       }
     }
   }

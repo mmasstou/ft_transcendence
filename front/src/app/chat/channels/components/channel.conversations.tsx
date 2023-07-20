@@ -18,30 +18,28 @@ import getChanneLMessages from "../actions/getChanneLMessages";
 import Cookies from "js-cookie";
 
 
-export default function Conversations({ children }: { children?: React.ReactNode }) {
+export default function Conversations({ socket }: { socket: Socket | null }) {
 
     const leftSidebar = LeftSidebarHook()
-    const [socket, setsocket] = useState<Socket | undefined>(undefined)
     const [IsMounted, setIsMounted] = useState(false)
     const [IsLoading, setIsLoading] = useState(false)
     const [messages, setMessages] = useState<any[]>([])
     const [hasparam, sethasparam] = useState(false)
     const [channeLinfo, setChanneLinfo] = useState<any>(null)
+    const [message, setMessage] = useState("")
+    const [InputValue, setInputValue] = useState("")
     const params = useSearchParams()
     const room = params.get('r')
-    console.log("               +> room : ", room)
 
-
+    // console.log("Conversations socket :", socket?.id)
     useEffect(() => { setIsMounted(true) }, [])
     useEffect(() => {
         room ? sethasparam(true) : sethasparam(false)
-        console.log("               +> room : ", room);
         const token: any = room && Cookies.get('token');
         room && (async () => {
             const response = await getChanneLMessages(room, token)
             if (response && response.ok) {
                 const data = await response.json()
-                console.log("---------*****data :", data)
                 setMessages(data.messages)
             }
 
@@ -57,16 +55,18 @@ export default function Conversations({ children }: { children?: React.ReactNode
                 return
             }
             const _roomInfo = await response2.json()
-            console.log("_roomInfo :", _roomInfo.name)
             setChanneLinfo(_roomInfo)
         })();
 
 
     }, [room])
 
-
-
-
+    useEffect(() => {
+        socket?.on('message', (message: any) => {
+            console.log('message : ', message)
+            // setMessages([...messages, message])
+        })
+    }, [messages, socket])
     const content = (
         <div className="flex flex-col gap-3">
 
@@ -88,7 +88,29 @@ export default function Conversations({ children }: { children?: React.ReactNode
             }
         </div>
     )
+
+    const onClickHandler = (event: FormEvent<HTMLInputElement>) => {
+        console.log('Conversations socket : ', socket?.id)
+
+    }
+
+    const OnSubmit = (event: FormEvent<HTMLInputElement>) => {
+        console.log('Conversations socket : ', socket?.id)
+        setInputValue("")
+
+        // send message to server using socket :
+        socket?.emit('sendMessage', {
+            content: message,
+            senderId: Cookies.get('_id'),
+            roomsId: room
+        }, (response: any) => {
+            console.log('message response : ', response)
+        })
+    }
+  
+
     if (!IsMounted) return null
+
     return <div className={`
     Conversations 
     relative 
@@ -102,12 +124,28 @@ export default function Conversations({ children }: { children?: React.ReactNode
             (hasparam && channeLinfo) ? <>
                 <ConversationsTitlebar messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
                 <ConversationsMessages Content={content} />
-                <ConversationsInput
-                    messageTo={channeLinfo.name}
-                    OnSubmit={function (event: FormEvent<HTMLInputElement>): void {
-                        console.log("event :", event)
-                    }}
-                />
+                <div className="w-full m-[2px]">
+                    <input
+                        className="ConversationsInput w-full h-[4vh]  text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
+                        onSubmit={(event: any) => {
+                            setMessage(event.target.value);
+                            OnSubmit(event)
+                            // onClickHandler(event)
+                        }
+                        }
+                        onKeyDown={(event) =>
+                            event.key === "Enter" ? OnSubmit(event) : null
+                        }
+                        onChange={(event) => {
+                            setInputValue(event.target.value);
+                            setMessage(event.target.value);
+                        }}
+                        value={InputValue}
+                        placeholder={`Message @'${channeLinfo.name}'`}
+                        type="search"
+                        name=""
+                        id="" />
+                </div>
             </>
                 : <div className="flex flex-col justify-center items-center h-full w-full">
                     <Image src="/no_conversations.svg" width={600} height={600} alt={""} />

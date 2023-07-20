@@ -4,11 +4,14 @@ import { FormEvent, useState } from "react";
 
 interface ConversationsInputInterface{
     messageTo: string;
+    value : string;
+    setInputValue : (value : string) => void;
+    onChange : (event : FormEvent<HTMLInputElement>) => void;
     OnSubmit : (event : FormEvent<HTMLInputElement>) => void;
 }
 
-export default function ConversationsInput( {messageTo, OnSubmit} : ConversationsInputInterface ) {
-    const [input, setInputValue] = useState("")
+export default function ConversationsInput( {messageTo, value, OnSubmit, onChange, setInputValue} : ConversationsInputInterface ) {
+   
     const [message, setMessage] = useState("");
     return <div className="w-full m-[2px]">
         <input
@@ -25,7 +28,7 @@ export default function ConversationsInput( {messageTo, OnSubmit} : Conversation
                 setInputValue(event.target.value);
                 setMessage(event.target.value);
             }}
-            value={input}
+            value={value}
             placeholder={`Message @'${messageTo}'`}
             type="search"
             name=""

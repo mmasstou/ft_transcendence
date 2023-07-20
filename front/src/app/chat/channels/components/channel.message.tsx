@@ -41,15 +41,12 @@ const Message = (props: messagesType) => {
     //     updated_at: ""
     // })
     const [create_At, setcreate_At] = useState("")
-    // // console.log("props :", props)
 
 
     useEffect(() => {
         const token = Cookies.get("token");
         (async function getsenderInfo() {
             if (props.senderId !== undefined && props.senderId !== null && props.senderId !== "") {
-                console.log("props.senderId :", props.senderId)
-                console.log("props :", props)
                 const response = await fetch(`http://127.0.0.1/api/users/${props.senderId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
