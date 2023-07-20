@@ -56,7 +56,7 @@ const ChanneLAddFriendsModaL = () => {
         aLLfriends !== null && channeLAddFriendsHookHook.selectedFriends.push(...aLLfriends)
         const data = channeLAddFriendsHookHook.onClose()
         channeLcreatemodaLHook.onOpen(data)
-        console.log("friends data :", data)
+     // console.log("friends data :", data)
     }
 
 

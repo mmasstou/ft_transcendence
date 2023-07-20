@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     body: JSON.stringify({ receiverId: userId }),
   }).then((res) => res.json());
   console.log('privateRoom :', privateRoom);
-//   console.log("User :", User)
+//// console.log("User :", User)
   // const User = await fetch(`http://127.0.0.1/api/users/${userId}`).then(res => res.json())
   // const Room = await fetch(`http://127.0.0.1/api/rooms/`, {
   //   method : 'POST',

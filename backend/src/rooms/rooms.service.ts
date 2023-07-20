@@ -354,7 +354,6 @@ export class RoomsService {
           messages: true,
         },
       });
-      console.log('message :', message);
       return message;
     } catch (error) {
       throw new HttpException(
