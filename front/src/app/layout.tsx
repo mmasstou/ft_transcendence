@@ -1,7 +1,10 @@
 
-import Login from '@/components/modals/Login';
+import Login from '@/modals/Login';
 import './globals.css';
 import { Changa, Lato } from 'next/font/google';
+import ConnectionAlert from '@/modals/connection.alert.modal';
+import ChanneLCreateModaL from '@/modals/channel/channel.create.modaL';
+import ChanneLAddFriendsModaL from '@/modals/channel/channel.add.friends.modaL';
 
 
 const changa = Changa({ 
@@ -16,18 +19,18 @@ const lato = Lato({
     variable: '--font-lato',
  });
 
-const metadata = {
-    title: 'Transcendence',
-    description: 'Online Pong Game',
-};
 
-export default function RootLayout({ children, }: { children: React.ReactNode;})
+
+export default function RootLayout({ children }: { children: React.ReactNode;})
 
 {
     return (
         <html lang="en" >
-            <Login />
-            <body className= {`${changa.variable} ${lato.variable}`} suppressHydrationWarning={true}>
+            {/* <Login />
+            <ChanneLCreateModaL />
+            <ChanneLAddFriendsModaL />
+            <ConnectionAlert /> */}
+            <body className= {` ${lato.variable}`} suppressHydrationWarning={true}>
 				{children}
             </body>
             

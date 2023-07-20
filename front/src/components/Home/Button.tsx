@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import Modal from "../modals/Modal";
+import Modal from "../../modals/Modal";
 import styles from "./style";
 import LoginButton from "./LoginButton";
 import loginImg from "../../../public/login.png";

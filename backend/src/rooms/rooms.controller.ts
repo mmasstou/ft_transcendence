@@ -20,16 +20,28 @@ export class RoomsController {
 
   @UseGuards(AuthGuard)
   @Post()
-  create(@Body('name') name: string, @Req() request: Request) {
+  create(
+    @Body('name') name: string,
+    @Body('type') type: string,
+    @Req() request: Request,
+  ) {
     const User_payload: any = request.user;
     const userId: any = User_payload.sub;
-    return this.roomsService.create({ name, userId });
+    return this.roomsService.create({ name, type, userId });
   }
 
   @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.roomsService.findAll();
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('users')
+  findAlLForUser(@Req() request: Request) {
+    const userIds: any = request.user;
+    const userId: string = userIds.sub;
+    return this.roomsService.findAlLForUser(userId);
   }
 
   @UseGuards(AuthGuard)
@@ -88,8 +100,8 @@ export class RoomsController {
   }
   @UseGuards(AuthGuard)
   @Get('messages/:messageId')
-  getaLLmessages( @Param('messageId') messageId: string){
-    return this.roomsService.getaLLmessages(messageId)
+  getaLLmessages(@Param('messageId') messageId: string) {
+    return this.roomsService.getaLLmessages(messageId);
   }
   // members
 }

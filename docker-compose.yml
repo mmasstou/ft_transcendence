@@ -11,10 +11,10 @@ services:
     depends_on:
       - backend
       - database
-    volumes:
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/src:/frontend/src:rw
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/G_Class:/frontend/G_Class:rw
+    # volumes:
+      # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/src:/frontend/src:rw
+      # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
+      # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/G_Class:/frontend/G_Class:rw
   backend:
     build: backend/
     container_name: backend
@@ -26,22 +26,26 @@ services:
       - APInetwork
     depends_on:
       - database
-    volumes:
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/G_Class:/app/G_Class:rw
+    # volumes:
+      # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
+      # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
+      # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/G_Class:/app/G_Class:rw
   database:
     image: postgres:13
     container_name: database
     env_file:
       - backend/.env
-    ports:
-      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=aboulhaj_012345
+      - POSTGRES_USER=aboulhaj
+      - POSTGRES_DB=transcendance
+      - POSTGRES_PORT=5432
     networks:
       - APInetwork
-    volumes:
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
+    # volumes:
+    #   - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
   
 networks:
   APInetwork:
     driver: bridge
+

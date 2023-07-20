@@ -12,6 +12,11 @@ import { MembersModule } from './members/members.module';
 import { ChatGateway } from './chat.gateway';
 import { GameModule } from './game/game.module';
 import { GatewayModule } from './game/gateway/gateway.module';
+import { RoomsService } from './rooms/rooms.service';
+import { MembersService } from './members/members.service';
+import { MessagesService } from './messages/messages.service';
+import { DirectMessageModule } from './direct-message/direct-message.module';
+import { UserGateway } from './user.gateway';
 @Module({
   imports: [
     AuthModule,
@@ -22,9 +27,19 @@ import { GatewayModule } from './game/gateway/gateway.module';
     MembersModule,
     GameModule,
     GatewayModule,
+    DirectMessageModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UserService, PrismaService, ChatGateway],
+  providers: [
+    AppService,
+    UserService,
+    PrismaService,
+    ChatGateway,
+    UserGateway,
+    RoomsService,
+    MembersService,
+    MessagesService,
+  ],
   exports: [UserService, PrismaService],
 })
 export class AppModule {}
