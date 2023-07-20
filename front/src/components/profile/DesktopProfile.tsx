@@ -22,7 +22,7 @@ export const DesktopProfile = () : JSX.Element => {
             <ImageUpload />
             <AvatarProfile position="left-[41vw] bottom-[7vh] z-10" />
             <div className='absolute bg-[#161F1E] bg-opacity-90
-                    border bottom-0 w-full h-[10vh] rounded-md'>
+                   bottom-0 w-full h-[10vh] rounded-md'>
                
                 <div className='text-white flex justify-between items-center ml-6'>
   
