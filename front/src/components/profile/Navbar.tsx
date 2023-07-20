@@ -1,11 +1,16 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import Friend from './Friend';
 import Statistics from './Statistics';
 import Historique from './Historique';
 
+interface Props {
+    mobile: boolean,
+    style: string,
+}
 
-export const Navbar = () => {
+
+export const Navbar: React.FC<Props> = (info) : JSX.Element => {
     const links = ['Statistics', 'Friend', 'History']
     const [isActive, setActive] = useState<string>(links[0]);
     const [url, setUrl] = useState<string>('');
@@ -30,11 +35,13 @@ export const Navbar = () => {
     }
   return (
     <>
-        <div className='bg-[#243230]'>
-            <div className='flex justify-center items-center'>
-                <div className='border-[1px] w-full mx-5 border-[#3D4042]'></div>
-            </div>
-            <nav className="flex items-center justify-start px-5 py-2">
+        <div className={`bg-[#243230] ${info.style}`}>
+            {info.mobile && 
+                <div className='flex justify-center items-center'>
+                    <div className='border-[1px] w-full mx-5 border-[#3D4042]'></div>
+                </div>
+            }
+            <nav className={`flex items-center justify-start px-5 py-2 `}>
                 <ul className="flex items-center gap-5 text-white">
                     {links.map((link) => (
                         <li className="pointer-cursor" key={link}>

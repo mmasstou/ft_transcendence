@@ -35,7 +35,7 @@ const ImageUpload = () => {
    <section className="bg-[#243230]">
      <div
       className="relative flex flex-col justify-center items-center h-[333px]  w-full cursor-pointer 
-                  border-2 hover:opacity-70 hover:border-2 hover:border-dashed hover:rounded-lg transition banner"
+          hover:opacity-70 hover:border-2 hover:border-dashed hover:rounded-lg transition banner"
       onClick={handleDivClick}
     >
       {createObjectURL && <img src={createObjectURL} alt="Uploaded File" className="w-full h-full border-2 rounded-lg border-transparent" />}

@@ -1,24 +1,44 @@
-import ImageUpload from '@/components/profile/ImageUpload'
+"use client"
 import Dashboard from '../Dashboard'
-import AvatarProfile from '@/components/profile/AvatarProfile'
-import { countries } from 'country-flag-icons'
-import { UserInfo } from '@/components/profile/UserInfo'
-import { UserStats } from '@/components/profile/UserStats'
-import { Navbar } from '@/components/profile/Navbar'
+import { useEffect, useState } from 'react'
+import { DesktopProfile } from '@/components/profile/DesktopProfile'
+import { MobileProfile } from '@/components/profile/MobileProfile'
+
+export type Info = {
+  id: number,
+  name: string,
+  username: string,
+  email: string,
+  address: object,
+  phone: string,
+  website: string,
+  company: Object
+}
 
 
-const Profile = () => {
+
+const Profile = () : JSX.Element => {
+
+  const [isMobile, setIsMobile] = useState(false);
+  
+    useEffect(() => {
+      const handleResize = () => {
+        const screenWidth = window.innerWidth;
+        setIsMobile(screenWidth <= 767);
+      };
+  
+      handleResize();
+  
+      window.addEventListener('resize', handleResize);
+  
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []);
+
   return (
       <Dashboard>
-        <div className='flex flex-col'>
-          <div className='bg-[#243230]'>
-            <ImageUpload />
-            <AvatarProfile/>
-            <UserInfo />
-            <UserStats />
-          </div>
-          <Navbar />
-        </div>
+        {isMobile ? <MobileProfile /> : <DesktopProfile />}
       </Dashboard>
   )
 }

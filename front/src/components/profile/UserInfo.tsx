@@ -1,9 +1,14 @@
-import React from 'react'
+import { Info } from '@/app/profile/page'
+import React, { FC } from 'react'
 
-export const UserInfo = () => {
+interface userProps {
+  user: Info | undefined | null,
+}
+
+export const UserInfo: FC<userProps> = ({ user }) : JSX.Element=> {
   return (
     <div className='text-white flex flex-col justify-center items-center ml-[100px]'>
-            <h2 className='text-[1.75em] sm:text-[1.2em] font-bold'>aouhadou</h2>
+            <h2 className='text-[1.75em] sm:text-[1.2em] font-bold'>{user?.username}</h2>
             <div className='flex justify-center items-center'>
               <img
                 className='h-[13px] w-[22px]'
