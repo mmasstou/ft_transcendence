@@ -20,18 +20,23 @@ export class UserService {
   async findOneLogin(params: { login: string }): Promise<User> {
     const { login } = params;
     console.log('+USER+findOne++>', login);
+   try {
     return await this.prisma.user.findUnique({
       where: { login },
     });
+   } catch (error) {
+      console.log('error', error);
+    return null;
+   }
   }
 
   async findAll(kind?: string): Promise<User[]> {
     return this.prisma.user.findMany({
       where: { kind },
-      // include: {
-      //   Rooms: true,
-      //   directMessage: true,
-      // },
+      include: {
+        Rooms: true,
+        directMessage: true,
+      },
     });
   }
 
