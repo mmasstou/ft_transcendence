@@ -20,7 +20,8 @@ export const DesktopProfile = () : JSX.Element => {
       <div className='flex flex-col gap-10 mx-[20px]'>
           <div className='bg-[#243230] relative rounded-md'>
             <ImageUpload />
-            <AvatarProfile position="left-[41vw] bottom-[7vh] z-10" />
+            <AvatarProfile position="left-[39vw] bottom-[7vh] z-10 w-[150px] h-[150px] border-2 rounded-full border-secondary" 
+                            score="text-[1.25em] font-bold  h-[40px] w-[40px]" />
             <div className='absolute bg-[#161F1E] bg-opacity-90
                    bottom-0 w-full h-[10vh] rounded-md'>
                

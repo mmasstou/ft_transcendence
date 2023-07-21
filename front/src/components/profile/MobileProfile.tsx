@@ -21,7 +21,8 @@ export const MobileProfile = () : JSX.Element => {
       <div className='flex flex-col'>
             <div className='bg-[#243230]'>
               <ImageUpload />
-              <AvatarProfile position="left-[7vw] top-[-5vh]"/>
+              <AvatarProfile position="left-[7vw] top-[-5vh] w-[100px] h-[100px] border-2 rounded-full border-secondary" 
+                                score="text-[0.875em] font-bold  h-[26px] w-[26px]" />
               <UserInfo user={user} />
               <UserStats />
             </div>

@@ -8,7 +8,7 @@ const MyAvatar = () => {
     <Avatar.Root className={`${style.flexCenter} flex-inline align-middle overflow-hidden select-none
             rounded-full `}>
         <Avatar.Image
-          className="w-[100%] h-[100%] object-cover rounded-[inherit] border-[2px] border-secondary"
+          className="w-[100%] h-[100%] object-cover rounded-[inherit] border-secondary"
           src={profile.src}
           alt="User Avatar"
         />
