@@ -2,27 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-
 .blue__gradient {
-    background: linear-gradient(180deg, rgba(135, 248, 218, 0) 0%, #2bedd7 100%);
-    filter: blur(123px);
-  }
-  
-  .pink__gradient {
-    background: linear-gradient(90deg, #89ffdd 0%, #26ffe6 100%);
-    filter: blur(900px);
-  }
-  
-  .white__gradient {
-    background: rgba(0, 228, 167, 0.6);
-    filter: blur(750px);
-  }
+  background: linear-gradient(180deg, rgba(135, 248, 218, 0) 0%, #2bedd7 100%);
+  filter: blur(123px);
+}
+
+.pink__gradient {
+  background: linear-gradient(90deg, #89ffdd 0%, #26ffe6 100%);
+  filter: blur(900px);
+}
+
+.white__gradient {
+  background: rgba(0, 228, 167, 0.6);
+  filter: blur(750px);
+}
 
 .gradient {
-  background: #4CA1AF;  /* fallback for old browsers */
-background: -webkit-linear-gradient(to right, #C4E0E5, #4CA1AF);
-background: linear-gradient(to right, #C4E0E5, #4CA1AF); 
-
+  background: #4ca1af; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #c4e0e5, #4ca1af);
+  background: linear-gradient(to right, #c4e0e5, #4ca1af);
 }
 
 .bg-blue-gradient {
@@ -37,7 +35,6 @@ background: linear-gradient(to right, #C4E0E5, #4CA1AF);
   );
 }
 
-
 @media (max-width: 767px) {
   .small-device {
     display: absolute;
@@ -50,3 +47,6 @@ background: linear-gradient(to right, #C4E0E5, #4CA1AF);
   }
 }
 
+*::-webkit-scrollbar {
+  display: none;
+}

@@ -6,6 +6,10 @@ import Image from 'next/image';
 const Intro = () => {
   return (
     <div
+        className=" flex flex-col justify-start 
+              md:flex-row md:justify-center"
+      >
+    <div
           className="flex flex-col justify-start items-center rounded-[15px] mx-5 md:mx-10 md:w-[90%]
                  md:bg-[#3E504D] md:flex-row md:justify-between md:gap-10 md:h-[40vh] md:my-9"
         >
@@ -37,6 +41,7 @@ const Intro = () => {
             </p>
           </div>
         </div>
+      </div>
   )
 }
 

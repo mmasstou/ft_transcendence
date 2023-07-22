@@ -1,31 +1,27 @@
-import { ReactElement } from 'react'
-import  './dashboard.css'
-import Header from '@/components/Dashboard/Header'
-import Sidebar from '@/components/Dashboard/Sidebar'
+import Header from '@/components/Dashboard/Header';
+import Sidebar from '@/components/Dashboard/Sidebar';
+import './dashboard.css';
 
 interface Props {
-    children: React.ReactNode,
+  children: React.ReactNode;
 }
 
-const Dashboard = ({children} : Props) => {
+const Dashboard = ({ children }: Props) => {
   return (
-    < >
-    <div className= "dashboard bg-primary ">
-      <header  className="flex items-center justify-between px-5 ">
-       <Header/>
-      </header>
+    <>
+      <div className="dashboard bg-primary ">
+        <header className="bg-transparent flex items-center justify-between px-5 ">
+          <Header />
+        </header>
 
-      <main className=''>
-        {children}
-      </main>
+        <main className="">{children}</main>
 
-      <div id="Sidebar">
-        <Sidebar />
+        <div id="Sidebar">
+          <Sidebar />
+        </div>
       </div>
-
-    </div>
     </>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
