@@ -19,15 +19,16 @@ export default function page() {
   const [_ChanneLsActiveID, setChanneLsActive] = React.useState<string | null>(null)
   const [socket, setSocket] = React.useState<Socket | null>(null)
   const params = useSearchParams()
+  const token: any = Cookies.get('token');
   const loginhook = LoginHook()
   document.title = "Transcendence - Chat/channeL"
 
 
 
   useEffect(() => {
-    const token: any = Cookies.get('token');
-    // Replace 'http://your-socket-server' with the actual URL of your socket server.
-    const socket = io('http://localhost/chat' , {
+    if (!token)
+      return;
+    const socket = io('http://localhost/chat', {
       transports: ['websocket'],
       auth: {
         token: token,
@@ -44,11 +45,9 @@ export default function page() {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [token]);
+
   useEffect(() => {
-
-
-
     const token: any = Cookies.get('token');
     if (!token)
       loginhook.onOpen()
@@ -73,13 +72,13 @@ export default function page() {
         const resp = await getChannels(token)
         if (resp && resp.ok) {
           const data = await resp.json()
-       // console.log("data :", data)
+          // console.log("data :", data)
           setChannel(data);
         }
-     // console.log("resp :", resp)
+        // console.log("resp :", resp)
       })();
     } catch (error) {
-   // console.log("error :", error)
+      // console.log("error :", error)
     }
 
     setIsMounted(true);

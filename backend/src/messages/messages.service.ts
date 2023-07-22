@@ -61,6 +61,9 @@ export class MessagesService {
             connect: { id: data.roomId },
           },
         },
+        include: {
+          sender: true,
+        },
       });
     } catch (error) {
       throw new HttpException(
@@ -94,6 +97,13 @@ export class MessagesService {
 
     return await this.prisma.messages.delete({
       where: { id },
+    });
+  }
+
+  async removeALL(id: string) {
+    // console.log('++removeALL++>', id);
+    return await this.prisma.messages.deleteMany({
+      where: { roomsId: id },
     });
   }
 }

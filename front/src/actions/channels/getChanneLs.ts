@@ -1,6 +1,6 @@
 const getChannels = async (token : string) => {
   try {
-    return await fetch('http://127.0.0.1/api/rooms', {
+    return await fetch('http://127.0.0.1/api/rooms/user', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

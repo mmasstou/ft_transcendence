@@ -62,11 +62,15 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     }, [room])
 
     useEffect(() => {
+        console.log('socket : ', socket?.id)    
         socket?.on('message', (message: any) => {
             console.log('message : ', message)
-            // setMessages([...messages, message])
+            setMessages([...messages, message])
         })
-    }, [messages, socket])
+    }, [messages, InputValue])
+
+
+
     const content = (
         <div className="flex flex-col gap-3">
 
@@ -76,12 +80,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                     messages.map((message, index) => (
                         <Message
                             key={index}
-                            content={message.content}
-                            id={message.id}
-                            senderId={message.senderId}
-                            roomsId={message.roomsId}
-                            created_at={message.created_at}
-                            updated_at={message.updated_at}
+                            message={message}
+                            userid={message.sender}
                         />
                     ))
                     : <div>no messages</div>
@@ -90,12 +90,10 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     )
 
     const onClickHandler = (event: FormEvent<HTMLInputElement>) => {
-        console.log('Conversations socket : ', socket?.id)
 
     }
 
     const OnSubmit = (event: FormEvent<HTMLInputElement>) => {
-        console.log('Conversations socket : ', socket?.id)
         setInputValue("")
 
         // send message to server using socket :
@@ -107,7 +105,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             console.log('message response : ', response)
         })
     }
-  
+
 
     if (!IsMounted) return null
 
@@ -122,7 +120,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     sm:flex`}>
         {
             (hasparam && channeLinfo) ? <>
-                <ConversationsTitlebar messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
+                <ConversationsTitlebar messageTo={channeLinfo.name + Cookies.get('_id')} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
                 <ConversationsMessages Content={content} />
                 <div className="w-full m-[2px]">
                     <input

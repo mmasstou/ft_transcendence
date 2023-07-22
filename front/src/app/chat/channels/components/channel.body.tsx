@@ -26,8 +26,8 @@ export default function ChanneLbody({ children , socket }: { children: React.Rea
             const resp = await getChannels(token)
             if (resp && resp.ok) {
                 const data = await resp.json()
-             // console.log("data :", data)
-                setChannel(data);
+             console.log("getChannels data :", data)
+                setChannel(data.Rooms);
             }
          // console.log("resp :", resp)
         }

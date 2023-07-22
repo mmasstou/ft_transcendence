@@ -56,4 +56,9 @@ export class MessagesController {
   remove(@Param('id') id: string) {
     return this.messageService.remove(id);
   }
+  @UseGuards(AuthGuard)
+  @Delete('all/:roomId')
+  removeALL(@Param('roomId') id: string) {
+    return this.messageService.removeALL(id);
+  }
 }

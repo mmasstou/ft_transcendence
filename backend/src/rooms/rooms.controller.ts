@@ -18,17 +18,17 @@ import { Request } from 'express';
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
-  @UseGuards(AuthGuard)
-  @Post()
-  create(
-    @Body('name') name: string,
-    @Body('type') type: string,
-    @Req() request: Request,
-  ) {
-    const User_payload: any = request.user;
-    const userId: any = User_payload.sub;
-    return this.roomsService.create({ name, type, userId });
-  }
+  // @UseGuards(AuthGuard)
+  // @Post()
+  // create(
+  //   @Body('name') name: string,
+  //   @Body('type') type: string,
+  //   @Req() request: Request,
+  // ) {
+  //   const User_payload: any = request.user;
+  //   const userId: any = User_payload.sub;
+  //   return this.roomsService.create({ name, type, userId });
+  // }
 
   @UseGuards(AuthGuard)
   @Get()
@@ -37,11 +37,11 @@ export class RoomsController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('users')
-  findAlLForUser(@Req() request: Request) {
+  @Get('user')
+  findALL(@Req() request: Request) {
     const userIds: any = request.user;
     const userId: string = userIds.sub;
-    return this.roomsService.findAlLForUser(userId);
+    return this.roomsService.findUserRooms(userId);
   }
 
   @UseGuards(AuthGuard)
