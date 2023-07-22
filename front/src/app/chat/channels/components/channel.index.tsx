@@ -78,7 +78,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
                         icon={BsJournalPlus}
                         small
                         outline
-                        onClick={() => {channeLcreatemodaLHook.onOpen([]) }}
+                        onClick={() => {channeLcreatemodaLHook.onOpen([], socket) }}
                     />
                     <Button
                         icon={FiUsers}

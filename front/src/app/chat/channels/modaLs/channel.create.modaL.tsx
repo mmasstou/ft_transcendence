@@ -1,7 +1,7 @@
 "use client"
 import ContactHook from "@/hooks/contactHook"
 import { TiArrowMinimise } from "react-icons/ti"
-import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler, useFieldArray } from "react-hook-form"
+import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler, useFieldArray, set } from "react-hook-form"
 import { useEffect, useState } from "react"
 import { userType } from "@/types/types"
 import Cookies from "js-cookie"
@@ -13,9 +13,13 @@ import Select from "../../components/Select"
 import ChanneLcreatemodaLHook from "../hooks/channel.create.hook"
 import ChanneLmodaLheader from "../components/channel.modal.header"
 import Input from "@/components/Input"
-
+import getUserWithId from "../actions/getUserWithId"
+enum RoomType {
+    PUBLIC = 'PUBLIC',
+    PRIVATE = 'PRIVATE',
+}
 const ChanneLCreateModaL = () => {
-    const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
+    const { IsOpen, onClose, onOpen, socket, selectedFriends } = ChanneLcreatemodaLHook()
     const route = useRouter()
     const token: any = Cookies.get('token')
     const [aLLfriends, setfriends] = useState<any[] | null>(null)
@@ -25,15 +29,17 @@ const ChanneLCreateModaL = () => {
     let users: any[] = []
     useEffect(() => {
         const token: any = Cookies.get('token');
-     // console.log("token :", token)
+        const User_ID: string | undefined = Cookies.get('_id');
+        // console.log("token :", token)
         if (!token)
             return;
         (async function getFriends() {
             await fetch('http://127.0.0.1/api/users', {
                 headers: { Authorization: `Bearer ${token}`, },
             }).then((resp) => resp.json()).then(data => {
-             // console.log("++++++++++*****data :", data)
-                setfriends(data)
+                // console.log("++++++++++*****data :", data)
+                const _list = data.filter((user: any) => user.id !== User_ID)
+                setfriends(_list)
             })
         })();
     }, [])
@@ -55,15 +61,10 @@ const ChanneLCreateModaL = () => {
     } = useForm<FieldValues>({
         defaultValues: {
             channel_name: '',
-            friends: [],
+            friends: selectedFriends,
         },
     });
 
-
-    if (channeLcreatemodaLHook.selectedFriends && channeLcreatemodaLHook.selectedFriends.length && !watch('friends').length) {
-     // console.log("channeLcreatemodaLHook.selectedFriends :", channeLcreatemodaLHook.selectedFriends)
-        setValue('friends', channeLcreatemodaLHook.selectedFriends)
-    }
     const friends = watch('friends')
     const _channel_name = watch('channel_name')
 
@@ -76,21 +77,46 @@ const ChanneLCreateModaL = () => {
 
 
     const onSubmit: SubmitHandler<FieldValues> = async (UserId: any) => {
-        // create private room :
-     // console.log("+onSubmit+ +> UserId :", UserId)
+        // create private room : createroom
+        console.log("+onSubmit+ +> UserId-channel_name :", UserId.channel_name)
+        console.log("+onSubmit+ +> UserId-friends :", UserId.friends)
+        setcustomvalue(_channel_name, "")
         reset();
         setInputValue("");
+        
+        const token: any = Cookies.get('token');
+        const User_ID: string | undefined = Cookies.get('_id');
+       
+        const LoginUser =  User_ID &&  await getUserWithId(User_ID, token)
+        LoginUser.role = "ADMIN"
+        let _friends: any[] = []
+
+        // get friends data :
+        for (let i = 0; i < UserId.friends.length; i++) {
+            const __friends = await getUserWithId(UserId.friends[i].value, token);
+            __friends.role = "USER"
+            _friends.push(__friends)
+        }
+        _friends.push(LoginUser)
+
+        socket?.emit('createroom', { name: UserId.channel_name, friends: _friends, type: RoomType.PUBLIC }, (response: any) => {
+            console.log('join response : ', response)
+        });
+        socket?.on('createroomResponseEvent', (room: any) => {
+            console.log('room created : ', room)
+            // route.push(`/chat/channels?r=${room.id}`)
+        })
 
     }
 
     const bodyContent = (
         <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[34rem]">
-          
+
             <div className="body flex flex-col gap-4">
                 <div className="body flex flex-col gap-2 py-4">
                     <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel name </h1>
                     <Input
-                        onChange={(e :any) => { setcustomvalue(_channel_name, e.target.value) }}
+                        onChange={(e: any) => { setcustomvalue(_channel_name, e.target.value) }}
                         id={"channel_name"} lable={"channel name"}
                         register={register}
                         errors={errors} />
@@ -101,6 +127,7 @@ const ChanneLCreateModaL = () => {
                     options={aLLfriends.map((friend) => ({
                         value: friend.id,
                         label: friend.login,
+                        role: "USER"
                     }))}
                     value={friends}
                     onChange={(value: any) => {
@@ -116,9 +143,7 @@ const ChanneLCreateModaL = () => {
             </div>
         </div>
     )
- // console.log("-----              --friends :", friends)
-    return <ChanneLModal IsOpen={channeLcreatemodaLHook.IsOpen} title={"create channel"} children={bodyContent} onClose={channeLcreatemodaLHook.onClose} />
-        // IsOpen={channeLcreatemodaLHook.IsOpen}
-        // body={bodyContent} />
+    return <ChanneLModal IsOpen={IsOpen} title={"create channel"} children={bodyContent} onClose={onClose} />
+
 }
 export default ChanneLCreateModaL
