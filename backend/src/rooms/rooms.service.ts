@@ -21,6 +21,23 @@ export class RoomsService {
     private membersservice: MembersService,
     private messageservice: MessagesService,
   ) {}
+  // check if member is in room
+  async isMemberInRoom(roomId: string, userId: string) {
+    const room = await this.prisma.rooms.findUnique({
+      where: { id: roomId },
+      include: { members: true },
+    });
+    if (!room) {
+      throw new NotFoundException(`Room with ID ${roomId} not found`);
+    }
+    const member = room.members.find((member) => member.userId === userId);
+    if (!member) {
+      throw new NotFoundException(
+        `User with ID ${userId} is not a member of room with ID ${roomId}`,
+      );
+    }
+    return member;
+  }
   async findOne(params: { name: string }): Promise<Rooms> {
     try {
       const { name } = params;
@@ -56,6 +73,7 @@ export class RoomsService {
       name: string;
       type: RoomType;
       friends: UserType[];
+      channeLpassword?: string;
     },
     userId: string,
   ) {
@@ -117,6 +135,7 @@ export class RoomsService {
           data: {
             name: _data.name,
             type: _data.type,
+            password: _data.channeLpassword,
             members: {
               create: _data.friends.map((friend: any) => ({
                 user: {

@@ -14,14 +14,13 @@ datasource db {
 enum UserType {
   ADMIN
   USER
-  SENDER
-  RECEIVER
+  OWNER
 }
 
 enum RoomType {
   PRIVATE
   PUBLIC
-  PROTACTED
+  PROTECTED
 }
 
 model UserSocket {
@@ -54,14 +53,16 @@ model User {
 }
 
 model Rooms {
-  id         String     @id @default(uuid())
-  name       String     @unique
-  type       RoomType   @default(PUBLIC)
-  members    Members[]
-  messages   Messages[]
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  User       User[]
+  id            String     @id @default(uuid())
+  name          String     @unique
+  type          RoomType   @default(PUBLIC)
+  members       Members[]
+  messages      Messages[]
+  viewedmessage Int        @default(0)
+  password      String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+  User          User[]
 }
 
 model DirectMessage {
@@ -94,6 +95,7 @@ model Messages {
   sender          User           @relation(fields: [senderId], references: [id])
   roomId          Rooms?         @relation(fields: [roomsId], references: [id])
   senderId        String
+  viewed          Int            @default(0)
   roomsId         String?
   created_at      DateTime       @default(now())
   updated_at      DateTime       @updatedAt

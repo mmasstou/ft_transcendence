@@ -28,6 +28,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const [channeLinfo, setChanneLinfo] = useState<any>(null)
     const [message, setMessage] = useState("")
     const [InputValue, setInputValue] = useState("")
+    const [viewed, setviewed] = useState<number>(0)
     const params = useSearchParams()
     const room = params.get('r')
 

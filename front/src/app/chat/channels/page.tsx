@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 import ChanneLIndex from './components/channel.index';
 import LoginHook from '@/hooks/auth/login';
 import { Socket, io } from 'socket.io-client';
+import getChannelWithId from './actions/getChannelWithId';
 const metadata = {
   title: 'Transcendence',
   description: 'Online Pong Game',
@@ -60,6 +61,23 @@ export default function page() {
     }
   }, [params])
 
+  useEffect(() => {
+    if (!_ChanneLsActiveID)
+    return
+    const token: any = Cookies.get('token');
+     (async () => {
+      const room = await getChannelWithId(_ChanneLsActiveID, token)
+      let JoinData : any = room
+      const userId = Cookies.get('_id')
+      if (userId){
+        JoinData.loginUser = userId
+        console.log('_ChanneLsActiveID : ', _ChanneLsActiveID)
+        socket?.emit('joinroom', JoinData, (response: any) => {
+          console.log('join response : ', response)
+        })
+      }
+    })();
+  }, [_ChanneLsActiveID, socket])
 
   useEffect(() => {
     if (!IsMounted)
