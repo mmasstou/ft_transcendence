@@ -4,6 +4,7 @@ import {CgProfile} from 'react-icons/cg';
 import {AiFillWechat} from 'react-icons/ai';
 import {FaUsers} from 'react-icons/fa';
 import {IoLogoGameControllerB} from 'react-icons/io';
+import { MdLeaderboard } from 'react-icons/md';
 import MenuItem from "./MenuItem"
 
 const DesktopSidebar = () => {
@@ -16,6 +17,8 @@ const DesktopSidebar = () => {
                 <MenuItem isActive={router === '/chat'} href='/chat' icon={AiFillWechat}/>
                 <MenuItem isActive={router === '/users'} href='/users' icon={FaUsers}/>
                 <MenuItem isActive={router === '/game'} href='/game' icon={IoLogoGameControllerB}/>
+                <MenuItem isActive={router === '/leaderboard'} href='/leaderboard' icon={MdLeaderboard}/>
+
             </ul>
         </nav>
   )
