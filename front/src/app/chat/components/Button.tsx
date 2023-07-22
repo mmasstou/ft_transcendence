@@ -10,6 +10,7 @@ interface ButtonProps {
     small?: boolean;
     icon?: IconType;
     border?: boolean;
+    IsActive?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -19,7 +20,8 @@ const Button: React.FC<ButtonProps> = ({
     outline,
     small,
     icon: Icon,
-    border
+    border,
+    IsActive
 }) => {
     return (
         <button
@@ -27,22 +29,25 @@ const Button: React.FC<ButtonProps> = ({
             onClick={onClick}
             className={`
         relative
+        flex
+        gap-2
         disabled:opacity-70
         disabled:cursor-not-allowed
         rounded-lg
         hover:opacity-80
         transition
         w-max
+        px-2
         ${outline ? ' bg-transparent' : 'bg-rose-500'}
        ${border ? outline ? 'border-black' : 'border-rose-500' : ''}
-       text-white
+       ${IsActive ? ' text-secondary' : 'text-white'}
         ${small ? 'text-sm' : 'text-md'}
         ${small ? 'py-1' : 'py-3'}
         ${small ? 'font-light' : 'font-semibold'}
         ${border ? small ? 'border-[1px]' : 'border-2' : ''}
       `}
         >
-            {Icon && (<Icon size={24} />)}
+            {Icon && (<Icon  size={24} />)}
             {label && label}
         </button>
     );

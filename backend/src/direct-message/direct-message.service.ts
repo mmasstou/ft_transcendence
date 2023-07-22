@@ -64,31 +64,6 @@ export class DirectMessageService {
         });
 
         console.log('directMessage', directMessage.id);
-
-        const sender_member = await this.prisma.members.create({
-          data: {
-            user: { connect: { id: user.id } },
-            type: UserType.SENDER,
-          },
-        });
-
-        console.log('sender_member', sender_member.id);
-        const receiver_member = await this.prisma.members.create({
-          data: {
-            user: { connect: { id: receiver.id } },
-            type: UserType.RECEIVER,
-          },
-        });
-        console.log('receiver_member', receiver_member.id);
-        return await prisma.directMessage.update({
-          where: { id: directMessage.id },
-          data: {
-            members: {
-              connect: [{ id: sender_member.id }, { id: receiver_member.id }],
-            },
-          },
-          include: { members: true },
-        });
       });
       return result;
     } catch (error) {

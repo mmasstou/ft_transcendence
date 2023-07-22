@@ -2,7 +2,7 @@
 import ContactHook from "@/hooks/contactHook"
 import { TiArrowMinimise } from "react-icons/ti"
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler, useFieldArray, set } from "react-hook-form"
-import { useEffect, useState } from "react"
+import { MouseEvent, useEffect, useState } from "react"
 import { userType } from "@/types/types"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
@@ -14,6 +14,12 @@ import ChanneLcreatemodaLHook from "../hooks/channel.create.hook"
 import ChanneLmodaLheader from "../components/channel.modal.header"
 import Input from "@/components/Input"
 import getUserWithId from "../actions/getUserWithId"
+import Button from "../../components/Button"
+import { RiGitRepositoryPrivateFill } from "react-icons/ri"
+import { MdOutlinePublic } from "react-icons/md"
+import { GrSecure, GrInsecure } from "react-icons/gr"
+import { GoEyeClosed } from "react-icons/go"
+import { HiLockClosed, HiLockOpen } from "react-icons/hi"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',
@@ -47,7 +53,9 @@ const ChanneLCreateModaL = () => {
 
     type formValues = {
         channel_name: string,
-        friends: userType[]
+        friends: userType[],
+        ChanneLpassword: string,
+        channeLtype: string
     }
 
     const {
@@ -62,11 +70,15 @@ const ChanneLCreateModaL = () => {
         defaultValues: {
             channel_name: '',
             friends: selectedFriends,
+            ChanneLpassword: "",
+            channeLtype: ""
         },
     });
 
     const friends = watch('friends')
     const _channel_name = watch('channel_name')
+    const _channeLpassword = watch('ChanneLpassword')
+    const _channeLtype = watch('channeLtype')
 
 
     // Argument of type 'string' is not assignable to parameter of type '"channel_name" | "friends" | `friends.${number}` | `friends.${number}.id` | `friends.${number}.login` | `friends.${number}.email` | `friends.${number}.password` | `friends.${number}.first_name` | `friends.${number}.last_name` | `friends.${number}.kind` | `friends.${number}.image` | `friends.${number}.is_active`
@@ -80,15 +92,17 @@ const ChanneLCreateModaL = () => {
         // create private room : createroom
         console.log("+onSubmit+ +> UserId-channel_name :", UserId.channel_name)
         console.log("+onSubmit+ +> UserId-friends :", UserId.friends)
+        console.log("+onSubmit+ +> UserId-ChanneLpassword :", UserId.ChanneLpassword)
+        console.log("+onSubmit+ +> UserId-channeLtype :", UserId.channeLtype)
         setcustomvalue(_channel_name, "")
         reset();
         setInputValue("");
-        
+
         const token: any = Cookies.get('token');
         const User_ID: string | undefined = Cookies.get('_id');
-       
-        const LoginUser =  User_ID &&  await getUserWithId(User_ID, token)
-        LoginUser.role = "ADMIN"
+
+        const LoginUser = User_ID && await getUserWithId(User_ID, token)
+        LoginUser.role = "OWNER"
         let _friends: any[] = []
 
         // get friends data :
@@ -99,28 +113,75 @@ const ChanneLCreateModaL = () => {
         }
         _friends.push(LoginUser)
 
-        socket?.emit('createroom', { name: UserId.channel_name, friends: _friends, type: RoomType.PUBLIC }, (response: any) => {
-            console.log('join response : ', response)
-        });
+        socket?.emit('createroom', {
+            name: UserId.channel_name,
+            friends: _friends,
+            type: UserId.channeLtype,
+            channeLpassword: UserId.ChanneLpassword
+        },
+            (response: any) => {
+                console.log('join response : ', response)
+            });
         socket?.on('createroomResponseEvent', (room: any) => {
             console.log('room created : ', room)
-            // route.push(`/chat/channels?r=${room.id}`)
+            route.push(`/chat/channels?r=${room.id}`)
+            onClose()
         })
-
     }
 
     const bodyContent = (
         <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[34rem]">
 
             <div className="body flex flex-col gap-4">
+
                 <div className="body flex flex-col gap-2 py-4">
                     <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel name </h1>
                     <Input
                         onChange={(e: any) => { setcustomvalue(_channel_name, e.target.value) }}
                         id={"channel_name"} lable={"channel name"}
                         register={register}
+
                         errors={errors} />
                 </div>
+                <div className="flex flex-col gap-3">
+                    <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel type </h1>
+
+                    <div className=" w-full flex flex-row justify-between items-center ">
+                        <Button
+                            icon={GoEyeClosed}
+                            label={"private"}
+                            outline
+                            IsActive={_channeLtype === "PRIVATE"}
+                            onClick={() => { setcustomvalue("channeLtype", "PRIVATE") }}
+                        />
+                        <Button
+                            icon={HiLockClosed}
+                            label={"public"}
+                            outline
+                            IsActive={_channeLtype === "PUBLIC"}
+                            onClick={() => { setcustomvalue("channeLtype", "PUBLIC") }}
+                        />
+                        <Button
+                            icon={HiLockOpen}
+                            label={"protected"}
+                            outline
+                            IsActive={_channeLtype === "PROTECTED"}
+                            onClick={() => { setcustomvalue("channeLtype", "PROTECTED") }}
+                        />
+                    </div>
+                </div>
+                {/* if protacted */}
+                {
+                    _channeLtype === "PROTECTED" && <div>
+                        <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel password </h1>
+                        <Input
+                            onChange={(e: any) => { setcustomvalue(_channeLpassword, e.target.value) }}
+                            id={"ChanneLpassword"} lable={"ChanneLpassword"}
+                            register={register}
+                            type="password"
+                            errors={errors} />
+                    </div>
+                }
                 {aLLfriends !== null && <Select
                     disabled={false}
                     lable={"Select Friends"}

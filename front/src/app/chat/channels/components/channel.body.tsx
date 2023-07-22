@@ -1,24 +1,24 @@
 import React, { use, useEffect } from "react";
 import LefttsideModaL from "../modaLs/LeftsideModal";
 import ChanneLSidebarItem from "./channel.sidebar.item";
-import { RoomsType } from "@/types/types";
+import { RoomsType, messagesType } from "@/types/types";
 import { useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import getChannels from "@/actions/channels/getChanneLs";
 import { Socket } from "socket.io-client";
 
-
-export default function ChanneLbody({ children , socket }: { children: React.ReactNode; socket : Socket | null }) {
+export default function ChanneLbody({ children, socket }: { children: React.ReactNode; socket: Socket | null }) {
     const [IsMounted, setIsMounted] = React.useState(false)
     const [ChanneLs, setChannel] = React.useState<RoomsType[] | null>(null)
     const [ChanneLsActiveID, setChanneLsActive] = React.useState<string | null>(null)
+    const [viewed, setviewed] = React.useState<number>(0)
     const params = useSearchParams()
- // console.log("ChannelBody socket :", socket?.id )
+    // console.log("ChannelBody socket :", socket?.id )
 
 
     useEffect(() => {
         const token: any = Cookies.get('token');
-       
+
 
         (async () => {
             if (!token)
@@ -26,19 +26,21 @@ export default function ChanneLbody({ children , socket }: { children: React.Rea
             const resp = await getChannels(token)
             if (resp && resp.ok) {
                 const data = await resp.json()
-             console.log("getChannels data :", data)
+                console.log("getChannels data :", data)
                 setChannel(data.Rooms);
             }
-         // console.log("resp :", resp)
+            // console.log("resp :", resp)
         }
         )();
     }, [])
 
-    useEffect(() => { if (params) {
-        setChanneLsActive(params.get('r'))
-    }}, [params])
-    const LeftsideContent = ChanneLs?.map((room, key) => (
-        <ChanneLSidebarItem key={key} room={room} socket={socket} active={room.id === ChanneLsActiveID} />
+    useEffect(() => {
+        if (params) {
+            setChanneLsActive(params.get('r'))
+        }
+    }, [params])
+    const LeftsideContent = ChanneLs?.map((room: RoomsType, key) => (
+        <ChanneLSidebarItem key={key} room={room} socket={socket} viewd={8} active={room.id === ChanneLsActiveID} />
     ))
 
     useEffect(() => {

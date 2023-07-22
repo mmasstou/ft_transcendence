@@ -11,6 +11,7 @@ export type Message = {
 
 export type membersType = {};
 export type messagesType = {
+  viewed: number;
   content: string;
   id: string;
   senderId: string;
