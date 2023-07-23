@@ -47,18 +47,22 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
                 if (!channeLLid)
                     return;
                 const channeLLMembers = await getChannelWithId(channeLLid, token)
-                setchanneLsmembers(channeLLMembers)
+                if (channeLLMembers && channeLLMembers.statusCode !== 200){
+                    setchanneLsmembers(channeLLMembers)
+                } 
 
             })();
         }
     }, [params])
-    const LeftsideContent = ChanneLs?.map((room: RoomsType, key) => (
-        <ChanneLSidebarItem key={key} room={room} socket={socket} viewd={8} active={room.id === ChanneLsActiveID} />
-    ))
 
-    const RightsideContent = ChanneLsmembers?.map((member: membersType, key :number) => (
-        <ChanneLsmembersItem key={key}  member={member} />
-    ))
+    // const LeftsideContent = ChanneLs && ChanneLs.map((room: RoomsType, key) => (
+    //     <ChanneLSidebarItem key={key} room={room} socket={socket} viewd={8} active={room.id === ChanneLsActiveID} />
+    // ))
+
+    // const RightsideContent = ChanneLsmembers && ChanneLsmembers.map((member: membersType, key: number) => (
+    //     <ChanneLsmembersItem key={key} member={member} />
+    // ))
+    console.log("ChanneLsmembers :", ChanneLsmembers)
 
 
     useEffect(() => {
@@ -70,11 +74,19 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     return (
         <div className="channeLbody h-[90vh] md:h-[94vh] border border-green-600 flex ">
             <LefttsideModaL>
-                {LeftsideContent}
+                {
+                    ChanneLs && ChanneLs.map((room: RoomsType, key) => (
+                        <ChanneLSidebarItem key={key} room={room} socket={socket} viewd={8} active={room.id === ChanneLsActiveID} />
+                    ))
+                }
             </LefttsideModaL>
             {children}
             <RightsideModaL>
-                {RightsideContent}
+                {
+                    ChanneLsmembers && ChanneLsmembers.map((member: membersType, key: number) => (
+                        <ChanneLsmembersItem key={key} member={member} />
+                    ))
+                }
             </RightsideModaL>
         </div>
     )

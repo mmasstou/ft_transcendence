@@ -34,7 +34,7 @@ export default function ChanneLsmembersItem( {member} : IChannelMembersItemProps
 
 <div className="MessagesenderInfo w-full boredr-2  -green-500 flex flex-row items-center p-1 gap-4">
                 <div className="flex flex-row items-center p-1 gap-1">
-                <UserAvatar size={18} image={"/avatar.jpg"} />
+                <UserAvatar size={24} image={"/avatar.jpg"} />
                 <h3 className="text-base font-light text-[#FFFFFF]">{UserInfo?.login}</h3>
                 </div>
                 {member.type === 'OWNER' && <FaChessQueen fill="#FFBF00" />}

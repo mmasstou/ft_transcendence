@@ -11,6 +11,7 @@ interface ButtonProps {
     icon?: IconType;
     border?: boolean;
     IsActive?: boolean;
+    size?: number;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -21,7 +22,8 @@ const Button: React.FC<ButtonProps> = ({
     small,
     icon: Icon,
     border,
-    IsActive
+    IsActive,
+    size
 }) => {
     return (
         <button
@@ -47,8 +49,8 @@ const Button: React.FC<ButtonProps> = ({
         ${border ? small ? 'border-[1px]' : 'border-2' : ''}
       `}
         >
-            {Icon && (<Icon  size={24} />)}
-            {label && label}
+            {Icon && (<Icon  size={size ? size : 24} />)}
+          <span className=" hidden sm:flex">  {label && label}</span>
         </button>
     );
 }
