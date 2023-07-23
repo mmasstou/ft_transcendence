@@ -24,8 +24,6 @@ main {
 }
 
 
-
-
 @media (max-width: 767px) {
     .dashboard{
         display: grid;
@@ -35,9 +33,5 @@ main {
                     "main "
                     "Sidebar";
     }
-    /* #Sidebar {
-        margin-top: 10px;
-        background-color: transparent;
-    } */
   }
 

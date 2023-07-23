@@ -7,12 +7,12 @@ import { IoLogoGameControllerB } from 'react-icons/io';
 import { MdLeaderboard } from 'react-icons/md';
 import MenuItem from './MenuItem';
 
-const SidebarMobile = () => {
+const DesktopSidebar = () => {
   const router = usePathname();
 
   return (
-    <nav className="fixed bottom-0 bg-[#243230] h-[5vh] w-full px-6 py-4 rounded-t-xl md:hidden ">
-      <ul className="relative h-full flex flex-row justify-around items-center">
+    <nav className="flex flex-col justify-between items-center h-full p-1">
+      <ul className="flex flex-col justify-center items-center gap-12 w-full h-full">
         <MenuItem
           isActive={router === '/profile'}
           href="/profile"
@@ -39,4 +39,4 @@ const SidebarMobile = () => {
   );
 };
 
-export default SidebarMobile;
+export default DesktopSidebar;
