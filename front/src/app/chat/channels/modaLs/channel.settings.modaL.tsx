@@ -150,7 +150,7 @@ const ChanneLSettingsModaL = () => {
             ${(_channeLtype !== "UserSettings" && _channeLtype !== "ChatSettings") ? ' justify-center items-center' : ''} `}>
                 {
                 _channeLtype === "UserSettings" 
-                ? <ChanneLUserSettings /> 
+                ? <ChanneLUserSettings socket={socket} /> 
                 : _channeLtype === "ChatSettings" 
                     ? <div>Chat settings</div> 
                     : <Image
