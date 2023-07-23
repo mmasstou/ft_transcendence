@@ -29,6 +29,14 @@ export class MembersService {
     return this.prisma.members.findMany();
   }
 
+  async findALLForRoom(roomId: string): Promise<Members[]> {
+    // console.log('++findALLForRoom++>', roomId);
+
+    return this.prisma.members.findMany({
+      where: { RoomId: { id: roomId } },
+    });
+  }
+
   async create(data: {
     type: any | Prisma.EnumUserTypeFieldUpdateOperationsInput;
     user: string;
