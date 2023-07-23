@@ -13,6 +13,8 @@ export type membersType = {
   id: string;
   type: string;
   userId: string;
+  isban: boolean;
+  ismute: boolean;
   roomsId: string;
   directmessageId: string;
   created_at: string;
@@ -57,4 +59,9 @@ export type userType ={
 export type messageSocket = {
   roomId: string,
   messageContent: string,
+}
+
+export type updatememberType = {
+  updateType: string,
+  member: membersType,
 }

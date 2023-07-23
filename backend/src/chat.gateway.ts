@@ -10,14 +10,22 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from './users/user.service';
-import { User, Messages } from '@prisma/client';
+import { User, Messages, UserType } from '@prisma/client';
 import { error } from 'console';
 import { RoomsService } from './rooms/rooms.service';
 import { MessagesService } from './messages/messages.service';
 
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { MembersService } from './members/members.service';
+import { PrismaService } from './prisma.service';
 
 export let _User: User | null = null;
+enum updatememberEnum {
+  SETADMIN = 'SETADMIN',
+  BANMEMBER = 'BANMEMBER',
+  KIKMEMBER = 'KIKMEMBER',
+  MUTEMEMBER = 'MUTEMEMBER',
+}
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway implements OnGatewayConnection {
   constructor(
@@ -25,6 +33,8 @@ export class ChatGateway implements OnGatewayConnection {
     private readonly usersService: UserService,
     private roomservice: RoomsService,
     private messageservice: MessagesService,
+    private memberService: MembersService,
+    private prisma: PrismaService,
   ) {}
 
   async handleConnection(socket: Socket) {
@@ -55,6 +65,72 @@ export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
+  @SubscribeMessage('updatemember')
+  async updatemember(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    data: {
+      updateType: string;
+      member: any;
+    },
+  ) {
+    try {
+      console.log(
+        'Chat-> updatemember +> user :%s has create room :%s',
+        _User.login,
+        data,
+      );
+      // type: UserType.ADMIN,
+      // id: data.member.id,
+      console.log('Chat-> __member- ---------+>', data.member);
+      // update member :
+      // set admin :
+      const __member = await this.memberService.findOne({
+        userId: data.member.userId,
+        roomId: data.member.roomsId,
+      });
+      if (data.updateType === updatememberEnum.SETADMIN) {
+        console.log('Chat-> __member- +>', __member);
+
+        const type: UserType =
+          __member.type === UserType.ADMIN ? UserType.USER : UserType.ADMIN;
+        const member = await this.prisma.members.update({
+          where: { id: data.member.id },
+          data: { type: type },
+        });
+        this.server.emit('updatememberResponseEvent', member);
+      }
+      // ban member :
+      if (data.updateType === updatememberEnum.BANMEMBER) {
+        const __isBan: boolean = __member.isban === true ? false : true;
+        const member = await this.prisma.members.update({
+          where: { id: data.member.id },
+          data: { isban: __isBan },
+        });
+        this.server.emit('updatememberResponseEvent', member);
+      }
+      // mute member :
+      if (data.updateType === updatememberEnum.MUTEMEMBER) {
+        const __isMute: boolean = __member.ismute === true ? false : true;
+        const member = await this.prisma.members.update({
+          where: { id: data.member.id },
+          data: { ismute: __isMute },
+        });
+        this.server.emit('updatememberResponseEvent', member);
+      }
+      // kick member :
+      if (data.updateType === updatememberEnum.KIKMEMBER) {
+        __member
+        const member = await this.prisma.members.delete({
+          where: { id: data.member.id },
+        });
+        this.server.emit('updatememberResponseEvent', member);
+      }
+      // create room :
+    } catch (error) {
+      console.log('Chat-> error- +>', error);
+    }
+  }
   @SubscribeMessage('createroom')
   async createRoom(
     @ConnectedSocket() client: Socket,

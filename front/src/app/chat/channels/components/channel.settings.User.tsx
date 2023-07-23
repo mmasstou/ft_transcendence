@@ -5,12 +5,17 @@ import ChanneLsettingsHook from "../hooks/channel.settings";
 import Cookies from "js-cookie";
 import { useSearchParams } from "next/navigation";
 import getChannelMembersWithId from "../actions/getChannelmembers";
+import { Socket } from "socket.io-client";
 
 
-export default function ChanneLUserSettings() {
+interface ChanneLUserSettingsProps {
+    socket : Socket | null
+}
+export default function ChanneLUserSettings( {socket} : ChanneLUserSettingsProps) {
 
     const [IsMounted, setIsMounted] = React.useState(false)
     const [members, setMembers] = React.useState<membersType[] | null>(null)
+    const [update, setUpdate] = React.useState<boolean>(false)
     const channeLsettingsHook = ChanneLsettingsHook()
     const params = useSearchParams()
     const channeLLid = params.get('r')
@@ -32,7 +37,20 @@ export default function ChanneLUserSettings() {
             } 
 
         })();
-    }, [channeLsettingsHook.selectedchanneL])
+        setUpdate(false)
+    }, [update])
+
+    const handlOnclick = (data: any) => {
+        console.log("handlOnclick :", data)
+        socket?.emit('updatemember', data)
+       
+    }
+
+    socket?.on('updatememberResponseEvent', (data) => {
+        console.log("updatememberResponseEvent :", data)
+        console.log("updatememberResponseEvent :", members)
+        setUpdate(true)
+    })
 
     if (!IsMounted)
         return <div className="Members flex p-4">
@@ -44,7 +62,14 @@ export default function ChanneLUserSettings() {
     return <div className="Members flex p-4 mt-3 sm:mt-0 sm:p-1 flex-col items-start gap-3 overflow-y-scroll max-h-[28rem]">
         {
             members && members.map((member, index) => (
-                <ChannelSettingsUserMemberItem key={index} member={member} />
+                <ChannelSettingsUserMemberItem 
+                key={index} 
+                member={member} 
+                socket={socket}  
+                OnClick={(data) => {
+                    console.log("OnClick :", data)
+                    handlOnclick(data)
+                }} />
 
             ))
         }
