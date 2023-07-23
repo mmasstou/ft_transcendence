@@ -9,7 +9,16 @@ export type Message = {
   content: string;
 };
 
-export type membersType = {};
+export type membersType = {
+  id: string;
+  type: string;
+  userId: string;
+  roomsId: string;
+  directmessageId: string;
+  created_at: string;
+  updated_at: string;
+
+};
 export type messagesType = {
   viewed: number;
   content: string;
