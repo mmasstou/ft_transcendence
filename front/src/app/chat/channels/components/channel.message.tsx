@@ -10,19 +10,22 @@ import { AiFillMessage } from "react-icons/ai";
 import { ChannelReactions } from "./channel.reaction";
 import { ChannelReplys } from "./channel.replys";
 import getUserWithId from "../actions/getUserWithId";
+import { CgOptions } from "react-icons/cg";
+import Button from "../../components/Button";
 
 
 
 interface Imessage {
     message: messagesType
     userid: string
+    isForOwner ?: boolean
 }
-const Message: FC<Imessage> = ({ message, userid }) => {
+const Message: FC<Imessage> = ({ message, userid ,isForOwner}) => {
     const [create_At, setcreate_At] = useState("")
     const [senderInfo, setsenderInfo] = useState<userType | null>(null)
 
     useEffect(() => {
-     
+
         const token = Cookies.get("token");
         if (!token) return;
         (async function getsenderInfo(userid: string, token: string) {
@@ -46,7 +49,7 @@ const Message: FC<Imessage> = ({ message, userid }) => {
     }, [message, userid])
 
     if (!senderInfo)
-        return 
+        return
     return <div className=" relative flex flex-col ">
         <div className="flex flex-row justify-between  items-center">
             <div className="MessagesenderInfo w-full boredr-2  -green-500 flex flex-row items-center p-1 gap-1">
@@ -61,6 +64,14 @@ const Message: FC<Imessage> = ({ message, userid }) => {
                     {/* <div className="header flex flex-row justify-end ">
                         <div><BsCheck2All /></div>
                     </div> */}
+                   {/* {isForOwner && <div className="header flex flex-row justify-end ">
+                        <Button
+                            icon={CgOptions}
+                            small
+                            outline
+                            onClick={() => { }}
+                        />
+                    </div>} */}
                     <div className="body p-1 text-base text-[#65656B]">{message.content}</div>
                 </div>
             </div>

@@ -82,6 +82,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                         <Message
                             key={index}
                             message={message}
+                            isForOwner={message.senderId === Cookies.get('_id')}
                             userid={message.sender}
                         />
                     ))
@@ -121,7 +122,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     sm:flex`}>
         {
             (hasparam && channeLinfo) ? <>
-                <ConversationsTitlebar messageTo={channeLinfo.name + Cookies.get('_id')} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
+                <ConversationsTitlebar socket={socket} channeLId={room} messageTo={channeLinfo.name + Cookies.get('_id')} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
                 <ConversationsMessages Content={content} />
                 <div className="w-full m-[2px]">
                     <input

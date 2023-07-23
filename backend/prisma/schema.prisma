@@ -84,6 +84,8 @@ model Members {
   type            UserType       @default(USER)
   userId          String
   roomsId         String?
+  isban           Boolean        @default(false)
+  ismute          Boolean        @default(false)
   directmessageId String?
   created_at      DateTime       @default(now())
   updated_at      DateTime       @updatedAt
