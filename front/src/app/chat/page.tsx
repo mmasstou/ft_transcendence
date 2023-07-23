@@ -1,11 +1,14 @@
 import React from 'react'
 import Dashboard from '../Dashboard'
-// import { Image } from 'next/image'
 
+const metadata = {
+  title: 'Transcendence',
+  description: 'Online Pong Game',
+};
 export default function page() {
   return (
     <Dashboard>
-      {/* <Image /> */}
+    chat
   </Dashboard>
   )
 }

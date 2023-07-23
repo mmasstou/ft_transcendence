@@ -47,6 +47,21 @@
   }
 }
 
+@media (min-width: 767px) {
+  .avatar-position {
+    display: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -150%);
+  }
+}
+
 *::-webkit-scrollbar {
   display: none;
+}
+
+/* For IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

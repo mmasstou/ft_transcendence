@@ -1,9 +1,8 @@
-"use client";
-import logo from '../../../public/logo2.svg';
+'use client';
 import Image from 'next/image';
 import { CgProfile } from 'react-icons/cg';
-import { RiSettingsLine, RiNotification2Fill } from 'react-icons/ri';
-
+import { RiNotification2Fill, RiSettingsLine } from 'react-icons/ri';
+import logo from '../../../public/logo2.svg';
 
 const Header = () => {
   return (
@@ -20,34 +19,25 @@ const Header = () => {
       </div>
       <nav className="flex justify-center items-center">
         <ul className="flex items-center  gap-5 ">
-          <li >
+          <li>
             <button className="">
-              <RiSettingsLine
-                size={32}
-                color='#E0E0E0'
-              />
+              <RiSettingsLine size={32} color="#E0E0E0" />
             </button>
           </li>
           <li>
-            <button >
-              <RiNotification2Fill
-               size={32}
-                color='#E0E0E0'
-              />
+            <button>
+              <RiNotification2Fill size={32} color="#E0E0E0" />
             </button>
           </li>
           <li>
-            <button >
-              <CgProfile
-                size={32}
-                color='#E0E0E0'
-              />
+            <button>
+              <CgProfile size={32} color="#E0E0E0" />
             </button>
           </li>
         </ul>
       </nav>
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
