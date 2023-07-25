@@ -13,5 +13,7 @@ COPY . .
 
 EXPOSE 80
 RUN chmod 0777 /app/tools/init.sh
+RUN chmod 0777 /app/tools/start.sh
+
 ENTRYPOINT [ "sh", "/app/tools/init.sh" ]
-CMD [ "" ]
+CMD [ "sh", "/app/tools/start.sh" ]
