@@ -8,24 +8,30 @@ import { UpdateUserDto } from './dtos/UpdateUserDto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(params: { login: string }): Promise<User> {
+  async findOne(params: { login: string }): Promise<any> {
     const { login } = params;
-    console.log('++findOne++>', login);
-    return await this.prisma.user.findUnique({
-      where: { id :login },
+    // console.log('++findOne++>', login);
+    const user = await this.prisma.user.findUnique({
+      where: { id: login },
     });
+    if (!user) return {};
+    return user;
   }
-  async findOneID(params: { login: string }): Promise<User> {
+  async findOneLogin(params: { login: string }): Promise<User> {
     const { login } = params;
-    console.log('++findOne++>', login);
+    console.log('+USER+findOne++>', login);
     return await this.prisma.user.findUnique({
-      where: {login },
+      where: { login },
     });
   }
 
   async findAll(kind?: string): Promise<User[]> {
     return this.prisma.user.findMany({
       where: { kind },
+      include: {
+        Rooms: true,
+        directMessage: true,
+      },
     });
   }
 
@@ -40,7 +46,7 @@ export class UserService {
 
   async update(params: { id: string; data: UpdateUserDto }): Promise<User> {
     const { id, data } = params;
-    console.log('++update++>', id);
+    // console.log('++update++>', id);
 
     return await this.prisma.user.update({
       data,
@@ -49,10 +55,21 @@ export class UserService {
   }
 
   async remove(id: string): Promise<User> {
-    console.log('++remove++>', id);
+    // console.log('++remove++>', id);
 
     return await this.prisma.user.delete({
       where: { id },
     });
+  }
+
+  async getUserDirectMessages(userId: string) {
+    // Add your logic to fetch the direct messages for the user from the database or any other source
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        directMessage: true,
+      },
+    });
+    return user;
   }
 }

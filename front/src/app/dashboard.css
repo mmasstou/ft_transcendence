@@ -15,15 +15,13 @@ header {
 }
 
 main {
-    border: 2px solid rgb(135, 135, 240);
+    /* border: 2px solid rgb(135, 135, 240); */
     grid-area: main;
 }
 
 #Sidebar {
     grid-area: Sidebar;
 }
-
-
 
 
 @media (max-width: 767px) {
@@ -34,10 +32,6 @@ main {
         grid-template-areas: "header "
                     "main "
                     "Sidebar";
-    }
-    #Sidebar {
-        margin-top: 10px;
-        background-color: transparent;
     }
   }
 

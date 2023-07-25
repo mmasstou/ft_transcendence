@@ -34,17 +34,16 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const User = await this.usersService.findOne({ login: payload.username });
+    const User = await this.usersService.findOne({ login: payload.sub });
+    console.log('payload.username', payload.sub);
+    console.log('++User++>', User);
     if (User && !User.is_active) throw new ForbiddenException();
 
     return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    console.log('++++++++>request :', request);
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    console.log('request.headers.type :', type);
-    console.log('request.headers.token :', token);
     return type === 'Bearer' ? token : undefined;
   }
 }

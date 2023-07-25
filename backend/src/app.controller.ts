@@ -7,6 +7,7 @@ export class AppController {
 
   @Get()
   index() {
-    return this.userService.getHello();
+    console.log('index page');
+    return '<h2>Hello World!</h2>';
   }
 }

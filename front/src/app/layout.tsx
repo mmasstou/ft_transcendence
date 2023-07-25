@@ -1,7 +1,6 @@
-
-import Login from '@/components/modals/Login';
 import './globals.css';
 import { Changa, Lato } from 'next/font/google';
+import React from 'react';
 
 
 const changa = Changa({ 
@@ -10,11 +9,11 @@ const changa = Changa({
     variable: '--font-changa',
 });
 
-const lato = Lato({ 
-    weight: ['400', '700'],
-    subsets: ['latin'],
-    variable: '--font-lato',
- });
+// const lato = Lato({ 
+//     weight: ['400', '700'],
+//     subsets: ['latin'],
+//     variable: '--font-lato',
+//  });
 
 const metadata = {
     title: 'Transcendence',
@@ -26,8 +25,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode;})
 {
     return (
         <html lang="en" >
-            <Login />
-            <body className= {`${changa.variable} ${lato.variable}`} suppressHydrationWarning={true}>
+            <body className= {changa.className} suppressHydrationWarning={true}>
 				{children}
             </body>
             

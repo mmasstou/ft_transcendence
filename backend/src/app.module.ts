@@ -10,6 +10,11 @@ import { RoomsModule } from './rooms/rooms.module';
 import { MessagesModule } from './messages/messages.module';
 import { MembersModule } from './members/members.module';
 import { ChatGateway } from './chat.gateway';
+import { RoomsService } from './rooms/rooms.service';
+import { MembersService } from './members/members.service';
+import { MessagesService } from './messages/messages.service';
+import { DirectMessageModule } from './direct-message/direct-message.module';
+import { UserGateway } from './user.gateway';
 @Module({
   imports: [
     AuthModule,
@@ -18,9 +23,19 @@ import { ChatGateway } from './chat.gateway';
     RoomsModule,
     MessagesModule,
     MembersModule,
+    DirectMessageModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UserService, PrismaService, ChatGateway],
+  providers: [
+    AppService,
+    UserService,
+    PrismaService,
+    ChatGateway,
+    UserGateway,
+    RoomsService,
+    MembersService,
+    MessagesService,
+  ],
   exports: [UserService, PrismaService],
 })
 export class AppModule {}

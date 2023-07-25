@@ -1,10 +1,14 @@
 #!/bin/bash
 
-npx prisma migrate dev --name init
 
-npx ts-node script.ts
+sleep 10
+npx prisma migrate dev --name init 
+
+# npx prisma generate
+# npx ts-node script.ts
 
 npm run start:dev
 
-exec "$@"
+# tail -f
 
+exec "$@"

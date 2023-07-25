@@ -1,9 +1,10 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import { CgProfile } from 'react-icons/cg';
 import { AiFillWechat } from 'react-icons/ai';
+import { CgProfile } from 'react-icons/cg';
 import { FaUsers } from 'react-icons/fa';
 import { IoLogoGameControllerB } from 'react-icons/io';
+import { MdLeaderboard } from 'react-icons/md';
 import MenuItem from './sidebar/MenuItem';
 
 const DesktopSidebar = () => {
@@ -25,8 +26,13 @@ const DesktopSidebar = () => {
         <MenuItem isActive={router === '/users'} href="/users" icon={FaUsers} />
         <MenuItem
           isActive={router === '/game' || router === '/game/modes'}
-          href={'/game' || '/game/modes'}
+          href="/game"
           icon={IoLogoGameControllerB}
+        />
+        <MenuItem
+          isActive={router === '/leaderboard'}
+          href="/leaderboard"
+          icon={MdLeaderboard}
         />
       </ul>
     </nav>
