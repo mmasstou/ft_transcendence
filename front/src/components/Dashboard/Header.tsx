@@ -5,43 +5,62 @@ import logo from '../../../public/logo2.svg';
 import MyAvatar from '../profile/MyAvatar';
 import Link from 'next/link';
 import { RiLogoutBoxFill } from 'react-icons/ri';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 
-export const Logout = () => {
+export const Logout: React.FC = (props) : JSX.Element => {
+  const [logout, setLogout] = useState<boolean>(false);
+  let logoutRef = useRef<HTMLDivElement | null>(null);
+
+  const renderLogout = () => {
+    setLogout(!logout);
+  };
+
+
   const logoutHandle = () => {
+
     Cookies.remove('token');
   }
 
-  return (
-    <div className=''>
-      <div className='absolute down-arrow top-7 -right-3 z-20'></div>
+  useEffect(() => {
+    const handler = (e: any) => {
+      if (logout && !logoutRef.current?.contains(e.target as Node)){
+        setLogout(false);
+      }
+    };
+    document.addEventListener("click", handler);
 
-      <div className="absolute text-white top-[68px] right-5 bg-[#2B504B] rounded-lg 
-              w-24 h-20 md:w-34 md:h-24 xl:w-38 xl:h-26 z-20">
-            <div className='flex flex-col justify-center items-center h-full'>
-              <h3 className='mx-2'>aouhadou</h3>
-              <div className='w-[5vw] border-b-[0.1vh] border-white opacity-50 my-1'></div>
-                <ul className='list-none cursor-pointer'> 
-                  <Link onClick={logoutHandle} href='/' className='flex justify-between items-center my-1'>
+    return() => {
+      document.removeEventListener("click", handler);
+    }
+  },[]);
+
+  return (
+    <div ref={logoutRef}>
+      <div className='cursor-pointer w-[32px] h-[32px' onClick={renderLogout}><MyAvatar /></div>
+        {logout &&
+        // <div className='absolute down-arrow top-7 -right-3 z-20'></div> &&
+          <div className="absolute text-white top-[68px] right-5 bg-[#2B504B] rounded-lg 
+          w-54 h-[110px] z-20"  >
+            <div className='flex flex-col justify-center items-center h-full' >
+              <h3 className='mx-2'>👋 Hey, aouhadou</h3>
+              <div className='w-2/3 border-b-[0.1vh] border-white opacity-50 my-2 ml-2'></div>
+                <ul className='list-none cursor-pointer mt-2'> 
+                  <Link onClick={logoutHandle} href='/'
+                      className='flex justify-between items-center my-1 hover:text-red-700'>
                     <RiLogoutBoxFill className='mx-2'/>
                     Logout
                   </Link>
                 </ul>
-          </div>
-      </div>
+            </div>
+          </div> 
+        }
     </div>
   )
 }
 
 
 const Header: React.FC = () : JSX.Element => {
-
-  const [logout, setLogout] = useState<boolean>(false);
-  const renderLogout = () => {
-    setLogout(!logout);
-  }
-
   return (
     <>
       <div className="flex justify-center items-center">
@@ -67,15 +86,9 @@ const Header: React.FC = () : JSX.Element => {
               
             </button>
           </li>
-          <li>
-          <div 
-            onClick={renderLogout}
-            className='w-[32px] h-[32px]'
-          >
-            <div className='cursor-pointer'><MyAvatar /></div>
-            {logout && <Logout />}
+          <div>
+              <Logout />
           </div>
-          </li>
         </ul>
       </nav>
     </>
