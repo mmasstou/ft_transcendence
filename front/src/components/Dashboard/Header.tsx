@@ -18,14 +18,13 @@ export const Logout: React.FC = (props) : JSX.Element => {
 
 
   const logoutHandle = () => {
-
     Cookies.remove('token');
   }
 
   useEffect(() => {
     const handler = (e: any) => {
       if (logout && !logoutRef.current?.contains(e.target as Node)){
-        setLogout(false);
+        setLogout(logout => !logout);
       }
     };
     document.addEventListener("click", handler);
@@ -33,21 +32,21 @@ export const Logout: React.FC = (props) : JSX.Element => {
     return() => {
       document.removeEventListener("click", handler);
     }
-  },[]);
+  }, );
 
+  console.log(logout);
   return (
     <div ref={logoutRef}>
       <div className='cursor-pointer w-[32px] h-[32px' onClick={renderLogout}><MyAvatar /></div>
+      {logout && <div className='absolute down-arrow top-7 -right-3 z-20'></div> }
         {logout &&
-        // <div className='absolute down-arrow top-7 -right-3 z-20'></div> &&
           <div className="absolute text-white top-[68px] right-5 bg-[#2B504B] rounded-lg 
           w-54 h-[110px] z-20"  >
             <div className='flex flex-col justify-center items-center h-full' >
               <h3 className='mx-2'>👋 Hey, aouhadou</h3>
               <div className='w-2/3 border-b-[0.1vh] border-white opacity-50 my-2 ml-2'></div>
                 <ul className='list-none cursor-pointer mt-2'> 
-                  <Link onClick={logoutHandle} href='/'
-                      className='flex justify-between items-center my-1 hover:text-red-700'>
+                  <Link onClick={logoutHandle} href='/' className='flex justify-between items-center my-1 hover:text-red-500'>
                     <RiLogoutBoxFill className='mx-2'/>
                     Logout
                   </Link>
@@ -88,6 +87,7 @@ const Header: React.FC = () : JSX.Element => {
           </li>
           <div>
               <Logout />
+              {/* {logout && <Logout logout={logout} setLogout={setLogout} />} */}
           </div>
         </ul>
       </nav>
