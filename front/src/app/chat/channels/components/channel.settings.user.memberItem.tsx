@@ -16,12 +16,17 @@ import { Socket } from "socket.io-client";
 import { useRouter, useSearchParams } from "next/navigation";
 import getMemberWithId from "../actions/getMemberWithId";
 import ChanneLsettingsHook from "../hooks/channel.settings";
+import Image from "next/image";
 
 enum updatememberEnum {
     SETADMIN = 'SETADMIN',
     BANMEMBER = 'BANMEMBER',
     KIKMEMBER = 'KIKMEMBER',
     MUTEMEMBER = 'MUTEMEMBER'
+}
+enum USERSETTINGSTEPS {
+    INDEX = 0,
+    USERINFO = 1,
 }
 interface IChannelSettingsUserMemberItemProps {
     member: any;
@@ -97,97 +102,25 @@ export default function ChannelSettingsUserMemberItem({ member, socket, OnClick 
     if (!IsMounted)
         return null
     CanEdit && console.log("CanEdit :", CanEdit)
-    return <div className="Member flex flex-col items-start w-full shadow-sm">
-        <div className="flex flex-row justify-between  items-center w-full">
-            <div className="MemberAvatar flex justify-center items-center">
-                <button className="flex flex-row items-center p-1 gap-1" onClick={() => {
-                    console.log("btn clicked :", member.userId)
-                }}>
-                    <UserAvatar size={24} image={"/avatar.jpg"} />
-                    <h3 className=" text-lg font-light text-[#FFFFFF]">
-                        {UserInfo?.login}
-                        {member.userId === __userId && <small className="text-[6px] px-1">[you]</small>}
-                    </h3>
-                </button>
-                <span>
-                    {member.type === 'OWNER' && <FaChessQueen size={16} fill="#FFBF00" />}
-                </span>
+    return <div className="flex flex-col w-full">
+        <div className="flex flex-row justify-between items-center shadow p-2 w-full rounded">
+            <button onClick={() => {
+                console.log("leave Channel")
+            }} className='flex justify-center items-center text-white gap-3'>
+                <div className={`image  min-w-[24px] rounded overflow-hidden`}>
+                    <Image src="/avatar.jpg" alt="avatar" width={24} height={24} />
+                </div>
+                <h2 className='text-white font-semibold capitalize'>mmasstou</h2>
+            </button>
+            <div className='text-white flex flex-row gap-2 justify-center items-center'>
+                <MdAdminPanelSettings size={24} />
+                 <Button
+                    icon={TbDeviceGamepad2}
+                    outline
+                    onClick={() => { }}
+                />
             </div>
-            {member.CanEdit
-                ? <div className="Actions flex flex-row gap-1 items-center">
-                    {!member.isban && <Button
-                        icon={MdAdminPanelSettings}
-                        small
-                        outline
-                        IsActive={member.type === 'ADMIN'}
-                        disabled={member.type === 'OWNER'}
-                        size={24}
-                        onClick={() => {
-                            OnClick({
-                                member: member,
-                                updateType: updatememberEnum.SETADMIN
-                            })
-                        }}
-                    />}
-                     <Button
-                        icon={TbDeviceGamepad2}
-                        small
-                        outline
-                        size={24}
-                        onClick={() => {}}
-                    />
-                    <Button
-                        icon={TbUserX}
-                        small
-                        outline
-                        disabled={member.type === 'OWNER' || member.userId === __userId}
-                        size={24}
-                        onClick={() => {
-                            OnClick({
-                                member: member,
-                                updateType: updatememberEnum.KIKMEMBER
-                            })
-                        }}
-                    />
-                    <Button
-                        icon={SlBan}
-                        small
-                        outline
-                        disabled={member.type === 'OWNER' || member.userId === __userId}
-                        size={24}
-                        IsBan={member.isban}
-                        onClick={() => {
-                            OnClick({
-                                member: member,
-                                updateType: updatememberEnum.BANMEMBER
-                            })
-                        }}
-                    />
-                    {!member.isban && <Button
-                        icon={FaVolumeMute}
-                        small
-                        outline
-                        IsBan={member.ismute}
-                        disabled={member.type === 'OWNER' || member.userId === __userId}
-                        size={24}
-                        onClick={() => {
-                            OnClick({
-                                member: member,
-                                updateType: updatememberEnum.MUTEMEMBER
-                            })
-                        }}
-                    />}
-                </div>
-                : <div className="Actions flex flex-row gap-1 items-center">
-                    <span>
-                        Join At :
-                        <strong>{Join_At}</strong>
-                    </span>
-                </div>
-            }
-        </div>
-        <div className="flex justify-between items-center">
-            {(member.type === 'OWNER' || member.type === 'ADMIN') && <h4 className=" pl-6 text-[10px] text-secondary font-medium">groupe Admin</h4>}
         </div>
     </div>
+
 }
