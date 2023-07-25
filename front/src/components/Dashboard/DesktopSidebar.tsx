@@ -5,7 +5,7 @@ import { CgProfile } from 'react-icons/cg';
 import { FaUsers } from 'react-icons/fa';
 import { IoLogoGameControllerB } from 'react-icons/io';
 import { MdLeaderboard } from 'react-icons/md';
-import MenuItem from './MenuItem';
+import MenuItem from './sidebar/MenuItem';
 
 const DesktopSidebar = () => {
   const router = usePathname();
@@ -25,7 +25,7 @@ const DesktopSidebar = () => {
         />
         <MenuItem isActive={router === '/users'} href="/users" icon={FaUsers} />
         <MenuItem
-          isActive={router === '/game'}
+          isActive={router === '/game' || router === '/game/modes'}
           href="/game"
           icon={IoLogoGameControllerB}
         />
