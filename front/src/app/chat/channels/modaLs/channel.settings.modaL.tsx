@@ -27,6 +27,7 @@ import Image from "next/image"
 import ChanneLUserSettings from "../components/channel.settings.User"
 import { TbInfoSquareRoundedFilled } from "react-icons/tb"
 import getChannelWithId from "../actions/getChannelWithId"
+import ChanneLChatSettings from "../components/channel.settings"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',
@@ -123,7 +124,7 @@ const ChanneLSettingsModaL = () => {
     }
 
     const bodyContent = (
-        <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col min-h-[34rem] h-full">
+        <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col min-h-[44rem] h-full">
             <div className=" w-full flex flex-row h-max justify-around items-center mb-5 text-white ">
                 <Button
                     icon={TbInfoSquareRoundedFilled}
@@ -146,13 +147,13 @@ const ChanneLSettingsModaL = () => {
                     onClick={() => { setcustomvalue("channeLtype", "ChatSettings") }}
                 />
             </div>
-            <div className={`body flex flex-col gap-4 h-full w-full min-h-[28rem] 
+            <div className={`body flex flex-col gap-4 h-full w-full min-h-[38rem] 
             ${(_channeLtype !== "UserSettings" && _channeLtype !== "ChatSettings") ? ' justify-center items-center' : ''} `}>
                 {
                 _channeLtype === "UserSettings" 
                 ? <ChanneLUserSettings socket={socket} /> 
                 : _channeLtype === "ChatSettings" 
-                    ? <div>Chat settings</div> 
+                    ? <ChanneLChatSettings />
                     : <Image
                     className="flex justify-center items-center"
                     src="/channelsettings.svg"

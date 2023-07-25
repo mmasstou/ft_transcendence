@@ -83,7 +83,7 @@ export class ChatGateway implements OnGatewayConnection {
       // type: UserType.ADMIN,
       // id: data.member.id,
       console.log('Chat-> __member- ---------+>', data.member);
-      // update member :
+      // update member in channeL:
       // set admin :
       const __member = await this.memberService.findOne({
         userId: data.member.userId,
@@ -120,7 +120,6 @@ export class ChatGateway implements OnGatewayConnection {
       }
       // kick member :
       if (data.updateType === updatememberEnum.KIKMEMBER) {
-        __member
         const member = await this.prisma.members.delete({
           where: { id: data.member.id },
         });

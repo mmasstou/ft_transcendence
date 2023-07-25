@@ -43,8 +43,8 @@ const ChanneLCreateModaL = () => {
             await fetch('http://127.0.0.1/api/users', {
                 headers: { Authorization: `Bearer ${token}`, },
             }).then((resp) => resp.json()).then(data => {
-                // console.log("++++++++++*****data :", data)
-                const _list = data.filter((user: any) => user.id !== User_ID)
+                console.log("++++++++++*****data :", data)
+                const _list =data && data.filter((user: any) => user.id !== User_ID)
                 setfriends(_list)
             })
         })();

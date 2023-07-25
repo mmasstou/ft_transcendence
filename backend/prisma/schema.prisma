@@ -68,8 +68,6 @@ model Rooms {
 model DirectMessage {
   id         String     @id @default(uuid())
   name       String     @unique
-  members    Members[]
-  messages   Messages[]
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt
   User       User?      @relation(fields: [userId], references: [id])
@@ -80,13 +78,11 @@ model Members {
   id              String         @id @default(uuid())
   user            User           @relation(fields: [userId], references: [id])
   RoomId          Rooms?         @relation(fields: [roomsId], references: [id])
-  DirectMessage   DirectMessage? @relation(fields: [directmessageId], references: [id])
   type            UserType       @default(USER)
   userId          String
   roomsId         String?
   isban           Boolean        @default(false)
   ismute          Boolean        @default(false)
-  directmessageId String?
   created_at      DateTime       @default(now())
   updated_at      DateTime       @updatedAt
 }
@@ -101,6 +97,4 @@ model Messages {
   roomsId         String?
   created_at      DateTime       @default(now())
   updated_at      DateTime       @updatedAt
-  DirectMessage   DirectMessage? @relation(fields: [directMessageId], references: [id])
-  directMessageId String?
 }
