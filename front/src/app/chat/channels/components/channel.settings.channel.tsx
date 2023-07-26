@@ -3,7 +3,7 @@ import React from 'react';
 import { BsArrowRightShort, BsSaveFill } from 'react-icons/bs';
 import { CgEditFlipH } from 'react-icons/cg';
 import { PiPassword } from "react-icons/pi";
-import { TbEdit } from 'react-icons/tb';
+import { TbEdit, TbUserCancel } from 'react-icons/tb';
 import { VscGroupByRefType } from "react-icons/vsc";
 import { Channel } from 'diagnostics_channel';
 import ChanneLSettingsEditModaL from '../modaLs/channel.settings.edit.modal';
@@ -13,6 +13,8 @@ import Button from '../../components/Button';
 import { IoChevronBackOutline, IoInformation, IoLogOut } from 'react-icons/io5';
 import { GoEyeClosed } from 'react-icons/go';
 import { HiLockClosed, HiLockOpen } from 'react-icons/hi';
+import {TfiTimer } from 'react-icons/tfi';
+import { FaChessQueen } from 'react-icons/fa';
 interface ChanneLChatSettingsProps {
 
 }
@@ -95,6 +97,38 @@ export default function ChanneLChatSettings({ }: ChanneLChatSettingsProps) {
                 </div>
                 <div>
                     <h2 className='text-white font-semibold capitalize'>Change Type</h2>
+                </div>
+                <div className='text-white'>
+                    <BsArrowRightShort size={24} />
+                </div>
+            </button>
+            <button
+                onClick={() => {
+                    console.log("Baned members")
+                    OnChangeChannel()
+                }}
+                className="flex flex-row justify-between items-center shadow p-2 rounded">
+                <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
+                    <TbUserCancel size={32} />
+                </div>
+                <div>
+                    <h2 className='text-white font-semibold capitalize'>Baned members</h2>
+                </div>
+                <div className='text-white'>
+                    <BsArrowRightShort size={24} />
+                </div>
+            </button>
+            <button
+                onClick={() => {
+                    console.log("Baned members")
+                    OnChangeChannel()
+                }}
+                className="flex flex-row justify-between items-center shadow p-2 rounded">
+                <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
+                    <FaChessQueen size={32} />
+                </div>
+                <div>
+                    <h2 className='text-white font-semibold capitalize'>set owner</h2>
                 </div>
                 <div className='text-white'>
                     <BsArrowRightShort size={24} />

@@ -9,6 +9,10 @@ import { Socket } from "socket.io-client";
 import RightsideModaL from "../modaLs/RightsideModal";
 import getChannelWithId from "../actions/getChannelmembers";
 import ChanneLsmembersItem from "./channel.membersItem";
+import LeftSidebarHook from "../hooks/LeftSidebarHook";
+import RightsidebarHook from "../hooks/RightSidebarHook";
+import ChanneLsettingsHook from "../hooks/channel.settings";
+import LoginHook from "@/hooks/auth/login";
 
 export default function ChanneLbody({ children, socket }: { children: React.ReactNode; socket: Socket | null }) {
     const [IsMounted, setIsMounted] = React.useState(false)
@@ -17,26 +21,32 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     const [ChanneLsmembers, setchanneLsmembers] = React.useState<membersType[] | null>(null)
     const [viewed, setviewed] = React.useState<number>(0)
     const params = useSearchParams()
+    const leftSidebar = LeftSidebarHook()
+    const channelsettingsHook = ChanneLsettingsHook()
+    const rightsidebar = RightsidebarHook()
     // console.log("ChannelBody socket :", socket?.id )
-
+    const loginHook = LoginHook()
 
     useEffect(() => {
-        const token: any = Cookies.get('token');
-
-
-        (async () => {
-            if (!token)
-                return;
-            const resp = await getChannels(token)
-            if (resp && resp.ok) {
-                const data = await resp.json()
-                console.log("getChannels data :", data)
-                setChannel(data.Rooms);
+        setTimeout(() => {
+            const token: any = Cookies.get('token');
+            (async () => {
+                console.log("loginHook => token :", token)
+                if (!token)
+                    return;
+                const resp = await getChannels(token)
+                if (resp && resp.ok) {
+                    const data = await resp.json()
+                    console.log("getChannels data :", data)
+                    setChannel(data.Rooms);
+                }
+                // console.log("resp :", resp)
             }
-            // console.log("resp :", resp)
-        }
-        )();
-    }, [])
+            )();
+        }, 1000);
+
+        
+    }, [loginHook])
 
     useEffect(() => {
         if (params) {
@@ -53,7 +63,7 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
 
             })();
         }
-    }, [params])
+    }, [params, rightsidebar, channelsettingsHook])
 
     // const LeftsideContent = ChanneLs && ChanneLs.map((room: RoomsType, key) => (
     //     <ChanneLSidebarItem key={key} room={room} socket={socket} viewd={8} active={room.id === ChanneLsActiveID} />
@@ -72,7 +82,7 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     if (!IsMounted)
         return null
     return (
-        <div className="channeLbody h-[90vh] md:h-[94vh] border border-green-600 flex ">
+        <div className="channeLbody h-[86vh] md:h-[94vh] border border-green-600 flex ">
             <LefttsideModaL>
                 {
                     ChanneLs && ChanneLs.map((room: RoomsType, key) => (
@@ -80,7 +90,9 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
                     ))
                 }
             </LefttsideModaL>
-            {children}
+           <div className={`${(leftSidebar.IsOpen || rightsidebar.IsOpen) && 'hidden md:flex'} w-full`}>
+           {children}
+           </div>
             <RightsideModaL>
                 {
                     ChanneLsmembers && ChanneLsmembers.map((member: membersType, key: number) => (

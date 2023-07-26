@@ -122,11 +122,11 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     sm:flex`}>
         {
             (hasparam && channeLinfo) ? <>
-                <ConversationsTitlebar socket={socket} channeLId={room} messageTo={channeLinfo.name + Cookies.get('_id')} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
+                <ConversationsTitlebar socket={socket} channeLId={room} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
                 <ConversationsMessages Content={content} />
                 <div className="w-full m-[2px]">
                     <input
-                        className="ConversationsInput w-full h-[4vh]  text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
+                        className="ConversationsInput w-full h-[5vh] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
                         onSubmit={(event: any) => {
                             setMessage(event.target.value);
                             OnSubmit(event)
@@ -141,7 +141,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                             setMessage(event.target.value);
                         }}
                         value={InputValue}
-                        placeholder={`Message @'${channeLinfo.name}'`}
+                        placeholder={`Message to @'${channeLinfo.name}'`}
                         type="search"
                         name=""
                         id="" />

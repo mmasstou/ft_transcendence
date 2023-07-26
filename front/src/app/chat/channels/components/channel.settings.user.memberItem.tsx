@@ -3,9 +3,9 @@ import { UserAvatar } from "./channel.userAvater";
 
 
 // icons :
-import { TbDeviceGamepad2, TbUserX } from "react-icons/tb";
-import { SlBan } from "react-icons/sl";
-import { FaChessQueen, FaVolumeMute } from "react-icons/fa";
+import { TbDeviceGamepad2, TbUserShield, TbUserX, TbUsersPlus } from "react-icons/tb";
+import { SlBan, SlOptionsVertical } from "react-icons/sl";
+import { FaChessQueen, FaUserShield, FaVolumeMute } from "react-icons/fa";
 import { membersType, updatememberType, userType } from "@/types/types";
 import React from "react";
 import Cookies from "js-cookie";
@@ -18,20 +18,24 @@ import getMemberWithId from "../actions/getMemberWithId";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import Image from "next/image";
 import ChannelSettingsUserMemberItemOption from "./channel.settings.user.memberItem.option";
+import { IoMdOptions } from "react-icons/io";
+import { CgOptions } from "react-icons/cg";
 
 enum updatememberEnum {
     SETADMIN = 'SETADMIN',
     BANMEMBER = 'BANMEMBER',
     KIKMEMBER = 'KIKMEMBER',
-    MUTEMEMBER = 'MUTEMEMBER'
+    MUTEMEMBER = 'MUTEMEMBER',
+    PLAYGAME = 'PLAYGAME',
 }
 
 interface IChannelSettingsUserMemberItemProps {
     member: any;
     socket: Socket | null;
     OnClick: (data: any) => void;
+    UserJoin?: boolean
 }
-export default function ChannelSettingsUserMemberItem({ member, socket, OnClick }: IChannelSettingsUserMemberItemProps) {
+export default function ChannelSettingsUserMemberItem({ member, socket, UserJoin, OnClick }: IChannelSettingsUserMemberItemProps) {
     const [IsMounted, setIsMounted] = React.useState(false)
     const [UserInfo, setUserInfo] = React.useState<userType | null>(null)
     const router = useRouter()
@@ -83,15 +87,15 @@ export default function ChannelSettingsUserMemberItem({ member, socket, OnClick 
             hour12: true,
         }))
         // set user pirmision :
-        console.log("               *-> LogedMember.type :", LogedMember.type)
+        // console.log("               *-> LogedMember.type :", LogedMember.type)
         if (LogedMember.type === 'OWNER') {
-            console.log("OWNER -> LogedMember :", LogedMember)
+            // console.log("OWNER -> LogedMember :", LogedMember)
             setCanEdit(true)
             member.CanEdit = true
 
         }
         if (LogedMember.type === 'ADMIN') {
-            console.log("ADMIN -> LogedMember :", LogedMember)
+            // console.log("ADMIN -> LogedMember :", LogedMember)
             setCanEdit(true)
             member.CanEdit = true
         }
@@ -99,65 +103,92 @@ export default function ChannelSettingsUserMemberItem({ member, socket, OnClick 
 
     if (!IsMounted)
         return null
-    CanEdit && console.log("CanEdit :", CanEdit)
+    // CanEdit && console.log("CanEdit :", CanEdit)
     return <div className="flex flex-col w-full">
         <div
-            className="flex flex-col justify-between items-center gap-4 shadow p-4 w-full rounded">
+            className="flex flex-col justify-between items-center gap-4 shadow p-1 md:p-4 w-full rounded">
             <div className="flex flex-row justify-between items-center w-full ">
                 <div className='flex justify-center items-center text-white gap-2'>
-                    <div className={`image  min-w-[24px] rounded overflow-hidden`}>
+                    <div className={`image  min-w-[24px] hidden sm:block rounded overflow-hidden`}>
                         <Image src="/avatar.jpg" alt="avatar" width={24} height={24} />
                     </div>
-                    <h2 className='text-white font-semibold capitalize'>
+                    <h2 className={`text-white  ${member.type === 'OWNER' && 'md:text-white text-[#FFBF00]'} font-semibold capitalize`}>
                         {UserInfo?.login}
                         {member.userId === __userId && <small className="text-[6px] px-1">[you]</small>}
                     </h2>
-                    <MdAdminPanelSettings size={16} fill="#1EF0AE" />
-                    {member.type === 'OWNER' && <FaChessQueen size={16} fill="#FFBF00" />}
+                    {/* <MdAdminPanelSettings size={16} fill="#1EF0AE" /> */}
+                    {member.type === 'OWNER' && <>
+                    <FaChessQueen className=" hidden md:flex" size={16} fill="#FFBF00" />
+                    </>}
                 </div>
-                {member.CanEdit 
-                ? <div className="flex flex-row gap-3 justify-center items-center">
-                    {/* <h4 className="text-[10px] text-secondary font-medium">Joined {Join_At}</h4> */}
-                    <ChannelSettingsUserMemberItemOption 
-                        icon={MdAdminPanelSettings}
-                        size={24}
-                        IsActivate={member.type === 'ADMIN'}
-                        Onclick={() => {
-                            console.log("set admin")
-                            OnClick({ type: updatememberEnum.SETADMIN, member: member })
-                        }}
-                    />
-                     <ChannelSettingsUserMemberItemOption 
-                        icon={TbUserX}
-                        size={24}
-                        IsActivate={member.type === 'BANNED'}
-                        Onclick={() => {
-                            console.log("set admin")
-                            OnClick({ type: updatememberEnum.KIKMEMBER, member: member })
-                        }}
-                    />
-                     <ChannelSettingsUserMemberItemOption 
-                        icon={SlBan}
-                        size={24}
-                        IsActivate={member.type === 'BANNED'}
-                        Onclick={() => {
-                            console.log("set admin")
-                            OnClick({ type: updatememberEnum.BANMEMBER, member: member })
-                        }}
-                    />
-                     <ChannelSettingsUserMemberItemOption 
-                        icon={FaVolumeMute}
-                        size={24}
-                        IsActivate={member.type === 'MUTED'}
-                        Onclick={() => {
-                            console.log("set admin")
-                            OnClick({ type: updatememberEnum.MUTEMEMBER, member: member })
-                        }}
-                    />
-                </div>
-                : <div className="flex flex-row gap-3 justify-center items-center">
-                    <h4 className="text-[10px] text-secondary font-medium">Joined {Join_At}</h4>
-                    </div>}
+                {UserJoin === false
+                    ? member.CanEdit
+                        ? <div className="flex flex-row gap-3 justify-center items-center">
+                            {/* <h4 className="text-[10px] text-secondary font-medium">Joined {Join_At}</h4> */}
+                            {!member.isban && <ChannelSettingsUserMemberItemOption
+                                icon={MdAdminPanelSettings}
+                                size={24}
+                                disabled={member.type === 'OWNER'}
+                                IsActivate={member.type === 'ADMIN'}
+                                background
+                                Onclick={() => {
+                                    OnClick({ updateType: updatememberEnum.SETADMIN, member: member })
+                                }}
+                            />}
+                            <ChannelSettingsUserMemberItemOption
+                                icon={TbUserX}
+                                size={24}
+                                disabled={member.type === 'OWNER'}
+                                background
+                                Onclick={() => {
+                                    OnClick({ updateType: updatememberEnum.KIKMEMBER, member: member })
+                                }}
+                            />
+                            <ChannelSettingsUserMemberItemOption
+                                icon={SlBan}
+                                size={24}
+                                disabled={member.type === 'OWNER'}
+                                IsActivate={member.isban}
+                                background
+                                Onclick={() => {
+                                    console.log("set admin")
+                                    OnClick({ updateType: updatememberEnum.BANMEMBER, member: member })
+                                }}
+                            />
+                            {!member.isban && <ChannelSettingsUserMemberItemOption
+                                icon={FaVolumeMute}
+                                size={24}
+                                disabled={member.type === 'OWNER'}
+                                IsActivate={member.ismute}
+                                background
+                                Onclick={() => {
+                                    console.log("set admin")
+                                    OnClick({ updateType: updatememberEnum.MUTEMEMBER, member: member })
+                                }}
+                            />}
+                            <ChannelSettingsUserMemberItemOption
+                                icon={TbDeviceGamepad2}
+                                size={24}
+                                background
+                                Onclick={() => {
+                                    OnClick({ updateType: updatememberEnum.PLAYGAME, member: member })
+                                }}
+                            />
+                        </div>
+                        : <div className="flex flex-row gap-3 justify-center items-center">
+                            <h4 className="text-[10px] text-secondary font-medium">Joined {Join_At}</h4>
+                        </div>
+                    : <div>
+                        <ChannelSettingsUserMemberItemOption
+                            icon={TbUsersPlus}
+                            size={24}
+                            Onclick={() => {
+                                console.log("add member")
+                                OnClick((member))
+                            }}
+                        />
+                    </div>
+                }
             </div>
 
         </div>

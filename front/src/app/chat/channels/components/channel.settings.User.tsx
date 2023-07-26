@@ -10,7 +10,15 @@ import getUserWithId from "../actions/getUserWithId";
 import getMemberWithId from "../actions/getMemberWithId";
 import Image from "next/image";
 import ChanneLUserSettingsModaL from "../modaLs/channel.user.settings.modal";
-
+import Button from "../../components/Button";
+import { TbUserPlus } from "react-icons/tb";
+import ChanneLSettingsMemberJoinModaL from "../modaLs/channel.settings.member.join.modal";
+import { IoChevronBackOutline } from "react-icons/io5";
+import { PiPassword } from "react-icons/pi";
+import { BsArrowRightShort } from "react-icons/bs";
+import { MdOutlineScoreboard } from "react-icons/md";
+import { TfiTimer } from "react-icons/tfi";
+import { channel } from "diagnostics_channel";
 
 interface ChanneLUserSettingsProps {
     socket: Socket | null
@@ -18,7 +26,8 @@ interface ChanneLUserSettingsProps {
 
 enum USERSETTINGSTEPS {
     INDEX = 0,
-    USERINFO = 1,
+    PLAYGAME = 1,
+    MEMBERJOIN = 2,
 }
 
 export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps) {
@@ -27,6 +36,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
     const [members, setMembers] = React.useState<membersType[] | null>(null)
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
     const [step, setStep] = React.useState<USERSETTINGSTEPS>(USERSETTINGSTEPS.INDEX)
+    const [PlayGameWith, setPlayGameWith] = React.useState<membersType | null>(null)
     const [update, setUpdate] = React.useState<boolean>(false)
     const channeLsettingsHook = ChanneLsettingsHook()
     const params = useSearchParams()
@@ -47,7 +57,9 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                 console.log("channeLLMembers :", channeLLMembers)
                 // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== __userId)
-                setMembers(channeLLMembers)
+                // filter if member is ban or member userId === loged userId
+                const filterdmembers = channeLLMembers.filter((member: membersType) => member.isban !== true)
+                setMembers(filterdmembers.filter((member: membersType) => member.userId !== __userId))
             }
 
         })();
@@ -89,41 +101,116 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
         </div>
 
     let bodyContent = (
-       <>
-        {(LogedMember?.type === "ADMIN" || LogedMember?.type === "OWNER") ?
-            members && members.map((member, index) => (
-                <ChannelSettingsUserMemberItem
-                    key={index}
-                    member={member}
-                    socket={socket}
-                    OnClick={(data) => {
-                        console.log("OnClick :", data)
-                        handlOnclick(data)
-                        setStep(USERSETTINGSTEPS.USERINFO)
-                    }} />
+        <>
+            <div className="flex flex-row justify-center items-center gap-2">
+                <Button
+                    icon={TbUserPlus}
+                    label={"Add member"}
+                    outline
+                    size={21}
+                    labelsize={8}
+                    onClick={() => {
+                        setStep(USERSETTINGSTEPS.MEMBERJOIN)
+                    }}
+                />
+            </div>
+            <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
+                {(LogedMember?.type === "ADMIN" || LogedMember?.type === "OWNER") ?
+                    members && members.map((member, index) => (
+                        <ChannelSettingsUserMemberItem
+                            key={index}
+                            member={member}
+                            socket={socket}
+                            UserJoin={false}
+                            OnClick={(data) => {
+                                console.log("OnClick :", data)
+                                if (data.updateType === "PLAYGAME") {
+                                    setStep(USERSETTINGSTEPS.PLAYGAME)
+                                    setPlayGameWith(data.member)
+                                    return;
+                                }
+                                handlOnclick(data)
+                            }} />
 
-            ))
-            : <div className="flex h-full w-full justify-center items-center min-h-[34rem] ">
-                <div className="flex flex-col justify-center items-center gap-3">
-                    <Image src="/access_denied.svg" width={200} height={200} alt={""} />
-                    <h2 className=" capitalize font-extrabold text-white">permission denied</h2>
-                </div>
+                    ))
+                    : <div className="flex h-full w-full justify-center items-center min-h-[34rem] ">
+                        <div className="flex flex-col justify-center items-center gap-3">
+                            <Image src="/access_denied.svg" width={200} height={200} alt={""} />
+                            <h2 className=" capitalize font-extrabold text-white">permission denied</h2>
+                        </div>
+                    </div>
+                }
             </div>
-        }
-       </>
+
+        </>
     )
-    if (step === USERSETTINGSTEPS.USERINFO) {
+    if (step === USERSETTINGSTEPS.PLAYGAME) {
         bodyContent = (
-            <div>
-                <h1>USERINFO</h1>
-                <button onClick={() => {
-                    setStep(USERSETTINGSTEPS.INDEX)
-                }}>back</button>
-            </div>
+            <>
+                <div className="flex flex-row justify-center items-center gap-2">
+                    <Button
+                        icon={IoChevronBackOutline}
+                        label={"back"}
+                        outline
+                        size={21}
+                        labelsize={8}
+                        onClick={() => {
+                            setStep(USERSETTINGSTEPS.INDEX)
+                        }}
+                    />
+                </div>
+                <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
+                    <div className="flex flex-col h-full w-full justify-start gap-4 items-center min-h-[34rem] ">
+                        <div className="flex flex-col justify-center items-center gap-3">
+                            <Image src="/game-mode.svg" width={200} height={200} alt={""} />
+                            {/* <h2 className=" capitalize font-extrabold text-white">permission denied</h2> */}
+                        </div>
+                        <div className="flex flex-col gap-3  w-full">
+                            <button
+                                onClick={() => {
+                                    console.log("Time Mode")
+                                }}
+                                className="flex flex-row justify-between items-center shadow p-2 rounded">
+                                <div className='flex justify-center items-center p-3 rounded bg-[#FFCC00] text-white'>
+                                    <TfiTimer size={28} />
+                                </div>
+                                <div>
+                                    <h2 className='text-white'>Time Mode</h2>
+                                </div>
+                                <div className='text-white'>
+                                    <BsArrowRightShort size={24} />
+                                </div>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    console.log("Score Mode")
+                                }}
+                                className="flex flex-row justify-between items-center shadow p-2 rounded">
+                                <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
+                                    <MdOutlineScoreboard size={28} />
+                                </div>
+                                <div>
+                                    <h2 className='text-white'>Score Mode</h2>
+                                </div>
+                                <div className='text-white'>
+                                    <BsArrowRightShort size={24} />
+                                </div>
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+
+            </>
         )
     }
+    if (step === USERSETTINGSTEPS.MEMBERJOIN) {
+        bodyContent = (<ChanneLSettingsMemberJoinModaL socket={socket} OnClick={() => {
+            setStep(USERSETTINGSTEPS.INDEX)
+        }} />)
+    }
 
-return <ChanneLUserSettingsModaL>
-    {bodyContent}
-</ChanneLUserSettingsModaL>
+    return <ChanneLUserSettingsModaL>
+        {bodyContent}
+    </ChanneLUserSettingsModaL>
 }
