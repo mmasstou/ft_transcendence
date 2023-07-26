@@ -25,7 +25,7 @@ const DesktopSidebar = () => {
         />
         <MenuItem isActive={router === '/users'} href="/users" icon={FaUsers} />
         <MenuItem
-          isActive={router === '/game'}
+          isActive={router === '/game' || router === '/game/modes'}
           href="/game"
           icon={IoLogoGameControllerB}
         />
