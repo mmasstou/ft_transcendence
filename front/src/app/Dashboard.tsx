@@ -1,4 +1,4 @@
-import Header from '@/components/Dashboard/Header';
+import Header from '@/components/Dashboard/Header/Header';
 import Sidebar from '@/components/Dashboard/sidebar/Sidebar';
 import Login from '@/components/auth/modaLs/Login';
 import React from 'react';

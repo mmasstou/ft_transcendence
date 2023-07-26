@@ -1,10 +1,12 @@
 'use client';
 import Image from 'next/image';
-import { CgProfile } from 'react-icons/cg';
 import { RiNotification2Fill, RiSettingsLine } from 'react-icons/ri';
-import logo from '../../../public/logo2.svg';
+import logo from '@/../public/logo2.svg'
+import { Logout } from './Logout';
 
-const Header = () => {
+
+
+const Header: React.FC = () : JSX.Element => {
   return (
     <>
       <div className="flex justify-center items-center">
@@ -29,11 +31,7 @@ const Header = () => {
               <RiNotification2Fill size={32} color="#E0E0E0" />
             </button>
           </li>
-          <li>
-            <button>
-              <CgProfile size={32} color="#E0E0E0" />
-            </button>
-          </li>
+            <Logout />
         </ul>
       </nav>
     </>

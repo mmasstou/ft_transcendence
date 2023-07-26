@@ -8,13 +8,13 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 
 export const DesktopProfile = (): JSX.Element => {
-  const [user, setUser] = useState<Info | null>();
-  useEffect(() => {
-    axios
-      .get('https://jsonplaceholder.typicode.com/users')
-      .then((userData) => setUser(userData.data[1]))
-      .catch((error) => console.log(error));
-  }, []);
+  // const [user, setUser] = useState<Info | null>();
+  // useEffect(() => {
+  //   axios
+  //     .get('https://jsonplaceholder.typicode.com/users')
+  //     .then((userData) => setUser(userData.data[1]))
+  //     .catch((error) => console.log(error));
+  // }, []);
 
   return (
     <div className="flex flex-col gap-10 mx-[20px]">
@@ -51,8 +51,8 @@ export const DesktopProfile = (): JSX.Element => {
             </div>
 
             <div className="w-1/3 flex justify-center items-center">
-              <h2 className="text-[2em] md:text-[1.5em] text-white font-bold mt-2">
-                {user?.username}
+              <h2 className="text-[2em] md:text-[1.5em] text-white font-bold mt-12">
+                aouhadou
               </h2>
             </div>
 

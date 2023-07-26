@@ -18,6 +18,7 @@ export type Info = {
 const Profile = (): JSX.Element => {
   const [isMobile, setIsMobile] = useState(false);
 
+  
   useEffect(() => {
     const handleResize = () => {
       const screenWidth = window.innerWidth;
