@@ -5,7 +5,7 @@ import { CgProfile } from 'react-icons/cg';
 import { FaUsers } from 'react-icons/fa';
 import { IoLogoGameControllerB } from 'react-icons/io';
 import { MdLeaderboard } from 'react-icons/md';
-import MenuItem from './sidebar/MenuItem';
+import MenuItem from './MenuItem';
 
 const DesktopSidebar = () => {
   const router = usePathname();

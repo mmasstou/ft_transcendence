@@ -14,7 +14,7 @@ const Dashboard = ({ children }: Props) => {
       <Login />
       {/* <ChanneLModal /> */}
       <ChanneLCreateModaL />
-      <div className="dashboard bg-primary">
+      <div className="dashboard bg-primary text-white">
         <header className="bg-transparent flex items-center justify-between px-5 ">
           <Header />
         </header>
