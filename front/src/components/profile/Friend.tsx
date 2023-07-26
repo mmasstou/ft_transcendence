@@ -8,8 +8,6 @@ const Friend = () => {
             max-h-[40vh] lg:max-h-[56vh] md:max-h-[56vh] xl:max-h-[56vh] 2xl:max-h-[56vh]
             flex flex-col items-center px-2 overflow-y-auto overflow-x-hidden m-2 mt-5'>
       <FriendCard />
-      <FriendCard />
-      <FriendCard />
     </div>
   )
 }

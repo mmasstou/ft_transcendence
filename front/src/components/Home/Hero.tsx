@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import table from '../../../public/table.svg';
 import BackgroundCircles from './BackgroundCircles';
-import Button from './Button';
+import Button from './CTA';
 import styles from './style';
 
 const Hero = () => {

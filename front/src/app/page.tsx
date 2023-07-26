@@ -5,8 +5,9 @@ import Showcase from "@/components/Home/Showcase";
 import Footer from "@/components/Home/Footer";
 import Head from "next/head";
 import React from "react";
+import { Metadata } from 'next';
 
-const metadata = {
+export const metadata: Metadata = {
     title: 'Transcendence',
     description: 'Online Pong Game',
 };
