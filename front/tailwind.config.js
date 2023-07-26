@@ -19,6 +19,7 @@ module.exports = {
                 primary: '#161F1E',
                 secondary: '#1EF0AE',
                 tertiary: '#D9D9D9',
+                danger: '#F1453E',
                 btn: '#161F1E',
                 isban: '#F03F19',
             },

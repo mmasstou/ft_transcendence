@@ -27,7 +27,7 @@ import Image from "next/image"
 import ChanneLUserSettings from "../components/channel.settings.User"
 import { TbInfoSquareRoundedFilled } from "react-icons/tb"
 import getChannelWithId from "../actions/getChannelWithId"
-import ChanneLChatSettings from "../components/channel.settings"
+import ChanneLChatSettings from "../components/channel.settings.channel"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',

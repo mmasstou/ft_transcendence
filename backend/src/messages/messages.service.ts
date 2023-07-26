@@ -45,9 +45,6 @@ export class MessagesService {
             sender: {
               connect: { id: data.userId },
             },
-            DirectMessage: {
-              connect: { id: data.DirectMessage },
-            },
           },
         });
       }

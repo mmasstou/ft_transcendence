@@ -42,6 +42,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
     return (
         <div className="border border-yellow-600 h-[90vh] md:h-[94vh] flex flex-col ">
             {/* nav bar */}
+            
             <div className="channeLnavbar grid grid-flow-row-dense grid-cols-4 justify-between items-center text-white px-2 py-1">
                 <div>
                     {leftSidebarHook.IsOpen
@@ -90,6 +91,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
                     />
                 </div>
             </div>
+
             <ChanneLbody socket={socket}>
                 <Conversations socket={socket} />
             </ChanneLbody>

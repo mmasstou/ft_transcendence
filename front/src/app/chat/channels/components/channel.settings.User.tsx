@@ -9,16 +9,24 @@ import { Socket } from "socket.io-client";
 import getUserWithId from "../actions/getUserWithId";
 import getMemberWithId from "../actions/getMemberWithId";
 import Image from "next/image";
+import ChanneLUserSettingsModaL from "../modaLs/channel.user.settings.modal";
 
 
 interface ChanneLUserSettingsProps {
     socket: Socket | null
 }
+
+enum USERSETTINGSTEPS {
+    INDEX = 0,
+    USERINFO = 1,
+}
+
 export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps) {
 
     const [IsMounted, setIsMounted] = React.useState(false)
     const [members, setMembers] = React.useState<membersType[] | null>(null)
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
+    const [step, setStep] = React.useState<USERSETTINGSTEPS>(USERSETTINGSTEPS.INDEX)
     const [update, setUpdate] = React.useState<boolean>(false)
     const channeLsettingsHook = ChanneLsettingsHook()
     const params = useSearchParams()
@@ -59,7 +67,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
     }, [update])
 
 
-    
+
 
     const handlOnclick = (data: any) => {
         console.log("handlOnclick :", data)
@@ -80,7 +88,8 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
             </div>
         </div>
 
-    return <div className="Members flex p-4 mt-3 sm:mt-0 sm:p-1 flex-col items-start gap-3 overflow-y-scroll max-h-[38rem]">
+    let bodyContent = (
+       <>
         {(LogedMember?.type === "ADMIN" || LogedMember?.type === "OWNER") ?
             members && members.map((member, index) => (
                 <ChannelSettingsUserMemberItem
@@ -90,15 +99,31 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                     OnClick={(data) => {
                         console.log("OnClick :", data)
                         handlOnclick(data)
+                        setStep(USERSETTINGSTEPS.USERINFO)
                     }} />
 
             ))
-            : <div className="flex h-full w-full justify-center items-center min-h-[34rem] "> 
+            : <div className="flex h-full w-full justify-center items-center min-h-[34rem] ">
                 <div className="flex flex-col justify-center items-center gap-3">
-                <Image src="/access_denied.svg" width={200} height={200} alt={""} />
-                <h2 className=" capitalize font-extrabold text-white">permission denied</h2>
+                    <Image src="/access_denied.svg" width={200} height={200} alt={""} />
+                    <h2 className=" capitalize font-extrabold text-white">permission denied</h2>
                 </div>
             </div>
         }
-    </div>
+       </>
+    )
+    if (step === USERSETTINGSTEPS.USERINFO) {
+        bodyContent = (
+            <div>
+                <h1>USERINFO</h1>
+                <button onClick={() => {
+                    setStep(USERSETTINGSTEPS.INDEX)
+                }}>back</button>
+            </div>
+        )
+    }
+
+return <ChanneLUserSettingsModaL>
+    {bodyContent}
+</ChanneLUserSettingsModaL>
 }

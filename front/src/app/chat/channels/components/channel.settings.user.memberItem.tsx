@@ -17,6 +17,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import getMemberWithId from "../actions/getMemberWithId";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import Image from "next/image";
+import ChannelSettingsUserMemberItemOption from "./channel.settings.user.memberItem.option";
 
 enum updatememberEnum {
     SETADMIN = 'SETADMIN',
@@ -24,10 +25,7 @@ enum updatememberEnum {
     KIKMEMBER = 'KIKMEMBER',
     MUTEMEMBER = 'MUTEMEMBER'
 }
-enum USERSETTINGSTEPS {
-    INDEX = 0,
-    USERINFO = 1,
-}
+
 interface IChannelSettingsUserMemberItemProps {
     member: any;
     socket: Socket | null;
@@ -103,23 +101,65 @@ export default function ChannelSettingsUserMemberItem({ member, socket, OnClick 
         return null
     CanEdit && console.log("CanEdit :", CanEdit)
     return <div className="flex flex-col w-full">
-        <div className="flex flex-row justify-between items-center shadow p-2 w-full rounded">
-            <button onClick={() => {
-                console.log("leave Channel")
-            }} className='flex justify-center items-center text-white gap-3'>
-                <div className={`image  min-w-[24px] rounded overflow-hidden`}>
-                    <Image src="/avatar.jpg" alt="avatar" width={24} height={24} />
+        <div
+            className="flex flex-col justify-between items-center gap-4 shadow p-4 w-full rounded">
+            <div className="flex flex-row justify-between items-center w-full ">
+                <div className='flex justify-center items-center text-white gap-2'>
+                    <div className={`image  min-w-[24px] rounded overflow-hidden`}>
+                        <Image src="/avatar.jpg" alt="avatar" width={24} height={24} />
+                    </div>
+                    <h2 className='text-white font-semibold capitalize'>
+                        {UserInfo?.login}
+                        {member.userId === __userId && <small className="text-[6px] px-1">[you]</small>}
+                    </h2>
+                    <MdAdminPanelSettings size={16} fill="#1EF0AE" />
+                    {member.type === 'OWNER' && <FaChessQueen size={16} fill="#FFBF00" />}
                 </div>
-                <h2 className='text-white font-semibold capitalize'>mmasstou</h2>
-            </button>
-            <div className='text-white flex flex-row gap-2 justify-center items-center'>
-                <MdAdminPanelSettings size={24} />
-                 <Button
-                    icon={TbDeviceGamepad2}
-                    outline
-                    onClick={() => { }}
-                />
+                {member.CanEdit 
+                ? <div className="flex flex-row gap-3 justify-center items-center">
+                    {/* <h4 className="text-[10px] text-secondary font-medium">Joined {Join_At}</h4> */}
+                    <ChannelSettingsUserMemberItemOption 
+                        icon={MdAdminPanelSettings}
+                        size={24}
+                        IsActivate={member.type === 'ADMIN'}
+                        Onclick={() => {
+                            console.log("set admin")
+                            OnClick({ type: updatememberEnum.SETADMIN, member: member })
+                        }}
+                    />
+                     <ChannelSettingsUserMemberItemOption 
+                        icon={TbUserX}
+                        size={24}
+                        IsActivate={member.type === 'BANNED'}
+                        Onclick={() => {
+                            console.log("set admin")
+                            OnClick({ type: updatememberEnum.KIKMEMBER, member: member })
+                        }}
+                    />
+                     <ChannelSettingsUserMemberItemOption 
+                        icon={SlBan}
+                        size={24}
+                        IsActivate={member.type === 'BANNED'}
+                        Onclick={() => {
+                            console.log("set admin")
+                            OnClick({ type: updatememberEnum.BANMEMBER, member: member })
+                        }}
+                    />
+                     <ChannelSettingsUserMemberItemOption 
+                        icon={FaVolumeMute}
+                        size={24}
+                        IsActivate={member.type === 'MUTED'}
+                        Onclick={() => {
+                            console.log("set admin")
+                            OnClick({ type: updatememberEnum.MUTEMEMBER, member: member })
+                        }}
+                    />
+                </div>
+                : <div className="flex flex-row gap-3 justify-center items-center">
+                    <h4 className="text-[10px] text-secondary font-medium">Joined {Join_At}</h4>
+                    </div>}
             </div>
+
         </div>
     </div>
 
