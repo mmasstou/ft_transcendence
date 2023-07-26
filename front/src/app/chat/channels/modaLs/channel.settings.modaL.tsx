@@ -25,9 +25,10 @@ import { RiChatSettingsLine } from "react-icons/ri"
 import { FaUsersCog } from "react-icons/fa"
 import Image from "next/image"
 import ChanneLUserSettings from "../components/channel.settings.User"
-import { TbInfoSquareRoundedFilled } from "react-icons/tb"
+import { TbInfoSquareRoundedFilled, TbUserPlus } from "react-icons/tb"
 import getChannelWithId from "../actions/getChannelWithId"
 import ChanneLChatSettings from "../components/channel.settings.channel"
+import ChanneLSettingsMemberJoinModaL from "./channel.settings.member.join.modal"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',
@@ -64,7 +65,7 @@ const ChanneLSettingsModaL = () => {
             const token: any = Cookies.get('token');
             if (!token)
                 return;
-            const response =roomId &&  await getChannelWithId(roomId, token)
+            const response = roomId && await getChannelWithId(roomId, token)
             console.log("+++> response :", response)
             setroomInfo(response)
         })();
@@ -130,12 +131,14 @@ const ChanneLSettingsModaL = () => {
                     icon={TbInfoSquareRoundedFilled}
                     label={"ChanneL Info"}
                     outline
+                    responsive
                     IsActive={_channeLtype === "ChatInfo"}
                     onClick={() => { setcustomvalue("channeLtype", "ChatInfo") }}
                 /><Button
                     icon={FaUsersCog}
                     label={"User Settings"}
                     outline
+                    responsive
                     IsActive={_channeLtype === "UserSettings"}
                     onClick={() => { setcustomvalue("channeLtype", "UserSettings") }}
                 />
@@ -143,23 +146,25 @@ const ChanneLSettingsModaL = () => {
                     icon={RiChatSettingsLine}
                     label={"ChanneL Settings"}
                     outline
+                    responsive
                     IsActive={_channeLtype === "ChatSettings"}
                     onClick={() => { setcustomvalue("channeLtype", "ChatSettings") }}
                 />
             </div>
+
             <div className={`body flex flex-col gap-4 h-full w-full min-h-[38rem] 
             ${(_channeLtype !== "UserSettings" && _channeLtype !== "ChatSettings") ? ' justify-center items-center' : ''} `}>
                 {
-                _channeLtype === "UserSettings" 
-                ? <ChanneLUserSettings socket={socket} /> 
-                : _channeLtype === "ChatSettings" 
-                    ? <ChanneLChatSettings />
-                    : <Image
-                    className="flex justify-center items-center"
-                    src="/channelsettings.svg"
-                    alt="avatar"
-                    width={160}
-                    height={160} />}
+                    _channeLtype === "UserSettings"
+                        ? <ChanneLUserSettings socket={socket} />
+                        : _channeLtype === "ChatSettings"
+                            ? <ChanneLChatSettings />
+                            : <Image
+                                    className="flex justify-center items-center"
+                                    src="/channelsettings.svg"
+                                    alt="avatar"
+                                    width={160}
+                                    height={160} />}
             </div>
         </div>
     )

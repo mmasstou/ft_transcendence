@@ -54,7 +54,7 @@ const Message: FC<Imessage> = ({ message, userid ,isForOwner}) => {
         <div className="flex flex-row justify-between  items-center">
             <div className="MessagesenderInfo w-full boredr-2  -green-500 flex flex-row items-center p-1 gap-1">
                 <UserAvatar size={18} image={"/avatar.jpg"} />
-                <h3 className="text-base font-light text-[#FFFFFF]">{senderInfo?.login} - {message.senderId}</h3>
+                <h3 className="text-base font-light text-[#FFFFFF]">{senderInfo?.login}</h3>
             </div>
             <span className="text-[.5rem] text-end text-[#D9D9D9] min-w-max">{create_At}</span>
         </div>

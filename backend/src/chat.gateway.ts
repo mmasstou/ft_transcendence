@@ -130,6 +130,50 @@ export class ChatGateway implements OnGatewayConnection {
       console.log('Chat-> error- +>', error);
     }
   }
+  @SubscribeMessage('joinmember')
+  async joinmember(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    data: {
+      userid: string;
+      roomid: string;
+    },
+  ) {
+    try {
+      console.log('Chat-> joinmember +>');
+      console.log('Chat-> joinmember +> data :', data);
+
+      // check if member is already in room database :
+      try {
+        const room = await this.roomservice.findOne({ name: data.roomid });
+        const memberExist = await this.prisma.members.findFirst({
+          where: { userId: data.userid, roomsId: room.id },
+        });
+        if (!memberExist) {
+          const member = await this.memberService.create({
+            type: UserType.USER,
+            user: data.userid,
+            roomId: room.id,
+          });
+          await this.prisma.rooms.update({
+            where: { id: room.id },
+            data: { members: { connect: { id: member.id } } },
+          });
+          console.log('Chat-> joinmember +> member :', member);
+          client.emit('joinmemberResponseEvent', member);
+        }
+      } catch (error) {
+        console.log('Chat-> joinmember error- +>', error);
+      }
+      // create room :
+      // const newRoom = await this.roomservice.create(data, _User.login);
+
+      // send message that room is created :
+      // this.server.emit('createroomResponseEvent', newRoom);
+    } catch (error) {
+      console.log('Chat-> error- +>', error);
+    }
+  }
   @SubscribeMessage('createroom')
   async createRoom(
     @ConnectedSocket() client: Socket,

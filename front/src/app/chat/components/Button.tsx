@@ -13,10 +13,13 @@ interface ButtonProps {
     IsActive?: boolean;
     size?: number;
     IsBan?: boolean;
+    labelsize?: number;
+    responsive ?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
     label,
+    labelsize,
     onClick,
     disabled,
     outline,
@@ -25,8 +28,10 @@ const Button: React.FC<ButtonProps> = ({
     border,
     IsActive,
     size,
-    IsBan
+    IsBan,
+    responsive
 }) => {
+    const _labelsise  :string | undefined = labelsize ? 'text-' + labelsize.toString() : undefined
     return (
         <button
             disabled={disabled}
@@ -52,7 +57,7 @@ const Button: React.FC<ButtonProps> = ({
       `}
         >
             {Icon && (<Icon size={size ? size : 24} />)}
-            <span className=" hidden sm:flex">  {label && label}</span>
+            <span className={` ${responsive ? 'hidden sm:flex' : ''}  ${_labelsise && _labelsise} `}>  {label && label}</span>
         </button>
     );
 }
