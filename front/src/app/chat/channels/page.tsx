@@ -2,14 +2,17 @@
 
 import React, { useEffect } from 'react'
 import Dashboard from '@/app/Dashboard';
-import { RoomsType } from '@/types/types';
-import { useSearchParams } from 'next/navigation';
+import { RoomsType, membersType } from '@/types/types';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import getChannels from '@/actions/channels/getChanneLs';
 import Cookies from 'js-cookie';
 import ChanneLIndex from './components/channel.index';
 import LoginHook from '@/hooks/auth/login';
 import { Socket, io } from 'socket.io-client';
 import getChannelWithId from './actions/getChannelWithId';
+import getMemberWithId from './actions/getMemberWithId';
+import getChannelMembersWithId from './actions/getChannelmembers';
+import ChanneLaccessDeniedHook from './hooks/ChanneL.access.denied.hook';
 const metadata = {
   title: 'Transcendence',
   description: 'Online Pong Game',
@@ -18,11 +21,16 @@ export default function page() {
   const [IsMounted, setIsMounted] = React.useState(false)
   const [_ChanneLs, setChannel] = React.useState<RoomsType[] | null>(null)
   const [_ChanneLsActiveID, setChanneLsActive] = React.useState<string | null>(null)
+  const [memberHasAccess, setmemberHasAccess] = React.useState<boolean>(false)
   const [socket, setSocket] = React.useState<Socket | null>(null)
   const params = useSearchParams()
   const token: any = Cookies.get('token');
   const loginhook = LoginHook()
-  document.title = "Transcendence - Chat/channeL"
+  const channeLaccessDeniedHook = ChanneLaccessDeniedHook()
+
+  if (IsMounted){
+    document.title = "Transcendence - Chat/channeL"
+  }
 
 
 
@@ -63,13 +71,25 @@ export default function page() {
 
   useEffect(() => {
     if (!_ChanneLsActiveID)
-    return
+      return
     const token: any = Cookies.get('token');
-     (async () => {
+    (async () => {
       const room = await getChannelWithId(_ChanneLsActiveID, token)
-      let JoinData : any = room
+      let JoinData: any = room
       const userId = Cookies.get('_id')
-      if (userId){
+      if (userId) {
+        
+        const Logedmemder = await getMemberWithId(userId, _ChanneLsActiveID, token)
+        console.log("+page+> Logedmemder :", Logedmemder)
+        const activeChannelsMembers = await getChannelMembersWithId(_ChanneLsActiveID, token)
+        console.table("+page+> activeChannelsMembers :", activeChannelsMembers)
+        activeChannelsMembers.forEach((member: membersType) => {
+          if (member.id === Logedmemder.id) {
+            console.log("+page+> match member :", member)
+
+            setmemberHasAccess(true)
+          }
+        });
         JoinData.loginUser = userId
         console.log('_ChanneLsActiveID : ', _ChanneLsActiveID)
         socket?.emit('joinroom', JoinData, (response: any) => {
@@ -78,6 +98,14 @@ export default function page() {
       }
     })();
   }, [_ChanneLsActiveID, socket])
+
+  React.useEffect(() => {
+    console.log("+page+> memberHasAccess :", memberHasAccess)
+    console.log("+page+> _ChanneLsActiveID :", _ChanneLsActiveID)
+    if (_ChanneLsActiveID && !memberHasAccess) {
+      channeLaccessDeniedHook.onOpen()
+    }
+  }, [memberHasAccess, _ChanneLsActiveID])
 
   useEffect(() => {
     if (!IsMounted)

@@ -6,6 +6,7 @@ import Login from '@/components/auth/modaLs/Login'
 import ChanneLModal from './chat/channels/modaLs/channel.modal'
 import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL'
 import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL'
+import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL'
 interface Props {
     children: React.ReactNode,
 }
@@ -17,6 +18,7 @@ const Dashboard = ({children} : Props) => {
     {/* <ChanneLModal /> */}
     <ChanneLCreateModaL />
     <ChanneLSettingsModaL />
+    <ChanneLaccessDeniedModaL />
     <div className= "dashboard bg-primary">
       <header  className="bg-transparent flex items-center justify-between px-5 ">
        <Header/>
