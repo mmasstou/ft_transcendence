@@ -126,6 +126,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                             member={member}
                             socket={socket}
                             UserJoin={false}
+                            UserOwne={false}
                             OnClick={(data) => {
                                 console.log("OnClick :", data)
                                 if (data.updateType === "PLAYGAME") {

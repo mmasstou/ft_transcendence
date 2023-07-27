@@ -65,3 +65,13 @@ export type updatememberType = {
   updateType: string,
   member: membersType,
 }
+
+export enum updatememberEnum {
+  SETADMIN = 'SETADMIN',
+  BANMEMBER = 'BANMEMBER',
+  KIKMEMBER = 'KIKMEMBER',
+  MUTEMEMBER = 'MUTEMEMBER',
+  PLAYGAME = 'PLAYGAME',
+  SETOWNER = 'SETOWNER',
+  ACCESSPASSWORD = 'ACCESSPASSWORD',
+}

@@ -13,7 +13,6 @@ module.exports = {
             },
             fontFamily: {
                 lato : 'var(--font-lato)',
-                changa : 'var(--font-changa)',
             },
             colors: {
                 primary: '#161F1E',
