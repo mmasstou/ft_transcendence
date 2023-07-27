@@ -114,8 +114,6 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     return <div className={`
     Conversations 
     relative 
-    h-[86vh]
-    md:h-[90vh]
     w-full 
     flex flex-col
     border-orange-300
@@ -124,9 +122,9 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             (hasparam && channeLinfo) ? <>
                 <ConversationsTitlebar socket={socket} channeLId={room} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
                 <ConversationsMessages Content={content} />
-                <div className="w-full m-[2px]">
+                <div className="w-full relative">
                     <input
-                        className="ConversationsInput w-full h-[5vh] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
+                        className="ConversationsInput w-full h-[54px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
                         onSubmit={(event: any) => {
                             setMessage(event.target.value);
                             OnSubmit(event)

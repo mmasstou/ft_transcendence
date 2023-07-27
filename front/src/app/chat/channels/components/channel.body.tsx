@@ -82,7 +82,7 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     if (!IsMounted)
         return null
     return (
-        <div className="channeLbody h-[86vh] md:h-[94vh] border border-green-600 flex ">
+        <div className="channeLbody h-[86vh] md:h-[88vh] border border-green-600 flex ">
             <LefttsideModaL>
                 {
                     ChanneLs && ChanneLs.map((room: RoomsType, key) => (
