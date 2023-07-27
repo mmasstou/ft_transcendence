@@ -11,7 +11,6 @@ import { MessagesModule } from './messages/messages.module';
 import { MembersModule } from './members/members.module';
 import { ChatGateway } from './chat.gateway';
 import { GameModule } from './game/game.module';
-import { GatewayModule } from './game/gateway/gateway.module';
 import { RoomsService } from './rooms/rooms.service';
 import { MembersService } from './members/members.service';
 import { MessagesService } from './messages/messages.service';
@@ -26,7 +25,6 @@ import { UserGateway } from './user.gateway';
     MessagesModule,
     MembersModule,
     GameModule,
-    GatewayModule,
     DirectMessageModule,
   ],
   controllers: [AppController],

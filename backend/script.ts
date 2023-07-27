@@ -31,6 +31,26 @@ const prisma = new PrismaClient();
 async function createUsers() {
   const users = [
     {
+      login: 'aboulhaj',
+      email: 'aboulhaj@prisma.io',
+      password: 'aboulhaj',
+      bg_color: '#808080',
+      paddle_color: '#FFFFFF',
+      ball_color: '#FFFFFF',
+      image: "pngavatar.png",
+      is_active: true,
+    },
+    {
+      login: 'aboulhaj2',
+      email: 'aboulhaj2@prisma.io',
+      password: 'aboulhaj2',
+      bg_color: '#000000',
+      paddle_color: '#0000FF',
+      ball_color: '#0000FF',
+      image: "pngavatar2.png",
+      is_active: true,
+    },
+    {
       login: 'mmasstou',
       email: 'mmasstou@prisma.io',
       password: 'mmasstou012345_',

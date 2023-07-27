@@ -51,7 +51,7 @@ const Login = () => {
 
         // socket && socket.emit("sendMessage", messageSocket, () => setmessages(""));
         socket && socket.on("connected", (data) => {
-            console.log("data :", data)
+            // console.log("data :", data)
         })
 
 
@@ -79,9 +79,11 @@ const Login = () => {
         if (token.status === 200) {
             loginHook.onClose()
             const user_token = await token.json()
-            console.log("usertoken :", user_token)
+            console.log("user_token :", user_token)
             Cookies.set("token", user_token.access_token)
             Cookies.set("_id", user_token._id)
+            Cookies.set("username", user_token.login)
+            router.refresh();
         }
     }
     const bodyContent = (

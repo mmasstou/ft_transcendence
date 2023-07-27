@@ -52,7 +52,7 @@ const Login = () => {
 
         // socket && socket.emit("sendMessage", messageSocket, () => setmessages(""));
         socket && socket.on("connected", (data) => {
-            console.log("data :", data)
+            // console.log("data :", data)
         })
 
 
@@ -65,7 +65,7 @@ const Login = () => {
     const onSubmit: SubmitHandler<FieldValues> = async (data: any) => {
 
 
-        console.log("Data :", data)
+        // console.log("Data :", data)
         const API_PATH = process.env.API_URL
         // console.log("API_PATH :", API_PATH)
         const token = await fetch(`http://127.0.0.1/api/auth/login`, {
@@ -79,6 +79,7 @@ const Login = () => {
         if (token.status === 200) {
             loginHook.onClose()
             const user_token = await token.json()
+            console.log("user_token :", user_token)
             Cookies.set("token", user_token.access_token)
             Cookies.set("_id", user_token._id)
         }

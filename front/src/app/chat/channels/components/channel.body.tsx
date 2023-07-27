@@ -24,7 +24,7 @@ export default function ChanneLbody({ children }: { children: React.ReactNode; }
             const resp = await getChannels(token)
             if (resp && resp.ok) {
                 const data = await resp.json()
-                console.log("data :", data)
+                // console.log("data :", data)
                 setChannel(data);
             }
             console.log("resp :", resp)
