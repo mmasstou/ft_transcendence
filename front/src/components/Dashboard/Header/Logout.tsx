@@ -1,54 +1,46 @@
-'use client';
-import { RiLogoutBoxFill } from 'react-icons/ri';
-import { useEffect, useRef, useState } from 'react';
+import { RiLogoutBoxFill} from 'react-icons/ri'
+import * as Popover from '@radix-ui/react-popover';
+import { Cross2Icon } from '@radix-ui/react-icons';
 import Cookies from 'js-cookie';
 import MyAvatar from '@/components/profile/MyAvatar';
 
 export const Logout: React.FC = (props) : JSX.Element => {
-  const [logout, setLogout] = useState<boolean>(false);
-  let logoutRef = useRef<HTMLDivElement | null>(null);
-
-  const renderLogout = () => {
-    setLogout(!logout);
-  };
-
 
   const logoutHandle = () => {
     Cookies.remove('token');
   }
 
-  useEffect(() => {
-    const handler = (e: any) => {
-      if (logout && !logoutRef.current?.contains(e.target as Node)){
-        setLogout(logout => !logout);
-      }
-    };
-    document.addEventListener("click", handler);
-
-    return() => {
-      document.removeEventListener("click", handler);
-    }
-  },);
- 
   return (
-    <div ref={logoutRef}>
-      <div className='cursor-pointer w-[32px] h-[32px' onClick={renderLogout}><MyAvatar /></div>
-      {logout && <div className='absolute down-arrow top-7 -right-3 z-20'></div> }
-        {logout &&
-          <div className="absolute text-white top-[68px] right-5 bg-[#2B504B] rounded-lg 
-          w-54 h-[110px] z-20"  >
-            <div className='flex flex-col justify-center items-center h-full' >
-              <h3 className='mx-2'>👋 Hey, aouhadou</h3>
-              <div className='w-3/4 border-b-[0.1vh] border-white opacity-50 my-2 ml-2'></div>
-                <ul className='list-none cursor-pointer mt-2'> 
-                  <a onClick={logoutHandle} href='/' className='flex justify-between items-center my-1 hover:text-red-500'>
+    <Popover.Root>
+          <Popover.Trigger asChild>
+          <button
+              aria-label="Update dimensions"
+          >
+            <div className='cursor-pointer w-[32px] h-[32px'><MyAvatar /></div>
+          </button>
+          </Popover.Trigger>
+          <Popover.Portal>
+          <Popover.Content
+              className="text-white rounded p-5 w-[200px] mr-4 bg-[#2B504B] shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)] "
+              sideOffset={5}
+          >
+              <div className="flex flex-col justify-center items-center gap-2.5 py-2">
+                <p className="text-[15px] leading-[19px] font-medium mt-2">👋 Hey, aouhadou</p>
+                <div className='w-3/4 border-b-[0.1vh] border-white opacity-50'></div>
+                <a onClick={logoutHandle} href='/' className='flex justify-between items-center my-1 hover:text-red-500'>
                     <RiLogoutBoxFill className='mx-2'/>
                     Logout
-                  </a>
-                </ul>
-            </div>
-          </div> 
-        }
-    </div>
-  )
+                </a>
+              </div>
+              <Popover.Close
+              className="rounded-full h-[25px] w-[25px] mr-4 inline-flex items-center justify-center text-white absolute top-[5px] right-[5px] outline-none cursor-pointer"
+              aria-label="Close"
+              >
+              <Cross2Icon />
+              </Popover.Close>
+              <Popover.Arrow className="fill-[#2B504B]" />
+          </Popover.Content>
+          </Popover.Portal>
+      </Popover.Root>
+);
 }
