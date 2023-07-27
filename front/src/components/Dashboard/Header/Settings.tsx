@@ -1,76 +1,108 @@
+'use client'
+import { useRef, useState } from 'react';
 import { RiSettingsLine } from 'react-icons/ri'
-import * as Popover from '@radix-ui/react-popover';
+import * as Avatar from '@radix-ui/react-avatar';
+import style from '@/components/Home/style'
+import profile from '@/../public/profile.png';
+import axios from 'axios';
+import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 
 
-const Settings = () => {
+
+const AvatarUpload = () => {
   return (
-      <Popover.Root>
-            <Popover.Trigger asChild>
-            <button
-                aria-label="Update dimensions"
-            >
-                <RiSettingsLine size={32} className='cursor-pointer hover:text-white text-[#E0E0E0]' />
-            </button>
-            </Popover.Trigger>
-            <Popover.Portal>
-            <Popover.Content
-                className="rounded p-5 w-[260px] bg-white shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)] focus:shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2),0_0_0_2px_theme(colors.violet7)] will-change-[transform,opacity] data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade"
-                sideOffset={5}
-            >
-                <div className="flex flex-col gap-2.5">
-                <p className="text-mauve12 text-[15px] leading-[19px] font-medium mb-2.5">Dimensions</p>
-                <fieldset className="flex gap-5 items-center">
-                    <label className="text-[13px] text-violet11 w-[75px]" htmlFor="width">
-                    Width
-                    </label>
-                    <input
-                    className="w-full inline-flex items-center justify-center flex-1 rounded px-2.5 text-[13px] leading-none text-violet11 shadow-[0_0_0_1px] shadow-violet7 h-[25px] focus:shadow-[0_0_0_2px] focus:shadow-violet8 outline-none"
-                    id="width"
-                    defaultValue="100%"
-                    />
-                </fieldset>
-                <fieldset className="flex gap-5 items-center">
-                    <label className="text-[13px] text-violet11 w-[75px]" htmlFor="maxWidth">
-                    Max. width
-                    </label>
-                    <input
-                    className="w-full inline-flex items-center justify-center flex-1 rounded px-2.5 text-[13px] leading-none text-violet11 shadow-[0_0_0_1px] shadow-violet7 h-[25px] focus:shadow-[0_0_0_2px] focus:shadow-violet8 outline-none"
-                    id="maxWidth"
-                    defaultValue="300px"
-                    />
-                </fieldset>
-                <fieldset className="flex gap-5 items-center">
-                    <label className="text-[13px] text-violet11 w-[75px]" htmlFor="height">
-                    Height
-                    </label>
-                    <input
-                    className="w-full inline-flex items-center justify-center flex-1 rounded px-2.5 text-[13px] leading-none text-violet11 shadow-[0_0_0_1px] shadow-violet7 h-[25px] focus:shadow-[0_0_0_2px] focus:shadow-violet8 outline-none"
-                    id="height"
-                    defaultValue="25px"
-                    />
-                </fieldset>
-                <fieldset className="flex gap-5 items-center">
-                    <label className="text-[13px] text-violet11 w-[75px]" htmlFor="maxHeight">
-                    Max. height
-                    </label>
-                    <input
-                    className="w-full inline-flex items-center justify-center flex-1 rounded px-2.5 text-[13px] leading-none text-violet11 shadow-[0_0_0_1px] shadow-violet7 h-[25px] focus:shadow-[0_0_0_2px] focus:shadow-violet8 outline-none"
-                    id="maxHeight"
-                    defaultValue="none"
-                    />
-                </fieldset>
-                </div>
-                <Popover.Close
-                className="rounded-full h-[25px] w-[25px] inline-flex items-center justify-center text-violet11 absolute top-[5px] right-[5px] hover:bg-violet4 focus:shadow-[0_0_0_2px] focus:shadow-violet7 outline-none cursor-default"
-                aria-label="Close"
-                >
+    <Avatar.Root className={`${style.flexCenter} flex-inline align-middle overflow-hidden select-none
+            rounded-full `}>
+        <Avatar.Image
+          className="w-[100%] h-[100%] object-cover rounded-[inherit] border-secondary"
+          src={profile.src}
+          alt="User Avatar"
+        />
+        <Avatar.Fallback className={`w-[100%] h-[100%] ${style.flexCenter} bg-white text-[15px] leanding-1 font-medium`} delayMs={600}>
+          Avatar
+        </Avatar.Fallback>
+      </Avatar.Root>
+  )
+}
+
+
+const Settings: React.FC = () => {
+    const [isOpen, setOpen] = useState<boolean>(false);
+    const [selectedFile, setFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const handleModal = () : void => {
+        setOpen(!isOpen);
+    }
+
+    const fileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0])
+      {
+        const file = e.target.files[0];
+        setFile(file);
+      }
+    }
+
+    const fileUpload = async () => {
+      if (selectedFile === null) {
+        return;
+      }
+      const formData = new FormData()
+      formData.append('myFile', selectedFile as Blob, selectedFile?.name)
+      await axios.post('http://localhost:8080/file-upload', formData)
+      .then(res => {
+        console.log(res);
+      })
+    }
+
+  return (
+    <Dialog.Root>
+        <Dialog.Trigger asChild>
+          <RiSettingsLine size={32} className='cursor-pointer hover:text-white text-[#E0E0E0]' onClick={handleModal} />
+        </Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0 
+                        w-screen h-screen bg-[#161F1E]/80" />
+          <Dialog.Content
+            className="data-[state=open]:animate-contentShow text-white rounded-lg bg-[#2B504B] p-6 fixed top-[25%] left-[50%] max-h-full w-[80%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[30%] translate-x-[-50%] lg:translate-x-[-45%] xl:translate-x-[-35%] translate-y-[-50%] 
+          shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px]
+          focus:outline-none z-50"
+          >
+            <Dialog.Title className="">Settings</Dialog.Title>
+            <Dialog.Close asChild>
+              <button className="text-white top-5 right-5 absolute">
                 <Cross2Icon />
-                </Popover.Close>
-                {/* <Popover.Arrow className="fill-white" /> */}
-            </Popover.Content>
-            </Popover.Portal>
-        </Popover.Root>
+              </button>
+            </Dialog.Close>
+                  <div className=' p-4 m-4 flex flex-col justify-center items-center gap-6'>
+                     <div className='flex justify-between gap-6 items-center'>
+                         <div className='h-[60px] w-[60px]'><AvatarUpload /></div>
+                         <input 
+                             style={{display: 'none'}}
+                             type="file" 
+                             onChange={fileSelect}
+                             ref={fileInputRef}
+                         />
+                         <button 
+                           className='bg-[#939DA3] px-[8px] w-[130px] h-[40px] py-1 font-normal rounded-lg text-[1.25em]'
+                           onClick={() => fileInputRef.current?.click()}
+                         >
+                             UPLOAD
+                         </button>
+                     </div>
+                     <button 
+                         className='bg-transparent text-secondary border border-secondary 
+                               px-[8px] w-[130px] h-[40px] font-normal rounded-lg text-[1.25em]'
+                         onClick={fileUpload}
+                            >
+                        CONFIRM
+                    </button>
+                </div>
+          </Dialog.Content>
+        </Dialog.Portal>    
+      </Dialog.Root>
+            
   );
 }
 

@@ -21,7 +21,7 @@ const Header: React.FC = () : JSX.Element => {
         />
       </div>
       <nav className="flex justify-center items-center">
-        <ul className="flex items-center  gap-5 ">
+        <ul className="flex items-center  gap-5 justify-center">
           <Settings />
           <li>
             <button>
