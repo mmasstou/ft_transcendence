@@ -158,7 +158,7 @@ const ChanneLSettingsModaL = () => {
                     _channeLtype === "UserSettings"
                         ? <ChanneLUserSettings socket={socket} />
                         : _channeLtype === "ChatSettings"
-                            ? <ChanneLChatSettings />
+                            ? <ChanneLChatSettings socket={socket} />
                             : <Image
                                     className="flex justify-center items-center"
                                     src="/channelsettings.svg"

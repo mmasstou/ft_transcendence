@@ -16,6 +16,7 @@ export default function ChanneLsmembersItem( {member} : IChannelMembersItemProps
     const [IsMounted, setIsMounted] = React.useState(false)
     const [UserInfo, setUserInfo] = React.useState< userType | null>(null)
     const params = useSearchParams()
+    const LogedUserId = Cookies.get('_id');
 
     React.useEffect(() => {
         setIsMounted(true)
@@ -35,7 +36,9 @@ export default function ChanneLsmembersItem( {member} : IChannelMembersItemProps
 <div className="MessagesenderInfo w-full boredr-2  -green-500 flex flex-row items-center p-1 gap-4">
                 <div className="flex flex-row items-center p-1 gap-1">
                 <UserAvatar size={24} image={"/avatar.jpg"} />
-                <h3 className="text-base font-light text-[#FFFFFF]">{UserInfo?.login}</h3>
+                <h3 className="text-base font-light text-[#FFFFFF]">{UserInfo?.login} {
+                    LogedUserId === member.userId && <span className="text-xs text-[#FFFFFF]"> (You)</span>
+                }</h3>
                 </div>
                 {member.type === 'OWNER' && <FaChessQueen fill="#FFBF00" />}
             </div>
