@@ -40,7 +40,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
 
     if (!IsMounted) return null
     return (
-        <div className="--channeL border border-yellow-600 h-[87vh] md:h-[94vh] flex flex-col ">
+        <div className="--channeL border border-yellow-600 relative h-full flex flex-col ">
             {/* nav bar */}
             
             <div className="channeLnavbar grid grid-flow-row-dense grid-cols-4 justify-between items-center text-white px-2 py-1">

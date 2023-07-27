@@ -63,7 +63,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     }, [room])
 
     useEffect(() => {
-        console.log('socket : ', socket?.id)    
+        console.log('socket : ', socket?.id)
         socket?.on('message', (message: any) => {
             console.log('message : ', message)
             setMessages([...messages, message])
@@ -111,42 +111,44 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
     if (!IsMounted) return null
 
-    return <div className={`
+    return <>
+
+        {(hasparam && channeLinfo) ? <div className={`
     Conversations 
     relative 
     w-full 
+    h-full
     flex flex-col
     border-orange-300
     sm:flex`}>
-        {
-            (hasparam && channeLinfo) ? <>
-                <ConversationsTitlebar socket={socket} channeLId={room} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
-                <ConversationsMessages Content={content} />
-                <div className="w-full relative">
-                    <input
-                        className="ConversationsInput w-full h-[54px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
-                        onSubmit={(event: any) => {
-                            setMessage(event.target.value);
-                            OnSubmit(event)
-                            // onClickHandler(event)
-                        }
-                        }
-                        onKeyDown={(event) =>
-                            event.key === "Enter" ? OnSubmit(event) : null
-                        }
-                        onChange={(event) => {
-                            setInputValue(event.target.value);
-                            setMessage(event.target.value);
-                        }}
-                        value={InputValue}
-                        placeholder={`Message to @'${channeLinfo.name}'`}
-                        type="search"
-                        name=""
-                        id="" />
-                </div>
-            </>
-                : <div className="flex flex-col justify-center items-center h-full w-full">
-                    <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
-                </div>}
-    </div>
+            <ConversationsTitlebar socket={socket} channeLId={room} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
+            <ConversationsMessages Content={content} />
+            <div className="w-full absolute bottom-4 left-0">
+                <input
+                    className="ConversationsInput w-full h-[54px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
+                    onSubmit={(event: any) => {
+                        setMessage(event.target.value);
+                        OnSubmit(event)
+                        // onClickHandler(event)
+                    }
+                    }
+                    onKeyDown={(event) =>
+                        event.key === "Enter" ? OnSubmit(event) : null
+                    }
+                    onChange={(event) => {
+                        setInputValue(event.target.value);
+                        setMessage(event.target.value);
+                    }}
+                    value={InputValue}
+                    placeholder={`Message to @'${channeLinfo.name}'`}
+                    type="search"
+                    name=""
+                    id="" />
+            </div>
+        </div>
+            : <div className="flex flex-col justify-center items-center h-full w-full">
+                <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
+            </div>
+        }
+    </>
 }
