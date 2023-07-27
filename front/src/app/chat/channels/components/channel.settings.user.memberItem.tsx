@@ -6,8 +6,8 @@ import { UserAvatar } from "./channel.userAvater";
 import { TbDeviceGamepad2, TbUserShield, TbUserX, TbUsersPlus } from "react-icons/tb";
 import { SlBan, SlOptionsVertical } from "react-icons/sl";
 import { FaChessQueen, FaUserShield, FaVolumeMute } from "react-icons/fa";
-import { membersType, updatememberType, userType } from "@/types/types";
-import React from "react";
+import { membersType, updatememberEnum, updatememberType, userType } from "@/types/types";
+import React, { ReactNode } from "react";
 import Cookies from "js-cookie";
 import getUserWithId from "../actions/getUserWithId";
 import { GrUserAdmin } from "react-icons/gr";
@@ -21,21 +21,15 @@ import ChannelSettingsUserMemberItemOption from "./channel.settings.user.memberI
 import { IoMdOptions } from "react-icons/io";
 import { CgOptions } from "react-icons/cg";
 
-enum updatememberEnum {
-    SETADMIN = 'SETADMIN',
-    BANMEMBER = 'BANMEMBER',
-    KIKMEMBER = 'KIKMEMBER',
-    MUTEMEMBER = 'MUTEMEMBER',
-    PLAYGAME = 'PLAYGAME',
-}
 
 interface IChannelSettingsUserMemberItemProps {
     member: any;
     socket: Socket | null;
     OnClick: (data: any) => void;
     UserJoin?: boolean
+    UserOwne?: boolean
 }
-export default function ChannelSettingsUserMemberItem({ member, socket, UserJoin, OnClick }: IChannelSettingsUserMemberItemProps) {
+export default function ChannelSettingsUserMemberItem({ member, socket, UserJoin, OnClick, UserOwne }: IChannelSettingsUserMemberItemProps) {
     const [IsMounted, setIsMounted] = React.useState(false)
     const [UserInfo, setUserInfo] = React.useState<userType | null>(null)
     const router = useRouter()
@@ -118,76 +112,86 @@ export default function ChannelSettingsUserMemberItem({ member, socket, UserJoin
                     </h2>
                     {/* <MdAdminPanelSettings size={16} fill="#1EF0AE" /> */}
                     {member.type === 'OWNER' && <>
-                    <FaChessQueen className=" hidden md:flex" size={16} fill="#FFBF00" />
+                        <FaChessQueen className=" hidden md:flex" size={16} fill="#FFBF00" />
                     </>}
                 </div>
-                {UserJoin === false
-                    ? member.CanEdit
-                        ? <div className="flex flex-row gap-3 justify-center items-center">
-                            {/* <h4 className="text-[10px] text-secondary font-medium">Joined {Join_At}</h4> */}
-                            {!member.isban && <ChannelSettingsUserMemberItemOption
-                                icon={MdAdminPanelSettings}
-                                size={24}
-                                disabled={member.type === 'OWNER'}
-                                IsActivate={member.type === 'ADMIN'}
-                                background
-                                Onclick={() => {
-                                    OnClick({ updateType: updatememberEnum.SETADMIN, member: member })
-                                }}
-                            />}
-                            <ChannelSettingsUserMemberItemOption
-                                icon={TbUserX}
-                                size={24}
-                                disabled={member.type === 'OWNER'}
-                                background
-                                Onclick={() => {
-                                    OnClick({ updateType: updatememberEnum.KIKMEMBER, member: member })
-                                }}
-                            />
-                            <ChannelSettingsUserMemberItemOption
-                                icon={SlBan}
-                                size={24}
-                                disabled={member.type === 'OWNER'}
-                                IsActivate={member.isban}
-                                background
-                                Onclick={() => {
-                                    console.log("set admin")
-                                    OnClick({ updateType: updatememberEnum.BANMEMBER, member: member })
-                                }}
-                            />
-                            {!member.isban && <ChannelSettingsUserMemberItemOption
-                                icon={FaVolumeMute}
-                                size={24}
-                                disabled={member.type === 'OWNER'}
-                                IsActivate={member.ismute}
-                                background
-                                Onclick={() => {
-                                    console.log("set admin")
-                                    OnClick({ updateType: updatememberEnum.MUTEMEMBER, member: member })
-                                }}
-                            />}
-                            <ChannelSettingsUserMemberItemOption
-                                icon={TbDeviceGamepad2}
-                                size={24}
-                                background
-                                Onclick={() => {
-                                    OnClick({ updateType: updatememberEnum.PLAYGAME, member: member })
-                                }}
-                            />
-                        </div>
-                        : <div className="flex flex-row gap-3 justify-center items-center">
-                            <h4 className="text-[10px] text-secondary font-medium">Joined {Join_At}</h4>
-                        </div>
+                {UserJoin === false ?
+                    UserOwne === false ?
+                        member.CanEdit
+                            ? <div className="flex flex-row gap-3 justify-center items-center">
+                                {/* <h4 className="text-[10px] text-secondary font-medium">Joined {Join_At}</h4> */}
+                                {!member.isban && <ChannelSettingsUserMemberItemOption
+                                    icon={MdAdminPanelSettings}
+                                    size={24}
+                                    disabled={member.type === 'OWNER'}
+                                    IsActivate={member.type === 'ADMIN'}
+                                    background
+                                    Onclick={() => {
+                                        OnClick({ updateType: updatememberEnum.SETADMIN, member: member })
+                                    }}
+                                />}
+                                <ChannelSettingsUserMemberItemOption
+                                    icon={TbUserX}
+                                    size={24}
+                                    disabled={member.type === 'OWNER'}
+                                    background
+                                    Onclick={() => {
+                                        OnClick({ updateType: updatememberEnum.KIKMEMBER, member: member })
+                                    }}
+                                />
+                                <ChannelSettingsUserMemberItemOption
+                                    icon={SlBan}
+                                    size={24}
+                                    disabled={member.type === 'OWNER'}
+                                    IsActivate={member.isban}
+                                    background
+                                    Onclick={() => {
+                                        console.log("set admin")
+                                        OnClick({ updateType: updatememberEnum.BANMEMBER, member: member })
+                                    }}
+                                />
+                                {!member.isban && <ChannelSettingsUserMemberItemOption
+                                    icon={FaVolumeMute}
+                                    size={24}
+                                    disabled={member.type === 'OWNER'}
+                                    IsActivate={member.ismute}
+                                    background
+                                    Onclick={() => {
+                                        console.log("set admin")
+                                        OnClick({ updateType: updatememberEnum.MUTEMEMBER, member: member })
+                                    }}
+                                />}
+                                <ChannelSettingsUserMemberItemOption
+                                    icon={TbDeviceGamepad2}
+                                    size={24}
+                                    background
+                                    Onclick={() => {
+                                        OnClick({ updateType: updatememberEnum.PLAYGAME, member: member })
+                                    }}
+                                />
+                            </div>
+                            : <div className="flex flex-row gap-3 justify-center items-center">
+                                <h4 className="text-[10px] text-secondary font-medium">Joined {Join_At}</h4>
+                            </div>
+                        : <div>
+                        <ChannelSettingsUserMemberItemOption
+                            icon={FaChessQueen}
+                            size={24}
+                            Onclick={() => {
+                                OnClick((member))
+                            }}
+                        />
+                    </div>
                     : <div>
                         <ChannelSettingsUserMemberItemOption
                             icon={TbUsersPlus}
                             size={24}
                             Onclick={() => {
-                                console.log("add member")
                                 OnClick((member))
                             }}
                         />
                     </div>
+
                 }
             </div>
 
@@ -195,3 +199,4 @@ export default function ChannelSettingsUserMemberItem({ member, socket, UserJoin
     </div>
 
 }
+

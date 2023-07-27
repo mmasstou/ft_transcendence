@@ -1,10 +1,10 @@
-import { IoChevronBackOutline } from "react-icons/io5";
 import { Socket } from "socket.io-client";
 import Button from "../../components/Button";
+import { IoChevronBackOutline } from "react-icons/io5";
 import { membersType, updatememberEnum } from "@/types/types";
 import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import Image from "next/image";
-interface ChanneLUserSettingsProps {
+interface ChanneLsettingsChanneLsetOwnerProps {
     socket: Socket | null;
     OnBack: () => void;
     LogedMember: membersType | null;
@@ -12,22 +12,21 @@ interface ChanneLUserSettingsProps {
     setUpdate: (data: boolean) => void
 }
 
-
-export default function ChanneLSettingsChanneLBanedMember(
-    { socket, OnBack, LogedMember, members, setUpdate }: ChanneLUserSettingsProps) {
-    const handlOnclick = (data: any) => {
-        console.log("handlOnclick :", data)
-        socket?.emit('updatemember', data)
-
-    }
-
-    socket?.on('updatememberResponseEvent', (data) => {
-        console.log("updatememberResponseEvent :", data)
-        console.log("updatememberResponseEvent :", members)
-        setUpdate(true)
-    })
-    return (
-        <div className="flex flex-col justify-between min-h-[34rem]">
+export default function ChanneLsettingsChanneLsetOwner(
+    { socket, OnBack, LogedMember, members, setUpdate }: ChanneLsettingsChanneLsetOwnerProps) {
+        const handlOnclick = (data: any) => {
+            console.log("handlOnclick :", data)
+            socket?.emit('updatemember', data)
+    
+        }
+    
+        socket?.on('updatememberResponseEvent', (data) => {
+            console.log("updatememberResponseEvent :", data)
+            console.log("updatememberResponseEvent :", members)
+            setUpdate(true)
+        })
+        return (
+            <div className="flex flex-col justify-between min-h-[34rem]">
             <div>
                 <Button
                     icon={IoChevronBackOutline}
@@ -37,17 +36,17 @@ export default function ChanneLSettingsChanneLBanedMember(
                 />
 
                 <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
-                    {(LogedMember?.isban === false && (LogedMember?.type === "OWNER" || LogedMember?.type === "ADMIN")) ?
+                    {(LogedMember?.isban === false && (LogedMember?.type === "OWNER")) ?
                         members && members.map((member, index) => (
                             <ChannelSettingsUserMemberItem
                                 key={index}
                                 member={member}
                                 socket={socket}
                                 UserJoin={false}
-                                UserOwne={false}
+                                UserOwne
                                 OnClick={(data) => {
                                     console.log("OnClick :", data)
-                                    handlOnclick({ updateType: updatememberEnum.BANMEMBER, member: member })
+                                    handlOnclick({ updateType: updatememberEnum.SETOWNER, member: member })
                                 }} />
 
                         ))
@@ -61,5 +60,5 @@ export default function ChanneLSettingsChanneLBanedMember(
                 </div>
             </div>
         </div>
-    )
+        )
 }

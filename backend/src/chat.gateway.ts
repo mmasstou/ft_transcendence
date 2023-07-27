@@ -10,7 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from './users/user.service';
-import { User, Messages, UserType } from '@prisma/client';
+import { User, UserType } from '@prisma/client';
 import { error } from 'console';
 import { RoomsService } from './rooms/rooms.service';
 import { MessagesService } from './messages/messages.service';
@@ -25,6 +25,9 @@ enum updatememberEnum {
   BANMEMBER = 'BANMEMBER',
   KIKMEMBER = 'KIKMEMBER',
   MUTEMEMBER = 'MUTEMEMBER',
+  PLAYGAME = 'PLAYGAME',
+  SETOWNER = 'SETOWNER',
+  ACCESSPASSWORD = 'ACCESSPASSWORD',
 }
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway implements OnGatewayConnection {
@@ -125,6 +128,16 @@ export class ChatGateway implements OnGatewayConnection {
         });
         this.server.emit('updatememberResponseEvent', member);
       }
+      // set owner :
+      if (data.updateType === updatememberEnum.SETOWNER) {
+        const type: UserType =
+          __member.type === UserType.OWNER ? UserType.USER : UserType.OWNER;
+        const member = await this.prisma.members.update({
+          where: { id: data.member.id },
+          data: { type: type },
+        });
+        this.server.emit('updatememberResponseEvent', member);
+      }
       // create room :
     } catch (error) {
       console.log('Chat-> error- +>', error);
@@ -142,26 +155,29 @@ export class ChatGateway implements OnGatewayConnection {
     try {
       console.log('Chat-> joinmember +>');
       console.log('Chat-> joinmember +> data :', data);
-
+      let member: any = null;
       // check if member is already in room database :
       try {
         const room = await this.roomservice.findOne({ name: data.roomid });
-        const memberExist = await this.prisma.members.findFirst({
+        member = await this.prisma.members.findFirst({
           where: { userId: data.userid, roomsId: room.id },
         });
-        if (!memberExist) {
-          const member = await this.memberService.create({
+        if (!member) {
+          member = await this.memberService.create({
             type: UserType.USER,
             user: data.userid,
             roomId: room.id,
           });
-          await this.prisma.rooms.update({
-            where: { id: room.id },
-            data: { members: { connect: { id: member.id } } },
-          });
-          console.log('Chat-> joinmember +> member :', member);
-          client.emit('joinmemberResponseEvent', member);
         }
+        await this.prisma.rooms.update({
+          where: { id: room.id },
+          data: {
+            members: { connect: { id: member.id } },
+            User: { connect: { id: data.userid } },
+          },
+        });
+        console.log('Chat-> joinmember +> member :', member);
+        client.emit('joinmemberResponseEvent', member);
       } catch (error) {
         console.log('Chat-> joinmember error- +>', error);
       }

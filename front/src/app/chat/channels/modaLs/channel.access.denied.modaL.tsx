@@ -1,3 +1,4 @@
+"use client"
 import { usePathname, useRouter } from "next/navigation";
 import ChanneLaccessDeniedHook from "../hooks/ChanneL.access.denied.hook";
 import ChanneLModal from "./channel.modal";
