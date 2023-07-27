@@ -16,6 +16,9 @@ import LeftSidebarHook from "../hooks/LeftSidebarHook";
 import ConversationsTitlebar from "./channel.conversations.titlebar";
 import getChanneLMessages from "../actions/getChanneLMessages";
 import Cookies from "js-cookie";
+import getMemberWithId from "../actions/getMemberWithId";
+import { membersType } from "@/types/types";
+import ChanneLsettingsHook from "../hooks/channel.settings";
 
 
 export default function Conversations({ socket }: { socket: Socket | null }) {
@@ -29,8 +32,11 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const [message, setMessage] = useState("")
     const [InputValue, setInputValue] = useState("")
     const [viewed, setviewed] = useState<number>(0)
+    const [LogedMember, setLogedMember] = useState<membersType | null>(null)
     const params = useSearchParams()
     const room = params.get('r')
+    const __userId = Cookies.get('_id')
+    const channeLsettingsHook = ChanneLsettingsHook()
 
     // console.log("Conversations socket :", socket?.id)
     useEffect(() => { setIsMounted(true) }, [])
@@ -71,6 +77,20 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     }, [messages, InputValue])
 
 
+    useEffect(() => {
+        (async () => {
+            const token: any = Cookies.get('token');
+            const channeLLid = params.get('r')
+            if (!channeLLid)
+                return;
+
+            const channeLLMembers = __userId && await getMemberWithId(__userId, channeLLid, token)
+            if (channeLLMembers && channeLLMembers.statusCode !== 200) {
+                setLogedMember(channeLLMembers)
+            }
+        })();
+
+    }, [socket, channeLsettingsHook])
 
     const content = (
         <div className="flex flex-col gap-3">
@@ -121,7 +141,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     flex flex-col
     border-orange-300
     sm:flex`}>
-            <ConversationsTitlebar socket={socket} channeLId={room} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
+            <ConversationsTitlebar LogedMember={LogedMember} socket={socket} channeLId={room} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
             <ConversationsMessages Content={content} />
             <div className="w-full absolute bottom-4 left-0">
                 <input

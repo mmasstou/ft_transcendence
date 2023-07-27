@@ -20,6 +20,7 @@ import Conversations from "./channel.conversations";
 import ChanneLcreatemodaLHook from "../hooks/channel.create.hook";
 import { Socket } from "socket.io-client";
 import RightsidebarHook from "../hooks/RightSidebarHook";
+import ChanneLsettingsHook from "../hooks/channel.settings";
 
 interface ChannelIndexProps {
     socket : Socket | null
@@ -32,6 +33,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
     const router = usePathname();
     const leftSidebarHook = LeftSidebarHook();
     const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
+    const channeLsettingsHook = ChanneLsettingsHook()
     const rightsidebarHook = RightsidebarHook()
  // console.log("ChannelIndex socket :", socket?.id )
 

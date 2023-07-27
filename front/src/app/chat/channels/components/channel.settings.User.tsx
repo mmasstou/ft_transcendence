@@ -114,6 +114,10 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                     }}
                 />
             </div>
+
+
+
+
             <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
                 {(LogedMember?.type === "ADMIN" || LogedMember?.type === "OWNER") ?
                     members && members.map((member, index) => (
