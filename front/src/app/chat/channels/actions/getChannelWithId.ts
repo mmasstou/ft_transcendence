@@ -1,9 +1,9 @@
-// http://127.0.0.1/api/rooms/a6602f3c-676d-492e-9292-c4eec04fdf35
+// ${process.env.NEXT_PUBLIC_API_URL}/rooms/a6602f3c-676d-492e-9292-c4eec04fdf35
 
 
 const getChannelWithId = async (channeLId : string, token : string) => {
     try {
-      return await fetch(`http://127.0.0.1/api/rooms/${channeLId}`, {
+      return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/${channeLId}`, {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json',

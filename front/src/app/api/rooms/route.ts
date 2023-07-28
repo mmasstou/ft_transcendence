@@ -1,8 +1,8 @@
 export async function POST(req: Request) {
   const { userId, token } = await req.json();
   // get user info :
-  const User = await fetch(`http://127.0.0.1/api/users/${userId}`).then(res => res.json())
-  const Room = await fetch(`http://127.0.0.1/api/rooms/`, {
+  const User = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`).then(res => res.json())
+  const Room = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/`, {
     method : 'POST',
     headers: {
         Authorization: `${token}`,

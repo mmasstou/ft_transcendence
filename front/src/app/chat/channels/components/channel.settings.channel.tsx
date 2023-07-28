@@ -226,7 +226,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
 
                     }}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
-                    <div className='flex justify-center items-center p-3 rounded bg-danger text-white'>
+                    <div className='flex justify-center items-center p-3 rounded bg-secondary  text-white'>
                         <IoBagRemove size={32} />
                     </div>
                     <div>
@@ -243,7 +243,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                         OnBack()
                     }}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
-                    <div className='flex justify-center items-center p-3 rounded bg-isban text-white'>
+                    <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
                         <IoLogOut size={32} />
                     </div>
                     <div>

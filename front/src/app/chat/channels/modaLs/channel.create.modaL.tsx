@@ -40,7 +40,7 @@ const ChanneLCreateModaL = () => {
         if (!token)
             return;
         (async function getFriends() {
-            await fetch('http://127.0.0.1/api/users', {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
                 headers: { Authorization: `Bearer ${token}`, },
             }).then((resp) => resp.json()).then(data => {
                 console.log("++++++++++*****data :", data)

@@ -22,12 +22,13 @@ import { Socket } from "socket.io-client";
 import RightsidebarHook from "../hooks/RightSidebarHook";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 
+// env vars :
 interface ChannelIndexProps {
     socket : Socket | null
  }
 
 const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
-
+    
     const [IsMounted, setIsMounted] = useState(false)
     const [IsLoading, setIsLoading] = useState(false)
     const router = usePathname();
@@ -35,8 +36,6 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
     const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
     const channeLsettingsHook = ChanneLsettingsHook()
     const rightsidebarHook = RightsidebarHook()
- // console.log("ChannelIndex socket :", socket?.id )
-
 
     useEffect(() => { setIsMounted(true) }, [])
 
