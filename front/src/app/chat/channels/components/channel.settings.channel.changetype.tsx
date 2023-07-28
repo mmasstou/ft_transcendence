@@ -67,8 +67,8 @@ export default function ChanneLSettingsChanneLChangeType(
                             onClick={() => {
                                 console.log("private")
                             }}
-                            className="flex flex-row justify-between items-center shadow p-2 rounded">
-                            <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
+                            className="flex flex-row justify-between items-center shadow p-2 rounded border-danger border">
+                            <div className='flex justify-center items-center p-3 rounded bg-danger text-white'>
                                 <GoEyeClosed size={28} />
                             </div>
                             <div>
@@ -110,14 +110,6 @@ export default function ChanneLSettingsChanneLChangeType(
                         </button>
                     </div>
                 </div>
-            </div>
-            <div className='flex flex-row justify-between items-center
-               '>
-                <Button
-                    label={"Save Changes"}
-                    outline
-                    onClick={() => { () => { } }}
-                />
             </div>
         </div>
     )
