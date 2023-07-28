@@ -1,6 +1,6 @@
 const getMemberWithId = async (userId : string, roomsId : string, token : string) => {
     try {
-      return await fetch(`http://127.0.0.1/api/members/${userId}/${roomsId}`, {
+      return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/members/${userId}/${roomsId}`, {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json',

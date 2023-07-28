@@ -1,6 +1,6 @@
 const getUserWithId = async (userId : string, token : string) => {
     try {
-      return await fetch(`http://127.0.0.1/api/users/${userId}`, {
+      return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`, {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json',

@@ -37,7 +37,7 @@ export default function page() {
   useEffect(() => {
     if (!token)
       return;
-    const socket = io('http://localhost/chat', {
+    const socket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
       transports: ['websocket'],
       auth: {
         token: token,

@@ -1,7 +1,7 @@
 
 const getChannelWithId = async (token : string) => {
     try {
-      return await fetch(`http://127.0.0.1/api/users`, {
+      return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json',
