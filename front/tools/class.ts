@@ -1,7 +1,3 @@
-// import exp from "constants";
-
-
-
 type User = {
     id: string
     login: string
@@ -11,7 +7,7 @@ type User = {
     last_name: string | null
     kind: string | null
     image: string | null
-    bg_color: string | null
+    bg_color: string[] | null
     paddle_color: string | null
     ball_color: string | null
     is_active: boolean
@@ -24,21 +20,22 @@ type table_obj = {
     player2: Player
     ball: Ball
     Status: boolean
+    current: any
     tableId: string
     GameMode: string
   }
 class GameSetting {
-    table: string;
+    table: string[];
     ball: string;
     player: string;
     avatar: string;
     constructor() {
-        this.table = '';
-        this.ball = '#ffffff';
-        this.player = '#ffffff';
+        this.table = [];
+        this.ball = '';
+        this.player = '';
         this.avatar = '';
     }
-    setData(table: string, ball: string, player: string, avatar: string) {
+    setData(table: string[], ball: string, player: string, avatar: string) {
         this.table = table;
         this.ball = ball;
         this.player = player;
@@ -86,10 +83,12 @@ class Ball {
     x: number;
     y: number;
     ball_speed: ballSpeed;
+    ballIcrement: number;
     constructor() {
         this.x = 50.0,
         this.y = 50.0,
         this.ball_speed = new ballSpeed()
+        this.ballIcrement = 0.2;
     }
     setBall(x: number, y: number) {
         this.x = x;
@@ -103,4 +102,5 @@ type UserMap = Map<string, {User: User, SocketId?: string, BallSocketId?: string
 
 type TableMap = Map<string, table_obj>;
 
-export {Player, Ball, ballSpeed, UserMap, TableMap}
+export { Player, Ball, ballSpeed }
+export type { UserMap, TableMap }

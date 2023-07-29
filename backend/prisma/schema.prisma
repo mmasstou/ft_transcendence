@@ -43,7 +43,7 @@ model User {
   last_name     String?
   kind          String?
   image         String?
-  bg_color      String?
+  bg_color      String[]      @default(["#bebebe", "#878683", "#444444"])
   paddle_color  String?
   ball_color    String?
   is_active     Boolean         @default(false)

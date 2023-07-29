@@ -131,9 +131,9 @@ function drawBackground(
       backgroundCtx.beginPath();
       const color = socket.auth.UserId === table_obj.player1.UserId ? table_obj.player1.GameSetting.table : table_obj.player2.GameSetting.table;
       const gradient = backgroundCtx.createLinearGradient(0, 0, canvasSize.width, canvasSize.height);
-      gradient.addColorStop(0, '#bebebe');
-      gradient.addColorStop(0.5, '#878683');
-      gradient.addColorStop(1, '#444444');
+      gradient.addColorStop(0, color[0]);
+      gradient.addColorStop(0.5, color[1]);
+      gradient.addColorStop(1, color[2]);
       backgroundCtx.fillStyle = gradient;
       if (is_vertical) {
           backgroundCtx.fillRect(0, 0, canvasSize.width, canvas.height);
@@ -190,13 +190,6 @@ function drawScore(
   return {ScoreCtx, ScoreLayer};
 }
 
-
-// function StartPause(e: KeyboardEvent, socket: any, Status: boolean) {
-//     if (e.keyCode == 32 && Status == false) {
-//         socket.emit('setStatus', true);
-//     }
-//   }
-
 function Player1Draw(canvas: HTMLCanvasElement | null, socket: any, table_obj: table_obj, canvasSize: {width:number, height: number}, player_width: number, Player1: number, Player2: number)
 {
     const playerLayer = document.createElement('canvas');
@@ -249,50 +242,38 @@ function Player2Draw(canvas: HTMLCanvasElement | null, socket: any, table_obj: t
     }
 }
 
-// function MouseFunction(
-//     event: { clientX: number; clientY: number; },
-//     canvas: HTMLCanvasElement | null,
-//     Player1: number,
-//     Player2: number,
-//     player_width: number,
-//     table_obj: table_obj,
-//     socket: any,
-//     setPlayer1: any,
-//     setPlayer2: any,
-//     isMounted: boolean,
-//     Status: boolean) {
-// var updatePlayer;
-// var max_variable = 100 - (100 / player_width);
-// if (isMounted && canvas && Status) {
-//     const rect = canvas.getBoundingClientRect();
-//     const x = event.clientX - rect.left;
-//     const y = event.clientY - rect.top;
-//     if (x >= 0 && y >= 0 && x <= rect.width && y <= rect.height) {
-//     var position1 = Player1;
-//     var position2 = Player2;
-//     var is_vertical = canvas.height > canvas.width ? true : false;
-//     if (is_vertical && isMounted && socket.auth.UserId == table_obj.player1.UserId) {
-//         updatePlayer = position1 >= 0 && position1 <= max_variable && (x / canvas.width) * 100 <= max_variable && (x / canvas.width) * 100 >= 0 ? Math.round((x / canvas.width) * 100) : position1;
-//         if (updatePlayer != position1)
-//             setPlayer1(updatePlayer)
-//         }
-//     else if (is_vertical && isMounted && socket.auth.UserId == table_obj.player2.UserId) {
-//         updatePlayer = position2 >= 0 && position2 <= max_variable && (x / canvas.width) * 100 <= max_variable && (x / canvas.width) * 100 >= 0 ? Math.round((x / canvas.width) * 100) : position2;
-//         if (updatePlayer != position2)
-//         setPlayer2(updatePlayer)
-//         }
-//     else if (!is_vertical && isMounted && socket.auth.UserId == table_obj.player1.UserId) {
-//         updatePlayer = position1 >= 0 && position1 <= max_variable && (y / canvas.height) * 100 <= max_variable && (y / canvas.height) * 100 >= 0 ? Math.round((y / canvas.height) * 100) : position1;
-//         if (updatePlayer != position1)
-//         setPlayer1(updatePlayer)
-//         }
-//     else if (!is_vertical && isMounted && socket.auth.UserId == table_obj.player2.UserId) {
-//         updatePlayer = position2 >= 0 && position2 <= max_variable && (y / canvas.height) * 100 <= max_variable && (y / canvas.height) * 100 >= 0 ? Math.round((y / canvas.height) * 100) : position2;
-//         if (updatePlayer != position2)
-//         setPlayer2(updatePlayer)
-//         }
-//     }
-// }
-// }
-
-export {drawBackground, drawScore, Player1Draw, Player2Draw}
+function drawingBall(
+    canvas: HTMLCanvasElement | null,
+    BallObj: { x: number; y: number;},
+    socket: any,
+    Table_obj: table_obj,
+    canvasSize: {width:number, height: number},) {
+    const ballLayer = document.createElement('canvas');
+    const ballCtx = ballLayer.getContext('2d');
+    if (canvas) {
+        var ball_rad = (canvas.width + canvas.height) / 120;
+        var ball = {
+            x:BallObj.x,
+            y:BallObj.y,
+        }
+        if (socket && socket.auth.UserId === Table_obj.player2.UserId)
+            ball.x = 100 - ball.x;
+        var is_vertical = canvas.height > canvas.width ? true : false;
+        ballLayer.width = canvas.width;
+        ballLayer.height = canvas.height;
+        ballLayer.style.position = 'absolute';
+        ballLayer.style.zIndex = '3';
+        canvas.parentNode && canvas.parentNode.insertBefore(ballLayer, canvas);
+        if (ballCtx) {
+            ballCtx.beginPath();
+            ballCtx.fillStyle = socket.auth.UserId === Table_obj.player1.UserId ? Table_obj.player1.GameSetting.ball : Table_obj.player2.GameSetting.ball;
+            if (is_vertical)
+            ballCtx.arc(((canvasSize.width) * ball.y) / 100, (canvasSize.height * ball.x) / 100, ball_rad, 0,Math.PI * 2);
+            else
+            ballCtx.arc((canvasSize.width * ball.x) / 100, ((canvasSize.height) * ball.y) / 100, ball_rad, 0,Math.PI * 2);
+            ballCtx.fill();
+        }
+    }
+    return {ballCtx, ballLayer}
+}
+export {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall}
