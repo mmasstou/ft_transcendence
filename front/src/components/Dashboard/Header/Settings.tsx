@@ -1,36 +1,26 @@
 'use client'
 import { useRef, useState } from 'react';
 import { RiSettingsLine } from 'react-icons/ri'
-import * as Avatar from '@radix-ui/react-avatar';
-import style from '@/components/Home/style'
-import profile from '@/../public/profile.png';
 import axios from 'axios';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
-
-
-
-const AvatarUpload = () => {
-  return (
-    <Avatar.Root className={`${style.flexCenter} flex-inline align-middle overflow-hidden select-none
-            rounded-full `}>
-        <Avatar.Image
-          className="w-[100%] h-[100%] object-cover rounded-[inherit] border-secondary"
-          src={profile.src}
-          alt="User Avatar"
-        />
-        <Avatar.Fallback className={`w-[100%] h-[100%] ${style.flexCenter} bg-white text-[15px] leanding-1 font-medium`} delayMs={600}>
-          Avatar
-        </Avatar.Fallback>
-      </Avatar.Root>
-  )
-}
+import AvatarUpload from './AvatarUpload'
+import UserInput from './UserInput';
+import * as Switch from '@radix-ui/react-switch';
 
 
 const Settings: React.FC = () => {
-    const [isOpen, setOpen] = useState<boolean>(false);
-    const [selectedFile, setFile] = useState<File | null>(null);
-    const fileInputRef = useRef<HTMLInputElement | null>(null);
+  
+  const [isOpen, setOpen] = useState<boolean>(false);
+  const [selectedFile, setFile] = useState<File | null>(null);
+  // default will be user avatar rather than undefined
+  const [imgProp, setImage] = useState<string | undefined>(undefined);
+  // default will be intra username
+  const [user, setUser] = useState<string>('');
+  const [validName, setValidName] = useState<boolean>(false);
+  // default will be fetched
+  const [twoFa, setTwoFA] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const handleModal = () : void => {
         setOpen(!isOpen);
@@ -41,19 +31,36 @@ const Settings: React.FC = () => {
       {
         const file = e.target.files[0];
         setFile(file);
+        setImage(URL.createObjectURL(file));
       }
     }
 
-    const fileUpload = async () => {
-      if (selectedFile === null) {
+    const fileUpload = async () : Promise<void> => {
+      console.log(user);
+      
+      if (selectedFile === null && !twoFa) {
         return;
       }
       const formData = new FormData()
-      formData.append('myFile', selectedFile as Blob, selectedFile?.name)
+      formData.append('avatar', selectedFile as Blob, selectedFile?.name);
+      formData.append('username', user);
+      formData.append('twoFa', String(twoFa));
+      console.log(formData);
       await axios.post('http://localhost:8080/file-upload', formData)
       .then(res => {
         console.log(res);
-      })
+      }), (err: string) => {
+        console.log(err);
+      }
+    }
+
+    const getUserInfo = (user: string, validName: boolean) : void => {
+      setUser(user);
+      setValidName(validName);
+    }
+
+    const handleTwoFa = () : void => {
+      setTwoFA(!twoFa);
     }
 
   return (
@@ -75,9 +82,9 @@ const Settings: React.FC = () => {
                 <Cross2Icon />
               </button>
             </Dialog.Close>
-                  <div className=' p-4 m-4 flex flex-col justify-center items-center gap-6'>
-                     <div className='flex justify-between gap-6 items-center'>
-                         <div className='h-[60px] w-[60px]'><AvatarUpload /></div>
+                  <div className=' p-4 m-4 flex flex-col justify-center items-center gap-6 md:gap-8 xl:gap-10'>
+                    <div className='flex justify-between gap-6 md:gap-8 xl:gap-10 items-center'>
+                         <div className='h-[60px] w-[60px]'><AvatarUpload image={imgProp} /></div>
                          <input 
                              style={{display: 'none'}}
                              type="file" 
@@ -90,13 +97,35 @@ const Settings: React.FC = () => {
                          >
                              UPLOAD
                          </button>
-                     </div>
-                     <button 
-                         className='bg-transparent text-secondary border border-secondary 
-                               px-[8px] w-[130px] h-[40px] font-normal rounded-lg text-[1.25em]'
-                         onClick={fileUpload}
-                            >
-                        CONFIRM
+                    </div>
+
+                    <UserInput getUserInfo={getUserInfo }/>
+
+                    <form>
+                      <div className="flex items-center" style={{ display: 'flex', alignItems: 'center' }}>
+                        <label className="text-white text-[20px] leading-none pr-[15px] font-bold" htmlFor="airplane-mode">
+                          TWO-FACTOR AUTH
+                        </label>
+                        <Switch.Root
+                          className="w-[42px] h-[25px] bg-blackA9 rounded-full relative shadow-[0_2px_10px] shadow-blackA7 
+                              focus:shadow-[0_0_0_2px] focus:shadow-black data-[state=checked]:focus:shadow-secondary data-[state=checked]:bg-secondary outline-none cursor-default"
+                          id="airplane-mode"
+                          onClick={handleTwoFa}
+                        >
+                          <Switch.Thumb className="block w-[21px] h-[21px] bg-white rounded-full shadow-[0_2px_2px] shadow-blackA7 
+                                          transition-transform duration-100 translate-x-0.5 will-change-transform 
+                                            data-[state=checked]:translate-x-[19px]" />
+                        </Switch.Root>
+                      </div>
+                    </form>
+
+
+                    <button
+                        className='bg-transparent text-secondary border border-secondary 
+                            px-[8px] w-[130px] h-[40px] font-normal rounded-lg text-[1.25em] hover:bg-secondary hover:text-white'
+                        onClick={fileUpload}
+                    >
+                      CONFIRM
                     </button>
                 </div>
           </Dialog.Content>
