@@ -1,11 +1,23 @@
 "use client"
+<<<<<<< HEAD
+import {FieldValues, useForm, SubmitHandler } from "react-hook-form"
+=======
 import ContactHook from "@/hooks/contactHook"
 import { TiArrowMinimise } from "react-icons/ti"
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler, useFieldArray } from "react-hook-form"
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
 import { useEffect, useState } from "react"
 import { userType } from "@/types/types"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
+<<<<<<< HEAD
+import Modal from "../channel.modaL"
+import ChanneLcreatemodaLHook from "@/hooks/channel.create.hook"
+import ChanneLAddFriendsHookHook from "@/hooks/channel.add.friends.hook"
+import Select from "../Select"
+import ChanneLmodaLheader from "@/app/chat/channels/components/channel.modal.header"
+import Input from "@/components/Input"
+=======
 import Input from "@/components/chat/Input"
 import Friend from "@/components/chat/Friend"
 import Modal from "../channel.modaL"
@@ -16,6 +28,7 @@ import ChanneLAddFriendsHookHook from "@/hooks/channel.add.friends.hook"
 import ChanneLAddFriendsItem from "@/components/chat/channel/channel.add.friends.friendItem"
 import ChanneLmodaLheader from "@/components/chat/channel.modal.header"
 import Select from "../Select"
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
 
 const ChanneLCreateModaL = () => {
     const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
@@ -29,6 +42,16 @@ const ChanneLCreateModaL = () => {
     let users: any[] = []
     useEffect(() => {
         const token: any = Cookies.get('token');
+<<<<<<< HEAD
+     // console.log("token :", token)
+        if (!token)
+            return;
+        (async function getFriends() {
+            await fetch('${process.env.NEXT_PUBLIC_API_URL}/users', {
+                headers: { Authorization: `Bearer ${token}`, },
+            }).then((resp) => resp.json()).then(data => {
+
+=======
         console.log("token :", token)
         if (!token)
             return;
@@ -37,6 +60,7 @@ const ChanneLCreateModaL = () => {
                 headers: { Authorization: `Bearer ${token}`, },
             }).then((resp) => resp.json()).then(data => {
                 console.log("++++++++++*****data :", data)
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
                 setfriends(data)
             })
         })();
@@ -65,7 +89,11 @@ const ChanneLCreateModaL = () => {
 
 
     if (channeLcreatemodaLHook.selectedFriends && channeLcreatemodaLHook.selectedFriends.length && !watch('friends').length) {
+<<<<<<< HEAD
+     // console.log("channeLcreatemodaLHook.selectedFriends :", channeLcreatemodaLHook.selectedFriends)
+=======
         console.log("channeLcreatemodaLHook.selectedFriends :", channeLcreatemodaLHook.selectedFriends)
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
         setValue('friends', channeLcreatemodaLHook.selectedFriends)
     }
     const friends = watch('friends')
@@ -81,7 +109,11 @@ const ChanneLCreateModaL = () => {
 
     const onSubmit: SubmitHandler<FieldValues> = async (UserId: any) => {
         // create private room :
+<<<<<<< HEAD
+     // console.log("+onSubmit+ +> UserId :", UserId)
+=======
         console.log("+onSubmit+ +> UserId :", UserId)
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
         reset();
         setInputValue("");
 
@@ -121,7 +153,11 @@ const ChanneLCreateModaL = () => {
             </div>
         </div>
     )
+<<<<<<< HEAD
+ // console.log("-----              --friends :", friends)
+=======
     console.log("-----              --friends :", friends)
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
     return <Modal
         IsOpen={channeLcreatemodaLHook.IsOpen}
         body={bodyContent} />

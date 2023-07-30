@@ -23,7 +23,7 @@ const NewMessage = () => {
         if (!token)
             return;
        (async function getFriends() {
-        await fetch('http://127.0.0.1/api/users', {
+        await fetch('${process.env.NEXT_PUBLIC_API_URL}/users', {
             headers: { Authorization: `Bearer ${token}`, },
         }).then((resp) => resp.json()).then(data => setfriends(data))
        })();
@@ -48,7 +48,7 @@ const NewMessage = () => {
 
         
         // create private room :
-        console.log("+onSubmit+ +> UserId :", UserId)
+     // console.log("+onSubmit+ +> UserId :", UserId)
 
 
         try {
@@ -64,7 +64,7 @@ const NewMessage = () => {
             })
             if (resp.ok){
                 const __data = await resp.json()
-                console.log("__data :", __data)
+             // console.log("__data :", __data)
                 route.push(`/chat?direct-message=${__data.id}`)
                 contacthook.onClose()
             }
@@ -94,7 +94,7 @@ const NewMessage = () => {
 
         </div>
     )
-    console.log("friends :", friends)
+ // console.log("friends :", friends)
     return <Modal IsOpen={contacthook.IsOpen} body={bodyContent} />
 }
 export default NewMessage

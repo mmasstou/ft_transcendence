@@ -45,9 +45,12 @@ export class MessagesService {
             sender: {
               connect: { id: data.userId },
             },
+<<<<<<< HEAD
+=======
             DirectMessage: {
               connect: { id: data.DirectMessage },
             },
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
           },
         });
       }
@@ -60,6 +63,9 @@ export class MessagesService {
           roomId: {
             connect: { id: data.roomId },
           },
+        },
+        include: {
+          sender: true,
         },
       });
     } catch (error) {
@@ -94,6 +100,13 @@ export class MessagesService {
 
     return await this.prisma.messages.delete({
       where: { id },
+    });
+  }
+
+  async removeALL(id: string) {
+    // console.log('++removeALL++>', id);
+    return await this.prisma.messages.deleteMany({
+      where: { roomsId: id },
     });
   }
 }

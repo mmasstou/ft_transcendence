@@ -38,7 +38,10 @@ export class SearchGateway implements OnGatewayConnection {
       console.log('payload :', payload);
       const login: string = payload.sub;
       _User = await this.usersService.findOne({ login });
+<<<<<<< HEAD
+=======
       console.log('user :', _User);
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
     } catch {
       console.log('+>', error);
     }
