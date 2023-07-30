@@ -46,6 +46,7 @@ export default function page() {
 
     // Handle socket events here
     socket.on('connect', () => {
+
       setSocket(socket)
     });
 
@@ -83,11 +84,13 @@ export default function page() {
         activeChannelsMembers.forEach((member: membersType) => {
           if (member.id === Logedmemder.id) {
 
+
             setmemberHasAccess(true)
           }
         });
         JoinData.loginUser = userId
         socket?.emit('joinroom', JoinData, (response: any) => {
+
         })
       }
     })();

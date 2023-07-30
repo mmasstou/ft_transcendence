@@ -37,8 +37,6 @@ export default function ChanneLSettingsChanneLAccessPassword(
     const _newChanneLpassword = watch('newChanneLpassword')
     const _confirmChanneLpassword = watch('confirmChanneLpassword')
 
- 
-
     socket?.on('updatememberResponseEvent', (data) => {
         setUpdate(true)
     })

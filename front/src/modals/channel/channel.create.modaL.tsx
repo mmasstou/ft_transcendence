@@ -30,6 +30,7 @@ const ChanneLCreateModaL = () => {
             await fetch('${process.env.NEXT_PUBLIC_API_URL}/users', {
                 headers: { Authorization: `Bearer ${token}`, },
             }).then((resp) => resp.json()).then(data => {
+
                 setfriends(data)
             })
         })();

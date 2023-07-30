@@ -89,10 +89,6 @@ const ChanneLCreateModaL = () => {
 
     const onSubmit: SubmitHandler<FieldValues> = async (UserId: any) => {
         // create private room : createroom
-    //    console.log("+onSubmit+ +> UserId-channel_name :", UserId.channel_name)
-    //    console.log("+onSubmit+ +> UserId-friends :", UserId.friends)
-    //    console.log("+onSubmit+ +> UserId-ChanneLpassword :", UserId.ChanneLpassword)
-    //    console.log("+onSubmit+ +> UserId-channeLtype :", UserId.channeLtype)
         setcustomvalue(_channel_name, "")
         reset();
         setInputValue("");

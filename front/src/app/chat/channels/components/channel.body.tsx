@@ -50,6 +50,7 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     }, [loginHook, update])
 
     useEffect(() => {
+
         if (params) {
             setChanneLsActive(params.get('r'));
             (async () => {
