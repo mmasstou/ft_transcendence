@@ -1,12 +1,13 @@
 'use client'
 import { useRef, useState } from 'react';
 import { RiSettingsLine } from 'react-icons/ri'
-import axios from 'axios';
+import axios , { AxiosError } from 'axios';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import AvatarUpload from './AvatarUpload'
 import UserInput from './UserInput';
 import * as Switch from '@radix-ui/react-switch';
+import toast from 'react-hot-toast';
 
 
 const Settings: React.FC = () => {
@@ -36,22 +37,31 @@ const Settings: React.FC = () => {
     }
 
     const fileUpload = async () : Promise<void> => {
-      console.log(user);
-      
-      if (selectedFile === null && !twoFa) {
+      console.log(validName);
+      if ((selectedFile === null && !twoFa && user === '') || ( !validName && user.length > 0) ) {
+        toast('Couldn\'t save informations!', {
+          style: {background: '#ff0e0e', color: "#FFFFFF"}
+        });
         return;
       }
-      const formData = new FormData()
-      formData.append('avatar', selectedFile as Blob, selectedFile?.name);
+      const formData = new FormData();
+      if (selectedFile){
+        formData.append('avatar', selectedFile as Blob, selectedFile?.name);
+      }
       formData.append('username', user);
       formData.append('twoFa', String(twoFa));
-      console.log(formData);
-      await axios.post('http://localhost:8080/file-upload', formData)
-      .then(res => {
-        console.log(res);
-      }), (err: string) => {
-        console.log(err);
+      try {
+        const response = await axios.post('http://localhost:8080/file-upload', formData);
+        toast(`Informations updated`, {
+          style: {background: '#198754', color: "#FFFFFF"}
+        });
+
+      } catch (error) {
+        toast(`'Couldn\'t save informations! ${error}'`, {
+          style: {background: '#ff0e0e', color: "#FFFFFF"}
+        });
       }
+      
     }
 
     const getUserInfo = (user: string, validName: boolean) : void => {
@@ -64,7 +74,7 @@ const Settings: React.FC = () => {
     }
 
   return (
-    <Dialog.Root>
+      <Dialog.Root>
         <Dialog.Trigger asChild>
           <RiSettingsLine size={32} className='cursor-pointer hover:text-white text-[#E0E0E0]' onClick={handleModal} />
         </Dialog.Trigger>
@@ -119,7 +129,7 @@ const Settings: React.FC = () => {
                       </div>
                     </form>
 
-
+                    <Dialog.Close asChild>
                     <button
                         className='bg-transparent text-secondary border border-secondary 
                             px-[8px] w-[130px] h-[40px] font-normal rounded-lg text-[1.25em] hover:bg-secondary hover:text-white'
@@ -127,11 +137,11 @@ const Settings: React.FC = () => {
                     >
                       CONFIRM
                     </button>
+                    </Dialog.Close>
                 </div>
           </Dialog.Content>
         </Dialog.Portal>    
       </Dialog.Root>
-            
   );
 }
 

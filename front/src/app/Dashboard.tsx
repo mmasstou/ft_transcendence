@@ -4,6 +4,7 @@ import Login from '@/components/auth/modaLs/Login';
 import React from 'react';
 import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
 import './dashboard.css';
+import { Toaster } from 'react-hot-toast';
 interface Props {
   children: React.ReactNode;
 }
@@ -25,6 +26,19 @@ const Dashboard = ({ children }: Props) => {
           <Sidebar />
         </div>
       </div>
+      <Toaster   toastOptions={{
+                success: {
+                  style: {
+                    background: 'green',
+                  },
+                },
+                error: {
+                  style: {
+                    background: 'red',
+                  },
+                },
+      }}/>
+      
     </>
   );
 };
