@@ -11,9 +11,8 @@ export class GameController {
     @Post('/FriendGame')
     selectFriendGame(@Body() body: any) {
         const promise = this.GameGateway.CreateFriendTable(body);
-        promise.then((res) => {
-            // console.log("promise--------------> ",res, body);
-            this.BallGateway.CreateFriendTable(body, res);
+        promise.then((tableId) => {
+            this.BallGateway.CreateFriendTable(body, tableId);
         });
     }
     /** {       ///////////////////////////////////////////////////////// body
@@ -31,14 +30,22 @@ export class GameController {
         });
     }
     /** {       ///////////////////////////////////////////////////////// body
-        "player1_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
+        "player_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
+        "mode": "time"
+        } */
+    
+    @Post('/RandomGame')
+    async selectRandomGame(@Body() body: any) {
+        const promise = this.GameGateway.CreateRandomTable(body);
+        promise.then((res) => {
+            this.BallGateway.CreateRandomTable(body, res);
+        });
+    }
+    /** {       ///////////////////////////////////////////////////////// body
+        "player_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
         "mode": "time"
         } */
 
-    // @Get()
-    // getSignup() {
-    //     console.log("test") 
-    // }
 }
 
 

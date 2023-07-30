@@ -24,6 +24,11 @@ type table_obj = {
     tableId: string
     GameMode: string
   }
+
+type Random_Obj = {
+    player: Player
+    GameMode: string
+}
 class GameSetting {
     table: string[];
     ball: string;
@@ -96,11 +101,49 @@ class Ball {
     }
 }
 
+class UniqueSet {
+    set: Set<string>;
+    array: Random_Obj[];
+    constructor() {
+      this.set = new Set();
+      this.array = [];
+    }
+  
+    add(obj: Random_Obj) {
+      if (!this.set.has(obj.player.UserId)) {
+        this.set.add(obj.player.UserId);
+        this.array.push(obj);
+      }
+    }
+
+    get getfirst() {
+        if (this.array.length === 0)
+            return null;
+        const first = this.array.shift();
+        this.set.delete(first.player.UserId);
+        return first;
+    }
+    get length() {
+      return this.array.length;
+    }
+  }
+
+  class random_obj {
+    player: Player;
+    GameMode: string;
+    constructor() {
+      this.player = new Player();
+      this.GameMode = '';
+    }
+}
+
 
 
 type UserMap = Map<string, {User: User, SocketId?: string, BallSocketId?: string, Status: string}>;
 
 type TableMap = Map<string, table_obj>;
 
-export { Player, Ball, ballSpeed }
-export type { UserMap, TableMap }
+type RandomPlayer = Array<Random_Obj>;
+
+export { Player, Ball, ballSpeed, UniqueSet, random_obj}
+export type { UserMap, TableMap, RandomPlayer}

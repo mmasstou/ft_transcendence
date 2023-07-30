@@ -6,14 +6,6 @@ import Cookies from "js-cookie";
 import LoginHook from '@/hooks/auth/login';
 import {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall} from './gameFunc';
 
-// var table_obj = {
-//     player1: new Player(),
-//     player2: new Player(),
-//     ball: new Ball(),
-//     Status: false,
-//     tableId: '',
-//     GameMode: '',
-// }
 const TableMap: TableMap = new Map();
 const IPmachine = '10.13.1.1/game';
 const IPmachineBall = '10.13.1.1/ball';
@@ -48,6 +40,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     const [isReady, setIsReady] = useState(false);
     const loginhook = LoginHook();
     const Token = Cookies.get('token');
+
     function StartPause(e: KeyboardEvent) {
         if (isReady && e.key == ' ' && Status == false) {
           socket.emit('setStatus', {status:true, tableId: Table_obj.tableId});
@@ -255,6 +248,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         }
     }, [canvasSize, Player1, Player2, Status])
 
+
     // useEffect for ball
     useEffect(() => {
         if (isReady) {
@@ -275,6 +269,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       ////////////////////// emit from the server ///////////////////////
 
       isMounted && socket.on('joinRoomGame', (table: any) => {
+        // console.log("reload:---->",table);
         TableMap.set(table.tableId, table);
         setTable_obj(table);
         socket.emit('joinToRoomGame', table.tableId);
@@ -287,6 +282,10 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       isMounted && socket.on('ready', (check: boolean) => {
         setIsReady(check);
       })
+
+      // isMounted && socket.on('reload', (table: any) => {
+
+      // })
 
       isMounted && socket.on('setPlayer1', (Player:number) => {
         setPlayer1(Player);
