@@ -20,6 +20,7 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     const [ChanneLsActiveID, setChanneLsActive] = React.useState<string | null>(null)
     const [ChanneLsmembers, setchanneLsmembers] = React.useState<membersType[] | null>(null)
     const [viewed, setviewed] = React.useState<number>(0)
+    const [update, setUpdate] = React.useState<boolean>(false)
     const params = useSearchParams()
     const leftSidebar = LeftSidebarHook()
     const channelsettingsHook = ChanneLsettingsHook()
@@ -27,6 +28,10 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     // console.log("ChannelBody socket :", socket?.id )
     const loginHook = LoginHook()
 
+    socket?.on('updateChanneLResponseEvent', (data) => {
+        console.log("updateChanneLResponseEvent :", data)
+        setUpdate(true)
+    })
     useEffect(() => {
         setTimeout(() => {
             const token: any = Cookies.get('token');
@@ -46,7 +51,7 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
         }, 1000);
 
         
-    }, [loginHook])
+    }, [loginHook, update])
 
     useEffect(() => {
         if (params) {

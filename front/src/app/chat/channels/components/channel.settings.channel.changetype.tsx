@@ -1,14 +1,22 @@
 import { IoChevronBackOutline } from "react-icons/io5";
 import { Socket } from "socket.io-client";
-import Button from "../../components/Button";
-import { membersType, updatememberEnum } from "@/types/types";
+import { RoomTypeEnum, UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
 import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import Image from "next/image";
-import { FieldValues, useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import Input from "@/components/Input";
 import { GoEyeClosed } from "react-icons/go";
-import { BsArrowRightShort } from "react-icons/bs";
+import { BsArrowRightShort, BsSaveFill } from "react-icons/bs";
 import { HiLockClosed, HiLockOpen } from "react-icons/hi";
+import ChanneLSettingsOptionItem from "./channel.settings.optionItem";
+import { IconBaseProps } from "react-icons";
+import React, { use, useCallback } from "react";
+import Cookies from "js-cookie";
+import { useSearchParams } from "next/navigation";
+import getChannelWithId from "../actions/getChannelWithId";
+import ChanneLSettingsAlert from "./channel.settings.alerts";
+import { setConstantValue } from "typescript";
+import Button from "../../components/Button";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -17,15 +25,27 @@ interface ChanneLUserSettingsProps {
     setUpdate: (data: boolean) => void
 }
 
-
-
 export default function ChanneLSettingsChanneLChangeType(
     { socket, OnBack, LogedMember, members, setUpdate }: ChanneLUserSettingsProps) {
+    const [ChanneLinfo, setChanneLinfo] = React.useState<membersType | null>(null)
+    const [passwordPopup, setPasswordPopup] = React.useState<boolean>(false)
+    const params = useSearchParams()
+    const channeLLid = params.get('r')
+
+    React.useEffect(() => {
+        const token: any = Cookies.get('token');
+        if (!channeLLid) return;
+        if (!token) return;
+        (async () => {
+            const ChanneLinfo = await getChannelWithId(channeLLid, token)
+            if (ChanneLinfo && ChanneLinfo.statusCode !== 200) {
+                setChanneLinfo(ChanneLinfo)
+            }
+        })();
+    }, [channeLLid])
 
     const {
-        control,
         register,
-        handleSubmit,
         setValue,
         watch,
         reset,
@@ -40,17 +60,41 @@ export default function ChanneLSettingsChanneLChangeType(
     const _newChanneLpassword = watch('newChanneLpassword')
     const _confirmChanneLpassword = watch('confirmChanneLpassword')
 
-    const handlOnclick = (data: any) => {
-        console.log("handlOnclick :", data)
-        socket?.emit('updatemember', data)
-
+    const onSubmit = (data: {
+        type: RoomTypeEnum,
+        id: string,
+        password?: string,
+        confirmpassword?: string
+    }) => {
+        // chack if  password is not empty and if password is not equal to confirm password
+        if (data.type === RoomTypeEnum.PROTECTED && (data.password !== "" && data.password !== data.confirmpassword)) {
+            return
+        }
+        // check if selected type is not equal to current type
+        if (data.type === ChanneLinfo?.type) {
+            return
+        }
+        // send data to server
+        socket?.emit('updateChanneL', data)
+        //   reset data for password
+        reset()
+        if (data.type === RoomTypeEnum.PROTECTED) {
+            setPasswordPopup(false)
+        }
     }
 
-    socket?.on('updatememberResponseEvent', (data) => {
-        console.log("updatememberResponseEvent :", data)
-        console.log("updatememberResponseEvent :", members)
-        setUpdate(true)
+    socket?.on('updateChanneLResponseEvent', (data) => {
+        const token: any = Cookies.get('token');
+        if (!channeLLid) return;
+        if (!token) return;
+        (async () => {
+            const ChanneLinfo = await getChannelWithId(channeLLid, token)
+            if (ChanneLinfo && ChanneLinfo.statusCode !== 200) {
+                setChanneLinfo(ChanneLinfo)
+            }
+        })();
     })
+
     return (
         <div className="flex flex-col justify-between min-h-[34rem]">
             <div>
@@ -60,56 +104,67 @@ export default function ChanneLSettingsChanneLChangeType(
                     outline
                     onClick={OnBack}
                 />
-
-                <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full p-6">
+                {LogedMember?.type === UserTypeEnum.OWNER ? <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full p-6">
                     <div className="flex flex-col gap-4 ">
-                        <button
-                            onClick={() => {
-                                console.log("private")
+                        <ChanneLSettingsOptionItem
+                            onClick={function (): void {
+                                channeLLid && onSubmit({ id: channeLLid, type: RoomTypeEnum.PRIVATE });
                             }}
-                            className="flex flex-row justify-between items-center shadow p-2 rounded border-danger border">
-                            <div className='flex justify-center items-center p-3 rounded bg-danger text-white'>
-                                <GoEyeClosed size={28} />
-                            </div>
-                            <div>
-                                <h2 className='text-white'>Private</h2>
-                            </div>
-                            <div className='text-white'>
-                                <BsArrowRightShort size={24} />
-                            </div>
-                        </button>
-                        <button
+                            icon={GoEyeClosed}
+                            label={"Private"}
+                            IsActive={ChanneLinfo?.type === RoomTypeEnum.PRIVATE}
+                        />
+                        <ChanneLSettingsOptionItem
                             onClick={() => {
-                                console.log("protected")
+                                setPasswordPopup(true)
                             }}
-                            className="flex flex-row justify-between items-center shadow p-2 rounded">
-                            <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                                <HiLockClosed size={28} />
+                            icon={HiLockClosed}
+                            label={"protected"}
+
+                            IsActive={ChanneLinfo?.type === RoomTypeEnum.PROTECTED} />
+
+                        {/* if you whon to change channel type to protacted */}
+                        {
+                            passwordPopup && <div className="flex flex-col gap-3 w-full relative">
+                                <Input id="newChanneLpassword" lable="password" type="password" register={register} errors={errors} onChange={(e) => { 
+                                    setValue('confirmChanneLpassword', e.target.value)
+                                 }} />
+                                <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={(e) => { 
+                                    setValue('confirmChanneLpassword', e.target.value)
+                                 }} />
+                                <div className=" relative w-full flex justify-center items-center">
+                                    <Button
+                                        icon={BsSaveFill}
+                                        label={"save"}
+                                        outline
+                                        responsive
+                                        size={18}
+                                        onClick={() => {
+                                            channeLLid && onSubmit({
+                                                id: channeLLid,
+                                                type: RoomTypeEnum.PROTECTED,
+                                                password: _newChanneLpassword,
+                                                confirmpassword: _confirmChanneLpassword
+                                            });
+                                        }}
+                                    />
+                                </div>
                             </div>
-                            <div>
-                                <h2 className='text-white'>Protected</h2>
-                            </div>
-                            <div className='text-white'>
-                                <BsArrowRightShort size={24} />
-                            </div>
-                        </button>
-                        <button
-                            onClick={() => {
-                                console.log("public")
+                        }
+                        <ChanneLSettingsOptionItem
+                            onClick={function (): void {
+                                channeLLid && onSubmit({
+                                    id: channeLLid,
+                                    type: RoomTypeEnum.PUBLIC
+                                });
                             }}
-                            className="flex flex-row justify-between items-center shadow p-2 rounded">
-                            <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                                <HiLockOpen size={28} />
-                            </div>
-                            <div>
-                                <h2 className='text-white'>Public</h2>
-                            </div>
-                            <div className='text-white'>
-                                <BsArrowRightShort size={24} />
-                            </div>
-                        </button>
+                            icon={HiLockOpen}
+                            label={"public"}
+                            IsActive={ChanneLinfo?.type === RoomTypeEnum.PUBLIC}
+                        />
                     </div>
                 </div>
+                    : <ChanneLSettingsAlert message={'you are not the owner'} />}
             </div>
         </div>
     )

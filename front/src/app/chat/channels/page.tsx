@@ -99,13 +99,13 @@ export default function page() {
     })();
   }, [_ChanneLsActiveID, socket])
 
-  React.useEffect(() => {
-    console.log("+page+> memberHasAccess :", memberHasAccess)
-    console.log("+page+> _ChanneLsActiveID :", _ChanneLsActiveID)
-    if (_ChanneLsActiveID && !memberHasAccess) {
-      channeLaccessDeniedHook.onOpen()
-    }
-  }, [memberHasAccess, _ChanneLsActiveID])
+  // React.useEffect(() => {
+  //   console.log("+page+> memberHasAccess :", memberHasAccess)
+  //   console.log("+page+> _ChanneLsActiveID :", _ChanneLsActiveID)
+  //   if (_ChanneLsActiveID && !memberHasAccess) {
+  //     channeLaccessDeniedHook.onOpen()
+  //   }
+  // }, [memberHasAccess, _ChanneLsActiveID])
 
   useEffect(() => {
     if (!IsMounted)

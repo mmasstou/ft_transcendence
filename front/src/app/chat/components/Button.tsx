@@ -44,7 +44,9 @@ const Button: React.FC<ButtonProps> = ({
         disabled:cursor-not-allowed
         rounded-lg
         hover:opacity-80
+        capitalize
         transition
+        items-center
         w-max
         px-2
         ${outline ? ' bg-transparent' : 'bg-rose-500'}

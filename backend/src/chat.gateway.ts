@@ -266,4 +266,33 @@ export class ChatGateway implements OnGatewayConnection {
       }
     }
   }
+
+  @SubscribeMessage('updateChanneL')
+  async updateChanneL(@MessageBody() data: any) {
+    try {
+      console.log('Chat-> updateChanneL +> data :', data);
+      const room = await this.roomservice.findOne({ name: data.id });
+
+      const responseMemberData = await this.roomservice.isMemberInRoom(
+        room.id,
+        _User.id,
+      );
+      if (responseMemberData.type === UserType.OWNER) {
+        console.log('Chat-> responseMemberData- +>', responseMemberData);
+
+        const dataRoom = {
+          name: room.name,
+          type: data.type,
+          password: data.password,
+        };
+        const updateRoom = await this.prisma.rooms.update({
+          where: { id: room.id },
+          data: dataRoom,
+        });
+        this.server.emit('updateChanneLResponseEvent', updateRoom);
+      }
+    } catch (error) {
+      console.log('Chat-> error- +>', error);
+    }
+  }
 }

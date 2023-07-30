@@ -69,9 +69,9 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket,viewd }: ChanneLSide
     className={`flex flex-row gap-3 justify-between px-1 items-center w-full  ${active ? ' text-secondary' : 'text-white'}`}>
     <div className="flex flex-row justify-start gap-3 items-center">
       <span className={` text-2xl `}>#</span>
-      <h2>{room.name}</h2>
+      <h2>{room.name} </h2>
     </div>
-    {viewd && <span className=" text-secondary">{viewd}</span>}
+    <span className=" text-secondary">{room.type}</span>
   </button>
 }
 

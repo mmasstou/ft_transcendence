@@ -21,6 +21,7 @@ module.exports = {
                 danger: '#F1453E',
                 btn: '#161F1E',
                 isban: '#F03F19',
+                IsActive: '#ED6C03',
             },
         },
     },

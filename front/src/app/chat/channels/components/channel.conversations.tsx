@@ -69,6 +69,9 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     }, [room])
 
     useEffect(() => {
+        setInputValue("")
+    }, [hasparam, room])
+    useEffect(() => {
         console.log('socket : ', socket?.id)
         socket?.on('message', (message: any) => {
             console.log('message : ', message)
