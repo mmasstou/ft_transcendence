@@ -16,6 +16,7 @@ import LeftSidebarHook from "../hooks/LeftSidebarHook";
 import ConversationsTitlebar from "./channel.conversations.titlebar";
 import getChanneLMessages from "../actions/getChanneLMessages";
 import Cookies from "js-cookie";
+<<<<<<< HEAD
 import getMemberWithId from "../actions/getMemberWithId";
 import { membersType } from "@/types/types";
 import ChanneLsettingsHook from "../hooks/channel.settings";
@@ -24,11 +25,20 @@ import ChanneLsettingsHook from "../hooks/channel.settings";
 export default function Conversations({ socket }: { socket: Socket | null }) {
 
     const leftSidebar = LeftSidebarHook()
+=======
+
+
+export default function Conversations({ children }: { children?: React.ReactNode }) {
+
+    const leftSidebar = LeftSidebarHook()
+    const [socket, setsocket] = useState<Socket | undefined>(undefined)
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
     const [IsMounted, setIsMounted] = useState(false)
     const [IsLoading, setIsLoading] = useState(false)
     const [messages, setMessages] = useState<any[]>([])
     const [hasparam, sethasparam] = useState(false)
     const [channeLinfo, setChanneLinfo] = useState<any>(null)
+<<<<<<< HEAD
     const [message, setMessage] = useState("")
     const [InputValue, setInputValue] = useState("")
     const [viewed, setviewed] = useState<number>(0)
@@ -42,16 +52,35 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     useEffect(() => { setIsMounted(true) }, [])
     useEffect(() => {
         room ? sethasparam(true) : sethasparam(false)
+=======
+    const params = useSearchParams()
+    const room = params.get('r')
+    console.log("               +> room : ", room)
+
+
+    useEffect(() => { setIsMounted(true) }, [])
+    useEffect(() => {
+        room ? sethasparam(true) : sethasparam(false)
+        console.log("               +> room : ", room);
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
         const token: any = room && Cookies.get('token');
         room && (async () => {
             const response = await getChanneLMessages(room, token)
             if (response && response.ok) {
                 const data = await response.json()
+<<<<<<< HEAD
+=======
+                console.log("---------*****data :", data)
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
                 setMessages(data.messages)
             }
 
             // get room data :
+<<<<<<< HEAD
             const response2 = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/${room}`, {
+=======
+            const response2 = await fetch(`http://127.0.0.1/api/rooms/${room}`, {
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -62,12 +91,17 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                 return
             }
             const _roomInfo = await response2.json()
+<<<<<<< HEAD
+=======
+            console.log("_roomInfo :", _roomInfo.name)
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
             setChanneLinfo(_roomInfo)
         })();
 
 
     }, [room])
 
+<<<<<<< HEAD
     useEffect(() => {
         setInputValue("")
     }, [hasparam, room])
@@ -93,6 +127,10 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         })();
 
     }, [socket, channeLsettingsHook])
+=======
+
+
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
 
     const content = (
         <div className="flex flex-col gap-3">
@@ -103,15 +141,25 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                     messages.map((message, index) => (
                         <Message
                             key={index}
+<<<<<<< HEAD
                             message={message}
                             isForOwner={message.senderId === Cookies.get('_id')}
                             userid={message.sender}
+=======
+                            content={message.content}
+                            id={message.id}
+                            senderId={message.senderId}
+                            roomsId={message.roomsId}
+                            created_at={message.created_at}
+                            updated_at={message.updated_at}
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
                         />
                     ))
                     : <div>no messages</div>
             }
         </div>
     )
+<<<<<<< HEAD
 
     const onClickHandler = (event: FormEvent<HTMLInputElement>) => {
 
@@ -172,4 +220,31 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             </div>
         }
     </>
+=======
+    if (!IsMounted) return null
+    return <div className={`
+    Conversations 
+    relative 
+    h-[86vh]
+    md:h-[90vh]
+    w-full 
+    flex flex-col
+    border-orange-300
+    sm:flex`}>
+        {
+            (hasparam && channeLinfo) ? <>
+                <ConversationsTitlebar messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
+                <ConversationsMessages Content={content} />
+                <ConversationsInput
+                    messageTo={channeLinfo.name}
+                    OnSubmit={function (event: FormEvent<HTMLInputElement>): void {
+                        console.log("event :", event)
+                    }}
+                />
+            </>
+                : <div className="flex flex-col justify-center items-center h-full w-full">
+                    <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
+                </div>}
+    </div>
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
 }

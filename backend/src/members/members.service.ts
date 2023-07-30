@@ -13,6 +13,7 @@ export class MembersService {
 
   async findOne(params: { userId: string; roomId: string }): Promise<Members> {
     try {
+<<<<<<< HEAD
       const { userId, roomId } = params;
       // console.log('++findOne||++>', id);
       const message = await this.prisma.members.findFirst({
@@ -20,6 +21,12 @@ export class MembersService {
           userId,
           roomsId: roomId,
         },
+=======
+      const { id } = params;
+      // console.log('++findOne||++>', id);
+      const message = await this.prisma.members.findUnique({
+        where: { id },
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
       });
       if (!message) throw new Error('');
       return message;

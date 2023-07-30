@@ -26,7 +26,11 @@ const ChanneLAddFriendsModaL = () => {
 
     useEffect(() => {
         (async function getFriends() {
+<<<<<<< HEAD
             await fetch('${process.env.NEXT_PUBLIC_API_URL}/users', {
+=======
+            await fetch('http://127.0.0.1/api/users', {
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
                 headers: { Authorization: `Bearer ${token}`, },
             }).then((resp) => resp.json()).then(data => setfriends(data))
         })();
@@ -56,7 +60,11 @@ const ChanneLAddFriendsModaL = () => {
         aLLfriends !== null && channeLAddFriendsHookHook.selectedFriends.push(...aLLfriends)
         const data = channeLAddFriendsHookHook.onClose()
         channeLcreatemodaLHook.onOpen(data)
+<<<<<<< HEAD
      // console.log("friends data :", data)
+=======
+        console.log("friends data :", data)
+>>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
     }
 
 
