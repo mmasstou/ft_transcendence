@@ -40,9 +40,7 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket,viewd }: ChanneLSide
     }, []);
 
   const onClickHandler = useCallback(() => {
-    console.log('ChanneLSidebarItem socket : ', socket?.id)
     socket?.emit('joinroom', JoinData, (response: any) => {
-      console.log('join response : ', response)
     })
     if (isMobile) leftSidebar.onClose()
   }, [params])
@@ -52,9 +50,7 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket,viewd }: ChanneLSide
   useEffect(() => {
     if (params) {
       if (params.get('r') === room.id) {
-        console.log('join room : ', room.name)
         socket?.emit('joinroom', room, (response: any) => {
-          console.log('join response : ', response)
         })
       }
     }
@@ -62,7 +58,6 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket,viewd }: ChanneLSide
 
   return <button
     onClick={() => {
-      console.log('room btn clicked room.id : ', room.name)
       router.push(`/chat/channels?r=${room.id}`)
       onClickHandler();
     }}

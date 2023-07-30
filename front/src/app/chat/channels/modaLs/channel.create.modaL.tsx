@@ -43,7 +43,6 @@ const ChanneLCreateModaL = () => {
             await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
                 headers: { Authorization: `Bearer ${token}`, },
             }).then((resp) => resp.json()).then(data => {
-                console.log("++++++++++*****data :", data)
                 const _list =data && data.filter((user: any) => user.id !== User_ID)
                 setfriends(_list)
             })
@@ -90,10 +89,10 @@ const ChanneLCreateModaL = () => {
 
     const onSubmit: SubmitHandler<FieldValues> = async (UserId: any) => {
         // create private room : createroom
-        console.log("+onSubmit+ +> UserId-channel_name :", UserId.channel_name)
-        console.log("+onSubmit+ +> UserId-friends :", UserId.friends)
-        console.log("+onSubmit+ +> UserId-ChanneLpassword :", UserId.ChanneLpassword)
-        console.log("+onSubmit+ +> UserId-channeLtype :", UserId.channeLtype)
+    //    console.log("+onSubmit+ +> UserId-channel_name :", UserId.channel_name)
+    //    console.log("+onSubmit+ +> UserId-friends :", UserId.friends)
+    //    console.log("+onSubmit+ +> UserId-ChanneLpassword :", UserId.ChanneLpassword)
+    //    console.log("+onSubmit+ +> UserId-channeLtype :", UserId.channeLtype)
         setcustomvalue(_channel_name, "")
         reset();
         setInputValue("");

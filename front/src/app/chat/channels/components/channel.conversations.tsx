@@ -38,7 +38,6 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const __userId = Cookies.get('_id')
     const channeLsettingsHook = ChanneLsettingsHook()
 
-    // console.log("Conversations socket :", socket?.id)
     useEffect(() => { setIsMounted(true) }, [])
     useEffect(() => {
         room ? sethasparam(true) : sethasparam(false)
@@ -72,9 +71,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         setInputValue("")
     }, [hasparam, room])
     useEffect(() => {
-        console.log('socket : ', socket?.id)
         socket?.on('message', (message: any) => {
-            console.log('message : ', message)
             setMessages([...messages, message])
         })
     }, [messages, InputValue])
@@ -127,7 +124,6 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             senderId: Cookies.get('_id'),
             roomsId: room
         }, (response: any) => {
-            console.log('message response : ', response)
         })
     }
 

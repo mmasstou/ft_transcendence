@@ -46,7 +46,6 @@ export default function page() {
 
     // Handle socket events here
     socket.on('connect', () => {
-      console.log('Socket connected');
       setSocket(socket)
     });
 
@@ -80,20 +79,15 @@ export default function page() {
       if (userId) {
         
         const Logedmemder = await getMemberWithId(userId, _ChanneLsActiveID, token)
-        console.log("+page+> Logedmemder :", Logedmemder)
         const activeChannelsMembers = await getChannelMembersWithId(_ChanneLsActiveID, token)
-        console.table("+page+> activeChannelsMembers :", activeChannelsMembers)
         activeChannelsMembers.forEach((member: membersType) => {
           if (member.id === Logedmemder.id) {
-            console.log("+page+> match member :", member)
 
             setmemberHasAccess(true)
           }
         });
         JoinData.loginUser = userId
-        console.log('_ChanneLsActiveID : ', _ChanneLsActiveID)
         socket?.emit('joinroom', JoinData, (response: any) => {
-          console.log('join response : ', response)
         })
       }
     })();

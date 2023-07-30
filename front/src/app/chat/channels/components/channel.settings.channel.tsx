@@ -65,7 +65,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                 return;
             const channeLLMembers = await getChannelMembersWithId(channeLLid, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
-                console.log("channeLLMembers :", channeLLMembers)
+            //    console.log("channeLLMembers :", channeLLMembers)
                 // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== __userId)
                 // filter if member is ban or member userId === loged userId
                 setMembers(channeLLMembers.filter((member: membersType) => member.userId !== __userId))
@@ -161,7 +161,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                 }
                 <button
                     onClick={() => {
-                        console.log("change password")
+                    //    console.log("change password")
                         OnChangeChannel()
                     }}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
@@ -178,7 +178,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
 
                 <button
                     onClick={() => {
-                        console.log("Baned members")
+                    //    console.log("Baned members")
                         OnBanedMembers()
                     }}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
@@ -195,7 +195,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
 
                 <button
                     onClick={() => {
-                        console.log("Baned members")
+                    //    console.log("Baned members")
                         OnSetOwner()
                     }}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
@@ -211,7 +211,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                 </button>
                 <button
                     onClick={() => {
-                        console.log("access password")
+                    //    console.log("access password")
                         OnAccessPassword()
                     }}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
@@ -227,7 +227,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                 </button>
                 <button
                     onClick={() => {
-                        console.log("remove access password")
+                    //    console.log("remove access password")
 
                     }}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
@@ -244,7 +244,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
 
                 <button
                     onClick={() => {
-                        console.log("leave Channel")
+                    //    console.log("leave Channel")
                         OnBack()
                     }}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
@@ -261,7 +261,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             </div>
             {/* <button
                 onClick={() => {
-                    console.log("leave Channel")
+                //    console.log("leave Channel")
                     OnEditPassword()
                 }}
                 className="flex flex-row gap-6  items-center shadow p-1 rounded bg-isban px-4">

@@ -16,14 +16,14 @@ interface ChanneLUserSettingsProps {
 export default function ChanneLSettingsChanneLBanedMember(
     { socket, OnBack, LogedMember, members, setUpdate }: ChanneLUserSettingsProps) {
     const handlOnclick = (data: any) => {
-        console.log("handlOnclick :", data)
+    //    console.log("handlOnclick :", data)
         socket?.emit('updatemember', data)
 
     }
 
     socket?.on('updatememberResponseEvent', (data) => {
-        console.log("updatememberResponseEvent :", data)
-        console.log("updatememberResponseEvent :", members)
+    //    console.log("updatememberResponseEvent :", data)
+    //    console.log("updatememberResponseEvent :", members)
         setUpdate(true)
     })
     return (
@@ -46,7 +46,7 @@ export default function ChanneLSettingsChanneLBanedMember(
                                 UserJoin={false}
                                 UserOwne={false}
                                 OnClick={(data) => {
-                                    console.log("OnClick :", data)
+                                //    console.log("OnClick :", data)
                                     handlOnclick({ updateType: updatememberEnum.BANMEMBER, member: member })
                                 }} />
 

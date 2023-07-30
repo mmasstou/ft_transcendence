@@ -15,14 +15,14 @@ interface ChanneLsettingsChanneLsetOwnerProps {
 export default function ChanneLsettingsChanneLsetOwner(
     { socket, OnBack, LogedMember, members, setUpdate }: ChanneLsettingsChanneLsetOwnerProps) {
         const handlOnclick = (data: any) => {
-            console.log("handlOnclick :", data)
+        //    console.log("handlOnclick :", data)
             socket?.emit('updatemember', data)
     
         }
     
         socket?.on('updatememberResponseEvent', (data) => {
-            console.log("updatememberResponseEvent :", data)
-            console.log("updatememberResponseEvent :", members)
+        //    console.log("updatememberResponseEvent :", data)
+        //    console.log("updatememberResponseEvent :", members)
             setUpdate(true)
         })
         return (
@@ -45,7 +45,7 @@ export default function ChanneLsettingsChanneLsetOwner(
                                 UserJoin={false}
                                 UserOwne
                                 OnClick={(data) => {
-                                    console.log("OnClick :", data)
+                                //    console.log("OnClick :", data)
                                     handlOnclick({ updateType: updatememberEnum.SETOWNER, member: member })
                                 }} />
 

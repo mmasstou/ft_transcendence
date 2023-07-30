@@ -49,7 +49,6 @@ export default function ConversationsTitlebar({ messageTo, OnSubmit, socket, cha
 
   if (!channeLId)
     return null
-  console.log("LogedMember?.type :", LogedMemberInfo?.type)
   return <div className="w-full  h-11  bg-[#24323044] shadow flex flex-row justify-between items-center p-2">
     <div className="left flex flex-row gap-1">
       <span className="text-base font-bold text-[#FFFFFF]">{messageTo}</span>

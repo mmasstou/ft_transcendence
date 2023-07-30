@@ -66,7 +66,6 @@ const ChanneLSettingsModaL = () => {
             if (!token)
                 return;
             const response = roomId && await getChannelWithId(roomId, token)
-            console.log("+++> response :", response)
             setroomInfo(response)
         })();
     }, [roomId])
