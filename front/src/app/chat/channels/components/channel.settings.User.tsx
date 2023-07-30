@@ -175,7 +175,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                                 onClick={() => {
                                     console.log("Time Mode")
                                 }}
-                                className="flex flex-row justify-between items-center shadow p-2 rounded">
+                                className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-[#FFCC00] hover:border">
                                 <div className='flex justify-center items-center p-3 rounded bg-[#FFCC00] text-white'>
                                     <TfiTimer size={28} />
                                 </div>
@@ -190,7 +190,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                                 onClick={() => {
                                     console.log("Score Mode")
                                 }}
-                                className="flex flex-row justify-between items-center shadow p-2 rounded">
+                                className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-secondary hover:border">
                                 <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
                                     <MdOutlineScoreboard size={28} />
                                 </div>

@@ -18,7 +18,7 @@ import { FaChessQueen } from 'react-icons/fa';
 import { useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
 import getChannelMembersWithId from '../actions/getChannelmembers';
-import { membersType } from '@/types/types';
+import { RoomTypeEnum, RoomsType, membersType } from '@/types/types';
 import getMemberWithId from '../actions/getMemberWithId';
 import ChannelSettingsUserMemberItem from './channel.settings.user.memberItem';
 import { Socket } from 'socket.io-client';
@@ -28,6 +28,8 @@ import ChanneLsettingsChanneLsetOwner from './channel.settings.channel.setOwner'
 import ChanneLSettingsChanneLAccessPassword from './channel.settings.channel.accesspassword';
 import ChanneLaccessDeniedModaL from '../modaLs/channel.access.denied.modaL';
 import ChanneLSettingsChanneLChangeType from './channel.settings.channel.changetype';
+import getChannelWithId from '../actions/getChannelWithId';
+import ChanneLSettingsOptionItem from './channel.settings.optionItem';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
@@ -49,7 +51,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     const [update, setUpdate] = React.useState<boolean>(false)
     const [members, setMembers] = React.useState<membersType[] | null>(null)
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
-
+    const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
     const params = useSearchParams()
     const channeLLid = params.get('r')
     const __userId = Cookies.get('_id')
@@ -83,8 +85,22 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                 setLogedMember(channeLLMembers)
             }
         })();
+
+
     }, [update])
 
+    React.useEffect(() => {
+        // get channel info :
+        const token: any = Cookies.get('token');
+        if (!channeLLid) return;
+        if (!token) return;
+        (async () => {
+            const ChanneLinfo = await getChannelWithId(channeLLid, token)
+            if (ChanneLinfo && ChanneLinfo.statusCode !== 200) {
+                setChanneLinfo(ChanneLinfo)
+            }
+        })();
+    }, [step])
     const {
         control,
         register,
@@ -129,31 +145,20 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     const OnAccessPassword = () => {
         setStep(SETTINGSTEPS.ACCESSPASSWORD)
     }
-    const OnRemoveAccessPassword = () => {}
-    const OnLeave = () => {}
+    const OnRemoveAccessPassword = () => { }
+    const OnLeave = () => { }
 
 
 
     let _body = (
         <div className="flex flex-col justify-between items-start min-h-[34rem] ">
             <div className="flex flex-col gap-2 w-full">
-                <button
-                    onClick={() => {
-                        console.log("change password")
-                        OnEditPassword()
-                    }}
-                    className="flex flex-row justify-between items-center shadow p-2 rounded">
-                    <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                        <PiPassword size={28} />
-                    </div>
-                    <div>
-                        <h2 className='text-white'>Change password</h2>
-                    </div>
-                    <div className='text-white'>
-                        <BsArrowRightShort size={24} />
-                    </div>
-                </button>
-
+                {ChanneLinfo && ChanneLinfo.type == RoomTypeEnum.PROTECTED &&
+                    <ChanneLSettingsOptionItem
+                        onClick={function (): void { OnEditPassword(); }}
+                        icon={GoEyeClosed}
+                        label={"Change password"} />
+                }
                 <button
                     onClick={() => {
                         console.log("change password")
@@ -293,9 +298,9 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     }
     if (step === SETTINGSTEPS.CHANGECHANNEL) {
         _body = <ChanneLSettingsChanneLChangeType setUpdate={setUpdate}
-        socket={socket}
-        OnBack={OnBack} LogedMember={LogedMember} members={members}
-    />
+            socket={socket}
+            OnBack={OnBack} LogedMember={LogedMember} members={members}
+        />
     }
     if (step === SETTINGSTEPS.EDITPASSWORD) {
         _body = (
