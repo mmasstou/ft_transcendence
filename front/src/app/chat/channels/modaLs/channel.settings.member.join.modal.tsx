@@ -86,20 +86,18 @@ export default function ChanneLSettingsMemberJoinModaL(
     }, [searchInput, update])
 
     const handlOnclick = (data: {userid : string, roomid : string}) => {
-        console.log("handlOnclick :", data)
+
         socket?.emit('joinmember', data)
 
     }
 
     socket?.on('joinmemberResponseEvent', (data) => {
-        console.log("updatememberResponseEvent :", data)
+
         setUpdate(true)
         router.refresh()
         channeLsettingsHook.onClose()
     })
-
     if (!IsMounted) return null
-    console.log("users : ",)
     return <div className="flex flex-col w-full">
         <Button
             icon={IoChevronBackOutline}

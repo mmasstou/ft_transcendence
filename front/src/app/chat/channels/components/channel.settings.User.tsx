@@ -55,7 +55,6 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                 return;
             const channeLLMembers = await getChannelMembersWithId(channeLLid, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
-                console.log("channeLLMembers :", channeLLMembers)
                 // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== __userId)
                 // filter if member is ban or member userId === loged userId
                 const filterdmembers = channeLLMembers.filter((member: membersType) => member.isban !== true)
@@ -82,14 +81,12 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
 
 
     const handlOnclick = (data: any) => {
-        console.log("handlOnclick :", data)
+
         socket?.emit('updatemember', data)
 
     }
 
     socket?.on('updatememberResponseEvent', (data) => {
-        console.log("updatememberResponseEvent :", data)
-        console.log("updatememberResponseEvent :", members)
         setUpdate(true)
     })
 
@@ -128,7 +125,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                             UserJoin={false}
                             UserOwne={false}
                             OnClick={(data) => {
-                                console.log("OnClick :", data)
+
                                 if (data.updateType === "PLAYGAME") {
                                     setStep(USERSETTINGSTEPS.PLAYGAME)
                                     setPlayGameWith(data.member)
@@ -173,7 +170,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                         <div className="flex flex-col gap-3  w-full">
                             <button
                                 onClick={() => {
-                                    console.log("Time Mode")
+
                                 }}
                                 className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-[#FFCC00] hover:border">
                                 <div className='flex justify-center items-center p-3 rounded bg-[#FFCC00] text-white'>
@@ -188,7 +185,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                             </button>
                             <button
                                 onClick={() => {
-                                    console.log("Score Mode")
+
                                 }}
                                 className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-secondary hover:border">
                                 <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>

@@ -25,24 +25,20 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     const leftSidebar = LeftSidebarHook()
     const channelsettingsHook = ChanneLsettingsHook()
     const rightsidebar = RightsidebarHook()
-    // console.log("ChannelBody socket :", socket?.id )
     const loginHook = LoginHook()
 
     socket?.on('updateChanneLResponseEvent', (data) => {
-        console.log("updateChanneLResponseEvent :", data)
         setUpdate(true)
     })
     useEffect(() => {
         setTimeout(() => {
             const token: any = Cookies.get('token');
             (async () => {
-                console.log("loginHook => token :", token)
                 if (!token)
                     return;
                 const resp = await getChannels(token)
                 if (resp && resp.ok) {
                     const data = await resp.json()
-                    console.log("getChannels data :", data)
                     setChannel(data.Rooms);
                 }
                 // console.log("resp :", resp)
@@ -54,6 +50,7 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     }, [loginHook, update])
 
     useEffect(() => {
+
         if (params) {
             setChanneLsActive(params.get('r'));
             (async () => {
@@ -69,16 +66,6 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
             })();
         }
     }, [params, rightsidebar, channelsettingsHook])
-
-    // const LeftsideContent = ChanneLs && ChanneLs.map((room: RoomsType, key) => (
-    //     <ChanneLSidebarItem key={key} room={room} socket={socket} viewd={8} active={room.id === ChanneLsActiveID} />
-    // ))
-
-    // const RightsideContent = ChanneLsmembers && ChanneLsmembers.map((member: membersType, key: number) => (
-    //     <ChanneLsmembersItem key={key} member={member} />
-    // ))
-    console.log("ChanneLsmembers :", ChanneLsmembers)
-
 
     useEffect(() => {
         setIsMounted(true)

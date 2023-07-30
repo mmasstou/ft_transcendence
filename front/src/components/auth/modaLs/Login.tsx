@@ -65,7 +65,7 @@ const Login = () => {
     const onSubmit: SubmitHandler<FieldValues> = async (data: any) => {
 
 
-        console.log("Data :", data)
+    //    console.log("Data :", data)
         const API_PATH = process.env.API_URL
         // console.log("API_PATH :", API_PATH)
         const token = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {

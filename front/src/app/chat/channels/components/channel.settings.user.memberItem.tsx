@@ -146,7 +146,7 @@ export default function ChannelSettingsUserMemberItem({ member, socket, UserJoin
                                     IsActivate={member.isban}
                                     background
                                     Onclick={() => {
-                                        console.log("set admin")
+
                                         OnClick({ updateType: updatememberEnum.BANMEMBER, member: member })
                                     }}
                                 />
@@ -157,7 +157,7 @@ export default function ChannelSettingsUserMemberItem({ member, socket, UserJoin
                                     IsActivate={member.ismute}
                                     background
                                     Onclick={() => {
-                                        console.log("set admin")
+
                                         OnClick({ updateType: updatememberEnum.MUTEMEMBER, member: member })
                                     }}
                                 />}
