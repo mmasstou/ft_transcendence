@@ -19,7 +19,7 @@ export class UserService {
   }
   async findOneLogin(params: { login: string }): Promise<User> {
     const { login } = params;
-    console.log('+USER+findOne++>', login);
+    // console.log('+USER+findOne++>', login);
     return await this.prisma.user.findUnique({
       where: { login },
     });

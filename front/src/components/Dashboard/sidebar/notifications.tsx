@@ -33,7 +33,7 @@ const Notifications = () => {
     }, [])
 
     socket && socket.on('notification', (data: { status: boolean, token: string }) => {
-        console.log("notification :", data)
+     // console.log("notification :", data)
         if (data.token === token)
             setnotification(data.status)
     })

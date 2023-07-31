@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import { IconType } from 'react-icons';
+import Notifications from './notifications';
 
 interface Props {
   isActive?: boolean;

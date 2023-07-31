@@ -19,8 +19,11 @@ module.exports = {
                 primary: '#161F1E',
                 secondary: '#1EF0AE',
                 tertiary: '#D9D9D9',
+                danger: '#F1453E',
                 btn: '#161F1E',
-                'container': '#3E504D'
+                isban: '#F03F19',
+                IsActive: '#ED6C03',
+                container: '#3E504D'
             },
             keyframes: {
                 overlayShow: {

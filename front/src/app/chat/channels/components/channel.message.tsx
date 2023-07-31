@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { messagesType, userType } from "@/types/types"
 import Cookies from "js-cookie";
 import Image from "next/image"
@@ -9,61 +9,32 @@ import { MdAddReaction } from "react-icons/md";
 import { AiFillMessage } from "react-icons/ai";
 import { ChannelReactions } from "./channel.reaction";
 import { ChannelReplys } from "./channel.replys";
+import getUserWithId from "../actions/getUserWithId";
+import { CgOptions } from "react-icons/cg";
+import Button from "../../components/Button";
 
 
 
-
-const Message = (props: messagesType) => {
-    const [senderInfo, setsenderInfo] = useState({
-        id: "",
-        login: "",
-        email: "",
-        password: "",
-        first_name: "",
-        last_name: "",
-        kind: "",
-        image: "",
-        is_active: false,
-        created_at: "",
-        updated_at: ""
-    })
-    // const [reciverInfo, setreciverInfo] = useState({
-    //     id: "",
-    //     login: "",
-    //     email: "",
-    //     password: "",
-    //     first_name: "",
-    //     last_name: "",
-    //     kind: "",
-    //     image: "",
-    //     is_active: false,
-    //     created_at: "",
-    //     updated_at: ""
-    // })
+interface Imessage {
+    message: messagesType
+    userid: string
+    isForOwner ?: boolean
+}
+const Message: FC<Imessage> = ({ message, userid ,isForOwner}) => {
     const [create_At, setcreate_At] = useState("")
-    // // console.log("props :", props)
-
+    const [senderInfo, setsenderInfo] = useState<userType | null>(null)
 
     useEffect(() => {
-        const token = Cookies.get("token");
-        (async function getsenderInfo() {
-            if (props.senderId !== undefined && props.senderId !== null && props.senderId !== "") {
-                console.log("props.senderId :", props.senderId)
-                console.log("props :", props)
-                const response = await fetch(`http://127.0.0.1/api/users/${props.senderId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                if (!response.ok) {
-                    return
-                }
-                const _userInfo = await response.json()
-                setsenderInfo(_userInfo);
-            }
-        })();
 
-        const date = new Date(props.created_at);
+        const token = Cookies.get("token");
+        if (!token) return;
+        (async function getsenderInfo(userid: string, token: string) {
+            const _userInfo = await getUserWithId(userid, token)
+            setsenderInfo(_userInfo);
+        })(message.senderId, token);
+
+
+        const date = new Date(message.created_at);
 
         setcreate_At(date.toLocaleString('en-US', {
             weekday: 'long',
@@ -75,12 +46,15 @@ const Message = (props: messagesType) => {
             hour12: true,
         }))
 
-    }, [props])
+    }, [message, userid])
+
+    if (!senderInfo)
+        return
     return <div className=" relative flex flex-col ">
         <div className="flex flex-row justify-between  items-center">
             <div className="MessagesenderInfo w-full boredr-2  -green-500 flex flex-row items-center p-1 gap-1">
                 <UserAvatar size={18} image={"/avatar.jpg"} />
-                <h3 className="text-base font-light text-[#FFFFFF]">{senderInfo.login}</h3>
+                <h3 className="text-base font-light text-[#FFFFFF]">{senderInfo?.login}</h3>
             </div>
             <span className="text-[.5rem] text-end text-[#D9D9D9] min-w-max">{create_At}</span>
         </div>
@@ -90,7 +64,15 @@ const Message = (props: messagesType) => {
                     {/* <div className="header flex flex-row justify-end ">
                         <div><BsCheck2All /></div>
                     </div> */}
-                    <div className="body p-1 text-base text-[#65656B]">{props.content}</div>
+                   {/* {isForOwner && <div className="header flex flex-row justify-end ">
+                        <Button
+                            icon={CgOptions}
+                            small
+                            outline
+                            onClick={() => { }}
+                        />
+                    </div>} */}
+                    <div className="body p-1 text-base text-[#65656B]">{message.content}</div>
                 </div>
             </div>
         </div>
