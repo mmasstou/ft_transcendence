@@ -38,10 +38,11 @@ model User {
   login         String          @unique
   email         String          @unique
   password      String?
-  first_name    String?
-  last_name     String?
+  name          String?
   kind          String?
-  image         String?
+  avatar         String?
+  intraId       Int?
+  banner        String?
   is_active     Boolean         @default(false)
   created_at    DateTime        @default(now())
   updated_at    DateTime        @updatedAt
@@ -66,35 +67,35 @@ model Rooms {
 }
 
 model DirectMessage {
-  id         String     @id @default(uuid())
-  name       String     @unique
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  User       User?      @relation(fields: [userId], references: [id])
+  id         String   @id @default(uuid())
+  name       String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  User       User?    @relation(fields: [userId], references: [id])
   userId     String?
 }
 
 model Members {
-  id              String         @id @default(uuid())
-  user            User           @relation(fields: [userId], references: [id])
-  RoomId          Rooms?         @relation(fields: [roomsId], references: [id])
-  type            UserType       @default(USER)
-  userId          String
-  roomsId         String?
-  isban           Boolean        @default(false)
-  ismute          Boolean        @default(false)
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  RoomId     Rooms?   @relation(fields: [roomsId], references: [id])
+  type       UserType @default(USER)
+  userId     String
+  roomsId    String?
+  isban      Boolean  @default(false)
+  ismute     Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Messages {
-  content         String
-  id              String         @id @default(uuid())
-  sender          User           @relation(fields: [senderId], references: [id])
-  roomId          Rooms?         @relation(fields: [roomsId], references: [id])
-  senderId        String
-  viewed          Int            @default(0)
-  roomsId         String?
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
+  content    String
+  id         String   @id @default(uuid())
+  sender     User     @relation(fields: [senderId], references: [id])
+  roomId     Rooms?   @relation(fields: [roomsId], references: [id])
+  senderId   String
+  viewed     Int      @default(0)
+  roomsId    String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }

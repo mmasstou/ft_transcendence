@@ -202,10 +202,10 @@ export class ChatGateway implements OnGatewayConnection {
         data,
       );
       // create room :
-      const newRoom = await this.roomservice.create(data, _User.login);
+      // const newRoom = await this.roomservice.create(data, _User.login);
 
       // send message that room is created :
-      this.server.emit('createroomResponseEvent', newRoom);
+      // this.server.emit('createroomResponseEvent', newRoom);
     } catch (error) {
       console.log('Chat-> error- +>', error);
     }

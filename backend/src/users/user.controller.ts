@@ -14,6 +14,8 @@ import { CreateUserDto } from './dtos/CreateUserDto';
 import { UpdateUserDto } from './dtos/UpdateUserDto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
+import { IntraAuthGuard } from 'src/auth/guards/intra-oauth.guard';
 @Controller('users')
 export class UserController {
   constructor(private readonly usersService: UserService) {}
@@ -23,7 +25,8 @@ export class UserController {
     return this.usersService.create(createUserDto);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  // @UseGuards(IntraAuthGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
