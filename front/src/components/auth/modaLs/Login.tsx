@@ -68,21 +68,7 @@ const Login = () => {
     //    console.log("Data :", data)
         const API_PATH = process.env.API_URL
         // console.log("API_PATH :", API_PATH)
-        const token = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Connection: "keep-alive",
-            },
-            body: JSON.stringify(data),
-        })
-        if (token.status === 200) {
-            loginHook.onClose()
-            const user_token = await token.json()
-            Cookies.set("token", user_token.access_token)
-            Cookies.set("_id", user_token._id)
-            router.refresh()
-        }
+        // router.push(`${process.env.NEXT_PUBLIC_API_URL}/auth/callback`)
     }
     const bodyContent = (
         <div className="flex flex-col gap-4 w-full sm:w-[440px]  sm:h-[260px] bg-[#243230] p-4">

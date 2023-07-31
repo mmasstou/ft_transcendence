@@ -1,5 +1,4 @@
 import { RoomsType } from "@/types/types"
-<<<<<<< HEAD
 import Cookies from "js-cookie"
 import { useRouter, useSearchParams } from "next/navigation"
 import { use, useCallback, useEffect, useState } from "react"
@@ -71,27 +70,6 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket,viewd }: ChanneLSide
     </div>
     <span className=" text-secondary">{room.type}</span>
   </button>
-=======
-import { useRouter } from "next/navigation"
-
-interface ChanneLSidebarItemProps {
-    room: RoomsType,
-    active?: boolean,
-    onClick?: () => void
-}
-const ChanneLSidebarItem = ({ room, active, onClick } : ChanneLSidebarItemProps) => {
-    const router = useRouter()
-    return  <button onClick={() => {
-        console.log('room btn clicked room.id : ', room.name)
-        router.push(`/chat/channels?r=${room.id}`)
-      }} className={`
-      flex flex-row gap-3 justify-start items-center
-      ${active ? ' text-secondary' : 'text-white'}
-      `}>
-        <span className={` text-2xl `}>#</span>
-        <h2>{room.name}</h2>
-      </button>
->>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
 }
 
 export default ChanneLSidebarItem
