@@ -4,25 +4,15 @@ export async function POST(req: Request) {
   console.log('userId :', userId);
   console.log('token :', token);
 
-<<<<<<< HEAD
   const privateRoom = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/direct-message`, {
-=======
-  const privateRoom = await fetch(`http://127.0.0.1/api/direct-message`, {
->>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
     method: 'POST',
     headers: { Authorization: `${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ receiverId: userId }),
   }).then((res) => res.json());
   console.log('privateRoom :', privateRoom);
-<<<<<<< HEAD
 //// console.log("User :", User)
   // const User = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`).then(res => res.json())
   // const Room = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/`, {
-=======
-//   console.log("User :", User)
-  // const User = await fetch(`http://127.0.0.1/api/users/${userId}`).then(res => res.json())
-  // const Room = await fetch(`http://127.0.0.1/api/rooms/`, {
->>>>>>> 83667b2c2c6fcadfdbeb783afabb311e9d36e57c
   //   method : 'POST',
   //   headers: {
   //       Authorization: `${token}`,

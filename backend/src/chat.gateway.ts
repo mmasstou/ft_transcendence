@@ -53,7 +53,6 @@ export class ChatGateway implements OnGatewayConnection {
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       const login: string = payload.sub;
-      console.log('Chat-> :%s |socket', payload.username, socket.id);
       _User = await this.usersService.findOne({ login });
     } catch {
       console.log('Chat-> error- +>', error);
@@ -78,23 +77,11 @@ export class ChatGateway implements OnGatewayConnection {
     },
   ) {
     try {
-      console.log(
-        'Chat-> updatemember +> user :%s has create room :%s',
-        _User.login,
-        data,
-      );
-      // type: UserType.ADMIN,
-      // id: data.member.id,
-      console.log('Chat-> __member- ---------+>', data.member);
-      // update member in channeL:
-      // set admin :
       const __member = await this.memberService.findOne({
         userId: data.member.userId,
         roomId: data.member.roomsId,
       });
       if (data.updateType === updatememberEnum.SETADMIN) {
-        console.log('Chat-> __member- +>', __member);
-
         const type: UserType =
           __member.type === UserType.ADMIN ? UserType.USER : UserType.ADMIN;
         const member = await this.prisma.members.update({
@@ -153,8 +140,6 @@ export class ChatGateway implements OnGatewayConnection {
     },
   ) {
     try {
-      console.log('Chat-> joinmember +>');
-      console.log('Chat-> joinmember +> data :', data);
       let member: any = null;
       // check if member is already in room database :
       try {
@@ -176,7 +161,6 @@ export class ChatGateway implements OnGatewayConnection {
             User: { connect: { id: data.userid } },
           },
         });
-        console.log('Chat-> joinmember +> member :', member);
         client.emit('joinmemberResponseEvent', member);
       } catch (error) {
         console.log('Chat-> joinmember error- +>', error);
@@ -196,11 +180,11 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() data: any,
   ) {
     try {
-      console.log(
-        'Chat-> createroom +> user :%s has create room :%s',
-        _User.login,
-        data,
-      );
+      // console.log(
+      //   'Chat-> createroom +> user :%s has create room :%s',
+      //   _User.login,
+      //   data,
+      // );
       // create room :
       const newRoom = await this.roomservice.create(data, _User.login);
 
@@ -214,22 +198,22 @@ export class ChatGateway implements OnGatewayConnection {
   @SubscribeMessage('joinroom')
   async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     try {
-      console.log(`client with socket ${client.id} joined room ${data.id}`);
-      console.log('socket +data.id-> :%s', data.id);
-      console.log('socket +client.id-> :%s', client.id);
-      console.log('socket +User.id-> :%s', _User.id);
-      console.log(
-        'Chat-> ChanneL +> user :%s has join to room :%s',
-        _User.login,
-        data,
-      );
+      // console.log(`client with socket ${client.id} joined room ${data.id}`);
+      // console.log('socket +data.id-> :%s', data.id);
+      // console.log('socket +client.id-> :%s', client.id);
+      // console.log('socket +User.id-> :%s', _User.id);
+      // console.log(
+      //   'Chat-> ChanneL +> user :%s has join to room :%s',
+      //   _User.login,
+      //   data,
+      // );
       // check if user is already in room database :
       const room = await this.roomservice.findOne({ name: data.id });
       const responseMemberData = await this.roomservice.isMemberInRoom(
         room.id,
         _User.id,
       );
-      console.log('Chat-> responseMemberData- +>', responseMemberData);
+      // console.log('Chat-> responseMemberData- +>', responseMemberData);
       if (!client.rooms.has(data.id)) {
         await client.join(data.id);
       }
@@ -257,7 +241,7 @@ export class ChatGateway implements OnGatewayConnection {
         content: data.content,
         userId: data.senderId,
       });
-      console.table(messages);
+      // console.table(messages);
       this.server.to(data.roomsId).emit('message', messages);
       // this.server.emit('message', messages);
     } catch (error) {
@@ -270,7 +254,7 @@ export class ChatGateway implements OnGatewayConnection {
   @SubscribeMessage('updateChanneL')
   async updateChanneL(@MessageBody() data: any) {
     try {
-      console.log('Chat-> updateChanneL +> data :', data);
+      // console.log('Chat-> updateChanneL +> data :', data);
       const room = await this.roomservice.findOne({ name: data.id });
 
       const responseMemberData = await this.roomservice.isMemberInRoom(
@@ -278,7 +262,7 @@ export class ChatGateway implements OnGatewayConnection {
         _User.id,
       );
       if (responseMemberData.type === UserType.OWNER) {
-        console.log('Chat-> responseMemberData- +>', responseMemberData);
+        // console.log('Chat-> responseMemberData- +>', responseMemberData);
 
         const dataRoom = {
           name: room.name,

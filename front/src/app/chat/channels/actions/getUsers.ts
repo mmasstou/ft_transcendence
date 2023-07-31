@@ -1,5 +1,5 @@
 
-const getChannelWithId = async (token : string) => {
+const getUsers = async (token : string) => {
     try {
       return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
           method: 'GET',
@@ -10,7 +10,8 @@ const getChannelWithId = async (token : string) => {
       }).then((res) => res.json());
     } catch (err) {
       console.log(err);
+      return null
     }
   };
-  export default getChannelWithId;
+  export default getUsers;
   
