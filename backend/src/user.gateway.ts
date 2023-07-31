@@ -11,12 +11,12 @@ import {
 import { Server, Socket } from 'socket.io';
 import { UserService } from './users/user.service';
 import { User } from '@prisma/client';
-import { error } from 'console';
 import { RoomsService } from './rooms/rooms.service';
 import { MessagesService } from './messages/messages.service';
 import { PrismaService } from './prisma.service';
 
 export let _User: User | null = null;
+let error = 'walo';
 @WebSocketGateway({ namespace: 'User' })
 export class UserGateway implements OnGatewayConnection {
   constructor(
@@ -38,9 +38,9 @@ export class UserGateway implements OnGatewayConnection {
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      const login: string = payload.sub;
+      const id: string = payload.sub;
       const result = await this.prisma.$transaction(async (prisma) => {
-        _User = await this.usersService.findOne({ login });
+        _User = await this.usersService.findOne({ id });
 
         const UserSocketId = await prisma.userSocket.findUnique({
           where: { userId: _User.id },

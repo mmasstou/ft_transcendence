@@ -1,3 +1,4 @@
+'use client'
 import Input from "@/components/Input"
 import { FieldValues, RegisterOptions, UseFormRegisterReturn, useForm } from "react-hook-form";
 import Button from "../../components/Button";
@@ -98,7 +99,8 @@ export default function ChanneLSettingsMemberJoinModaL(
         channeLsettingsHook.onClose()
     })
     if (!IsMounted) return null
-    return <div className="flex flex-col w-full">
+    return (
+        <div className="flex flex-col w-full">
         <Button
             icon={IoChevronBackOutline}
             label={"Back"}
@@ -115,6 +117,7 @@ export default function ChanneLSettingsMemberJoinModaL(
                     type="search"
                     value={searchInput}
                     onChange={(e) => {
+                        e.preventDefault()
                         setsearchInput(e.target.value)
                     }}
                     className={`
@@ -181,4 +184,5 @@ export default function ChanneLSettingsMemberJoinModaL(
                 </div>}
         </div>
     </div>
+    )
 }

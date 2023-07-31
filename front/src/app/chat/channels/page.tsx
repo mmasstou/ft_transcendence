@@ -76,21 +76,19 @@ export default function page() {
     const token: any = Cookies.get('token');
     (async () => {
       const room = await getChannelWithId(_ChanneLsActiveID, token)
-      let JoinData: any = room
       const userId = Cookies.get('_id')
       if (userId) {
         
         const Logedmemder = await getMemberWithId(userId, _ChanneLsActiveID, token)
         const activeChannelsMembers = await getChannelMembersWithId(_ChanneLsActiveID, token)
+        if (!activeChannelsMembers)
+          return
         activeChannelsMembers.forEach((member: membersType) => {
           if (member.id === Logedmemder.id) {
-
-
             setmemberHasAccess(true)
           }
         });
-        JoinData.loginUser = userId
-        socket?.emit('joinroom', JoinData, (response: any) => {
+        room && socket?.emit('joinroom', room, (response: any) => {
 
         })
       }

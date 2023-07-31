@@ -39,11 +39,11 @@ export class AuthController {
       const { accessToken } = result;
       console.log('result-> :', result);
       res.cookie('token', accessToken, {
-        httpOnly: true,
+        httpOnly: false,
         sameSite: false,
       });
       res.cookie('_id', req.user.id, {
-        httpOnly: true,
+        httpOnly: false,
         sameSite: false,
       });
       res.redirect(`http://localhost:8080/profile`);

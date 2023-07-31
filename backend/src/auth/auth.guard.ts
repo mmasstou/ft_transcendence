@@ -19,6 +19,7 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
+    console.log('async canActivate(context: ExecutionContext): token', token);
     let payload: any = '';
     if (!token) {
       throw new UnauthorizedException();
@@ -34,13 +35,19 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const User = await this.usersService.findOne({ login: payload.sub });
-    if (User && !User.is_active) throw new ForbiddenException();
+    const User = await this.usersService.findOne({ id: payload.sub });
+    if (!User) throw new ForbiddenException();
 
     return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
+    const authHeader = request.headers.cookie;
+    const __token = request.cookies;
+    const _e_token = request.cookies;
+    console.log('authHeader', authHeader);
+    console.log('__token', __token);
+    console.log('_e_token', _e_token);
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }

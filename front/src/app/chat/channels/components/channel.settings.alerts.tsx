@@ -1,5 +1,4 @@
 import { IconType } from "react-icons"
-import { PiEyeClosedBold } from "react-icons/pi"
 
 interface ChanneLSettingsAlertProps {
     message: string
@@ -15,6 +14,5 @@ export default function ChanneLSettingsAlert(
     return <div className="p-6 flex flex-row w-full justify-between items-center">
 
         <div>{message}</div>
-        <PiEyeClosedBold />
     </div>
 }

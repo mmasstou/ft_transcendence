@@ -14,7 +14,6 @@ import Button from "../../components/Button";
 import { TbUserPlus } from "react-icons/tb";
 import ChanneLSettingsMemberJoinModaL from "../modaLs/channel.settings.member.join.modal";
 import { IoChevronBackOutline } from "react-icons/io5";
-import { PiPassword } from "react-icons/pi";
 import { BsArrowRightShort } from "react-icons/bs";
 import { MdOutlineScoreboard } from "react-icons/md";
 import { TfiTimer } from "react-icons/tfi";
@@ -54,7 +53,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
             if (!channeLLid)
                 return;
             const channeLLMembers = await getChannelMembersWithId(channeLLid, token)
-            if (channeLLMembers && channeLLMembers.statusCode !== 200) {
+            if (channeLLMembers) {
                 // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== __userId)
                 // filter if member is ban or member userId === loged userId
                 const filterdmembers = channeLLMembers.filter((member: membersType) => member.isban !== true)
@@ -207,9 +206,9 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
         )
     }
     if (step === USERSETTINGSTEPS.MEMBERJOIN) {
-        bodyContent = (<ChanneLSettingsMemberJoinModaL socket={socket} OnClick={() => {
+        bodyContent = <ChanneLSettingsMemberJoinModaL socket={socket} OnClick={() => {
             setStep(USERSETTINGSTEPS.INDEX)
-        }} />)
+        }} />
     }
 
     return <ChanneLUserSettingsModaL>

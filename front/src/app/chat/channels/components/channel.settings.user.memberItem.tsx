@@ -3,9 +3,9 @@ import { UserAvatar } from "./channel.userAvater";
 
 
 // icons :
-import { TbDeviceGamepad2, TbUserShield, TbUserX, TbUsersPlus } from "react-icons/tb";
+import { TbDeviceGamepad2, TbUserX } from "react-icons/tb";
 import { SlBan, SlOptionsVertical } from "react-icons/sl";
-import { FaChessQueen, FaUserShield, FaVolumeMute } from "react-icons/fa";
+import { FaChessQueen, FaUserPlus, FaUserShield, FaVolumeMute } from "react-icons/fa";
 import { membersType, updatememberEnum, updatememberType, userType } from "@/types/types";
 import React, { ReactNode } from "react";
 import Cookies from "js-cookie";
@@ -18,8 +18,6 @@ import getMemberWithId from "../actions/getMemberWithId";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import Image from "next/image";
 import ChannelSettingsUserMemberItemOption from "./channel.settings.user.memberItem.option";
-import { IoMdOptions } from "react-icons/io";
-import { CgOptions } from "react-icons/cg";
 
 
 interface IChannelSettingsUserMemberItemProps {
@@ -184,7 +182,7 @@ export default function ChannelSettingsUserMemberItem({ member, socket, UserJoin
                     </div>
                     : <div>
                         <ChannelSettingsUserMemberItemOption
-                            icon={TbUsersPlus}
+                            icon={FaUserPlus}
                             size={24}
                             Onclick={() => {
                                 OnClick((member))

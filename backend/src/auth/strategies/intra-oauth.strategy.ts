@@ -37,6 +37,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
       where: { login: profile._json.login },
     });
     if (!_UserExist) {
+      console.log('+++++++IntraStrategy-> :', profile._json);
       const _User = await this.prisma.user.create({
         data: {
           login: profile._json.login,

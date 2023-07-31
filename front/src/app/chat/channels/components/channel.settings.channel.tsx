@@ -1,9 +1,9 @@
 
+"use client"
 import React from 'react';
 import { BsArrowRightShort, BsSaveFill } from 'react-icons/bs';
 import { CgEditFlipH } from 'react-icons/cg';
-import { PiPassword } from "react-icons/pi";
-import { TbEdit, TbPassword, TbUserCancel } from 'react-icons/tb';
+import { TbEdit, TbPassword } from 'react-icons/tb';
 import { VscGroupByRefType } from "react-icons/vsc";
 import { Channel } from 'diagnostics_channel';
 import ChanneLSettingsEditModaL from '../modaLs/channel.settings.edit.modal';
@@ -14,7 +14,7 @@ import { IoBagRemove, IoChevronBackOutline, IoInformation, IoLogOut } from 'reac
 import { GoEyeClosed } from 'react-icons/go';
 import { HiLockClosed, HiLockOpen } from 'react-icons/hi';
 import { TfiTimer } from 'react-icons/tfi';
-import { FaChessQueen } from 'react-icons/fa';
+import { FaChessQueen, FaUserTimes } from 'react-icons/fa';
 import { useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
 import getChannelMembersWithId from '../actions/getChannelmembers';
@@ -183,7 +183,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                     }}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
                     <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                        <TbUserCancel size={32} />
+                        <FaUserTimes size={32} />
                     </div>
                     <div>
                         <h2 className='text-white font-semibold capitalize'>Baned members</h2>

@@ -11,14 +11,14 @@ import {
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { UpdateRoomDto } from './dtos/UpdateRoomDto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
 import { Request } from 'express';
 
 @Controller('rooms')
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
-  // @UseGuards(AuthGuard)
+  // @UseGuards(JwtAuthGuard)
   // @Post()
   // create(
   //   @Body('name') name: string,
@@ -30,40 +30,40 @@ export class RoomsController {
   //   return this.roomsService.create({ name, type, userId });
   // }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.roomsService.findAll();
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('user')
-  findALL(@Req() request: Request) {
+  findALLUser(@Req() request: Request) {
     const userIds: any = request.user;
     const userId: string = userIds.sub;
     return this.roomsService.findUserRooms(userId);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get(':name')
   findOne(@Param('name') name: string) {
     return this.roomsService.findOne({ name });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() data: UpdateRoomDto) {
     return this.roomsService.update({ id, data });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.roomsService.remove(id);
   }
 
   // messages :
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post(':roomId/addmessage')
   AddMessage(
     @Param('roomId') roomId: string,
@@ -75,7 +75,7 @@ export class RoomsController {
     return this.roomsService.AddMessage({ roomId, content, userId });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('join')
   JoinUser(@Body('roomId') roomId: string, @Req() request: Request) {
     const User: any = request.user;
@@ -98,7 +98,7 @@ export class RoomsController {
   ) {
     return this.roomsService.DeleteMessage({ messageId });
   }
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('messages/:messageId')
   getaLLmessages(@Param('messageId') messageId: string) {
     return this.roomsService.getaLLmessages(messageId);
