@@ -53,7 +53,7 @@ const Settings: React.FC = () => {
       try {
         const response = await axios.post('http://localhost:8080/file-upload', formData);
         toast(`Informations updated`, {
-          style: {background: '#198754', color: "#FFFFFF"}
+          style: {background: '#81c784', color: "#FFFFFF"}
         });
 
       } catch (error) {
