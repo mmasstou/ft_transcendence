@@ -46,7 +46,7 @@ export class AuthController {
         httpOnly: false,
         sameSite: false,
       });
-      res.redirect(`http://localhost:8080/profile`);
+      res.redirect(`${process.env.AUTH_REDIRECT_URI}`);
     } catch (error) {
       res.status(400).json(error);
     }

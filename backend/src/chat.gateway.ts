@@ -199,25 +199,31 @@ export class ChatGateway implements OnGatewayConnection {
   @SubscribeMessage('joinroom')
   async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     try {
-      // console.log(`client with socket ${client.id} joined room ${data.id}`);
-      // console.log('socket +data.id-> :%s', data.id);
-      // console.log('socket +client.id-> :%s', client.id);
-      // console.log('socket +User.id-> :%s', _User.id);
       console.log(
         'Chat-> ChanneL +> user :%s has join to room :%s',
         _User.login,
         data,
       );
+      // get user from client :
+      const { token } = client.handshake.auth;
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      // 💡 We're assigning the payload to the request object here
+      // so that we can access it in our route handlers
+      const login: string = payload.login;
+      const User = await this.usersService.findOneLogin({ login });
+      console.log('Chat-> joinRoom +> User :', User);
+      console.log('Chat-> joinRoom +> payload :', payload);
       // check if user is already in room database :
-      console.log('Chat-> data- +>', data);
       const room = await this.roomservice.findOne({ name: data.id });
       console.log('Chat-> room- +>', room);
-      // const responseMemberData = await this.roomservice.isMemberInRoom(
-      //   data.id,
-      //   _User.id,
-      // );
+      const _isMemberInRoom = await this.roomservice.isMemberInRoom(
+        data.id,
+        User.id,
+      );
       // console.log('Chat-> responseMemberData- +>', responseMemberData);
-      if (!client.rooms.has(data.id)) {
+      if (_isMemberInRoom !== null && !client.rooms.has(data.id)) {
         await client.join(data.id);
       }
     } catch (error) {

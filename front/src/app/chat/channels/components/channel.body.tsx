@@ -4,7 +4,6 @@ import ChanneLSidebarItem from "./channel.sidebar.item";
 import { RoomsType, membersType, messagesType } from "@/types/types";
 import { useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
-import getChannels from "@/actions/channels/getChanneLs";
 import { Socket } from "socket.io-client";
 import RightsideModaL from "../modaLs/RightsideModal";
 import getChannelWithId from "../actions/getChannelmembers";
@@ -13,6 +12,7 @@ import LeftSidebarHook from "../hooks/LeftSidebarHook";
 import RightsidebarHook from "../hooks/RightSidebarHook";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import LoginHook from "@/hooks/auth/login";
+import getChannels from "../actions/getChanneLs";
 
 export default function ChanneLbody({ children, socket }: { children: React.ReactNode; socket: Socket | null }) {
     const [IsMounted, setIsMounted] = React.useState(false)
@@ -37,9 +37,10 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
                 if (!token)
                     return;
                 const resp = await getChannels(token)
-                if (resp && resp.ok) {
-                    const data = await resp.json()
-                    setChannel(data.Rooms);
+                if (resp) {
+                
+                    console.log("getChannels data :", resp)
+                    setChannel(resp);
                 }
                 // console.log("resp :", resp)
             }

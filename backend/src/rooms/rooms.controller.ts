@@ -40,7 +40,7 @@ export class RoomsController {
   @Get('user')
   findALLUser(@Req() request: Request) {
     const userIds: any = request.user;
-    const userId: string = userIds.sub;
+    const userId: string = userIds.login;
     return this.roomsService.findUserRooms(userId);
   }
 

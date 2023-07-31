@@ -4,7 +4,6 @@ import React, { useEffect } from 'react'
 import Dashboard from '@/app/Dashboard';
 import { RoomsType, membersType } from '@/types/types';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import getChannels from '@/actions/channels/getChanneLs';
 import Cookies from 'js-cookie';
 import ChanneLIndex from './components/channel.index';
 import LoginHook from '@/hooks/auth/login';
@@ -13,6 +12,7 @@ import getChannelWithId from './actions/getChannelWithId';
 import getMemberWithId from './actions/getMemberWithId';
 import getChannelMembersWithId from './actions/getChannelmembers';
 import ChanneLaccessDeniedHook from './hooks/ChanneL.access.denied.hook';
+import getChannels from './actions/getChanneLs';
 const metadata = {
   title: 'Transcendence',
   description: 'Online Pong Game',

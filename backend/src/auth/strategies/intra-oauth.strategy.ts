@@ -33,6 +33,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     //   banner: '',
     //   intraId: profile._json.id,
     // };
+    console.log('+++++++IntraStrategy-> :', profile._json);
     const _UserExist = await this.prisma.user.findUnique({
       where: { login: profile._json.login },
     });
