@@ -28,7 +28,6 @@ import ChanneLUserSettings from "../components/channel.settings.User"
 import { TbInfoSquareRoundedFilled, TbUserPlus } from "react-icons/tb"
 import getChannelWithId from "../actions/getChannelWithId"
 import ChanneLChatSettings from "../components/channel.settings.channel"
-import ChanneLSettingsMemberJoinModaL from "./channel.settings.member.join.modal"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',

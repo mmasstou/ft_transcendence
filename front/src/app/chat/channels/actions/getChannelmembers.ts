@@ -10,9 +10,11 @@ const getChannelMembersWithId = async (channeLId: string, token: string) => {
       if (res.status === 200) {
         return res.json();
       }
+      return null
     });
   } catch (err) {
     console.log(err);
+    return null
   }
 };
 export default getChannelMembersWithId;
