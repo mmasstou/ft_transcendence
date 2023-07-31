@@ -10,14 +10,25 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from './users/user.service';
-import { User, Messages } from '@prisma/client';
+import { User, UserType } from '@prisma/client';
 import { error } from 'console';
 import { RoomsService } from './rooms/rooms.service';
 import { MessagesService } from './messages/messages.service';
 
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { MembersService } from './members/members.service';
+import { PrismaService } from './prisma.service';
 
 export let _User: User | null = null;
+enum updatememberEnum {
+  SETADMIN = 'SETADMIN',
+  BANMEMBER = 'BANMEMBER',
+  KIKMEMBER = 'KIKMEMBER',
+  MUTEMEMBER = 'MUTEMEMBER',
+  PLAYGAME = 'PLAYGAME',
+  SETOWNER = 'SETOWNER',
+  ACCESSPASSWORD = 'ACCESSPASSWORD',
+}
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway implements OnGatewayConnection {
   constructor(
@@ -25,6 +36,8 @@ export class ChatGateway implements OnGatewayConnection {
     private readonly usersService: UserService,
     private roomservice: RoomsService,
     private messageservice: MessagesService,
+    private memberService: MembersService,
+    private prisma: PrismaService,
   ) {}
 
   async handleConnection(socket: Socket) {
@@ -40,10 +53,9 @@ export class ChatGateway implements OnGatewayConnection {
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       const login: string = payload.sub;
-      // console.log('user : %s |socket', payload.username, socket.id);
       _User = await this.usersService.findOne({ login });
     } catch {
-      console.log('+ ->error- +>', error);
+      console.log('Chat-> error- +>', error);
     }
     // Perform any necessary validation or authorization checks with the token
     // ...
@@ -55,26 +67,158 @@ export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
-  @SubscribeMessage('joinroom')
-  async joinRoom(
+  @SubscribeMessage('updatemember')
+  async updatemember(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomId: string },
+    @MessageBody()
+    data: {
+      updateType: string;
+      member: any;
+    },
   ) {
     try {
-      console.log('++++++++++++++++++data.roomId+++++++++++++++', data.roomId);
-      console.log('++++++++++++++++++client.id+++++++++++++++', client.id);
-
-      // console.log(`client with socket ${client.id} joined room ${data.roomId}`);
-      await client.join(data.roomId);
-      const messages = await this.messageservice.create({
-        roomId: data.roomId,
-        content: `userId : ${client.id} has connected`,
-        userId: _User.id,
+      const __member = await this.memberService.findOne({
+        userId: data.member.userId,
+        roomId: data.member.roomsId,
       });
-      client.emit('message', messages);
-      console.log('+++++++++joinroom++++++++++|> MessageBody :', data);
+      if (data.updateType === updatememberEnum.SETADMIN) {
+        const type: UserType =
+          __member.type === UserType.ADMIN ? UserType.USER : UserType.ADMIN;
+        const member = await this.prisma.members.update({
+          where: { id: data.member.id },
+          data: { type: type },
+        });
+        this.server.emit('updatememberResponseEvent', member);
+      }
+      // ban member :
+      if (data.updateType === updatememberEnum.BANMEMBER) {
+        const __isBan: boolean = __member.isban === true ? false : true;
+        const member = await this.prisma.members.update({
+          where: { id: data.member.id },
+          data: { isban: __isBan },
+        });
+        this.server.emit('updatememberResponseEvent', member);
+      }
+      // mute member :
+      if (data.updateType === updatememberEnum.MUTEMEMBER) {
+        const __isMute: boolean = __member.ismute === true ? false : true;
+        const member = await this.prisma.members.update({
+          where: { id: data.member.id },
+          data: { ismute: __isMute },
+        });
+        this.server.emit('updatememberResponseEvent', member);
+      }
+      // kick member :
+      if (data.updateType === updatememberEnum.KIKMEMBER) {
+        const member = await this.prisma.members.delete({
+          where: { id: data.member.id },
+        });
+        this.server.emit('updatememberResponseEvent', member);
+      }
+      // set owner :
+      if (data.updateType === updatememberEnum.SETOWNER) {
+        const type: UserType =
+          __member.type === UserType.OWNER ? UserType.USER : UserType.OWNER;
+        const member = await this.prisma.members.update({
+          where: { id: data.member.id },
+          data: { type: type },
+        });
+        this.server.emit('updatememberResponseEvent', member);
+      }
+      // create room :
     } catch (error) {
-      console.log('eroooooor:', error);
+      console.log('Chat-> error- +>', error);
+    }
+  }
+  @SubscribeMessage('joinmember')
+  async joinmember(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    data: {
+      userid: string;
+      roomid: string;
+    },
+  ) {
+    try {
+      let member: any = null;
+      // check if member is already in room database :
+      try {
+        const room = await this.roomservice.findOne({ name: data.roomid });
+        member = await this.prisma.members.findFirst({
+          where: { userId: data.userid, roomsId: room.id },
+        });
+        if (!member) {
+          member = await this.memberService.create({
+            type: UserType.USER,
+            user: data.userid,
+            roomId: room.id,
+          });
+        }
+        await this.prisma.rooms.update({
+          where: { id: room.id },
+          data: {
+            members: { connect: { id: member.id } },
+            User: { connect: { id: data.userid } },
+          },
+        });
+        client.emit('joinmemberResponseEvent', member);
+      } catch (error) {
+        console.log('Chat-> joinmember error- +>', error);
+      }
+      // create room :
+      // const newRoom = await this.roomservice.create(data, _User.login);
+
+      // send message that room is created :
+      // this.server.emit('createroomResponseEvent', newRoom);
+    } catch (error) {
+      console.log('Chat-> error- +>', error);
+    }
+  }
+  @SubscribeMessage('createroom')
+  async createRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    try {
+      // console.log(
+      //   'Chat-> createroom +> user :%s has create room :%s',
+      //   _User.login,
+      //   data,
+      // );
+      // create room :
+      const newRoom = await this.roomservice.create(data, _User.login);
+
+      // send message that room is created :
+      this.server.emit('createroomResponseEvent', newRoom);
+    } catch (error) {
+      console.log('Chat-> error- +>', error);
+    }
+  }
+
+  @SubscribeMessage('joinroom')
+  async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+    try {
+      // console.log(`client with socket ${client.id} joined room ${data.id}`);
+      // console.log('socket +data.id-> :%s', data.id);
+      // console.log('socket +client.id-> :%s', client.id);
+      // console.log('socket +User.id-> :%s', _User.id);
+      // console.log(
+      //   'Chat-> ChanneL +> user :%s has join to room :%s',
+      //   _User.login,
+      //   data,
+      // );
+      // check if user is already in room database :
+      const room = await this.roomservice.findOne({ name: data.id });
+      const responseMemberData = await this.roomservice.isMemberInRoom(
+        room.id,
+        _User.id,
+      );
+      // console.log('Chat-> responseMemberData- +>', responseMemberData);
+      if (!client.rooms.has(data.id)) {
+        await client.join(data.id);
+      }
+    } catch (error) {
+      console.log('Chat-> error- +>', error);
     }
   }
 
@@ -84,47 +228,55 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() data: { roomId: string; messageContent: string },
   ) {
     try {
-      console.log('+++++++++LeaveRoom++++++++++|> MessageBody :', data);
-      const messages = await this.messageservice.create({
-        roomId: data.roomId,
-        content: `userId : ${client.id} has Leave room`,
-        userId: _User.id,
-      });
-      client.emit('message', messages);
       client.leave(data.roomId);
     } catch (error) {}
   }
 
   @SubscribeMessage('sendMessage')
-  async handleEvent(
-    @MessageBody()
-    data: any,
-  ) {
+  async handleEvent(@MessageBody() data: any) {
     let messages: any;
     try {
-      const { directMessage, messageContent, type } = data;
-      console.log('+++++++++++++++++++|> MessageBody :', data);
-
       messages = await this.messageservice.create({
-        DirectMessage: directMessage,
-        content: messageContent,
-        userId: _User.id,
+        roomId: data.roomsId,
+        content: data.content,
+        userId: data.senderId,
       });
-      console.log(`------------room id: ${data.roomId}`);
-
-      // const numClients = this.server.sockets.adapter.rooms.get(
-      //   data.roomId,
-      // ).size;
-      // console.log(`Number of clients in myRoom: ${numClients}`);
-      // console.log(`${user.name} [${user.id}] join to room : ${user.roomId}`);
-      // console.log("we are emmiting the message to room")
-      this.server.to(data.roomId).emit('message', messages);
-      console.log('messages :', messages);
+      // console.table(messages);
+      this.server.to(data.roomsId).emit('message', messages);
       // this.server.emit('message', messages);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        console.log('Error: ', error);
+        console.log('Chat-> error- +>', error);
       }
+    }
+  }
+
+  @SubscribeMessage('updateChanneL')
+  async updateChanneL(@MessageBody() data: any) {
+    try {
+      // console.log('Chat-> updateChanneL +> data :', data);
+      const room = await this.roomservice.findOne({ name: data.id });
+
+      const responseMemberData = await this.roomservice.isMemberInRoom(
+        room.id,
+        _User.id,
+      );
+      if (responseMemberData.type === UserType.OWNER) {
+        // console.log('Chat-> responseMemberData- +>', responseMemberData);
+
+        const dataRoom = {
+          name: room.name,
+          type: data.type,
+          password: data.password,
+        };
+        const updateRoom = await this.prisma.rooms.update({
+          where: { id: room.id },
+          data: dataRoom,
+        });
+        this.server.emit('updateChanneLResponseEvent', updateRoom);
+      }
+    } catch (error) {
+      console.log('Chat-> error- +>', error);
     }
   }
 }

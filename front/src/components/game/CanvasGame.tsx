@@ -224,7 +224,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     // useEffect for Score
     useEffect(() => {
       if (isReady) {
-        const obj = drawScore(canvas, images, socket, Table_obj);
+        const obj = drawScore(canvas, images, Table_obj, socket);
         return () => {
             obj.ScoreCtx && obj.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ScoreLayer);
@@ -269,10 +269,11 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       ////////////////////// emit from the server ///////////////////////
 
       isMounted && socket.on('joinRoomGame', (table: any) => {
-        // console.log("reload:---->",table);
-        TableMap.set(table.tableId, table);
-        setTable_obj(table);
-        socket.emit('joinToRoomGame', table.tableId);
+        if (TableMap) {
+          TableMap.set(table.tableId, table);
+          setTable_obj(table);
+          socket.emit('joinToRoomGame', table.tableId);
+        }
       })
 
       isMounted && ballSocket.on('joinRoomBall', (table: string) => {

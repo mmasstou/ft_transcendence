@@ -39,7 +39,6 @@ export class UserGateway implements OnGatewayConnection {
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       const login: string = payload.sub;
-      // console.log('user : %s |socket', payload.username, socket);
       const result = await this.prisma.$transaction(async (prisma) => {
         _User = await this.usersService.findOne({ login });
 

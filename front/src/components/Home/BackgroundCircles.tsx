@@ -1,8 +1,5 @@
-import { type } from 'os';
 import React from 'react'
 import { motion } from 'framer-motion';
-
-type Props = {};
 
 const BackgroundCircles = () => {
   return (

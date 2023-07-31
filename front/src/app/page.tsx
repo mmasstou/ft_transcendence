@@ -4,9 +4,10 @@ import Hero from "@/components/Home/Hero";
 import Showcase from "@/components/Home/Showcase";
 import Footer from "@/components/Home/Footer";
 import Head from "next/head";
-import Modal from "@/modals/Modal";
+import React from "react";
+import { Metadata } from 'next';
 
-const metadata = {
+export const metadata: Metadata = {
     title: 'Transcendence',
     description: 'Online Pong Game',
 };

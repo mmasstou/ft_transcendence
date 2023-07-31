@@ -43,9 +43,15 @@ export class MembersController {
   }
 
   @UseGuards(AuthGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messageService.findOne({ id });
+  @Get(':roomId')
+  findALLForRoom(@Param('roomId') roomId: string) {
+    return this.messageService.findALLForRoom(roomId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get(':userId/:roomId')
+  findOne(@Param('userId') userId: string, @Param('roomId') roomId: string) {
+    return this.messageService.findOne({ userId, roomId });
   }
 
   @UseGuards(AuthGuard)

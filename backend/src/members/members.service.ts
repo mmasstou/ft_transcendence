@@ -11,12 +11,15 @@ import { PrismaService } from 'src/prisma.service';
 export class MembersService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(params: { id: string }): Promise<Members> {
+  async findOne(params: { userId: string; roomId: string }): Promise<Members> {
     try {
-      const { id } = params;
+      const { userId, roomId } = params;
       // console.log('++findOne||++>', id);
-      const message = await this.prisma.members.findUnique({
-        where: { id },
+      const message = await this.prisma.members.findFirst({
+        where: {
+          userId,
+          roomsId: roomId,
+        },
       });
       if (!message) throw new Error('');
       return message;
@@ -27,6 +30,14 @@ export class MembersService {
 
   async findAll(): Promise<Members[]> {
     return this.prisma.members.findMany();
+  }
+
+  async findALLForRoom(roomId: string): Promise<Members[]> {
+    // console.log('++findALLForRoom++>', roomId);
+
+    return this.prisma.members.findMany({
+      where: { RoomId: { id: roomId } },
+    });
   }
 
   async create(data: {

@@ -1,7 +1,7 @@
 'use client'
 import Image from "next/image";
 import logo from "../../../public/logo2.svg"
-import Button from "./Button";
+import Button from "./CTA";
 import { motion } from "framer-motion";
 
 const Home_Header = () => {

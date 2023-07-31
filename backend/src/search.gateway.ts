@@ -23,8 +23,8 @@ export class SearchGateway implements OnGatewayConnection {
   ) {}
   async handleConnection(socket: Socket) {
     const { token } = socket.handshake.auth; // Extract the token from the auth object
-    console.log('Received token:', token);
-    console.log('socket id:', socket.id);
+    // console.log('Received token:', token);
+    // console.log('socket id:', socket.id);
     let payload: any = '';
     try {
       if (!token) {
@@ -35,10 +35,9 @@ export class SearchGateway implements OnGatewayConnection {
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      console.log('payload :', payload);
+      // console.log('payload :', payload);
       const login: string = payload.sub;
       _User = await this.usersService.findOne({ login });
-      console.log('user :', _User);
     } catch {
       console.log('+>', error);
     }
@@ -56,8 +55,8 @@ export class SearchGateway implements OnGatewayConnection {
     @MessageBody() data: { roomId: string; messageContent: string },
   ) {
     try {
-      console.log('+++++++++++++++++++|> MessageBody :', data);
-      console.log('+++++++++++++++++++|> sendMessage :', _User);
+      // console.log('+++++++++++++++++++|> MessageBody :', data);
+      // console.log('+++++++++++++++++++|> sendMessage :', _User);
       const messages = await this.messageservice.create({
         roomId: data.roomId,
         content: data.messageContent,
