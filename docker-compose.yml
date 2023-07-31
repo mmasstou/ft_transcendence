@@ -14,7 +14,6 @@ services:
     volumes:
       - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/src:/frontend/src:rw
       - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
-      # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/G_Class:/G_Class:rw
   backend:
     build: backend/
     container_name: backend
@@ -27,7 +26,6 @@ services:
     depends_on:
       - database
     volumes:
-      # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/G_Class:/app/G_Class:rw
       - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
       - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
@@ -35,11 +33,6 @@ services:
     container_name: database
     env_file:
       - backend/.env
-    environment:
-      - POSTGRES_PASSWORD=aboulhaj_012345
-      - POSTGRES_USER=aboulhaj
-      - POSTGRES_DB=transcendance
-      - POSTGRES_PORT=5432
     networks:
       - APInetwork
     volumes:
