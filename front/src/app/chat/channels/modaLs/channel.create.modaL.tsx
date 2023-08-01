@@ -21,26 +21,21 @@ import { GrSecure, GrInsecure } from "react-icons/gr"
 import { GoEyeClosed } from "react-icons/go"
 import { HiLockClosed, HiLockOpen } from "react-icons/hi"
 import getUsers from "../actions/getUsers"
-enum RoomType {
-    PUBLIC = 'PUBLIC',
-    PRIVATE = 'PRIVATE',
-}
+
 const ChanneLCreateModaL = () => {
     const { IsOpen, onClose, onOpen, socket, selectedFriends } = ChanneLcreatemodaLHook()
     const route = useRouter()
-    const token: any = Cookies.get('token')
     const [aLLfriends, setfriends] = useState<any[] | null>(null)
     const [userId, setuserId] = useState<userType | null>(null)
     const [InputValue, setInputValue] = useState("")
 
     let users: any[] = []
     useEffect(() => {
-        const token: any = Cookies.get('token');
-        const User_ID: string | undefined = Cookies.get('_id');
-        console.log("User_ID :", User_ID)
-        if (!token)
-            return;
         (async function getFriends() {
+            const token: any =  Cookies.get('token');
+            const User_ID: string | undefined = Cookies.get('_id');
+            // if (!token)
+            //     return;
             // await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
             //     headers: { Authorization: `Bearer ${token}`, },
             // }).then((resp) => resp.json()).then(data => {
@@ -48,7 +43,9 @@ const ChanneLCreateModaL = () => {
             //     setfriends(_list)
             // })
             const resp = await getUsers(token)
-            console.log("await getUsers(token) :", resp)
+
+
+            console.log("+++++++++++++++++++++await getUsers(token) :", resp)
             const _list = resp && resp.filter((user: any) => user.id !== User_ID)
             setfriends(_list)
         })();
@@ -204,6 +201,7 @@ const ChanneLCreateModaL = () => {
             </div>
         </div>
     )
+    console.log("aLLfriends :", aLLfriends)
     return <ChanneLModal IsOpen={IsOpen} title={"create channel"} children={bodyContent} onClose={onClose} />
 
 }

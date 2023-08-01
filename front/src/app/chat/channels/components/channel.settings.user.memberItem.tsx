@@ -102,7 +102,7 @@ export default function ChannelSettingsUserMemberItem({ member, socket, UserJoin
             <div className="flex flex-row justify-between items-center w-full ">
                 <div className='flex justify-center items-center text-white gap-2'>
                     <div className={`image  min-w-[24px] hidden sm:block rounded overflow-hidden`}>
-                        <Image src="/avatar.jpg" alt="avatar" width={24} height={24} />
+                        <Image src={UserInfo ? UserInfo?.avatar : '/avatar.jpg'} alt="avatar" width={24} height={24} />
                     </div>
                     <h2 className={`text-white  ${member.type === 'OWNER' && 'md:text-white text-[#FFBF00]'} font-semibold capitalize`}>
                         {UserInfo?.login}

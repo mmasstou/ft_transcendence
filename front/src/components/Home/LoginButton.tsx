@@ -4,11 +4,13 @@ import login42  from '../../../public/42_Logo.png';
 interface ButtonProps {
     label: string,
     outline?: boolean,
+    OnClick : () => void
 }
 
-const LoginButton = ({label, outline} : ButtonProps) => {
+const LoginButton = ({label, outline, OnClick} : ButtonProps) => {
   return (
     <button
+    onClick={OnClick}
       className={`
         flex
         items-center justify-center mt-2
