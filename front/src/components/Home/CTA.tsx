@@ -10,11 +10,11 @@ interface Btn {
   login: boolean;
   style: string;
   title: string;
+  OnClick : () => void
 }
 
-const Button = ({ login, style, title }: Btn) => {
+const Button = ({ login, style, title, OnClick}: Btn) => {
   const [isOpen, setIsOpen] = useState(false);
-
   return (
     <>
       <div className={` w-full lg:flex lg:justify-start xl:flex xl:flex-start`}>
@@ -57,7 +57,7 @@ const Button = ({ login, style, title }: Btn) => {
           <p className={`${styles.paragraph} text-[11px] lg:text[16px] p-2`}>
             You can login via these option :
           </p>
-          <LoginButton label="Login With 42" />
+          <LoginButton OnClick={OnClick} label="Login With 42" />
         </div>
       </Modal>
     </>

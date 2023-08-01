@@ -5,6 +5,8 @@ import { AuthController } from './auth.controller';
 import { UserModule } from 'src/users/user.module';
 import { UserService } from 'src/users/user.service';
 import { PrismaService } from 'src/prisma.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { IntraStrategy } from './strategies/intra-oauth.strategy';
 
 @Module({
   imports: [
@@ -15,7 +17,13 @@ import { PrismaService } from 'src/prisma.service';
       signOptions: { expiresIn: process.env.TOOKEN_EXP },
     }),
   ],
-  providers: [AuthService, UserService, PrismaService],
+  providers: [
+    AuthService,
+    UserService,
+    PrismaService,
+    JwtStrategy,
+    IntraStrategy,
+  ],
   controllers: [AuthController],
   exports: [AuthService],
 })

@@ -36,8 +36,8 @@ export class SearchGateway implements OnGatewayConnection {
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       // console.log('payload :', payload);
-      const login: string = payload.sub;
-      _User = await this.usersService.findOne({ login });
+      const id: string = payload.sub;
+      _User = await this.usersService.findOne({ id });
     } catch {
       console.log('+>', error);
     }

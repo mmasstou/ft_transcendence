@@ -3,18 +3,33 @@ import { RiLogoutBoxFill } from 'react-icons/ri';
 import { useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import MyAvatar from '@/components/profile/MyAvatar';
+import { useRouter } from 'next/navigation';
 
 export const Logout: React.FC = (props) : JSX.Element => {
   const [logout, setLogout] = useState<boolean>(false);
   let logoutRef = useRef<HTMLDivElement | null>(null);
-
+  const router = useRouter();
   const renderLogout = () => {
     setLogout(!logout);
   };
 
 
   const logoutHandle = () => {
-    Cookies.remove('token');
+    (async () => {
+      const resp = await fetch('http://localhost:80/api/auth/logout', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('token')}`
+        }
+      });
+      if (resp.status === 200) {
+        Cookies.remove('token');
+        Cookies.remove('_id');
+        router.push('/')
+        
+      }
+    })();
   }
 
   useEffect(() => {
@@ -41,10 +56,10 @@ export const Logout: React.FC = (props) : JSX.Element => {
               <h3 className='mx-2'>👋 Hey, aouhadou</h3>
               <div className='w-3/4 border-b-[0.1vh] border-white opacity-50 my-2 ml-2'></div>
                 <ul className='list-none cursor-pointer mt-2'> 
-                  <a onClick={logoutHandle} href='/' className='flex justify-between items-center my-1 hover:text-red-500'>
-                    <RiLogoutBoxFill className='mx-2'/>
+                  <button onClick={logoutHandle} className='flex justify-between items-center my-1 hover:text-red-500'>
+                  <RiLogoutBoxFill className='mx-2'/>
                     Logout
-                  </a>
+                  </button>
                 </ul>
             </div>
           </div> 
