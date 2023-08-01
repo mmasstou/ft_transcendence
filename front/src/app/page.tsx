@@ -13,8 +13,7 @@ export const metadata: Metadata = {
 };
 export default function Home() {
     return (
-        <>
-        <div className="bg-[#161F1E] h-screen overflow-scroll ">
+        <div className="bg-[#161F1E] h-screen overflow-scroll">
             <Head>
                 <title>Transcendence</title>
             </Head>
@@ -24,6 +23,5 @@ export default function Home() {
             <Showcase />
             <Footer />
         </div>
-        </>
     );
 }

@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode;})
 {
     return (
         <html lang="en" >
-            <body className= {changa.className} suppressHydrationWarning={true}>
+            <body className= {`${changa.className}`} suppressHydrationWarning={true}>
 				{children}
             </body>
             

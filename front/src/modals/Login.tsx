@@ -5,16 +5,16 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import { HiOutlineLogin } from "react-icons/hi"
 import { useRouter } from "next/navigation";
+import Modal from "./channel.modaL";
+import LoginHook from "@/hooks/login";
 import { Socket, io } from "socket.io-client";
-import Modal from "./Modal";
 import Input from "@/components/Input";
-import LoginHook from "@/hooks/auth/login";
+
 
 
 const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [socket, setSocket] = useState<Socket | null>(null);
-    const [inputValue, setInputValue] = useState("")
     const loginHook = LoginHook()
     const token = Cookies.get("token")
     const router = useRouter()
@@ -36,7 +36,7 @@ const Login = () => {
 
     useEffect(() => {
 
-        const socket: Socket = io(`${process.env.NEXT_PUBLIC_USERSOCKET_URL_WS}`, {
+        const socket: Socket = io("http://localhost:80/User", {
             auth: {
                 token: `${token}`,
                 id: `${Cookies.get("_id")}`
@@ -52,23 +52,36 @@ const Login = () => {
 
         // socket && socket.emit("sendMessage", messageSocket, () => setmessages(""));
         socket && socket.on("connected", (data) => {
-            // console.log("data :", data)
+         // console.log("data :", data)
         })
 
 
         return () => {
             socket && socket.disconnect();
         };
-
+       
     }, [])
 
     const onSubmit: SubmitHandler<FieldValues> = async (data: any) => {
 
 
-    //    console.log("Data :", data)
+     // console.log("Data :", data)
         const API_PATH = process.env.API_URL
         // console.log("API_PATH :", API_PATH)
-        // router.push(`${process.env.NEXT_PUBLIC_API_URL}/auth/callback`)
+        const token = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Connection: "keep-alive",
+            },
+            body: JSON.stringify(data),
+        })
+        if (token.status === 200) {
+            loginHook.onClose()
+            const user_token = await token.json()
+            Cookies.set("token", user_token.access_token)
+            Cookies.set("_id", user_token._id)
+        }
     }
     const bodyContent = (
         <div className="flex flex-col gap-4 w-full sm:w-[440px]  sm:h-[260px] bg-[#243230] p-4">
@@ -87,7 +100,6 @@ const Login = () => {
                     id='password'
                     lable="password"
                     type="password"
-
                     disabled={isLoading}
                     register={register}
                     errors={errors}
@@ -101,7 +113,7 @@ const Login = () => {
         </div>
 
     );
-    return <Modal isVisible={loginHook.IsOpen} onClose={function (isOpen: boolean): void { }} children={bodyContent} />
+    return <Modal IsOpen={loginHook.IsOpen} body={bodyContent} />
 }
 
 export default Login
