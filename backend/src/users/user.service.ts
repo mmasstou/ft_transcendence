@@ -31,6 +31,7 @@ export class UserService {
       include: {
         Rooms: true,
         directMessage: true,
+        cursus_users: true,
       },
     });
   }

@@ -199,10 +199,11 @@ export class ChatGateway implements OnGatewayConnection {
   @SubscribeMessage('joinroom')
   async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     try {
+      const room = await this.roomservice.findOne({ name: data.id });
       console.log(
-        'Chat-> ChanneL +> user :%s has join to room :%s',
+        'Chat-> joinRoom +> user :%s has join to room :%s',
         _User.login,
-        data,
+        room.name,
       );
       // get user from client :
       const { token } = client.handshake.auth;
@@ -213,11 +214,7 @@ export class ChatGateway implements OnGatewayConnection {
       // so that we can access it in our route handlers
       const login: string = payload.login;
       const User = await this.usersService.findOneLogin({ login });
-      console.log('Chat-> joinRoom +> User :', User);
-      console.log('Chat-> joinRoom +> payload :', payload);
       // check if user is already in room database :
-      const room = await this.roomservice.findOne({ name: data.id });
-      console.log('Chat-> room- +>', room);
       const _isMemberInRoom = await this.roomservice.isMemberInRoom(
         data.id,
         User.id,

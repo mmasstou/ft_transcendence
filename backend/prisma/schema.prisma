@@ -41,6 +41,8 @@ model User {
   name          String?
   kind          String?
   avatar        String?
+  location      String?
+  cursus_users  Cursus?          @relation(fields: [cursusId], references: [id])
   intraId       Int?
   banner        String?
   is_active     Boolean         @default(false)
@@ -51,6 +53,15 @@ model User {
   Rooms         Rooms[]
   directMessage DirectMessage[]
   UserSocket    UserSocket[]
+  cursusId      String?
+}
+
+model Cursus {
+  id            String @id @default(uuid())
+  grade         String
+  level         Float
+  blackholed_at String
+  User          User[]
 }
 
 model Rooms {

@@ -23,8 +23,6 @@ export class RoomsService {
   ) {}
   // check if member is in room
   async isMemberInRoom(roomId: string, userId: string) {
-    console.log('++isMemberInRoom++roomId>', roomId);
-    console.log('++isMemberInRoom++userId>', userId);
     const room = await this.prisma.rooms.findUnique({
       where: { id: roomId },
       include: { members: true },
@@ -84,7 +82,6 @@ export class RoomsService {
       },
     });
 
-    console.log('++findUserRooms+%s +>', __User.login, rooms);
     return rooms;
   }
   // this is the function that create room and add members to it

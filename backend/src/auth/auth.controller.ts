@@ -35,9 +35,7 @@ export class AuthController {
   async IntraAuthCallback(@Req() req: any, @Res() res: Response) {
     try {
       const result = await this.authService.signIn(req.user);
-      console.log('signIn -- IntraAuthCallback-> :', result);
       const { accessToken } = result;
-      console.log('result-> :', result);
       res.cookie('token', accessToken, {
         httpOnly: false,
         sameSite: false,
@@ -52,13 +50,14 @@ export class AuthController {
     }
   }
 
-  // @Get('logout')
+  @Get('logout')
   // @UseGuards(JwtAuthGuard)
-  // async logout(@Req() req: any, @Res() res: Response): Promise<any> {
-  //   res.clearCookie('access_token');
-  //   await this.authService.logout(req.user.login);
-  //   res.sendStatus(200);
-  // }
+  async logout(@Req() req: any, @Res() res: Response): Promise<any> {
+    // res.clearCookie('token');
+    // res.clearCookie('_id');
+    // res.redirect('http://localhost:8080');
+    res.sendStatus(200);
+  }
 
   @Get('status')
   // @UseGuards(JwtAuthGuard)

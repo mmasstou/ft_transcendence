@@ -23,6 +23,7 @@ interface Imessage {
 const Message: FC<Imessage> = ({ message, userid ,isForOwner}) => {
     const [create_At, setcreate_At] = useState("")
     const [senderInfo, setsenderInfo] = useState<userType | null>(null)
+    const [Location, setLocation] = useState<string | null>("")
 
     useEffect(() => {
 
@@ -44,8 +45,7 @@ const Message: FC<Imessage> = ({ message, userid ,isForOwner}) => {
             hour: 'numeric',
             minute: 'numeric',
             hour12: true,
-        }))
-
+        }));
     }, [message, userid])
 
     if (!senderInfo)
@@ -56,7 +56,10 @@ const Message: FC<Imessage> = ({ message, userid ,isForOwner}) => {
                 <UserAvatar size={32} image={senderInfo?.avatar} />
                 <h3 className="text-base font-light text-[#FFFFFF]">{senderInfo?.login}</h3>
             </div>
+            <div className="flex flex-row gap-2 justify-center items-center">
+            <span className="text-[.5rem] text-end text-[#D9D9D9] min-w-max">{senderInfo.location}</span>
             <span className="text-[.5rem] text-end text-[#D9D9D9] min-w-max">{create_At}</span>
+            </div>
         </div>
         <div className="flex flex-col gap-1 bg-[#24323044] rounded-bl-[21px] rounded-r-[21px] p-2  mb-4">
             <div className="message-body flex flex-row items-center gap-4">

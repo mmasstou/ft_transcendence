@@ -67,8 +67,17 @@ export type userType = {
   created_at: string;
   updated_at: string;
   Rooms: RoomsType[];
+  location: string;
+  cursus_users: cursusType[];
+
 };
 
+export type cursusType = {
+  id: string;
+    grade: string,
+    level: Float32Array,
+    blackholed_at: string
+}
 export type messageSocket = {
   roomId: string;
   messageContent: string;

@@ -25,20 +25,17 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    // const user: User = {
-    //   login: profile._json.login,
-    //   email: profile._json.email,
-    //   avatar: profile._json.image.link,
-    //   name: profile._json.usual_full_name,
-    //   banner: '',
-    //   intraId: profile._json.id,
-    // };
-    console.log('+++++++IntraStrategy-> :', profile._json);
     const _UserExist = await this.prisma.user.findUnique({
       where: { login: profile._json.login },
     });
     if (!_UserExist) {
-      console.log('+++++++IntraStrategy-> :', profile._json);
+      const cursus_users = await this.prisma.cursus.create({
+        data: {
+          grade: profile._json.cursus_users[1].grade,
+          level: profile._json.cursus_users[1].level,
+          blackholed_at: profile._json.cursus_users[1].blackholed_at,
+        },
+      });
       const _User = await this.prisma.user.create({
         data: {
           login: profile._json.login,
@@ -46,11 +43,16 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
           avatar: profile._json.image.link,
           name: profile._json.usual_full_name,
           banner: '',
+          kind: profile._json.kind,
           intraId: profile._json.id,
+          location: profile._json.location,
+          cursus_users: {
+            connect: {
+              id: cursus_users.id,
+            },
+          },
         },
       });
-      console.log('+++++++IntraStrategy-> :', _User);
-      console.log('+++profile++++IntraStrategy-> :', profile._json.login);
       done(null, _User);
     } else done(null, _UserExist);
   }
