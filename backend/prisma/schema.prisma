@@ -40,7 +40,7 @@ model User {
   password      String?
   name          String?
   kind          String?
-  avatar         String?
+  avatar        String?
   intraId       Int?
   banner        String?
   is_active     Boolean         @default(false)
@@ -54,16 +54,17 @@ model User {
 }
 
 model Rooms {
-  id            String     @id @default(uuid())
-  name          String     @unique
-  type          RoomType   @default(PUBLIC)
-  members       Members[]
-  messages      Messages[]
-  viewedmessage Int        @default(0)
-  password      String?
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
-  User          User[]
+  id             String     @id @default(uuid())
+  name           String     @unique
+  type           RoomType   @default(PUBLIC)
+  members        Members[]
+  messages       Messages[]
+  viewedmessage  Int        @default(0)
+  password       String?
+  accesspassword String?    @default("")
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+  User           User[]
 }
 
 model DirectMessage {

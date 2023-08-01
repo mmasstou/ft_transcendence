@@ -7,6 +7,7 @@ import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL'
 import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL'
 import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL'
 import Header from '@/components/Dashboard/Header/Header'
+import ChanneLPasswordAccessModaL from './chat/channels/modaLs/channel.access.password.modaL';
 interface Props {
   children: React.ReactNode;
 }
@@ -16,6 +17,7 @@ const Dashboard = ({ children }: Props) => {
     <>
       <Login />
       {/* <ChanneLModal /> */}
+      <ChanneLPasswordAccessModaL />
       <ChanneLCreateModaL />
       <ChanneLSettingsModaL />
       <ChanneLaccessDeniedModaL />

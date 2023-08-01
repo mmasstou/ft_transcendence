@@ -1,9 +1,10 @@
-import { RoomsType } from "@/types/types"
+import { RoomTypeEnum, RoomsType } from "@/types/types"
 import Cookies from "js-cookie"
 import { useRouter, useSearchParams } from "next/navigation"
 import { use, useCallback, useEffect, useState } from "react"
 import { Socket } from "socket.io-client"
 import LeftSidebarHook from "../hooks/LeftSidebarHook"
+import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
 
 interface ChanneLSidebarItemProps {
   room: RoomsType,
@@ -18,6 +19,7 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket,viewd }: ChanneLSide
   const router = useRouter()
   const params = useSearchParams()
   const userId = Cookies.get('_id')
+  const channeLPasswordAccessHook = ChanneLPasswordAccessHook()
   let JoinData: any = room
   if (userId) {
     JoinData.loginUser = userId
@@ -40,6 +42,7 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket,viewd }: ChanneLSide
     }, []);
 
   const onClickHandler = useCallback(() => {
+    if(room.accesspassword !== '') channeLPasswordAccessHook.onOpen()
     room && socket?.emit('joinroom', room, (response: any) => {
 
     })
