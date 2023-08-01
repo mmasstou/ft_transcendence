@@ -16,7 +16,7 @@ function draw_line(
   socket: any)
   {
     const color = socket.auth.UserId === table_obj.player1.UserId ? table_obj.player1.GameSetting.ball : table_obj.player2.GameSetting.ball;
-      backgroundCtx.strokeStyle = color;
+      backgroundCtx.strokeStyle = "#ffffff";
       backgroundCtx.beginPath();
       let x = 0;
       if (is_vertical) {
@@ -57,9 +57,9 @@ function drawBackground(
       backgroundCtx.beginPath();
       const color = socket.auth.UserId === table_obj.player1.UserId ? table_obj.player1.GameSetting.table : table_obj.player2.GameSetting.table;
       const gradient = backgroundCtx.createLinearGradient(0, 0, canvasSize.width, canvasSize.height);
-      gradient.addColorStop(0, color[0]);
-      gradient.addColorStop(0.5, color[1]);
-      gradient.addColorStop(1, color[2]);
+      gradient.addColorStop(0.05, color[0]);
+    //   gradient.addColorStop(0.5, color[1]);
+      gradient.addColorStop(0.85, color[1]);
       backgroundCtx.fillStyle = gradient;
       if (is_vertical)
           backgroundCtx.fillRect(0, 0, canvasSize.width, canvas.height);
@@ -73,39 +73,50 @@ function drawBackground(
 
 function drawScore(
   canvas: HTMLCanvasElement | null,
-  images: { img1: CanvasImageSource | null; img2: CanvasImageSource | null;},
+  images: { img1: CanvasImageSource | null; img2: CanvasImageSource | null; pause: CanvasImageSource | null},
   Table_obj: table_obj,
+  Status: boolean,
   socket?: any,
   ){
       const ScoreLayer = document.createElement('canvas');
       const ScoreCtx = ScoreLayer.getContext('2d');
       const is_vertical = canvas && canvas.height > canvas.width ? true : false;
-      const first = socket && images.img1 && images.img2 && socket.auth.UserId == Table_obj.player1.UserId ? {score: Table_obj.player1.score, img: images.img1} : {score: Table_obj.player2.score, img: images.img2};
-      const second = socket && images.img1 && images.img2 && socket.auth.UserId == Table_obj.player1.UserId ? {score: Table_obj.player2.score, img: images.img2} : {score: Table_obj.player1.score, img: images.img1};
-
+      const second = socket && images.img1 && images.img2 && socket.auth.UserId == Table_obj.player1.UserId ? {score: Table_obj.player1.score, img: images.img1, color:''} : {score: Table_obj.player2.score, img: images.img2, color:''};
+      const first = socket && images.img1 && images.img2 && socket.auth.UserId == Table_obj.player1.UserId ? {score: Table_obj.player2.score, img: images.img2, color:''} : {score: Table_obj.player1.score, img: images.img1, color:''};
+      first.score >= second.score ? first.color = '#1EF0AE' : first.color = '#F1453E';
+      second.score >= first.score ? second.color = '#1EF0AE' : second.color = '#F1453E';
   if (canvas && ScoreCtx) {
       ScoreLayer.width = canvas.width;
       ScoreLayer.height = canvas.height;
+      const radius = is_vertical ? canvas.width * 0.06: canvas.height * 0.06;
       ScoreLayer.style.position = 'absolute';
       ScoreLayer.style.zIndex = '1';
       canvas.parentNode && canvas.parentNode.insertBefore(ScoreLayer, canvas);
-      ScoreCtx.beginPath();
-      ScoreCtx.fillStyle = "#808080";
       if (is_vertical){
-          const str = canvas.width / 25 + "px Arial";
+          const str = canvas.width / 20 + "px Arial";
           ScoreCtx && (ScoreCtx.fillStyle = '#fff') && (ScoreCtx.font = str);
-          second.img && ScoreCtx.drawImage(second.img, (canvas.width - canvas.width * 0.12), 0, canvas.width * 0.12, canvas.width * 0.12);
-          first.img && ScoreCtx.drawImage(first.img, (canvas.width - canvas.width * 0.12), canvas.height - canvas.width * 0.12, canvas.width * 0.12, canvas.width * 0.12);
-          ScoreCtx && ScoreCtx.fillText(second.score, canvas.width - (canvas.width * 0.07), canvas.height / 4);
-          ScoreCtx && ScoreCtx.fillText(first.score, canvas.width - (canvas.width * 0.07), canvas.height - canvas.height / 4);
+          ScoreCtx.beginPath();
+          ScoreCtx.arc(canvas.width - radius, radius, radius, 0, Math.PI * 2, true);
+          ScoreCtx.arc(canvas.width - radius,canvas.height - radius,radius, 0, Math.PI * 2, true);
+          ScoreCtx && (ScoreCtx.fillStyle = second.color) && ScoreCtx.fillText(second.score, canvas.width - (canvas.width * 0.07), canvas.height / 4);
+          ScoreCtx && (ScoreCtx.fillStyle = first.color) && ScoreCtx.fillText(first.score, canvas.width - (canvas.width * 0.07), canvas.height - canvas.height / 4);
+          ScoreCtx && images.pause && !Status && ScoreCtx.drawImage(images.pause, canvas.width - radius * 2, (canvas.height / 2) - radius, radius * 2, radius * 2);
+          ScoreCtx.clip();
+          first.img && ScoreCtx.drawImage(first.img, canvas.width - radius * 2, 0, radius * 2, radius * 2);
+          second.img && ScoreCtx.drawImage(second.img, (canvas.width - radius * 2), (canvas.height - radius * 2), radius * 2, radius * 2);
       }
       else {
-          const str = canvas.width / 25 + "px Arial";
+          const str = canvas.height / 20 + "px Arial";
           ScoreCtx && (ScoreCtx.fillStyle = '#fff') && (ScoreCtx.font = str);
-          second.img && ScoreCtx.drawImage(second.img,0, canvas.height - (canvas.height * 0.12), canvas.height * 0.12, canvas.height * 0.12);
-          first.img && ScoreCtx.drawImage(first.img,canvas.width - (canvas.height * 0.12), canvas.height - canvas.height * 0.12, canvas.height * 0.12, canvas.height * 0.12);
-          ScoreCtx && ScoreCtx.fillText(second.score, canvas.width / 4, canvas.height - canvas.height * 0.04);
-          ScoreCtx && ScoreCtx.fillText(first.score, canvas.width - canvas.width / 4, canvas.height - canvas.height * 0.04);
+          ScoreCtx.beginPath();
+          ScoreCtx.arc(radius, (canvas.height - radius), radius, 0, Math.PI * 2, true);
+          ScoreCtx.arc(canvas.width - radius, (canvas.height - radius), radius, 0, Math.PI * 2, true);
+          ScoreCtx && (ScoreCtx.fillStyle = second.color) && ScoreCtx.fillText(second.score, canvas.width / 4, canvas.height - canvas.height * 0.04);
+          ScoreCtx && (ScoreCtx.fillStyle = first.color) && ScoreCtx.fillText(first.score, canvas.width - canvas.width / 4, canvas.height - canvas.height * 0.04);
+          ScoreCtx && images.pause && !Status && ScoreCtx.drawImage(images.pause, (canvas.width / 2) - radius, canvas.height - radius * 2, radius * 2, radius * 2);
+          ScoreCtx.clip();
+          first.img && ScoreCtx.drawImage(first.img, 0, (canvas.height - (radius * 2)), radius * 2, radius * 2);
+          second.img && ScoreCtx.drawImage(second.img, canvas.width - radius * 2, (canvas.height - (radius * 2)), radius * 2, radius * 2);
       }
   }
   return {ScoreCtx, ScoreLayer};
@@ -126,13 +137,10 @@ function Player1Draw(canvas: HTMLCanvasElement | null, socket: any, table_obj: t
         const first = socket.auth.UserId == table_obj.player1.UserId ? Player1 : Player2;
         const color = socket.auth.UserId == table_obj.player1.UserId ? table_obj.player1.GameSetting.player : table_obj.player2.GameSetting.player;
         playerCtx.fillStyle = color;
-        if (is_vertical) {
+        if (is_vertical)
             playerCtx.fillRect(((canvasSize.width * first) / 100), canvasSize.height - ((canvasSize.height / 150) + canvasSize.height / 45), canvasSize.width / player_width, canvasSize.height / 90)
-        }
-        else {
-            // playerCtx.fillStyle = player1Color;
+        else
             playerCtx.fillRect(canvasSize.width - ((canvasSize.width / 150) + canvasSize.width / 45), (canvasSize.height * first) / 100, canvasSize.width / 90, canvasSize.height / player_width)
-        }
         return { playerLayer, playerCtx }
     }
 }

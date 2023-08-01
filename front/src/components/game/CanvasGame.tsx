@@ -15,6 +15,7 @@ var imageLoad = 0;
 var player_width = 6.25;
 
 function pongFunc(divRef: RefObject<HTMLDivElement>) {
+  
     const  canvasRef = useRef<HTMLCanvasElement>(null);
     const [isMounted, setIsMounted] = useState(false);
     const [Table_obj, setTable_obj] = useState<any>(null);
@@ -22,10 +23,12 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     const [socket, setSocket] = useState<any>(null);
     const [ballSocket, setBallSocket] = useState<any>(null);
     const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-    const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null}>({
+    const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null}>({
         img1: null,
         img2: null,
+        pause: null,
       });
+
     const [Player1, setPlayer1] = useState(Table_obj ? Table_obj.player1.position : 50);
     const [Player2, setPlayer2] = useState(Table_obj ? Table_obj.player2.position : 50);
     const [BallObj, setBallObj] = useState({
@@ -160,19 +163,23 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         return;
     const img1 = new Image();
     const img2 = new Image();
+    const pause = new Image();
     function checkImageLoaded() {
         imageLoad++;
-        if (imageLoad == 2) {
+        if (imageLoad == 3) {
             setImages({
                 img1:img1,
                 img2:img2,
+                pause:pause,
             })
         }
     }
     img1.src = Table_obj.player1.GameSetting.avatar;
     img2.src = Table_obj.player2.GameSetting.avatar;
+    pause.src = "pause.png";
     img1.onload = checkImageLoaded;
     img2.onload = checkImageLoaded;
+    pause.onload = checkImageLoaded;
     handleResize();
     setBallObj({
         x:Table_obj.ball.x,
@@ -224,7 +231,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     // useEffect for Score
     useEffect(() => {
       if (isReady) {
-        const obj = drawScore(canvas, images, Table_obj, socket);
+        const obj = drawScore(canvas, images, Table_obj, Status, socket);
         return () => {
             obj.ScoreCtx && obj.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ScoreLayer);
@@ -269,7 +276,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       ////////////////////// emit from the server ///////////////////////
 
       isMounted && socket.on('joinRoomGame', (table: any) => {
-        if (TableMap) {
+        if (table) {
           TableMap.set(table.tableId, table);
           setTable_obj(table);
           socket.emit('joinToRoomGame', table.tableId);
