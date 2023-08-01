@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 // import { PrismaService } from 'src/prisma.service';
 import { User, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dtos/UpdateUserDto';
+import { Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
   async findOne(params: { id: string }): Promise<any> {
     const { id } = params;
@@ -69,6 +71,31 @@ export class UserService {
       where: { id: userId },
       include: {
         directMessage: true,
+      },
+    });
+    return user;
+  }
+
+  // get User in cluent socket
+  async getUserInClientSocket(client: Socket) {
+    const { token } = client.handshake.auth; // Extract the token from the auth object
+    let payload: any = '';
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+    payload = await this.jwtService.verifyAsync(token, {
+      secret: process.env.JWT_SECRET,
+    });
+    // 💡 We're assigning the payload to the request object here
+    // so that we can access it in our route handlers
+    const login: string = payload.login;
+    // Add your logic to fetch the direct messages for the user from the database or any other source
+    const user = await this.prisma.user.findUnique({
+      where: { login },
+      include: {
+        Rooms: true,
+        directMessage: true,
+        cursus_users: true,
       },
     });
     return user;

@@ -14,7 +14,7 @@ import LeftSidebarHook from "../hooks/LeftSidebarHook";
 // Icons :
 import { HiChatBubbleLeftRight } from "react-icons/hi2";
 import { FaUsers } from "react-icons/fa";
-import { BsJournalPlus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from "react-icons/bs";
+import { BsFillHandIndexFill, BsJournalPlus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from "react-icons/bs";
 import { FiUsers } from "react-icons/fi";
 import Conversations from "./channel.conversations";
 import ChanneLcreatemodaLHook from "../hooks/channel.create.hook";
@@ -77,7 +77,13 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
                         active={router.includes('channels')}
                     />
                 </div>
-                <div className="flex justify-end items-center gap-2">
+                <div className="flex justify-end items-center gap-2"> 
+                <Button
+                        icon={BsFillHandIndexFill}
+                        small
+                        outline
+                        onClick={() => {rightsidebarHook.IsOpen ? rightsidebarHook.onClose() : rightsidebarHook.onOpen([]) }}
+                    />
                     <Button
                         icon={BsJournalPlus}
                         small
@@ -90,6 +96,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
                         outline
                         onClick={() => {rightsidebarHook.IsOpen ? rightsidebarHook.onClose() : rightsidebarHook.onOpen([]) }}
                     />
+                   
                 </div>
             </div>
 

@@ -199,25 +199,19 @@ export class ChatGateway implements OnGatewayConnection {
   @SubscribeMessage('joinroom')
   async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     try {
+      // get room from database :
       const room = await this.roomservice.findOne({ name: data.id });
+      // get user from client :
+      const LogedUser = await this.usersService.getUserInClientSocket(client);
       console.log(
         'Chat-> joinRoom +> user :%s has join to room :%s',
-        _User.login,
+        LogedUser.login,
         room.name,
       );
-      // get user from client :
-      const { token } = client.handshake.auth;
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      const login: string = payload.login;
-      const User = await this.usersService.findOneLogin({ login });
-      // check if user is already in room database :
+      // check if member is already in room database :
       const _isMemberInRoom = await this.roomservice.isMemberInRoom(
         data.id,
-        User.id,
+        LogedUser.id,
       );
       // console.log('Chat-> responseMemberData- +>', responseMemberData);
       if (_isMemberInRoom !== null && !client.rooms.has(data.id)) {
