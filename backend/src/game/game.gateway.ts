@@ -24,6 +24,7 @@ var table_obj = {
     GameMode: '',
 }
 
+
 export let _User: User | null = null;
 
 function check_col(table: any){
@@ -79,7 +80,6 @@ function moveBall(server: Server, table: any){
         }
       }
     }
-
 
 @Injectable()
 @WebSocketGateway({namespace: 'game'})
@@ -138,7 +138,6 @@ class MyGateway implements OnGatewayConnection {
           }
       });
     }
-
 
     async CreateBotTable(data: any) {
       return new Promise(async (resolve, reject) => {
@@ -254,7 +253,7 @@ class MyGateway implements OnGatewayConnection {
       } catch {
         console.log('+> not valid token', error);
       }
-      console.log('+-> Client',_User.login , 'connected');
+      console.log('+-> Client',_User.login , 'connected ', _User.id);
       UserMap.set(_User.id, {User: _User, SocketId: socket.id, Status: 'online'});
       if (socket.handshake.auth.tableId) {
         // console.log('join to room----------', TableMap.get(socket.handshake.auth.tableId));

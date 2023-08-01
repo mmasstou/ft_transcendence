@@ -1,19 +1,19 @@
 version: '3'
 services:
-  frontend:
-    build: front/
-    container_name: frontend
-    ports:
-      - 3000:3000
-      - 5430:5430
-    networks:
-      - APInetwork
-    depends_on:
-      - backend
-      - database
-    volumes:
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/src:/frontend/src:rw
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
+  # frontend:
+  #   build: front/
+  #   container_name: frontend
+  #   ports:
+  #     - 3000:3000
+  #     # - 5430:5430
+  #   # networks:
+  #   #   - APInetwork
+  #   # depends_on:
+  #   #   - backend
+  #   #   - database
+  #   volumes:
+  #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front:/frontend:rw
+  #    # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
   backend:
     build: backend/
     container_name: backend
