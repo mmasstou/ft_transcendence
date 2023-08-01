@@ -1,19 +1,29 @@
-type User = {
-    id: string
-    login: string
-    email: string
-    password: string | null
-    first_name: string | null
-    last_name: string | null
-    kind: string | null
-    image: string | null
-    bg_color: string[] | null
-    paddle_color: string | null
-    ball_color: string | null
-    is_active: boolean
-    created_at: Date
-    updated_at: Date
-  }
+import { User, UserType } from '@prisma/client';
+// type User = {
+//     id: string;
+//     login: string;
+//     email: string;
+//     password: string | null;
+//     name: string;
+//     kind: null;
+//     avatar: string | '';
+//     bg_color: string[] | null
+//     paddle_color: string | null
+//     ball_color: string | null
+//     intraId: number;
+//     banner: string | '';
+//     is_active: boolean;
+//     created_at: string;
+//     updated_at: string;
+//     Rooms: any;
+//     location: string;
+//     cursus_users: any;
+//     Members: any;
+//     Messages: any;
+//     directMessage: any;
+//     UserSocket: any;
+//     cursusId: any;
+//   }
 
 type table_obj = {
     player1: Player

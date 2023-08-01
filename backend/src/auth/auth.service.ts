@@ -1,5 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma.service';
 import { UserService } from 'src/users/user.service';
 
 @Injectable()
@@ -7,24 +13,59 @@ export class AuthService {
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
+    private prisma: PrismaService,
   ) {}
 
-  async signIn(username: string, pass: string) {
-    const user = await this.usersService.findOneLogin({ login: username });
-    // console.log('signIn(username: string, pass: string) user:', user);
-    if (user && user?.password !== pass) {
-      throw new UnauthorizedException();
-    }
-    const payload = { sub: user.id, username: user.login };
-    // console.log('signIn(username: string, pass: string) payload:', payload);
+  async signIn(user: Prisma.UserUncheckedCreateInput) {
+    // if (!user) {
+    //   throw new BadRequestException('Unauthenticated');
+    // }
 
-    const _token = await this.jwtService.signAsync(payload);
-    // console.log('signIn(username: string, pass: string) _token:', _token);
-
-    return {
-      access_token: _token,
-      _id: user.id,
+    const userExists = await this.usersService.findOneLogin({
       login: user.login,
+    });
+
+    if (!userExists) {
+      return await this.registerUser(user);
+    }
+
+    return this.generateJwt({
+      login: userExists.login,
+      email: userExists.email,
+      avatar: userExists.avatar,
+      name: userExists.name,
+      banner: userExists.banner,
+      intraId: userExists.intraId,
+    });
+  }
+  async registerUser(user: Prisma.UserUncheckedCreateInput) {
+    try {
+      const newUser = await this.prisma.user.create({
+        data: {
+          login: user.login,
+          email: user.email,
+          avatar: user.avatar,
+          name: user.name,
+          banner: user.banner,
+          intraId: user.intraId,
+        },
+      });
+      return await this.generateJwt({
+        login: newUser.login,
+        email: newUser.email,
+        avatar: newUser.avatar,
+        name: newUser.name,
+        banner: newUser.banner,
+        intraId: newUser.intraId,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async generateJwt(payload: any) {
+    return {
+      accessToken: await this.jwtService.signAsync(payload),
     };
   }
 }

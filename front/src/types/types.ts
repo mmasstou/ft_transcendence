@@ -19,7 +19,6 @@ export type membersType = {
   directmessageId: string;
   created_at: string;
   updated_at: string;
-
 };
 export type messagesType = {
   viewed: number;
@@ -42,51 +41,66 @@ export type messagesType = {
 // };
 
 export type RoomsType = {
-  id: string,
-  name: string,
-  type: string,
-  viewedmessage: number,
-  password: string,
-  created_at: string,
-  updated_at: string,
-  members:membersType[],
-  messages: Message[],
-}
+  id: string;
+  name: string;
+  type: string;
+  viewedmessage: number;
+  password: string;
+  created_at: string;
+  updated_at: string;
+  members: membersType[];
+  messages: Message[];
+  accesspassword:string
+};
 
-export type userType ={
-    id: string,
-    login: string,
-    email: string,
-    password: string,
-    first_name: string,
-    last_name: string,
-    kind: string,
-    image: string,
-    is_active: boolean,
-    created_at: string,
-    updated_at: string
-}
+export type userType = {
+  id: string;
+  login: string;
+  email: string;
+  password: string | null;
+  name: string;
+  kind: null;
+  avatar: string | '';
+  bg_color: string[] | null
+  paddle_color: string | null
+  ball_color: string | null
+  intraId: number;
+  banner: string | '';
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  Rooms: RoomsType[];
+  location: string;
+  cursus_users: cursusType[];
 
+};
+
+export type cursusType = {
+  id: string;
+    grade: string,
+    level: Float32Array,
+    blackholed_at: string
+}
 export type messageSocket = {
-  roomId: string,
-  messageContent: string,
-}
+  roomId: string;
+  messageContent: string;
+};
 
 export type updatememberType = {
-  updateType: string,
-  member: membersType,
-}
+  updateType: string;
+  member: membersType;
+};
 // enums :
 
 export enum UserTypeEnum {
-  ADMIN = "ADMIN",
-  USER = "USER",
-  OWNER = "OWNER",
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+  OWNER = 'OWNER',
 }
 export enum RoomTypeEnum {
-  PRIVATE = "PRIVATE",
-  PUBLIC = "PUBLIC",
-  PROTECTED = "PROTECTED",
+  PRIVATE = 'PRIVATE',
+  PUBLIC = 'PUBLIC',
+  PROTECTED = 'PROTECTED',
 }
 export enum updatememberEnum {
   SETADMIN = 'SETADMIN',
@@ -97,4 +111,3 @@ export enum updatememberEnum {
   SETOWNER = 'SETOWNER',
   ACCESSPASSWORD = 'ACCESSPASSWORD',
 }
-

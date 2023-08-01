@@ -4,7 +4,6 @@ import React, { useEffect } from 'react'
 import Dashboard from '@/app/Dashboard';
 import { RoomsType, membersType } from '@/types/types';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import getChannels from '@/actions/channels/getChanneLs';
 import Cookies from 'js-cookie';
 import ChanneLIndex from './components/channel.index';
 import LoginHook from '@/hooks/auth/login';
@@ -13,6 +12,7 @@ import getChannelWithId from './actions/getChannelWithId';
 import getMemberWithId from './actions/getMemberWithId';
 import getChannelMembersWithId from './actions/getChannelmembers';
 import ChanneLaccessDeniedHook from './hooks/ChanneL.access.denied.hook';
+import getChannels from './actions/getChanneLs';
 const metadata = {
   title: 'Transcendence',
   description: 'Online Pong Game',
@@ -58,8 +58,9 @@ export default function page() {
 
   useEffect(() => {
     const token: any = Cookies.get('token');
-    if (!token)
-      loginhook.onOpen()
+    console.log("token :", token)
+    // if (!token)
+    //   loginhook.onOpen()
     setIsMounted(true)
   }, [])
 
@@ -75,21 +76,19 @@ export default function page() {
     const token: any = Cookies.get('token');
     (async () => {
       const room = await getChannelWithId(_ChanneLsActiveID, token)
-      let JoinData: any = room
       const userId = Cookies.get('_id')
       if (userId) {
         
         const Logedmemder = await getMemberWithId(userId, _ChanneLsActiveID, token)
         const activeChannelsMembers = await getChannelMembersWithId(_ChanneLsActiveID, token)
+        if (!activeChannelsMembers)
+          return
         activeChannelsMembers.forEach((member: membersType) => {
           if (member.id === Logedmemder.id) {
-
-
             setmemberHasAccess(true)
           }
         });
-        JoinData.loginUser = userId
-        socket?.emit('joinroom', JoinData, (response: any) => {
+        room && socket?.emit('joinroom', room, (response: any) => {
 
         })
       }
