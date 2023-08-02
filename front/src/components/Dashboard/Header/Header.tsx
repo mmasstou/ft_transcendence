@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { RiNotification2Fill, RiSettingsLine } from 'react-icons/ri';
 import logo from '@/../public/logo2.svg';
 import { Logout } from './Logout';
+import Settings from './Settings';
 import * as Popover from '@radix-ui/react-popover';
 import Notification from '@/components/profile/Notification';
 
@@ -21,12 +22,8 @@ const Header: React.FC = (): JSX.Element => {
         />
       </div>
       <nav className="flex justify-center items-center">
-        <ul className="flex items-center  gap-5 ">
-          <li>
-                <button className="">
-                  <RiSettingsLine size={32} color="#E0E0E0" />
-                </button>
-          </li>
+        <ul className="flex items-center  gap-5 justify-center">
+          <Settings />
           <li>
     <Popover.Root>
     <Popover.Trigger asChild>

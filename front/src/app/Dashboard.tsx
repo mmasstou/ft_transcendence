@@ -3,6 +3,8 @@ import React from 'react';
 import './dashboard.css';
 import Sidebar from '@/components/Dashboard/sidebar/Sidebar';
 import Login from '@/components/auth/modaLs/Login';
+import './dashboard.css';
+import { Toaster } from 'react-hot-toast';
 import ChanneLModal from './chat/channels/modaLs/channel.modal';
 import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
 import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
@@ -41,6 +43,7 @@ const Dashboard = ({ children }: Props) => {
           <Sidebar />
         </div>
       </div>
+      <Toaster />
     </>
   );
 };

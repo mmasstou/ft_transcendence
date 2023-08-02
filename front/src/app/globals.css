@@ -66,11 +66,3 @@
   scrollbar-width: none; /* Firefox */
 }
 
-.down-arrow {
-  width: 0; 
-  height: 0; 
-  border-left: 18px solid transparent;
-  border-right: 18px solid transparent;
-  border-bottom: 18px solid #2B504B;
-  margin: 2rem;
-}
