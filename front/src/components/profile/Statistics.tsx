@@ -22,9 +22,9 @@ const Statistics = () => {
   });
 
   return (
-    <div className='bg-[#243230] flex justify-center items-center m-2 mt-5 rounded-[5px] 
-          text-white min-h-[250px] overflow-hidden lg:p-6 xl:p-6 2xl:p-6'>
-        <Bar data={userData} />
+    <div className='bg-[#243230] flex justify-center rounded-md
+          text-white lg:p-6'>
+        <Bar data={userData} className='!w-[80%] !h-min' />
         {/* <Pie data={userData} /> */}
     </div>
   )
