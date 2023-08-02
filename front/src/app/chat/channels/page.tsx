@@ -80,6 +80,7 @@ export default function page() {
       if (userId) {
         
         const Logedmemder = await getMemberWithId(userId, _ChanneLsActiveID, token)
+        if (!Logedmemder) return
         const activeChannelsMembers = await getChannelMembersWithId(_ChanneLsActiveID, token)
         if (!activeChannelsMembers)
           return

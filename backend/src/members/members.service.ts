@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -11,20 +12,23 @@ import { PrismaService } from 'src/prisma.service';
 export class MembersService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(params: { userId: string; roomId: string }): Promise<Members> {
+  async findOne(params: {
+    userId: string;
+    roomId: string;
+  }): Promise<Members | null> {
     try {
       const { userId, roomId } = params;
       // console.log('++findOne||++>', id);
-      const message = await this.prisma.members.findFirst({
+      const response = await this.prisma.members.findFirst({
         where: {
           userId,
           roomsId: roomId,
         },
       });
-      if (!message) throw new Error('');
-      return message;
+      if (!response) new NotFoundException();
+      return response;
     } catch (error) {
-      throw new NotFoundException();
+      throw new BadRequestException();
     }
   }
 

@@ -21,6 +21,7 @@ import { PrismaService } from './prisma.service';
 import { clientOnLigne } from './user.gateway';
 import { RoomsType, membersType } from './users/user.type';
 export let _User: User | null = null;
+
 enum updatememberEnum {
   SETADMIN = 'SETADMIN',
   BANMEMBER = 'BANMEMBER',
@@ -112,10 +113,16 @@ export class ChatGateway implements OnGatewayConnection {
       }
       // kick member :
       if (data.updateType === updatememberEnum.KIKMEMBER) {
-        const member = await this.prisma.members.delete({
-          where: { id: data.member.id },
-        });
-        this.server.emit('updatememberResponseEvent', member);
+        const result = await this.prisma.$transaction([
+          this.prisma.rooms.update({
+            where: { id: data.member.roomsId },
+            data: { members: { disconnect: { id: data.member.id } } },
+          }),
+          this.prisma.members.delete({
+            where: { id: data.member.id },
+          }),
+        ]);
+        this.server.emit('updatememberResponseEvent', result);
       }
       // set owner :
       if (data.updateType === updatememberEnum.SETOWNER) {

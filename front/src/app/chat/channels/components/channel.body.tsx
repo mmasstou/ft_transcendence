@@ -31,7 +31,6 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
         setUpdate(true)
     })
     useEffect(() => {
-        setTimeout(() => {
             const token: any = Cookies.get('token');
             (async () => {
                 if (!token)
@@ -45,14 +44,14 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
                 // console.log("resp :", resp)
             }
             )();
-        }, 1000);
-
+            setUpdate(false)
         
     }, [loginHook, update])
 
     socket?.on('createroomResponseEvent', (data) => {
-        setUpdate(true)
+        setUpdate(update ? false : true)
     })
+    socket?.on('updatememberResponseEvent', (data) => {setUpdate(update ? false : true)})
 
     useEffect(() => {
 

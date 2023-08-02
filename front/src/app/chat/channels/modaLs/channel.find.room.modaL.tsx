@@ -7,6 +7,7 @@ import ChannelFindRoomItem from "../components/channel.find.roomItem"
 import getPublicProtactedChannels from "../actions/getPublicProtactedChannels"
 import Image from "next/image"
 import { sync } from "framer-motion"
+import IsMember from "../actions/IsMember"
 
 export default function ChanneLFindRoommodaL() {
     const { IsOpen, onClose, onOpen, socket } = ChanneLFindRoommodaLHook()
@@ -18,10 +19,17 @@ export default function ChanneLFindRoommodaL() {
         (async () => {
             const token: any = Cookies.get('token');
             if (!token) return
-            const response = await getPublicProtactedChannels(token)
+            if (!UserId) return
+            let response = await getPublicProtactedChannels(token)
             if (!response) return
             console.log("response :", response)
-            setrooms(response)
+            // check if user is member of room
+            response = response.map(async (room: RoomsType) => {
+                const isMember = await IsMember(room.id, UserId, token)
+                if (!isMember) return true
+            })
+            console.log("response : -> ", response)
+            setrooms(response.filter((room: RoomsType) => room.type === "PUBLIC" || room.type === "PROTECTED"))
         })();
     }, [])
 
@@ -54,9 +62,9 @@ export default function ChanneLFindRoommodaL() {
 
                     {
                         roomsFiltered ? roomsFiltered.map((room: RoomsType, index: number) => {
-                            return <ChannelFindRoomItem key={index} room={room} onClick={(room: RoomsType) => { 
-                                socket?.emit("sendNotification", {userId : UserId, room : room})
-                                console.log("selected room :", room.name) 
+                            return <ChannelFindRoomItem key={index} room={room} onClick={(room: RoomsType) => {
+                                socket?.emit("sendNotification", { userId: UserId, room: room })
+                                console.log("selected room :", room.name)
                             }} />
                         }
                         )
