@@ -1,13 +1,14 @@
-"use client"
 import React from 'react'
-import FriendCard from './FriendCard';
+import UserCard from '../ui/user/UserCard';
 
 const Friend = () => {
   return (
-    <div className='bg-[#243230] rounded-[5px] text-white min-h-[200px] 
-            max-h-[40vh] lg:max-h-[56vh] md:max-h-[56vh] xl:max-h-[56vh] 2xl:max-h-[56vh]
-            flex flex-col items-center px-2 overflow-y-auto overflow-x-hidden m-2 mt-5'>
-      <FriendCard />
+    <div className='bg-[#243230] rounded-md text-white max-h-[80vh]
+            flex flex-col overflow-auto p-3 lg:p-5'>
+              <UserCard username='Mehdi' addRequest />
+              <UserCard username='Mehdi' online />
+              <UserCard username='Mehdi' inGame />
+              <UserCard username='Mehdi' />
     </div>
   )
 }

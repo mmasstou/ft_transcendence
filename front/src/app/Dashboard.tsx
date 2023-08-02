@@ -3,9 +3,12 @@ import React, { useEffect } from 'react';
 import './dashboard.css';
 import Sidebar from '@/components/Dashboard/sidebar/Sidebar';
 import Login from '@/components/auth/modaLs/Login';
-import './dashboard.css';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import React from 'react';
 import { Toaster } from 'react-hot-toast';
-import ChanneLModal from './chat/channels/modaLs/channel.modal';
+import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
+import ChanneLPasswordAccessModaL from './chat/channels/modaLs/channel.access.password.modaL';
 import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
 import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
 import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
@@ -31,10 +34,10 @@ const Dashboard = ({ children }: Props) => {
   useEffect(() => {
 
     const socket: Socket = io(`${process.env.NEXT_PUBLIC_USERSOCKET_URL_WS}`, {
-        auth: {
-            token: `${token}`,
-            id: `${Cookies.get("_id")}`
-        }
+      auth: {
+        token: `${token}`,
+        id: `${Cookies.get("_id")}`
+      }
     });
     setSocket(socket);
 
@@ -46,15 +49,15 @@ const Dashboard = ({ children }: Props) => {
 
     // socket && socket.emit("sendMessage", messageSocket, () => setmessages(""));
     socket && socket.on("connected", (data) => {
-        
+
     })
 
 
     return () => {
-        socket && socket.disconnect();
+      socket && socket.disconnect();
     };
 
-}, [])
+  }, [])
   return (
     <>
       <Login />
@@ -67,7 +70,7 @@ const Dashboard = ({ children }: Props) => {
       <ChanneLPasswordAccessModaL />
       <div className="dashboard bg-primary">
         <header className="bg-transparent flex items-center justify-between px-5 ">
-          <Header socket={socket}  />
+          <Header socket={socket} />
         </header>
 
         <main className="">{children}</main>
