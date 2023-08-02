@@ -4,11 +4,12 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Messages, Rooms, UserType } from '@prisma/client';
+import { Members, Messages, Rooms, UserType } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateRoomDto } from './dtos/UpdateRoomDto';
 import { MembersService } from 'src/members/members.service';
 import { MessagesService } from 'src/messages/messages.service';
+import { membersType } from 'src/users/user.type';
 
 enum RoomType {
   PUBLIC = 'PUBLIC',
@@ -375,5 +376,32 @@ export class RoomsService {
     });
 
     return newMember;
+  }
+
+  async findPublicAndProtected() {
+    const rooms = await this.prisma.rooms.findMany({
+      where: {
+        type: {
+          in: ['PUBLIC', 'PROTECTED'],
+        },
+      },
+    });
+    if (!rooms) null;
+    return rooms;
+  }
+
+  // git all owner roomsÍ
+  async findOwnerRooms(roomId: string): Promise<Members[] | null> {
+    const rooms = await this.membersservice.findALLForRoom(roomId);
+    if (rooms) {
+      const ownerRooms = rooms.filter(
+        (member: Members) => member.type === 'OWNER',
+      );
+      if (!ownerRooms) {
+        return null;
+      }
+      return ownerRooms;
+    }
+    return null;
   }
 }

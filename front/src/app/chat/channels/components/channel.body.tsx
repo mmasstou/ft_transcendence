@@ -50,6 +50,10 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
         
     }, [loginHook, update])
 
+    socket?.on('createroomResponseEvent', (data) => {
+        setUpdate(true)
+    })
+
     useEffect(() => {
 
         if (params) {

@@ -10,7 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from './users/user.service';
-import { User, UserType } from '@prisma/client';
+import { Members, RoomType, User, UserType } from '@prisma/client';
 import { error } from 'console';
 import { RoomsService } from './rooms/rooms.service';
 import { MessagesService } from './messages/messages.service';
@@ -18,7 +18,8 @@ import { MessagesService } from './messages/messages.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { MembersService } from './members/members.service';
 import { PrismaService } from './prisma.service';
-
+import { clientOnLigne } from './user.gateway';
+import { RoomsType, membersType } from './users/user.type';
 export let _User: User | null = null;
 enum updatememberEnum {
   SETADMIN = 'SETADMIN',
@@ -39,6 +40,8 @@ export class ChatGateway implements OnGatewayConnection {
     private memberService: MembersService,
     private prisma: PrismaService,
   ) {}
+  @WebSocketServer()
+  server: Server;
 
   async handleConnection(socket: Socket) {
     const { token } = socket.handshake.auth; // Extract the token from the auth object
@@ -55,6 +58,7 @@ export class ChatGateway implements OnGatewayConnection {
       const id: string = payload.login;
       console.log('Chat-> handleConnection +> payload :', payload.login);
       _User = await this.usersService.findOne({ id });
+      // console server socket id :
     } catch {
       console.log('Chat-handleConnection> error- +>', error);
     }
@@ -64,9 +68,6 @@ export class ChatGateway implements OnGatewayConnection {
     // Proceed with the connection handling
     // ...
   }
-
-  @WebSocketServer()
-  server: Server;
 
   @SubscribeMessage('updatemember')
   async updatemember(
@@ -277,6 +278,39 @@ export class ChatGateway implements OnGatewayConnection {
       }
     } catch (error) {
       console.log('Chat-updateChanneL> error- +>', error);
+    }
+  }
+  @SubscribeMessage('sendNotification')
+  async sendNotification(
+    @MessageBody() data: { userId: string; room: RoomsType },
+  ) {
+    try {
+      // console.log('Chat-> sendNotification +> data :', data);
+      // git owner of room :
+      const sendedUser = await this.usersService.findOne({ id: data.userId });
+      const owner: Members[] = await this.roomservice.findOwnerRooms(
+        data.room.id,
+      );
+      if (owner) {
+        owner.forEach(async (member: Members) => {
+          const ListSocket = clientOnLigne.get(member.userId);
+          if (ListSocket) {
+            const User = await this.usersService.findOne({
+              id: member.userId,
+            });
+            ListSocket.forEach((socket) => {
+              socket.emit('notificationEvent', {
+                message: `ask to join to room ${data.room.name}`,
+                User: User,
+                member: member,
+                sendedUser: sendedUser,
+              });
+            });
+          }
+        });
+      }
+    } catch (error) {
+      console.log('Chat-sendNotification> error- +>', error);
     }
   }
 }

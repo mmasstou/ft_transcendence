@@ -1,65 +1,53 @@
-import { UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import {
-  ConnectedSocket,
-  MessageBody,
   OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import { UserService } from './users/user.service';
-import { User } from '@prisma/client';
-import { RoomsService } from './rooms/rooms.service';
-import { MessagesService } from './messages/messages.service';
-import { PrismaService } from './prisma.service';
 
-export let _User: User | null = null;
-let error = 'walo';
+export const clientOnLigne = new Map<string, Socket[]>();
 @WebSocketGateway({ namespace: 'User' })
 export class UserGateway implements OnGatewayConnection {
-  constructor(
-    private jwtService: JwtService,
-    private readonly usersService: UserService,
-    private prisma: PrismaService,
-  ) {}
+  constructor(private readonly usersService: UserService) {}
 
   async handleConnection(socket: Socket) {
-    const { token } = socket.handshake.auth; // Extract the token from the auth object
-    // console.log('token', token);
-    let payload: any = '';
-    try {
-      if (!token) {
-        throw new UnauthorizedException();
-      }
-      payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      const id: string = payload.sub;
-      const result = await this.prisma.$transaction(async (prisma) => {
-        _User = await this.usersService.findOne({ id });
-
-        const UserSocketId = await prisma.userSocket.findUnique({
-          where: { userId: _User.id },
-        });
-        if (!UserSocketId) {
-          return await prisma.userSocket.create({
-            data: { socketId: socket.id, userId: _User.id },
-          });
-        } else {
-          return await prisma.userSocket.update({
-            where: { userId: _User.id },
-            data: { socketId: socket.id },
-          });
-        }
-      });
-      //   console.log('User result', result);
-      socket.emit('connected', { UserSocketId: result });
-    } catch {
-      console.log('+hna>', error);
+    const User = await this.usersService.getUserInClientSocket(socket);
+    if (User) {
+      // check if user is already connected
+      if (clientOnLigne.has(User.id)) {
+        const ListSocket = clientOnLigne.get(User.id);
+        clientOnLigne.set(User.id, [...ListSocket, socket]);
+        // clientOnLigne.get(User.id).push(socket.id);
+      } else clientOnLigne.set(User.id, [socket]);
+      //   console.log('++handleConnection++clientOnLigne> : %s ->', User.login);
+      //   clientOnLigne.get(User.id).forEach((socket) => {
+      //     console.log(socket.id);
+      //   });
+      return User;
     }
+  }
+  //   on client socket disconnect remove socket.id from clientOnLigne that disconnected
+  @SubscribeMessage('disconnect')
+  async handleDisconnect(socket: Socket) {
+    const User = await this.usersService.getUserInClientSocket(socket);
+    if (User) {
+      if (clientOnLigne.has(User.id)) {
+        const ListSocket = clientOnLigne.get(User.id);
+        const index = ListSocket.indexOf(socket);
+        if (index > -1) {
+          ListSocket.splice(index, 1);
+          clientOnLigne.set(User.id, ListSocket);
+        }
+        // console.log('--handleDisconnect--clientOnLigne> : %s ->', User.login);
+        console.table(clientOnLigne.get(User.id));
+      }
+      return User;
+    }
+  }
+
+  sendMessageToSocket(socket: Socket, message: any) {
+    // send notificationEvent to user
+    socket.emit('notificationEvent', message);
   }
 }

@@ -31,6 +31,11 @@ export class RoomsController {
   // }
 
   @UseGuards(JwtAuthGuard)
+  @Get('public&protected')
+  findPublicAndProtected() {
+    return this.roomsService.findPublicAndProtected();
+  }
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.roomsService.findAll();

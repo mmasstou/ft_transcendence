@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 // import { PrismaService } from 'src/prisma.service';
-import { User, Prisma } from '@prisma/client';
+import { User, Prisma, UserSocket } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dtos/UpdateUserDto';
 import { Socket } from 'socket.io';
@@ -99,5 +99,31 @@ export class UserService {
       },
     });
     return user;
+  }
+
+  // get all clients socket from database; and return array of socket; if not return null
+  async getUserSocket() {
+    const UserSocket = await this.prisma.userSocket.findMany();
+    if (!UserSocket) return null;
+    return UserSocket;
+  }
+  // create client socket in database
+  async createUserSocket(data: {
+    userId: string;
+    socketId: string;
+  }): Promise<UserSocket | null> {
+    try {
+      const userSocket = await this.prisma.userSocket.create({
+        data: {
+          userId: data.userId,
+          socketId: data.socketId,
+        },
+      });
+      console.log('++createUserSocket++userSocket>', userSocket);
+      return userSocket;
+    } catch (error) {
+      console.log('++createUserSocket++error>', error);
+      return null;
+    }
   }
 }

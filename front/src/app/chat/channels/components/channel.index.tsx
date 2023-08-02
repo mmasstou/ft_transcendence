@@ -21,6 +21,8 @@ import ChanneLcreatemodaLHook from "../hooks/channel.create.hook";
 import { Socket } from "socket.io-client";
 import RightsidebarHook from "../hooks/RightSidebarHook";
 import ChanneLsettingsHook from "../hooks/channel.settings";
+import { RiSearch2Fill, RiSearchLine } from "react-icons/ri";
+import ChanneLFindRoommodaLHook from "../hooks/channel.find.room.hook";
 
 // env vars :
 interface ChannelIndexProps {
@@ -36,6 +38,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
     const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
     const channeLsettingsHook = ChanneLsettingsHook()
     const rightsidebarHook = RightsidebarHook()
+    const channeLFindRoommodaLHook = ChanneLFindRoommodaLHook()
 
     useEffect(() => { setIsMounted(true) }, [])
 
@@ -79,10 +82,10 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
                 </div>
                 <div className="flex justify-end items-center gap-2"> 
                 <Button
-                        icon={BsFillHandIndexFill}
+                        icon={RiSearchLine}
                         small
                         outline
-                        onClick={() => {rightsidebarHook.IsOpen ? rightsidebarHook.onClose() : rightsidebarHook.onOpen([]) }}
+                        onClick={() => {channeLFindRoommodaLHook.onOpen(socket) }}
                     />
                     <Button
                         icon={BsJournalPlus}
