@@ -24,7 +24,6 @@ export default function Home() {
             <About />
             <Showcase />
             <Footer />
-            
         </div>
         </>
     );
