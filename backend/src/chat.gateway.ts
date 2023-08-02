@@ -204,6 +204,29 @@ export class ChatGateway implements OnGatewayConnection {
     }
   }
 
+  @SubscribeMessage('deleteChannel')
+  async deleteRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    console.log('Chat-> responseMemberData- +>', data);
+    const room = await this.roomservice.findOne({ name: data.room.id });
+    const LogedUser = await this.usersService.getUserInClientSocket(client);
+    if (!LogedUser) {
+      return;
+    }
+    const responseMemberData = await this.roomservice.isMemberInRoom(
+      room.id,
+      LogedUser.id,
+    );
+    if (responseMemberData && responseMemberData.type === UserType.OWNER) {
+      const deleteRoom = await this.roomservice.remove(room.id);
+      if (deleteRoom) {
+        this.server.emit('deleteChannelResponseEvent', deleteRoom);
+      }
+      this.server.emit('deleteroomResponseEvent', null);
+    }
+  }
   @SubscribeMessage('joinroom')
   async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     try {

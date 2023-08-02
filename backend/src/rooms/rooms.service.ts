@@ -154,7 +154,7 @@ export class RoomsService {
     });
   }
 
-  async remove(id: string): Promise<Rooms> {
+  async remove(id: string): Promise<Rooms | null> {
     // console.log('++remove++>', id);
 
     try {
@@ -166,34 +166,27 @@ export class RoomsService {
       if (!room) {
         throw new NotFoundException(`Room with ID ${id} not found`);
       }
+      const result = await this.prisma.$transaction(async (prisma) => {
+        // Delete all associated Members entities first
+        await prisma.members.deleteMany({
+          where: { roomsId: id },
+        });
+        // console.log('mmrs :', mmrs);
 
-      // Delete all associated Members entities first
-      const mmrs = await this.prisma.members.deleteMany({
-        where: { roomsId: id },
-      });
-      // console.log('mmrs :', mmrs);
+        // Delete all associated Members entities first
+        await prisma.messages.deleteMany({
+          where: { roomsId: id },
+        });
+        // console.log('rms :', rms);
 
-      // Delete all associated Members entities first
-      const rms = await this.prisma.messages.deleteMany({
-        where: { roomsId: id },
+        return await prisma.rooms.delete({
+          where: { id },
+        });
       });
-      // console.log('rms :', rms);
-
-      return await this.prisma.rooms.delete({
-        where: { id },
-      });
+      return result;
     } catch (error) {
-      // console.log('+++> error :', error);
-      throw new HttpException(
-        {
-          status: HttpStatus.FORBIDDEN,
-          error: `CAN'T ROMOVE ROOM ${id}`,
-        },
-        HttpStatus.FORBIDDEN,
-        {
-          cause: error,
-        },
-      );
+      console.log('+++> error :', error);
+      return null;
     }
   }
 
