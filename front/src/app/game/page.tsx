@@ -1,11 +1,16 @@
+'use client'
 import Image from 'next/image';
 import Dashboard from '../Dashboard';
 import Link from 'next/link';
+import * as Dialog from '@radix-ui/react-dialog';
+import { Cross2Icon } from '@radix-ui/react-icons';
+import GameThemes from '../../../lib/GameThemes';
+
 
 const page = () => {
   return (
     <Dashboard>
-      <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide">
+      <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide text-white">
         <h1 className="text-2xl xl:text-4xl 2xl:text-5xl font-bold">
           Game Play
         </h1>
@@ -25,6 +30,51 @@ const page = () => {
               to enter our vibrant community and engage in exhilarating matches.
             </p>
             <div className="flex gap-10 my-4 w-full justify-center">
+            <Dialog.Root>
+                <Dialog.Trigger asChild>
+                  <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-sky-500 rounded-xl font-bold text-sky-500 focus:outline-none">
+                    Settings
+                  </button>
+                </Dialog.Trigger>
+                <Dialog.Portal>
+                  <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0" />
+                  <Dialog.Content
+                    className="data-[state=open]:animate-contentShow flex flex-col items-center gap-4 xl:gap-8 text-white rounded-lg bg-[#243230] p-6 fixed top-[25%] left-[50%] max-h-full w-[90vw] max-w-[800px] translate-x-[-50%] lg:translate-x-[-45%] xl:translate-x-[-35%] translate-y-[-50%] 
+                    shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px]
+                    focus:outline-none"
+                  >
+                    <Dialog.Title className="text-lg lg:text-xl 2xl:text-2xl self-start">Game settings</Dialog.Title>
+                    <div className='grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-4 md:gap-6 2xl:gap-10 xl:text-lg'>
+                      {
+                        GameThemes.map((theme, index) => {
+                          const gradientStyle = {
+                            backgroundImage: `linear-gradient(to right, ${theme.left}, ${theme.right})`,
+                          };
+                          return (
+                            <button key={index} className={`w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-md ring-2 ring-transparent focus:ring-secondary transition-all`} style={gradientStyle}/>
+                          )
+                        }
+                        )
+                      }
+                    </div>
+                    <div className='flex gap-4'>
+                      <button className=" px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-secondary rounded-xl font-bold text-secondary focus:outline-none">
+                        Save
+                      </button>
+                    <Dialog.Close asChild>
+                      <button className=" px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-red-500 rounded-xl font-bold text-red-500 focus:outline-none">
+                        Cancel
+                      </button>
+                    </Dialog.Close>
+                    </div>
+                    <Dialog.Close asChild>
+                      <button className="text-white top-5 right-5 absolute">
+                        <Cross2Icon />
+                      </button>
+                    </Dialog.Close>
+                  </Dialog.Content>
+                </Dialog.Portal>
+              </Dialog.Root>
               <Link
                 href={'/game/modes'}
                 className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-yellow-500 rounded-xl font-bold text-yellow-500"
