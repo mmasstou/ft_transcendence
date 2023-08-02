@@ -42,7 +42,7 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket,viewd }: ChanneLSide
     }, []);
 
   const onClickHandler = useCallback(() => {
-    if(room.accesspassword !== '') channeLPasswordAccessHook.onOpen()
+    if(room.accesspassword !== '') channeLPasswordAccessHook.onOpen(null)
     room && socket?.emit('joinroom', room, (response: any) => {
 
     })
@@ -64,6 +64,7 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket,viewd }: ChanneLSide
   return <button
     onClick={() => {
       router.push(`/chat/channels?r=${room.id}`)
+      
       onClickHandler();
     }}
     className={`flex flex-row gap-3 justify-between px-1 items-center w-full  ${active ? ' text-secondary' : 'text-white'}`}>

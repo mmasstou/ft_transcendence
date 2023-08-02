@@ -1,6 +1,6 @@
 import { IoChevronBackOutline } from "react-icons/io5";
 import { Socket } from "socket.io-client";
-import { RoomTypeEnum, UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
+import { RoomTypeEnum, RoomsType, UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
 import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import Image from "next/image";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -25,6 +25,16 @@ interface ChanneLUserSettingsProps {
     setUpdate: (data: boolean) => void
 }
 
+export enum UpdateChanneLSendType {
+    CHANGETYPE = 'CHANGETYPE',
+    SETACCESSEPASSWORD = 'SETACCESSEPASSWORD',
+}
+export type UpdateChanneLSendData =  {
+    Updatetype: UpdateChanneLSendType,
+    accesspassword?: string,
+    roomtype?: RoomTypeEnum,
+    room : RoomsType
+}
 export default function ChanneLSettingsChanneLChangeType(
     { socket, OnBack, LogedMember, members, setUpdate }: ChanneLUserSettingsProps) {
     const [ChanneLinfo, setChanneLinfo] = React.useState<membersType | null>(null)

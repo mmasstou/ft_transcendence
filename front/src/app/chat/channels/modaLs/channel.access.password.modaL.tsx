@@ -77,12 +77,12 @@ const ChanneLPasswordAccessModaL = () => {
     }
 
     const bodyContent = (
-        <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[34rem]">
+        <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[9rem]">
 
             <div className="body flex flex-col gap-4">
 
                 <div className="body flex flex-col gap-2 py-4">
-                    <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel name </h1>
+                    {/* <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel name </h1> */}
                     <Input
                         onChange={(e: any) => { setcustomvalue(_channeLpassword, e.target.value) }}
                         id={"ChanneLpassword"} lable={"ChanneL password"}
@@ -91,7 +91,7 @@ const ChanneLPasswordAccessModaL = () => {
                         errors={errors} />
                 </div>
             </div>
-            <div className="">
+            <div className="w-full">
                 <button onClick={handleSubmit(onSubmit)} className="text-white hover:text-black border border-secondary hover:bg-secondary text-sm font-bold capitalize px-7 py-3 rounded-[12px]  w-max">
                     Access to room
                 </button>

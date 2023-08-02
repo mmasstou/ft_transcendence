@@ -64,6 +64,7 @@ const Dashboard = ({ children }: Props) => {
       <ChanneLSettingsModaL />
       <ChanneLFindRoommodaL />
       <ChanneLaccessDeniedModaL />
+      <ChanneLPasswordAccessModaL />
       <div className="dashboard bg-primary">
         <header className="bg-transparent flex items-center justify-between px-5 ">
           <Header socket={socket}  />

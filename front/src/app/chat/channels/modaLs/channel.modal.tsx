@@ -9,7 +9,7 @@ export default function ChanneLModal({ children , onClose , title, IsOpen }: { c
         <div className=" absolute top-0 bg-[#2632389e] w-full h-full z-50 flex justify-center items-center">
             <div className=" w-full max-w-xl bg-[#2B504B] m-3 rounded">
                 <div className="flex justify-between items-center p-2 w-full mb-2">
-                    <h1 className=" text-white capitalize">{title}</h1>
+                    <h1 className=" text-white capitalize pl-6">{title}</h1>
                     <Button
                         icon={AiFillCloseCircle}
                         small
