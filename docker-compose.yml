@@ -31,11 +31,6 @@ services:
     container_name: database
     env_file:
       - backend/.env
-    environment:
-      - POSTGRES_PASSWORD=mmasstou_012345
-      - POSTGRES_USER=mmasstou
-      - POSTGRES_DB=db_chat
-      - POSTGRES_PORT=5432
     networks:
       - APInetwork
     restart: always

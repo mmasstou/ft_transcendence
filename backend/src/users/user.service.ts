@@ -8,18 +8,18 @@ import { UpdateUserDto } from './dtos/UpdateUserDto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(params: { login: string }): Promise<any> {
-    const { login } = params;
+  async findOne(params: { id: string }): Promise<any> {
+    const { id } = params;
     // console.log('++findOne++>', login);
     const user = await this.prisma.user.findUnique({
-      where: { id: login },
+      where: { id },
     });
     if (!user) return {};
     return user;
   }
   async findOneLogin(params: { login: string }): Promise<User> {
     const { login } = params;
-    console.log('+USER+findOne++>', login);
+    // console.log('+USER+findOne++>', login);
     return await this.prisma.user.findUnique({
       where: { login },
     });
@@ -31,6 +31,7 @@ export class UserService {
       include: {
         Rooms: true,
         directMessage: true,
+        cursus_users: true,
       },
     });
   }

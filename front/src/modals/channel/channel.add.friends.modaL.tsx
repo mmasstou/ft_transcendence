@@ -6,14 +6,12 @@ import { useEffect, useState } from "react"
 import { userType } from "@/types/types"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
-import Input from "@/components/chat/Input"
-import Friend from "@/components/chat/Friend"
 import Modal from "../channel.modaL"
 import { IoMdCloseCircle } from "react-icons/io"
 import { AiFillPlusCircle } from "react-icons/ai"
 import ChanneLAddFriendsHookHook from "@/hooks/channel.add.friends.hook"
 import ChanneLcreatemodaLHook from "@/hooks/channel.create.hook"
-import ChanneLAddFriendsItem from "@/components/chat/channel/channel.add.friends.friendItem"
+import Input from "@/components/Input"
 
 const ChanneLAddFriendsModaL = () => {
     const channeLAddFriendsHookHook = ChanneLAddFriendsHookHook()
@@ -26,7 +24,7 @@ const ChanneLAddFriendsModaL = () => {
 
     useEffect(() => {
         (async function getFriends() {
-            await fetch('http://127.0.0.1/api/users', {
+            await fetch('${process.env.NEXT_PUBLIC_API_URL}/users', {
                 headers: { Authorization: `Bearer ${token}`, },
             }).then((resp) => resp.json()).then(data => setfriends(data))
         })();
@@ -56,7 +54,7 @@ const ChanneLAddFriendsModaL = () => {
         aLLfriends !== null && channeLAddFriendsHookHook.selectedFriends.push(...aLLfriends)
         const data = channeLAddFriendsHookHook.onClose()
         channeLcreatemodaLHook.onOpen(data)
-        console.log("friends data :", data)
+     // console.log("friends data :", data)
     }
 
 

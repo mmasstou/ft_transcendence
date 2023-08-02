@@ -3,8 +3,10 @@ import Image from "next/image";
 import logo from "../../../public/logo2.svg"
 import Button from "./CTA";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const Home_Header = () => {
+  const router = useRouter()
   return (
     <header className="flex justify-between items-center  ">
       <motion.div
@@ -44,7 +46,10 @@ const Home_Header = () => {
       }}
       transition={{ duration: 1}}
       >
-        <Button login={true} style="hover:text-white" title="Sign In" />
+        <Button OnClick={() => {
+            router.push(`${process.env.NEXT_PUBLIC_API_URL}/auth/callback`)
+          
+        }} login={true} style="hover:text-white" title="Sign In" />
       </motion.div>
     </header>
   )

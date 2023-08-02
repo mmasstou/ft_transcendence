@@ -21,12 +21,15 @@ module.exports = {
                 primary: '#161F1E',
                 secondary: '#1EF0AE',
                 tertiary: '#D9D9D9',
+                danger: '#F1453E',
                 btn: '#161F1E',
                 'container': '#3E504D',
                 ...blackA,
                 ...mauve,
                 ...violet,
-        
+                isban: '#F03F19',
+                IsActive: '#ED6C03',
+                container: '#3E504D'
             },
             keyframes: {
                 overlayShow: {
@@ -68,6 +71,28 @@ module.exports = {
                 slideLeftAndFade: 'slideLeftAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
         
               },
+              slideUpAndFade: {
+                from: { opacity: 0, transform: 'translateY(2px)' },
+                to: { opacity: 1, transform: 'translateY(0)' },
+              },
+              slideRightAndFade: {
+                from: { opacity: 0, transform: 'translateX(-2px)' },
+                to: { opacity: 1, transform: 'translateX(0)' },
+              },
+              slideDownAndFade: {
+                from: { opacity: 0, transform: 'translateY(-2px)' },
+                to: { opacity: 1, transform: 'translateY(0)' },
+              },
+              slideLeftAndFade: {
+                from: { opacity: 0, transform: 'translateX(2px)' },
+                to: { opacity: 1, transform: 'translateX(0)' },
+              },
+            },
+            animation: {
+              slideUpAndFade: 'slideUpAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
+              slideRightAndFade: 'slideRightAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
+              slideDownAndFade: 'slideDownAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
+              slideLeftAndFade: 'slideLeftAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
         },
     },
     plugins: [],

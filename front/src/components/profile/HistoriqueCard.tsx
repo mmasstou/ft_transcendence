@@ -3,7 +3,7 @@ import MyAvatar from './MyAvatar';
 
 const HistoriqueCard = () => {
   return (
-    <div className="bg-[#3E504D]  w-full h-[47px] lg:h-[85px] flex justify-between mx-2 my-2 rounded-md 2xl:h-[95px]">
+    <div className="bg-[#3E504D]  w-full flex justify-between py-3 lg:py-4 rounded-md">
       <div className="flex flex-col overflow-hidden items-center justify-center lg:mx-8">
         <div className="w-[28px] h-[28px] lg:h-[45px] lg:w-[45px] xl:h-[60px] xl:w-[60px] mx-2">
           <MyAvatar />

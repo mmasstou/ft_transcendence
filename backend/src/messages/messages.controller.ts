@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
 import { UpdateMessageDto } from 'src/Dtos/UpdateMessageDto';
 import { Request } from 'express';
 
@@ -18,7 +18,7 @@ import { Request } from 'express';
 export class MessagesController {
   constructor(private readonly messageService: MessagesService) {}
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(
     @Req() request: Request,
@@ -33,27 +33,32 @@ export class MessagesController {
     });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.messageService.findAll();
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.messageService.findOne({ id });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() data: UpdateMessageDto) {
     return this.messageService.update({ id, data });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.messageService.remove(id);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Delete('all/:roomId')
+  removeALL(@Param('roomId') id: string) {
+    return this.messageService.removeALL(id);
   }
 }

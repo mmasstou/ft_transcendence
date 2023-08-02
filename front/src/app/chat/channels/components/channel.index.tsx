@@ -18,24 +18,32 @@ import { BsJournalPlus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse
 import { FiUsers } from "react-icons/fi";
 import Conversations from "./channel.conversations";
 import ChanneLcreatemodaLHook from "../hooks/channel.create.hook";
+import { Socket } from "socket.io-client";
+import RightsidebarHook from "../hooks/RightSidebarHook";
+import ChanneLsettingsHook from "../hooks/channel.settings";
 
-interface ChannelIndexProps { }
+// env vars :
+interface ChannelIndexProps {
+    socket : Socket | null
+ }
 
-const ChanneLIndex: FC<ChannelIndexProps> = () => {
-
+const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
+    
     const [IsMounted, setIsMounted] = useState(false)
     const [IsLoading, setIsLoading] = useState(false)
     const router = usePathname();
     const leftSidebarHook = LeftSidebarHook();
     const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
-
+    const channeLsettingsHook = ChanneLsettingsHook()
+    const rightsidebarHook = RightsidebarHook()
 
     useEffect(() => { setIsMounted(true) }, [])
 
     if (!IsMounted) return null
     return (
-        <div className="border border-yellow-600 h-[90vh] md:h-[94vh] flex flex-col ">
+        <div className="--channeL relative h-full flex flex-col border-4 border-[#24323044] ">
             {/* nav bar */}
+            
             <div className="channeLnavbar grid grid-flow-row-dense grid-cols-4 justify-between items-center text-white px-2 py-1">
                 <div>
                     {leftSidebarHook.IsOpen
@@ -74,20 +82,19 @@ const ChanneLIndex: FC<ChannelIndexProps> = () => {
                         icon={BsJournalPlus}
                         small
                         outline
-                        onClick={() => {channeLcreatemodaLHook.onOpen([]) }}
+                        onClick={() => {channeLcreatemodaLHook.onOpen([], socket) }}
                     />
                     <Button
                         icon={FiUsers}
                         small
                         outline
-                        onClick={() => { }}
+                        onClick={() => {rightsidebarHook.IsOpen ? rightsidebarHook.onClose() : rightsidebarHook.onOpen([]) }}
                     />
                 </div>
             </div>
-            <ChanneLbody>
-                <Conversations>
 
-                </Conversations>
+            <ChanneLbody socket={socket}>
+                <Conversations socket={socket} />
             </ChanneLbody>
 
         </div>

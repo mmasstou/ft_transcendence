@@ -10,14 +10,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { MembersService } from './members.service';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
 import { Request } from 'express';
 import { Prisma } from '@prisma/client';
 @Controller('members')
 export class MembersController {
   constructor(private readonly messageService: MembersService) {}
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(
     @Req() request: Request,
@@ -36,19 +36,25 @@ export class MembersController {
     });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.messageService.findAll();
   }
 
-  @UseGuards(AuthGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messageService.findOne({ id });
+  @UseGuards(JwtAuthGuard)
+  @Get(':roomId')
+  findALLForRoom(@Param('roomId') roomId: string) {
+    return this.messageService.findALLForRoom(roomId);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @Get(':userId/:roomId')
+  findOne(@Param('userId') userId: string, @Param('roomId') roomId: string) {
+    return this.messageService.findOne({ userId, roomId });
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -57,7 +63,7 @@ export class MembersController {
     return this.messageService.update({ id, type });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.messageService.remove(id);

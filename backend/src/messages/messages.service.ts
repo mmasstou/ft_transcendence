@@ -45,9 +45,6 @@ export class MessagesService {
             sender: {
               connect: { id: data.userId },
             },
-            DirectMessage: {
-              connect: { id: data.DirectMessage },
-            },
           },
         });
       }
@@ -60,6 +57,9 @@ export class MessagesService {
           roomId: {
             connect: { id: data.roomId },
           },
+        },
+        include: {
+          sender: true,
         },
       });
     } catch (error) {
@@ -94,6 +94,13 @@ export class MessagesService {
 
     return await this.prisma.messages.delete({
       where: { id },
+    });
+  }
+
+  async removeALL(id: string) {
+    // console.log('++removeALL++>', id);
+    return await this.prisma.messages.deleteMany({
+      where: { roomsId: id },
     });
   }
 }
