@@ -128,7 +128,7 @@ const Settings: React.FC = () => {
         />
         <Dialog.Content
           className="data-[state=open]:animate-contentShow text-white rounded-lg bg-[#2B504B] p-6 absolute 
-          top-1/2 md:top-1/2 xl:top-1/2 2xl:top-1/3 left-[50%] max-h-full w-[80%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[35%] translate-x-[-50%] lg:translate-x-[-50%] xl:translate-x-[-35%] translate-y-[-50%] 
+          top-[40%] left-[50%] max-h-full w-[80%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[35%] translate-x-[-50%] lg:translate-x-[-50%] xl:translate-x-[-35%] translate-y-[-50%] 
           shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px]
           focus:outline-none z-50 overflow-scroll"
         >
