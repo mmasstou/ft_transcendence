@@ -10,6 +10,7 @@ const getChanneLMessages = async (channelId: string, token : string) => {
         });
       } catch (err) {
         console.log(err);
+        return null;
       }
 };
 export default getChanneLMessages;

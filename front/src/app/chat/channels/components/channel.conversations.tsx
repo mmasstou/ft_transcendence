@@ -32,6 +32,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const [message, setMessage] = useState("")
     const [InputValue, setInputValue] = useState("")
     const [viewed, setviewed] = useState<number>(0)
+    const [reload, setreload] = useState<boolean>(false)
     const [LogedMember, setLogedMember] = useState<membersType | null>(null)
     const params = useSearchParams()
     const room = params.get('r')
@@ -46,7 +47,9 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         room && (async () => {
             const response = await getChanneLMessages(room, token)
             if (response && response.ok) {
+                console.log("= await getChanneLMessage :", response)
                 const data = await response.json()
+                console.log("= await getChanneLMessage :", data)
                 setMessages(data.messages)
             }
 
@@ -59,7 +62,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                 },
             })
             if (!response2.ok) {
-                return
+                return setChanneLinfo(null)
             }
             const _roomInfo = await response2.json()
             setChanneLinfo(_roomInfo)
@@ -71,6 +74,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     useEffect(() => {
         setInputValue("")
     }, [hasparam, room])
+
     useEffect(() => {
         socket?.on('message', (message: any) => {
 
@@ -94,6 +98,12 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
     }, [socket, channeLsettingsHook])
 
+    // chack if remove channle is sended :
+    useEffect(() => {
+        socket?.on("removeChannelResponseEvent", (data) => {
+            setreload(reload ? false : true)
+        })
+    }, [socket, channeLsettingsHook])
     const content = (
         <div className="flex flex-col gap-3">
 

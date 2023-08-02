@@ -8,7 +8,7 @@ import { VscGroupByRefType } from "react-icons/vsc";
 import { Channel } from 'diagnostics_channel';
 import ChanneLSettingsEditModaL from '../modaLs/channel.settings.edit.modal';
 import Input from '@/components/Input';
-import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm } from 'react-hook-form';
+import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, set } from 'react-hook-form';
 import Button from '../../components/Button';
 import { IoBagRemove, IoChevronBackOutline, IoInformation, IoLogOut } from 'react-icons/io5';
 import { GoEyeClosed } from 'react-icons/go';
@@ -18,7 +18,7 @@ import { FaChessQueen, FaUserTimes } from 'react-icons/fa';
 import { useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
 import getChannelMembersWithId from '../actions/getChannelmembers';
-import { RoomTypeEnum, RoomsType, membersType } from '@/types/types';
+import { RoomTypeEnum, RoomsType, UserTypeEnum, membersType } from '@/types/types';
 import getMemberWithId from '../actions/getMemberWithId';
 import ChannelSettingsUserMemberItem from './channel.settings.user.memberItem';
 import { Socket } from 'socket.io-client';
@@ -30,6 +30,8 @@ import ChanneLaccessDeniedModaL from '../modaLs/channel.access.denied.modaL';
 import ChanneLSettingsChanneLChangeType from './channel.settings.channel.changetype';
 import getChannelWithId from '../actions/getChannelWithId';
 import ChanneLSettingsOptionItem from './channel.settings.optionItem';
+import { AiOutlineDelete } from 'react-icons/ai';
+import ChanneLSettingsChanneLDeleteChannel from './channel.settings.channel.deletechannel';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
@@ -43,6 +45,8 @@ export enum SETTINGSTEPS {
     SETOWNER = 4,
     LEAVECHANNEL = 5,
     ACCESSPASSWORD = 6,
+    REMOVEACCESSPASSWORD = 7,
+    DELETECHANNEL = 8
 }
 
 
@@ -83,6 +87,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             const channeLLMembers = __userId && await getMemberWithId(__userId, channeLLid, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                 setLogedMember(channeLLMembers)
+                console.log("+++++++++channeLLMembers :", channeLLMembers);
             }
         })();
 
@@ -147,6 +152,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     }
     const OnRemoveAccessPassword = () => { }
     const OnLeave = () => { }
+    const OnDeleteChannel = () => { setStep(SETTINGSTEPS.DELETECHANNEL) }
 
 
 
@@ -258,6 +264,23 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                         <BsArrowRightShort size={24} />
                     </div>
                 </button>
+                {/* delete channel */}
+                {
+                    LogedMember && LogedMember.type === UserTypeEnum.OWNER &&
+                    <button
+                        onClick={() => { setStep(SETTINGSTEPS.DELETECHANNEL)}}
+                        className="flex flex-row justify-between items-center shadow p-2 rounded">
+                        <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
+                            <AiOutlineDelete size={32} />
+                        </div>
+                        <div>
+                            <h2 className='text-white font-semibold capitalize'>Delete Channel</h2>
+                        </div>
+                        <div className='text-white'>
+                            <BsArrowRightShort size={24} />
+                        </div>
+                    </button>
+                }
             </div>
             {/* <button
                 onClick={() => {
@@ -331,10 +354,12 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             </div>
         )
     }
-    // if (step === SETTINGSTEPS.CHANGECHANNEL) {
-    //     _body = ()
-    // }
-    return <ChanneLSettingsEditModaL >
-        {_body}
-    </ChanneLSettingsEditModaL>
-}
+    if (step === SETTINGSTEPS.DELETECHANNEL) {
+        _body = <ChanneLSettingsChanneLDeleteChannel room={ChanneLinfo} OnBack={OnBack} socket={socket} />}
+        // if (step === SETTINGSTEPS.CHANGECHANNEL) {
+        //     _body = ()
+        // }
+        return <ChanneLSettingsEditModaL >
+            {_body}
+        </ChanneLSettingsEditModaL>
+    }

@@ -24,10 +24,10 @@ export default function ChanneLFindRoommodaL() {
             if (!response) return
             console.log("response :", response)
             // check if user is member of room
-            response = response.map(async (room: RoomsType) => {
-                const isMember = await IsMember(room.id, UserId, token)
-                if (!isMember) return true
-            })
+            // response = response.map(async (room: RoomsType) => {
+            //     const isMember = await IsMember(room.id, UserId, token)
+            //     if (!isMember) return true
+            // })
             console.log("response : -> ", response)
             setrooms(response.filter((room: RoomsType) => room.type === "PUBLIC" || room.type === "PROTECTED"))
         })();
