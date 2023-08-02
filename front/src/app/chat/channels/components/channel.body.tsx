@@ -27,31 +27,28 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     const rightsidebar = RightsidebarHook()
     const loginHook = LoginHook()
 
-    socket?.on('updateChanneLResponseEvent', (data) => {
-        setUpdate(true)
-    })
     useEffect(() => {
-            const token: any = Cookies.get('token');
-            (async () => {
-                if (!token)
-                    return;
-                const resp = await getChannels(token)
-                if (resp) {
-                
-                    console.log("getChannels data :", resp)
-                    setChannel(resp);
-                }
-                // console.log("resp :", resp)
+        const token: any = Cookies.get('token');
+        (async () => {
+            if (!token)
+                return;
+            const resp = await getChannels(token)
+            if (resp) {
+
+                console.log("getChannels data :", resp)
+                setChannel(resp);
             }
-            )();
-            setUpdate(false)
-        
+            // console.log("resp :", resp)
+        }
+        )();
+        setUpdate(false)
+
     }, [loginHook, update])
 
-    socket?.on('createroomResponseEvent', (data) => {
-        setUpdate(update ? false : true)
-    })
-    socket?.on('updatememberResponseEvent', (data) => {setUpdate(update ? false : true)})
+    socket?.on('updateChanneLResponseEvent', (data) => { setUpdate(update) })
+    socket?.on('createroomResponseEvent', (data) => { setUpdate(update ? false : true) })
+    socket?.on('deleteChannelResponseEvent', (data) => { setUpdate(update ? false : true) })
+    socket?.on('updatememberResponseEvent', (data) => { setUpdate(update ? false : true) })
 
     useEffect(() => {
 
@@ -63,9 +60,9 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
                 if (!channeLLid)
                     return;
                 const channeLLMembers = await getChannelWithId(channeLLid, token)
-                if (channeLLMembers && channeLLMembers.statusCode !== 200){
+                if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                     setchanneLsmembers(channeLLMembers)
-                } 
+                }
 
             })();
         }
@@ -86,9 +83,9 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
                     ))
                 }
             </LefttsideModaL>
-           <div className={`${(leftSidebar.IsOpen || rightsidebar.IsOpen) && 'hidden md:flex'} w-full`}>
-           {children}
-           </div>
+            <div className={`${(leftSidebar.IsOpen || rightsidebar.IsOpen) && 'hidden md:flex'} w-full`}>
+                {children}
+            </div>
             <RightsideModaL>
                 {
                     ChanneLsmembers && ChanneLsmembers.map((member: membersType, key: number) => (
