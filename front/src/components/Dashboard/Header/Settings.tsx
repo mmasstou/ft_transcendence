@@ -1,14 +1,13 @@
 'use client';
-import { useRef, useState } from 'react';
-import { RiSettingsLine } from 'react-icons/ri';
-import { FaGreaterThan } from 'react-icons/fa';
-import axios, { AxiosError } from 'axios';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
+import * as Switch from '@radix-ui/react-switch';
+import axios from 'axios';
+import { useRef, useState } from 'react';
+import toast from 'react-hot-toast';
+import { RiSettingsLine } from 'react-icons/ri';
 import AvatarUpload from './AvatarUpload';
 import UserInput from './UserInput';
-import * as Switch from '@radix-ui/react-switch';
-import toast from 'react-hot-toast';
 
 const Settings: React.FC = () => {
   const [isOpen, setOpen] = useState<boolean>(false);
@@ -153,15 +152,6 @@ const Settings: React.FC = () => {
                 </Switch.Root>
               </div>
             </form>
-
-            <p
-              className=" text-secondary flex justify-evenly items-center cursor-pointer
-                px-[8px] w-[200px] font-normal rounded-lg text-[1.25em] hover:text-white"
-              onClick={callToast}
-            >
-              GAME SETTING
-              <FaGreaterThan />
-            </p>
 
             <Dialog.Close asChild>
               <button
