@@ -52,9 +52,28 @@
     display: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -150%);
+    transform: translate(-50%, -30%);
   }
 }
+
+@media (min-width: 1024px) {
+  .avatar-position {
+    display: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+  }
+}
+
+@media (min-width: 1200px) {
+  .avatar-position {
+    display: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+  }
+}
+
 
 *::-webkit-scrollbar {
   display: none;

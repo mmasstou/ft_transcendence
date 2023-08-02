@@ -6,6 +6,7 @@ import { Navbar } from '@/components/profile/Navbar';
 import { Statis } from '@/components/profile/UserStats';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import MyAvatar from './MyAvatar';
 
 export const DesktopProfile = (): JSX.Element => {
   // const [user, setUser] = useState<Info | null>();
@@ -18,15 +19,23 @@ export const DesktopProfile = (): JSX.Element => {
 
   return (
     <div className="flex flex-col gap-10 mx-[20px]">
-      <div className="bg-[#243230] relative rounded-md">
+      <div className="bg-[#243230] relative rounded-xl max-h-[333px]">
         <ImageUpload />
-        <AvatarProfile
-          position="z-10 w-[150px] h-[150px] border-2 rounded-full border-secondary avatar-position"
-          score="text-[1.25em] font-bold  h-[40px] w-[40px]"
-        />
+        <div className="absolute w-[150px] h-[150px] z-10 avatar-position">
+          <MyAvatar />
+          <div className="bottom-1 absolute">
+            <span
+              className={`bg-secondary flex justify-center items-center
+                      rounded-full text-[#161F1E] text-[1.25em] font-bold  h-[40px] w-[40px]`}
+            >
+              18
+            </span>
+          </div>
+        </div>
+
         <div
           className="absolute bg-[#161F1E] bg-opacity-90
-                   bottom-0 w-full h-[10vh] rounded-md"
+                   w-full h-1/3 rounded-md bottom-0"
         >
           <div className="text-white flex justify-between items-center ml-6">
             <div className="flex items-center justify-between py-8 w-1/3">

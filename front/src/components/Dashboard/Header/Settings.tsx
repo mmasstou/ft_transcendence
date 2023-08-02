@@ -8,7 +8,7 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import AvatarUpload from './AvatarUpload';
 import UserInput from './UserInput';
 import * as Switch from '@radix-ui/react-switch';
-import toast from 'react-hot-toast';
+import toast, { Toast } from 'react-hot-toast';
 
 const Settings: React.FC = () => {
   const [isOpen, setOpen] = useState<boolean>(false);
@@ -75,10 +75,41 @@ const Settings: React.FC = () => {
     setTwoFA(!twoFa);
   };
 
-  const callToast = () => {
-    toast(`Informations updated`, {
-      style: { background: '#81c784', color: '#FFFFFF' },
-    });
+  const handleToast = () => {
+    const handleAccept = (e: React.MouseEvent<HTMLButtonElement>, t: Toast) => {
+      e.preventDefault();
+      toast.dismiss(t.id);
+    };
+    toast(
+      (t) => (
+        <div className="flex flex-col items-center gap-4 my-2">
+          <p>
+            <span className="text-secondary">mmasstou </span> invite you to game
+          </p>
+          <div className="flex justify-between w-full gap-2">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="border border-[D9D9D9] w-1/2 rounded-md text-white"
+            >
+              Deny
+            </button>
+            <button
+              onClick={(e) => handleAccept(e, t)}
+              className="bg-secondary w-1/2 rounded-md"
+            >
+              Accept
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        style: {
+          background: '#2B504B',
+          color: '#ffffff',
+          zIndex: '1000',
+        },
+      }
+    );
   };
 
   return (
@@ -93,12 +124,13 @@ const Settings: React.FC = () => {
       <Dialog.Portal>
         <Dialog.Overlay
           className="data-[state=open]:animate-overlayShow fixed inset-0 
-                        w-screen h-screen bg-[#161F1E]/80"
+                        w-screen h-screen bg-[#161F1E]/80 z-20"
         />
         <Dialog.Content
-          className="data-[state=open]:animate-contentShow text-white rounded-lg bg-[#2B504B] p-6 fixed top-[25%] left-[50%] max-h-full w-[80%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[30%] translate-x-[-50%] lg:translate-x-[-45%] xl:translate-x-[-35%] translate-y-[-50%] 
+          className="data-[state=open]:animate-contentShow text-white rounded-lg bg-[#2B504B] p-6 absolute 
+          top-1/2 md:top-1/2 xl:top-1/2 2xl:top-1/3 left-[50%] max-h-full w-[80%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[35%] translate-x-[-50%] lg:translate-x-[-50%] xl:translate-x-[-35%] translate-y-[-50%] 
           shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px]
-          focus:outline-none z-50"
+          focus:outline-none z-50 overflow-scroll"
         >
           <Dialog.Title className="">Settings</Dialog.Title>
           <Dialog.Close asChild>
@@ -157,7 +189,7 @@ const Settings: React.FC = () => {
             <p
               className=" text-secondary flex justify-evenly items-center cursor-pointer
                 px-[8px] w-[200px] font-normal rounded-lg text-[1.25em] hover:text-white"
-              onClick={callToast}
+              onClick={handleToast}
             >
               GAME SETTING
               <FaGreaterThan />
