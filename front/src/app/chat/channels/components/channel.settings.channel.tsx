@@ -316,6 +316,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         _body = <ChanneLSettingsChanneLAccessPassword
             setUpdate={setUpdate}
             socket={socket}
+            room={ChanneLinfo}
             OnBack={OnBack} LogedMember={LogedMember} members={members}
         />
     }

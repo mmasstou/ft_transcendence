@@ -72,6 +72,7 @@ model Rooms {
   messages       Messages[]
   viewedmessage  Int        @default(0)
   password       String?
+  hasAccess      Boolean    @default(false)
   accesspassword String?    @default("")
   created_at     DateTime   @default(now())
   updated_at     DateTime   @updatedAt

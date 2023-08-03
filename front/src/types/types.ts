@@ -48,6 +48,7 @@ export type RoomsType = {
   password: string;
   created_at: string;
   updated_at: string;
+  hasAccess: boolean;
   members: membersType[];
   messages: Message[];
   accesspassword:string
