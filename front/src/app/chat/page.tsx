@@ -1,5 +1,5 @@
-import React from 'react'
-import Dashboard from '../Dashboard'
+import React from 'react';
+import Dashboard from '../Dashboard';
 
 const metadata = {
   title: 'Transcendence',
@@ -7,8 +7,8 @@ const metadata = {
 };
 export default function page() {
   return (
-    <Dashboard>
-    chat
-  </Dashboard>
-  )
+    <>
+      <Dashboard>chat</Dashboard>
+    </>
+  );
 }

@@ -8,6 +8,7 @@ import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
 import ChanneLPasswordAccessModaL from './chat/channels/modaLs/channel.access.password.modaL';
+import { useEffect } from 'react';
 import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
 import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
 import './dashboard.css';
@@ -17,11 +18,17 @@ interface Props {
 
 const Dashboard = ({ children }: Props) => {
   const router = useRouter();
+
   const token: any = Cookies.get('token');
-  if (!token) {
-    router.push('/');
-    return null;
-  }
+  useEffect(() => {
+    if (!token) {
+      router.push('/');
+    }
+    return () => {
+      return;
+    };
+  }, [token]);
+
   return (
     <>
       <Login />
@@ -30,7 +37,7 @@ const Dashboard = ({ children }: Props) => {
       <ChanneLCreateModaL />
       <ChanneLSettingsModaL />
       <ChanneLaccessDeniedModaL />
-      <div className="dashboard bg-primary">
+      <div className="dashboard bg-primary relative">
         <header className="bg-transparent flex items-center justify-between px-5 ">
           <Header />
         </header>
