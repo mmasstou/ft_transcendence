@@ -23,6 +23,7 @@ type table_obj = {
     current: any
     tableId: string
     GameMode: string
+    imageLoad: number
   }
 class GameSetting {
     table: string[];

@@ -1,21 +1,22 @@
  "use client"
 import {RefObject, useEffect, useRef, useState } from "react";
-import {io} from 'socket.io-client';
+import {Socket, io} from 'socket.io-client';
 import {Player, Ball, ballSpeed, TableMap} from '../../../tools/class';
 import Cookies from "js-cookie";
 import LoginHook from '@/hooks/auth/login';
 import {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall} from './gameFunc';
+import LeaveButton from '@/components/game/LeaveButton';
 
 const TableMap: TableMap = new Map();
-const IPmachine = '10.13.1.1/game';
-const IPmachineBall = '10.13.1.1/ball';
-var imageLoad = 0;
+const IPmachine = '127.0.0.1/game';
+const IPmachineBall = '127.0.0.1/ball';
 
 /// game settings /// on % of the canvas
 var player_width = 6.25;
 
 function pongFunc(divRef: RefObject<HTMLDivElement>) {
   
+    const DivCanvas = document.getElementById('CanvasGameDiv');
     const  canvasRef = useRef<HTMLCanvasElement>(null);
     const [isMounted, setIsMounted] = useState(false);
     const [Table_obj, setTable_obj] = useState<any>(null);
@@ -28,13 +29,13 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         img2: null,
         pause: null,
       });
-
     const [Player1, setPlayer1] = useState(Table_obj ? Table_obj.player1.position : 50);
     const [Player2, setPlayer2] = useState(Table_obj ? Table_obj.player2.position : 50);
     const [BallObj, setBallObj] = useState({
         x: 0,
         y: 0,
     });
+    const [LeaveGame, setLeaveGame] = useState(false);
     const [Score, setScore] = useState({first: Table_obj ? Table_obj.player1.score : 0, second: Table_obj ? Table_obj.player2.score : 0});
     const [canvasSize, SetCanvasSize] = useState({
         width: 0,
@@ -42,7 +43,11 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     });
     const [isReady, setIsReady] = useState(false);
     const loginhook = LoginHook();
-    const Token = Cookies.get('token');
+
+    function handleRemoveCanvas() {
+      // canvas?.parentNode?.contains(canvas) && canvas?.parentNode?.removeChild(canvas);
+      DivCanvas?.parentNode?.contains(DivCanvas) && DivCanvas?.parentNode?.removeChild(DivCanvas);
+    };
 
     function StartPause(e: KeyboardEvent) {
         if (isReady && e.key == ' ' && Status == false) {
@@ -136,7 +141,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
           height = (dashboardRect.height - headerHeight) * 0.9;
           width = (dashboardRect.width - sideBarwidth) * 0.9;
       }
-      isMounted && socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
+      isMounted && !LeaveGame && socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
       if (height > width) {
           SetCanvasSize({
               width: (width - (width * 0.15)),
@@ -161,12 +166,13 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     useEffect(() => {
       if (!isReady)
         return;
+    Table_obj.imageLoad == 0;
     const img1 = new Image();
     const img2 = new Image();
     const pause = new Image();
     function checkImageLoaded() {
-        imageLoad++;
-        if (imageLoad == 3) {
+        Table_obj.imageLoad++;
+        if (Table_obj.imageLoad == 3) {
             setImages({
                 img1:img1,
                 img2:img2,
@@ -176,7 +182,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     }
     img1.src = Table_obj.player1.GameSetting.avatar;
     img2.src = Table_obj.player2.GameSetting.avatar;
-    pause.src = "pause.png";
+    pause.src = "../../pause.png";
     img1.onload = checkImageLoaded;
     img2.onload = checkImageLoaded;
     pause.onload = checkImageLoaded;
@@ -197,76 +203,127 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     }
     }, [isReady])
 
-    // useEffect for socket
+    // create client socket for the game
     useEffect(() => {
-      if (!Cookies.get('token'))
-        return;
-      setSocket(io(IPmachine, {auth: {token: Cookies.get('token'), UserId: Cookies.get('_id'), Username: Cookies.get('username'), tableId: Cookies.get('tableId')}}));
-      setBallSocket(io(IPmachineBall ,{auth: {token: Cookies.get('token'), UserId: Cookies.get('_id'), Username: Cookies.get('username'), tableId: Cookies.get('tableId')}}));
+      const token = Cookies.get("token");
+      if (!token) return;
+      const socket: Socket = io(IPmachine, {
+          auth: {
+              token: `${token}`,
+              UserId: `${Cookies.get("_id")}`,
+              Username: Cookies.get('username'),
+              tableId: Cookies.get('tableId')
+          }
+      });
+      const socketBall: Socket = io(IPmachineBall, {
+        auth: {
+            token: `${token}`,
+            UserId: `${Cookies.get("_id")}`,
+            Username: Cookies.get('username'),
+            tableId: Cookies.get('tableId')
+        }
+    });
+      setSocket(socket);
+      setBallSocket(socketBall);
       setIsMounted(true);
-    }, [Token]);
 
+      return () => {
+          // socket && socket.on("disconnecting", () => {
+          //     socket.emit("disconnecting", "test printing");
+          // })
+          Cookies.remove('tableId');
+          socket && socket.disconnect();
+          socketBall && socketBall.disconnect();
+      };
+      // socket && socket.on("connected", (data) => {
+      //     console.log("socket %s connected", socket.id);
+      // })
+  
+  //client namespace disconnect
+  // transport close
+  }, [])
+    
 
     // useEffect for background
     useEffect(() => {
+      if (LeaveGame) {
+        handleRemoveCanvas();
+        return
+      }
       if (isReady) {
         if (!Cookies.get('tableId'))
           Cookies.set('tableId', Table_obj.tableId);
-        const obj = drawBackground(Table_obj, canvas, canvasSize, socket);
+        const obj = drawBackground(Table_obj, canvas, canvasSize, socket, DivCanvas);
         setScore({first: Table_obj.player1.score, second: Table_obj.player2.score});
         window.addEventListener("resize", handleResize);
         window.addEventListener("mousemove", MouseFunction)
         window.addEventListener("keydown", StartPause)
         return () => {
-            obj.backgroundCtx && obj.backgroundCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-            canvas?.parentNode && canvas.parentNode.removeChild(obj.backgroundLayer);
-            window.removeEventListener("resize", handleResize);
-            window.removeEventListener("mousemove", MouseFunction)
-            window.removeEventListener("keydown", StartPause)
+          obj.backgroundCtx && obj.backgroundCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+          canvas?.parentNode && canvas.parentNode.contains(obj.backgroundLayer) && canvas.parentNode.removeChild(obj.backgroundLayer);
+          window.removeEventListener("resize", handleResize);
+          window.removeEventListener("mousemove", MouseFunction)
+          window.removeEventListener("keydown", StartPause)
         }
       }
             
-    }, [canvasSize, images, Status])
+    }, [canvasSize, images, Status, LeaveGame])
 
     // useEffect for Score
     useEffect(() => {
+      // if (LeaveGame){
+      //   console.log("Score useEffect return --------leaveGame-----------")
+      //   objScore && objScore.ScoreCtx && objScore.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+      //     canvas?.parentNode && canvas.parentNode.removeChild(objScore.ScoreLayer);
+      //     return;
+      // }
+      // let obj: any;
+      // if (LeaveGame) {
+      //   // handleRemoveCanvas();
+      //   return
+      // }
       if (isReady) {
         const obj = drawScore(canvas, images, Table_obj, Status, socket);
         return () => {
-            obj.ScoreCtx && obj.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+          // handleRemoveCanvas();
+          // console.log("Score useEffect return -------------------");
+            obj && obj.ScoreCtx && obj.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ScoreLayer);
+            // handleResize();
+            // canvas?.parentNode && canvas.parentNode.removeChild();
         }
       }
-    }, [canvasSize, images, Score, Status, isReady]) 
+    }, [canvasSize, images, Score, Status, isReady, LeaveGame]) 
 
     // useEffect for Player
     useEffect(() => {
-        if (isReady) {
-            const obj1 = Player1Draw(canvas, socket, Table_obj, canvasSize, player_width, Player1, Player2);
-            const obj2 = Player2Draw(canvas, socket, Table_obj, canvasSize, player_width, Player1, Player2);
-            window.addEventListener("keydown", keyFunction);
-            return () => {
-                obj1 && obj1.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-                canvas?.parentNode && obj1 && canvas.parentNode.removeChild(obj1.playerLayer);
-                obj2 && obj2.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-                canvas?.parentNode && obj2 && canvas.parentNode.removeChild(obj2.playerLayer);
-                  window.removeEventListener("keydown", keyFunction);
-            }
-        }
-    }, [canvasSize, Player1, Player2, Status])
+      if (isReady) {
+          const obj1 = Player1Draw(canvas, socket, Table_obj, canvasSize, player_width, Player1, Player2);
+          const obj2 = Player2Draw(canvas, socket, Table_obj, canvasSize, player_width, Player1, Player2);
+          window.addEventListener("keydown", keyFunction);
+          return () => {
+            // handleRemoveCanvas();
+              obj1 && obj1.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+              canvas?.parentNode && obj1 && canvas.parentNode.removeChild(obj1.playerLayer);
+              obj2 && obj2.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+              canvas?.parentNode && obj2 && canvas.parentNode.removeChild(obj2.playerLayer);
+                window.removeEventListener("keydown", keyFunction);
+          }
+      }
+    }, [canvasSize, Player1, Player2, Status, LeaveGame])
 
 
     // useEffect for ball
     useEffect(() => {
-        if (isReady) {
-            const obj = drawingBall(canvas, BallObj, socket, Table_obj, canvasSize);
-            Table_obj.player2.UserId == 'Bot' && BallObj.y > 8 && BallObj.y < 92 && socket.emit("setBot", {Player: BallObj.y - 8, tableId: Table_obj.tableId}) && setPlayer2(BallObj.y - 8);   /////////////// bot /////////////// need more calculation
-            return () => {
-              obj.ballCtx && obj.ballCtx.clearRect(0, 0,  canvasSize.width, canvasSize.height);
-              canvas?.parentNode && canvas.parentNode.removeChild(obj.ballLayer);
-            }
-        }
-      }, [BallObj, canvasSize, isReady])
+      if (isReady) {
+          const obj = drawingBall(canvas, BallObj, socket, Table_obj, canvasSize);
+          Table_obj.player2.UserId == 'Bot' && BallObj.y > 8 && BallObj.y < 92 && socket.emit("setBot", {Player: BallObj.y - 8, tableId: Table_obj.tableId}) && setPlayer2(BallObj.y - 8);   /////////////// bot /////////////// need more calculation
+          return () => {
+            obj.ballCtx && obj.ballCtx.clearRect(0, 0,  canvasSize.width, canvasSize.height);
+            canvas?.parentNode && canvas.parentNode.removeChild(obj.ballLayer);
+          }
+      }
+      }, [BallObj, canvasSize, isReady, LeaveGame])
 
     // useEffect for emit the status to the server
     useEffect(() => {
@@ -284,6 +341,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       })
 
       isMounted && ballSocket.on('joinRoomBall', (table: string) => {
+        // console.log("check--------");
         ballSocket.emit('joinToRoomBall', table);
       })
 
@@ -321,17 +379,32 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         setScore({first: Table_obj.player1.score, second: score});
       })
 
+      isMounted && socket.on('leaveGame', (id: string) => {
+        if (socket.id != id)
+          setLeaveGame(true);
+        // console.log("leaveGame");
+      })
+
       if (canvasSize.width < canvasSize.height)
           var isvertical = true;
       else
           var isvertical = false;
-    return <canvas ref={canvasRef} width={isvertical ? canvasSize.width * 1.15 : canvasSize.width} height={isvertical ? canvasSize.height : canvasSize.height * 1.15} />;
+    return (
+      LeaveGame ? <h1 className=" font-bold text-white">WIN</h1> :
+      <>
+        <LeaveButton isvertical={isvertical} isReady={isReady} />
+        <div id="CanvasGameDiv">
+          <canvas id="GameCanvas" ref={canvasRef} width={isvertical ? canvasSize.width * 1.15 : canvasSize.width} height={isvertical ? canvasSize.height : canvasSize.height * 1.15} />
+        </div>
+      </>
+
+    );
 }
 
 export default function CanvasGame() {
     const divRef = useRef<HTMLDivElement>(null);
   return (
-    <div ref={divRef} className='flex w-full h-full justify-center items-center'>
+    <div ref={divRef} className='flex flex-col gap-2 w-full h-full justify-center items-center'>
         {pongFunc(divRef)}
     </div>
   );

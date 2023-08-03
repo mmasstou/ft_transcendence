@@ -1,14 +1,19 @@
 "use client"
+import { IoChevronBackOutline } from "react-icons/io5";
 import React, { useRef, useEffect, createContext } from 'react';
 import Dashboard from '../Dashboard';
 import CanvasGame from '@/components/game/CanvasGame'; 
 import Image from 'next/image';
 import Link from 'next/link';
+import LeaveGame from '@/components/game/LeaveButton';
 //<CanvasGame/>
+
 const page = () => {
   return (
     <Dashboard>
-      {/* <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide">
+      {/* <LeaveGame/> */}
+
+      <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide">
         <h1 className="text-2xl xl:text-4xl 2xl:text-5xl font-bold">
           Game Play
         </h1>
@@ -46,8 +51,8 @@ const page = () => {
             <Image fill src="/game-play 1.svg" alt="game-play" className="" />
           </div>
         </div>
-      </div> */}
-      <CanvasGame/>
+      </div>
+      {/* <CanvasGame/> */}
     </Dashboard>
   );
 };

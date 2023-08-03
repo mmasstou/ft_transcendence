@@ -21,7 +21,6 @@ export class GameController {
         "mode": "time"
         } */
 
-
     @Post('/BotGame')
     async selectBotGame(@Body() body: any) {
         const promise = this.GameGateway.CreateBotTable(body);
@@ -45,7 +44,18 @@ export class GameController {
         "player_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
         "mode": "time"
         } */
+    
 
+    @Post('/leaveGame')
+    leaveGame(@Body() body: any) {
+        // console.log("body: ", body);
+        this.GameGateway.LeaveGame(body);
+        // const promise = this.GameGateway.LeaveGame(body);
+    }
+
+    /**{       ///////////////////////////////////////////////////////// body
+        "table_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
+        } */
 }
 
 

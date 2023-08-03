@@ -33,6 +33,7 @@ type table_obj = {
     current: any
     tableId: string
     GameMode: string
+    imageLoad: number
   }
 
 type Random_Obj = {
@@ -149,7 +150,7 @@ class UniqueSet {
 
 
 
-type UserMap = Map<string, {User: User, SocketId?: string, BallSocketId?: string, Status: string}>;
+type UserMap = Map<string, {User: User, SocketId?: string, BallSocketId?: string, Status: string, TableId?: string}>;
 
 type TableMap = Map<string, table_obj>;
 

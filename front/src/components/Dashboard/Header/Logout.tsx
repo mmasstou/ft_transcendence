@@ -26,6 +26,7 @@ export const Logout: React.FC = (props) : JSX.Element => {
       if (resp.status === 200) {
         Cookies.remove('token');
         Cookies.remove('_id');
+        Cookies.remove('tableId');
         router.push('/')
         
       }

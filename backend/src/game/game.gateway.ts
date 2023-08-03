@@ -22,6 +22,7 @@ var table_obj = {
     current: currents,
     tableId: '',
     GameMode: '',
+    imageLoad: 0,
 }
 
 
@@ -59,7 +60,6 @@ function check_col(table: any){
 
 }
 
-
 function moveBall(server: Server, table: any){
     if (table.ball.x > 0 && table.ball.x < 100 && table.ball.y > 0 && table.ball.y < 100) {
       table.ball.x += table.ball.ball_speed.x;
@@ -85,8 +85,6 @@ function moveBall(server: Server, table: any){
 @WebSocketGateway({namespace: 'game'})
 class MyGateway implements OnGatewayConnection {
     constructor(private jwtService: JwtService,private readonly usersService: UserService) {}
-    // private gameType: string;
-    // private gameMode: string;
     
     @WebSocketServer()
     server: Server;
@@ -108,7 +106,8 @@ class MyGateway implements OnGatewayConnection {
           && UserMap.get(data.player1_Id).SocketId
           && UserMap.get(data.player2_Id).SocketId
           && table_obj.tableId) {
-  
+            UserMap.get(data.player1_Id).TableId = table_obj.tableId;
+            UserMap.get(data.player2_Id).TableId = table_obj.tableId;
             const user1 = UserMap.get(data.player1_Id).User;
             const user2 = UserMap.get(data.player2_Id).User;
             table_obj.GameMode = data.mode;
@@ -128,6 +127,7 @@ class MyGateway implements OnGatewayConnection {
               current: currents,
               tableId: '',
               GameMode: '',
+              imageLoad: 0,
             }
           }
         else
@@ -139,6 +139,8 @@ class MyGateway implements OnGatewayConnection {
       });
     }
 
+
+    
     async CreateBotTable(data: any) {
       return new Promise(async (resolve, reject) => {
         if (!UserMap.has(data.player_Id)) {
@@ -148,6 +150,10 @@ class MyGateway implements OnGatewayConnection {
         if (UserMap.get(data.player_Id) && UserMap.get(data.player_Id).SocketId && UserMap.get(data.player_Id).BallSocketId) {
           const user = UserMap.get(data.player_Id).User;
           table_obj.tableId = uuidv4();
+          UserMap.get(data.player_Id).TableId = table_obj.tableId;
+          // console.log("userMap---->", UserMap.get(data.player_Id));
+          // UserMap.set(data.player_Id, {TableId: table_obj.tableId});
+          // console.log("userMap++++>", UserMap.get(data.player_Id));
           table_obj.GameMode = data.mode;
           table_obj.player1.setUserId(data.player_Id);
           table_obj.player2.setUserId('Bot');
@@ -165,6 +171,7 @@ class MyGateway implements OnGatewayConnection {
             current: currents,
             tableId: '',
             GameMode: '',
+            imageLoad: 0,
         }
         } else {
           setTimeout(() => {
@@ -196,6 +203,8 @@ class MyGateway implements OnGatewayConnection {
                 table_obj.GameMode = 'time';
                 table_obj.player1 = RandomListTime.getfirst.player;
                 table_obj.player2 = RandomListTime.getfirst.player;
+                UserMap.get(data.player1_Id).TableId = table_obj.tableId;
+                UserMap.get(data.player2_Id).TableId = table_obj.tableId;
                 this.server.to(UserMap.get(table_obj.player1.UserId).SocketId).emit('joinRoomGame', table_obj);
                 this.server.to(UserMap.get(table_obj.player2.UserId).SocketId).emit('joinRoomGame', table_obj);
                 TableMap.set(table_obj.tableId, table_obj);
@@ -208,12 +217,15 @@ class MyGateway implements OnGatewayConnection {
                   current: currents,
                   tableId: '',
                   GameMode: '',
+                  imageLoad: 0,
                 }
               }
             else {
               table_obj.GameMode = 'score';
               table_obj.player1 = RandomListScore.getfirst.player;
               table_obj.player2 = RandomListScore.getfirst.player;
+              UserMap.get(data.player1_Id).TableId = table_obj.tableId;
+              UserMap.get(data.player2_Id).TableId = table_obj.tableId;
               this.server.to(UserMap.get(table_obj.player1.UserId).SocketId).emit('joinRoomGame', table_obj);
               this.server.to(UserMap.get(table_obj.player2.UserId).SocketId).emit('joinRoomGame', table_obj);
               TableMap.set(table_obj.tableId, table_obj);
@@ -226,6 +238,7 @@ class MyGateway implements OnGatewayConnection {
                 current: currents,
                 tableId: '',
                 GameMode: '',
+                imageLoad: 0,
               }
             }
           }
@@ -236,6 +249,13 @@ class MyGateway implements OnGatewayConnection {
           }, 1000);
         }
       });
+    }
+
+    LeaveGame(data: any) {
+      const table = TableMap.get(data.TableId);
+      if (table) {
+        this.server.to(table.tableId).emit('leaveGame',UserMap.get(data.UserId).SocketId);
+      }
     }
 
     async handleConnection(socket: Socket) {
@@ -256,26 +276,15 @@ class MyGateway implements OnGatewayConnection {
       if (!_User)
         return
       console.log('+-> Client',_User.login , 'connected ', _User.id);
-      UserMap.set(_User.id, {User: _User, SocketId: socket.id, Status: 'online'});
+      if (!UserMap.has(_User.id))
+        UserMap.set(_User.id, {User: _User, SocketId: socket.id, Status: 'online'});
+      else
+        UserMap.get(_User.id).SocketId = socket.id;
       if (socket.handshake.auth.tableId) {
-        // console.log('join to room----------', TableMap.get(socket.handshake.auth.tableId));
         socket.emit('joinRoomGame', TableMap.get(socket.handshake.auth.tableId));
       }
     }
 
-    
-
-    handleDisconnect(socket: Socket) {
-      console.log('Client disconnected', socket.id);
-      if (socket.handshake.auth.tableId)
-        clearInterval(TableMap.get(socket.handshake.auth.tableId).current);
-      else {
-        TableMap.forEach((value) => {
-          if (value.player1.UserId === socket.handshake.auth.UserId || value.player2.UserId === socket.handshake.auth.UserId)
-            clearInterval(value.current);
-        });
-      }
-    }
     @SubscribeMessage('joinToRoomGame')
     JoinToRoomGame(client: any, data: any) {
       client.join(data);
@@ -288,6 +297,30 @@ class MyGateway implements OnGatewayConnection {
       this.server.to(data.tableId).emit('setPlayer1', data.Player);
     }
 
+    @SubscribeMessage('disconnecting')
+    disconneting(client: any, data: any) {
+      const UsId = client.handshake.auth.UserId;
+      const TableId = UserMap.get(UsId).TableId;
+      if (data[0] == "transport close") {
+        console.log("the client id: ",UsId," reload the game page");
+        if (UserMap.get(UsId).TableId && TableMap.get(UserMap.get(UsId).TableId)) {
+          TableMap.get(TableId).Status = false;
+          this.server.to(TableId).emit('setStatus', false);
+        }
+      }
+      else {
+        console.log("the client id: ",UsId," logout from the game page");
+        if (UserMap.get(UsId).TableId && TableMap.get(UserMap.get(UsId).TableId)) {
+          this.server.to(TableId).emit('leaveGame');
+          clearInterval(TableMap.get(UserMap.get(UsId).TableId).current);
+          TableMap.delete(UserMap.get(UsId).TableId);
+          UserMap.delete(UsId);
+        }
+      }
+      // TableMap.get(data.tableId).player1.position = data.Player;
+      // this.server.to(data.tableId).emit('setPlayer1', data.Player);
+    }
+    
     @SubscribeMessage('setPlayer2')
     SetPlayer2(client: any, data: any) {
       TableMap.get(data.tableId).player2.position = data.Player;
@@ -302,7 +335,8 @@ class MyGateway implements OnGatewayConnection {
     
     @SubscribeMessage('setStatus')
     SetStatus(client:any, data: any) {
-      TableMap.get(data.tableId).Status = data.status;
+      const table = TableMap.get(data.tableId);
+      table && (table.Status = data.status);
       this.server.to(data.tableId).emit('setStatus', data.status);
     }
 }
@@ -336,7 +370,7 @@ class BallGateway implements OnGatewayConnection {
         this.server.to(UserMap.get(data.player_Id).BallSocketId).emit('joinRoomBall', id);
       }
     }
-
+    
     async handleConnection(socket: Socket) {
         const { token } = socket.handshake.auth; // Extract the token from the auth object
         let payload: any = '';
@@ -354,23 +388,19 @@ class BallGateway implements OnGatewayConnection {
         }
         if (!_User)
           return
-        console.log('+-> Client',_User.login , 'connected to ball');
-        UserMap.get(_User.id).BallSocketId = socket.id;
+        console.log('+-> Client',_User.login , 'connected to ball ', _User.id);
+        if (!UserMap.has(_User.id))
+          UserMap.set(_User.id, {User: _User, BallSocketId: socket.id, Status: 'online'});
+        else
+          UserMap.get(_User.id).BallSocketId = socket.id;
         if (socket.handshake.auth.tableId) {
           socket.emit('joinRoomBall', socket.handshake.auth.tableId);
         }
     }
-    
-  
 
-    handleDisconnect(socket: Socket) {
-      console.log('Client disconnected', socket.id);
-      if (UserMap.has(_User.id))
-        UserMap.get(_User.id).BallSocketId = '';
-    }
-    
     @SubscribeMessage('moveBall')
     MoveBall(client: any, data: any) {
+      if (TableMap.get(data)) {
         clearInterval(TableMap.get(data).current);
         if (TableMap.get(data).Status) {
           TableMap.get(data).current = setInterval(() => {
@@ -382,14 +412,12 @@ class BallGateway implements OnGatewayConnection {
                 this.server.to(data + 'ball').emit('setBall', TableMap.get(data).ball);
             }, 30);
         }
+      }
     }
-
     @SubscribeMessage('joinToRoomBall')
     JoinToRoomBall(client: any, data: any) {
       client.join(data + 'ball');
     }
-
-
 }
 
 
