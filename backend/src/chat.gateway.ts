@@ -193,13 +193,17 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() data: any,
   ) {
     try {
+      const LogedUser = await this.usersService.getUserInClientSocket(client);
+      if (!LogedUser) {
+        return;
+      }
       // console.log(
       //   'Chat-> createroom +> user :%s has create room :%s',
       //   _User.login,
       //   data,
       // );
       // create room :
-      const newRoom = await this.roomservice.create(data, _User.login);
+      const newRoom = await this.roomservice.create(data, LogedUser.login);
 
       // send message that room is created :
       this.server.emit('createroomResponseEvent', newRoom);
