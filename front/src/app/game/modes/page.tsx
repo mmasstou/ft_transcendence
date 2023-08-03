@@ -9,7 +9,7 @@ import CanvasGame from '@/components/game/CanvasGame';
 const page = () => {
   return (
     <Dashboard>
-      <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide">
+      <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide text-white">
         <h1 className="text-2xl xl:text-4xl 2xl:text-5xl font-bold">
           Game Modes
         </h1>
@@ -33,12 +33,12 @@ const page = () => {
                 Robot
               </button>
               <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-secondary rounded-xl font-bold text-secondary">
-                Friend
+                Random
               </button>
               <Dialog.Root>
                 <Dialog.Trigger asChild>
                   <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-orange-500 rounded-xl font-bold text-orange-500 focus:outline-none">
-                    Random
+                    Friend
                   </button>
                 </Dialog.Trigger>
                 <Dialog.Portal>
@@ -48,7 +48,7 @@ const page = () => {
                   shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px]
                   focus:outline-none"
                   >
-                    <Dialog.Title className="">Invite a friend !</Dialog.Title>
+                    <Dialog.Title className="text-lg lg:text-xl 2xl:text-2xl">Invite a friend !</Dialog.Title>
                     <Dialog.Close asChild>
                       <button className="text-white top-5 right-5 absolute">
                         <Cross2Icon />

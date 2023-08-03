@@ -7,6 +7,7 @@ import Head from "next/head";
 import React from "react";
 import { Metadata } from 'next';
 
+
 export const metadata: Metadata = {
     title: 'Transcendence',
     description: 'Online Pong Game',

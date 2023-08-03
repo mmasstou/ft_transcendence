@@ -25,7 +25,6 @@ var table_obj = {
     imageLoad: 0,
 }
 
-
 export let _User: User | null = null;
 
 function check_col(table: any){
