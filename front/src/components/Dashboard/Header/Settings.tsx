@@ -4,10 +4,10 @@ import { RiSettingsLine } from 'react-icons/ri';
 import axios from 'axios';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import AvatarUpload from './AvatarUpload';
-import UserInput from './UserInput';
 import * as Switch from '@radix-ui/react-switch';
 import toast from 'react-hot-toast';
+import AvatarUpload from './AvatarUpload';
+import UserInput from './UserInput';
 
 const Settings: React.FC = () => {
   const [isOpen, setOpen] = useState<boolean>(false);

@@ -1,11 +1,10 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import Friend from './Friend';
 import Historique from './Historique';
-import Statistics from './Statistics';
 import Achpage from './Achpage';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Statistics from './Statistics';
+import Friend from './Friend';
 
 interface Props {
   mobile: boolean;

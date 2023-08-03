@@ -1,18 +1,17 @@
 'use client';
-import './dashboard.css';
+import Header from '@/components/Dashboard/Header/Header';
 import Sidebar from '@/components/Dashboard/sidebar/Sidebar';
 import Login from '@/components/auth/modaLs/Login';
-import './dashboard.css';
-import { Toaster } from 'react-hot-toast';
-import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
-import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
-import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
-import Header from '@/components/Dashboard/Header/Header';
-import ChanneLPasswordAccessModaL from './chat/channels/modaLs/channel.access.password.modaL';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import React from 'react';
+import { Toaster } from 'react-hot-toast';
+import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
+import ChanneLPasswordAccessModaL from './chat/channels/modaLs/channel.access.password.modaL';
 import { useEffect } from 'react';
-
+import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
+import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
+import './dashboard.css';
 interface Props {
   children: React.ReactNode;
 }

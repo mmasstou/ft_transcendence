@@ -31,6 +31,37 @@ const prisma = new PrismaClient();
 
 let _data = [
   {
+    login: 'aboulhaj1',
+    email: 'aboulhaj1@prisma.io',
+    password: 'aboulhaj1',
+    image: "https://cdn.intra.42.fr/users/c9a6f9f9009e4112128b97aaa41460b3/aboulhaj.jpg",
+    is_active: true,
+  },
+  {
+    login: 'mmasstou1',
+    email: 'mmasstou1@prisma.io',
+    password: 'mmasstou1',
+    bg_color: ['#B6F1E4', '#00AEA9'],
+    paddle_color: '#E0E0E0',
+    ball_color: '#E0E0E0',
+    image: "https://cdn.intra.42.fr/users/5f10eb429fc9ed4eb28c5850095a14cb/mmasstou.jpg",
+    is_active: true,
+  },
+  {
+    login: 'aboulhaj2',
+    email: 'aboulhaj2@prisma.io',
+    password: 'aboulhaj2',
+    image: "pngavatar2.png",
+    is_active: true,
+  },
+  {
+    login: 'mmasstou2',
+    email: 'mmasstou2@prisma.io',
+    password: 'mmasstou2',
+    image: "pngavatar.png",
+    is_active: true,
+  },
+  {
     login: 'mmasstou',
     email: 'mmasstou@student.1337.ma',
     password: 'mmasstou012345_',

@@ -10,6 +10,7 @@ import { RoomsModule } from './rooms/rooms.module';
 import { MessagesModule } from './messages/messages.module';
 import { MembersModule } from './members/members.module';
 import { ChatGateway } from './chat.gateway';
+import { GameModule } from './game/game.module';
 import { RoomsService } from './rooms/rooms.service';
 import { MembersService } from './members/members.service';
 import { MessagesService } from './messages/messages.service';
@@ -22,6 +23,7 @@ import { UserGateway } from './user.gateway';
     RoomsModule,
     MessagesModule,
     MembersModule,
+    GameModule,
   ],
   controllers: [AppController],
   providers: [

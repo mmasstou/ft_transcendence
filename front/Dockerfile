@@ -3,7 +3,7 @@ FROM node:buster
 WORKDIR /frontend
 
 RUN npm install -g next
-COPY ./package.json .
+COPY ./package*.json .
 
 
 RUN npm i

@@ -14,7 +14,7 @@ export class UserService {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
-    if (!user) return {};
+    if (!user) return null;
     return user;
   }
   async findOneLogin(params: { login: string }): Promise<User> {
@@ -38,7 +38,7 @@ export class UserService {
 
   async create(data: Prisma.UserCreateInput): Promise<User> {
     const Req_Data: Prisma.UserCreateInput = data;
-    if (Req_Data.is_active === true && Req_Data.login !== 'mmasstou')
+    if (Req_Data.is_active === true && Req_Data.login !== 'aboulhaj')
       data.is_active = false;
     return await this.prisma.user.create({
       data,

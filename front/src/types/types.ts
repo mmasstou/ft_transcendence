@@ -61,6 +61,9 @@ export type userType = {
   name: string;
   kind: null;
   avatar: string | '';
+  bg_color: string[] | null
+  paddle_color: string | null
+  ball_color: string | null
   intraId: number;
   banner: string | '';
   is_active: boolean;
