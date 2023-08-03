@@ -1,6 +1,6 @@
 import { IoChevronBackOutline } from "react-icons/io5";
 import { Socket } from "socket.io-client";
-import { RoomTypeEnum, RoomsType, UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
+import { RoomTypeEnum, RoomsType, UpdateChanneLSendData, UpdateChanneLSendEnum, UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
 import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import Image from "next/image";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -25,19 +25,9 @@ interface ChanneLUserSettingsProps {
     setUpdate: (data: boolean) => void
 }
 
-export enum UpdateChanneLSendType {
-    CHANGETYPE = 'CHANGETYPE',
-    SETACCESSEPASSWORD = 'SETACCESSEPASSWORD',
-}
-export type UpdateChanneLSendData =  {
-    Updatetype: UpdateChanneLSendType,
-    accesspassword?: string,
-    roomtype?: RoomTypeEnum,
-    room : RoomsType
-}
 export default function ChanneLSettingsChanneLChangeType(
     { socket, OnBack, LogedMember, members, setUpdate }: ChanneLUserSettingsProps) {
-    const [ChanneLinfo, setChanneLinfo] = React.useState<membersType | null>(null)
+    const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
     const [passwordPopup, setPasswordPopup] = React.useState<boolean>(false)
     const params = useSearchParams()
     const channeLLid = params.get('r')
@@ -70,25 +60,21 @@ export default function ChanneLSettingsChanneLChangeType(
     const _newChanneLpassword = watch('newChanneLpassword')
     const _confirmChanneLpassword = watch('confirmChanneLpassword')
 
-    const onSubmit = (data: {
-        type: RoomTypeEnum,
-        id: string,
-        password?: string,
-        confirmpassword?: string
-    }) => {
+    const onSubmit = (data: UpdateChanneLSendData) => {
         // chack if  password is not empty and if password is not equal to confirm password
-        if (data.type === RoomTypeEnum.PROTECTED && (data.password !== "" && data.password !== data.confirmpassword)) {
+        console.log("send data :", data)
+        if (data.roomtype === RoomTypeEnum.PROTECTED && (data.password !== "" && data.password !== data.confirmpassword)) {
             return
         }
         // check if selected type is not equal to current type
-        if (data.type === ChanneLinfo?.type) {
+        if (data.roomtype === ChanneLinfo?.type) {
             return
         }
         // send data to server
         socket?.emit('updateChanneL', data)
         //   reset data for password
         reset()
-        if (data.type === RoomTypeEnum.PROTECTED) {
+        if (data.roomtype === RoomTypeEnum.PROTECTED) {
             setPasswordPopup(false)
         }
     }
@@ -118,7 +104,15 @@ export default function ChanneLSettingsChanneLChangeType(
                     <div className="flex flex-col gap-4 ">
                         <ChanneLSettingsOptionItem
                             onClick={function (): void {
-                                channeLLid && onSubmit({ id: channeLLid, type: RoomTypeEnum.PRIVATE });
+
+                                channeLLid && ChanneLinfo && onSubmit({
+                                    roomtype: RoomTypeEnum.PRIVATE,
+                                    room: ChanneLinfo,
+                                    Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
+                                    password: '',
+                                    confirmpassword: '',
+                                    accesspassword: ''
+                                });
                             }}
                             icon={GoEyeClosed}
                             label={"Private"}
@@ -136,12 +130,12 @@ export default function ChanneLSettingsChanneLChangeType(
                         {/* if you whon to change channel type to protacted */}
                         {
                             passwordPopup && <div className="flex flex-col gap-3 w-full relative">
-                                <Input id="newChanneLpassword" lable="password" type="password" register={register} errors={errors} onChange={(e) => { 
+                                <Input id="newChanneLpassword" lable="password" type="password" register={register} errors={errors} onChange={(e) => {
                                     setValue('confirmChanneLpassword', e.target.value)
-                                 }} />
-                                <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={(e) => { 
+                                }} />
+                                <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={(e) => {
                                     setValue('confirmChanneLpassword', e.target.value)
-                                 }} />
+                                }} />
                                 <div className=" relative w-full flex justify-center items-center">
                                     <Button
                                         icon={BsSaveFill}
@@ -150,11 +144,13 @@ export default function ChanneLSettingsChanneLChangeType(
                                         responsive
                                         size={18}
                                         onClick={() => {
-                                            channeLLid && onSubmit({
-                                                id: channeLLid,
-                                                type: RoomTypeEnum.PROTECTED,
+                                            channeLLid && ChanneLinfo && onSubmit({
+                                                roomtype: RoomTypeEnum.PROTECTED,
+                                                room: ChanneLinfo,
+                                                Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
                                                 password: _newChanneLpassword,
-                                                confirmpassword: _confirmChanneLpassword
+                                                confirmpassword: _confirmChanneLpassword,
+                                                accesspassword: ''
                                             });
                                         }}
                                     />
@@ -163,9 +159,13 @@ export default function ChanneLSettingsChanneLChangeType(
                         }
                         <ChanneLSettingsOptionItem
                             onClick={function (): void {
-                                channeLLid && onSubmit({
-                                    id: channeLLid,
-                                    type: RoomTypeEnum.PUBLIC
+                                channeLLid && ChanneLinfo && onSubmit({
+                                    roomtype: RoomTypeEnum.PUBLIC,
+                                    room: ChanneLinfo,
+                                    Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
+                                    password: '',
+                                    confirmpassword: '',
+                                    accesspassword: ''
                                 });
                             }}
                             icon={HiLockOpen}

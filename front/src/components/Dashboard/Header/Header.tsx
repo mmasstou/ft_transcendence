@@ -13,10 +13,12 @@ import { membersType, userType } from '@/types/types';
 
 const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
   const [Notifications, setNotifications] = React.useState<any[]>([])
+
   socket?.on('notificationEvent', (data) => {
     console.log("notificationEvent data :", data)
     setNotifications([...Notifications, data])
   })
+  
   return (
     <>
       <div className="flex justify-center items-center">

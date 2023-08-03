@@ -115,9 +115,11 @@ export enum UpdateChanneLSendEnum {
   REMOVEACCESSEPASSWORD = 'REMOVEACCESSEPASSWORD',
   EDITACCESSEPASSWORD = 'EDITACCESSEPASSWORD',
 }
-export type UpdateChanneLSendData =  {
+export type UpdateChanneLSendData = {
   Updatetype: UpdateChanneLSendEnum,
+  password?: string,
+  confirmpassword?: string,
   accesspassword?: string,
   roomtype?: RoomTypeEnum,
-  room : RoomsType
+  room: RoomsType
 }

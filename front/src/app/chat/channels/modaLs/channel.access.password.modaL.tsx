@@ -87,7 +87,7 @@ const ChanneLPasswordAccessModaL = () => {
                         onChange={(e: any) => { setcustomvalue(_channeLpassword, e.target.value) }}
                         id={"ChanneLpassword"} lable={"ChanneL password"}
                         register={register}
-
+                        type={"password"}   
                         errors={errors} />
                 </div>
             </div>

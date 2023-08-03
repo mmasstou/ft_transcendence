@@ -20,6 +20,10 @@ import { MembersService } from './members/members.service';
 import { PrismaService } from './prisma.service';
 import { clientOnLigne } from './user.gateway';
 import { RoomsType, membersType } from './users/user.type';
+import {
+  UpdateChanneLSendData,
+  UpdateChanneLSendEnum,
+} from './rooms/types/upatecahnnel';
 export let _User: User | null = null;
 
 enum updatememberEnum {
@@ -283,28 +287,38 @@ export class ChatGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('updateChanneL')
-  async updateChanneL(@MessageBody() data: any) {
+  async updateChanneL(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: UpdateChanneLSendData,
+  ) {
     try {
-      // console.log('Chat-> updateChanneL +> data :', data);
-      const room = await this.roomservice.findOne({ name: data.id });
-
+      console.log('Chat-> updateChanneL +> data :', data);
+      const room = await this.roomservice.findOne({ name: data.room.id });
+      const LogedUser = await this.usersService.getUserInClientSocket(client);
       const responseMemberData = await this.roomservice.isMemberInRoom(
         room.id,
-        _User.id,
+        LogedUser.id,
       );
       if (responseMemberData.type === UserType.OWNER) {
         // console.log('Chat-> responseMemberData- +>', responseMemberData);
-
-        const dataRoom = {
-          name: room.name,
-          type: data.type,
-          password: data.password,
-        };
-        const updateRoom = await this.prisma.rooms.update({
-          where: { id: room.id },
-          data: dataRoom,
-        });
-        this.server.emit('updateChanneLResponseEvent', updateRoom);
+        // check type of update :
+        // change type of room :
+        if (data.Updatetype === UpdateChanneLSendEnum.CHANGETYPE) {
+          const dataRoom = {
+            name: room.name,
+            type: data.roomtype,
+            accesspassword: data.accesspassword,
+            password: data.password,
+          };
+          const updateRoom = await this.prisma.rooms.update({
+            where: { id: room.id },
+            data: {
+              ...dataRoom,
+            },
+          });
+          console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
+          this.server.emit('updateChanneLResponseEvent', updateRoom);
+        }
       }
     } catch (error) {
       console.log('Chat-updateChanneL> error- +>', error);
