@@ -5,27 +5,29 @@ services:
   #   container_name: frontend
   #   ports:
   #     - 8080:8080
-  #   networks:
-  #     - APInetwork
-  #   depends_on:
-  #     - backend
+  #     # - 5430:5430
+  #   # networks:
+  #   #   - APInetwork
+  #   # depends_on:
+  #   #   - backend
+  #   #   - database
   #   volumes:
-  #     - /Users/mohamed/Documents/Projects/ft_transcendence/front/src:/frontend/src:rw
-  #   restart: always
-  # backend:
-  #   build: backend/
-  #   container_name: backend
-  #   env_file:
-  #     - backend/.env
-  #   ports:
-  #     - 80:80
-  #   networks:
-  #     - APInetwork
-  #   depends_on:
-  #     - database
-  #   restart: always
-  #   volumes:
-  #     - /Users/mohamed/Documents/Projects/ft_transcendence/backend/src:/app/src:rw
+  #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front:/frontend:rw
+  #    # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
+  backend:
+    build: backend/
+    container_name: backend
+    env_file:
+      - backend/.env
+    ports:
+      - 80:80
+    networks:
+      - APInetwork
+    depends_on:
+      - database
+    volumes:
+      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
+      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
     image: postgres:13
     container_name: database
@@ -33,11 +35,8 @@ services:
       - backend/.env
     networks:
       - APInetwork
-    restart: always
-    ports:
-      - 5432:5432
-    # volumes:
-      # - /Users/mohamed/Documents/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
+    volumes:
+      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
   
 networks:
   APInetwork:
