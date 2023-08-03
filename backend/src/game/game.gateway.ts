@@ -157,7 +157,7 @@ class MyGateway implements OnGatewayConnection {
           table_obj.player1.setUserId(data.player_Id);
           table_obj.player2.setUserId('Bot');
           table_obj.player1.GameSetting.setData(user.bg_color, user.ball_color, user.paddle_color, user.avatar);
-          table_obj.player2.GameSetting.setData(user.bg_color, user.ball_color, user.paddle_color, "avatarBot.png");
+          table_obj.player2.GameSetting.setData(user.bg_color, user.ball_color, user.paddle_color, "/avatarBot.png");
           this.server.to(UserMap.get(data.player_Id).SocketId).emit('joinRoomGame', table_obj);
           TableMap.set(table_obj.tableId, table_obj);
           resolve(table_obj.tableId);
