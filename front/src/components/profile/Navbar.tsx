@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import Friend from './Friend';
 import Historique from './Historique';
 import Statistics from './Statistics';
+import Achievement from './Achievement';
+import Achpage from './Achpage';
 
 interface Props {
   mobile: boolean;
@@ -10,7 +12,7 @@ interface Props {
 }
 
 export const Navbar: React.FC<Props> = (info): JSX.Element => {
-  const links = ['Statistics', 'Friend', 'History'];
+  const links = ['Statistics', 'Friend', 'History', 'Achievements'];
   const [isActive, setActive] = useState<string>(links[0]);
   const [url, setUrl] = useState<string>('');
 
@@ -63,6 +65,7 @@ export const Navbar: React.FC<Props> = (info): JSX.Element => {
 
         {url === 'http://localhost:8080/profile#History' && <Historique />}
         {url === 'http://localhost:8080/profile#Friend' && <Friend />}
+        {url === 'http://localhost:8080/profile#Achievements' && <Achpage />}
       </div>
     </>
   );

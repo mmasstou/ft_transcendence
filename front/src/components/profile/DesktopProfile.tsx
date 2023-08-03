@@ -1,6 +1,4 @@
 'use client';
-import { Info } from '@/app/profile/page';
-import AvatarProfile from '@/components/profile/AvatarProfile';
 import ImageUpload from '@/components/profile/ImageUpload';
 import { Navbar } from '@/components/profile/Navbar';
 import { Statis } from '@/components/profile/UserStats';
@@ -21,7 +19,7 @@ export const DesktopProfile = (): JSX.Element => {
     <div className="flex flex-col gap-10 mx-[20px]">
       <div className="bg-[#243230] relative rounded-xl max-h-[333px]">
         <ImageUpload />
-        <div className="absolute w-[150px] h-[150px] z-10 avatar-position">
+        <div className="absolute w-[150px] h-[150px] z-10 avatar-position  border-2 border-secondary rounded-full">
           <MyAvatar />
           <div className="bottom-1 absolute">
             <span
