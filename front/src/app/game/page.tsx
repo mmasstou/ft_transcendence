@@ -1,6 +1,7 @@
 'use client'
 import Image from 'next/image';
 import Dashboard from '../Dashboard';
+import CanvasGame from '@/components/game/CanvasGame'; 
 import Link from 'next/link';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
@@ -94,6 +95,7 @@ const page = () => {
           </div>
         </div>
       </div>
+      {/* <CanvasGame/> */}
     </Dashboard>
   );
 };
