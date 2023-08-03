@@ -182,7 +182,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     }
     img1.src = Table_obj.player1.GameSetting.avatar;
     img2.src = Table_obj.player2.GameSetting.avatar;
-    pause.src = "../../pause.png";
+    pause.src = "/pause.png";
     img1.onload = checkImageLoaded;
     img2.onload = checkImageLoaded;
     pause.onload = checkImageLoaded;
