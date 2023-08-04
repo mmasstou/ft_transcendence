@@ -4,7 +4,6 @@ import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import Image from 'next/image';
-import CanvasGame from '@/components/game/CanvasGame';
 
 const page = () => {
   return (
@@ -23,10 +22,9 @@ const page = () => {
             </p>
             <p>
               To start playing, simply choose your preferred game mode. Are you
-              up for a quick practice session to warm up? Select the "Practice
-              Mode" and hone your techniques against our responsive AI
-              opponents. Want to challenge friends ? Click on "Multiplayer Mode"
-              to enter our vibrant community and engage in exhilarating matches.
+              up for a quick practice session to warm up? Select the <strong className='text-yellow-500'>Robot</strong> and hone your techniques against our responsive AI
+              opponents. Want to challenge friends ? Click on <strong className='text-secondary'>Random</strong> or <strong className='text-orange-500'>Friend</strong> 
+              {" "}to enter our vibrant community and engage in exhilarating matches.
             </p>
             <div className="flex gap-10 my-4 w-full justify-center">
               <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-yellow-500 rounded-xl font-bold text-yellow-500">
