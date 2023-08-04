@@ -27,8 +27,8 @@ const UserMap: UserMap = new Map(); ////////// list of user connected to the gam
 const TableMap: TableMap = new Map(); ////////// list of table obj created
 const RandomListTime = new UniqueSet(); ////////// list of random time obj created
 const RandomListScore = new UniqueSet(); ////////// list of random score obj created
-var currents: NodeJS.Timeout;
-var table_obj = {
+let currents: NodeJS.Timeout;
+let table_obj = {
   player1: new Player(),
   player2: new Player(),
   ball: new Ball(),
@@ -51,11 +51,11 @@ function check_col(table: any) {
     table.ball.y < table.player1.position + 16
   ) {
     // colleg with player1
-    var centerPlayer = table.player1.position + 8;
-    var ballOffset = table.ball.y - centerPlayer;
-    var ballPositionOnPaddle = ballOffset / 16;
-    var maxAngle = Math.PI * 0.9;
-    var angle = ballPositionOnPaddle * maxAngle;
+    const centerPlayer = table.player1.position + 8;
+    const ballOffset = table.ball.y - centerPlayer;
+    const ballPositionOnPaddle = ballOffset / 16;
+    const maxAngle = Math.PI * 0.9;
+    const angle = ballPositionOnPaddle * maxAngle;
     table.ball.ball_speed.x = -Math.cos(angle);
     table.ball.ball_speed.y = Math.sin(angle);
     table.ball.ball_speed.x +=
@@ -73,11 +73,11 @@ function check_col(table: any) {
     table.ball.y < table.player2.position + 16
   ) {
     // colleg with player2
-    var centerPlayer = table.player2.position + 8;
-    var ballOffset = table.ball.y - centerPlayer;
-    var ballPositionOnPaddle = ballOffset / 16;
-    var maxAngle = Math.PI * 0.9;
-    var angle = ballPositionOnPaddle * maxAngle;
+    const centerPlayer = table.player2.position + 8;
+    const ballOffset = table.ball.y - centerPlayer;
+    const ballPositionOnPaddle = ballOffset / 16;
+    const maxAngle = Math.PI * 0.9;
+    const angle = ballPositionOnPaddle * maxAngle;
     table.ball.ball_speed.x = Math.cos(angle);
     table.ball.ball_speed.y = Math.sin(angle);
     table.ball.ball_speed.x +=
@@ -220,7 +220,7 @@ class MyGateway implements OnGatewayConnection {
           user.bg_color,
           user.ball_color,
           user.paddle_color,
-          '/avatarBot.png',
+          'avatarBot.png',
         );
         this.server
           .to(UserMap.get(data.player_Id).SocketId)
@@ -258,7 +258,7 @@ class MyGateway implements OnGatewayConnection {
         UserMap.get(data.player_Id).BallSocketId
       ) {
         const user = UserMap.get(data.player_Id).User;
-        let obj = new random_obj();
+        const obj = new random_obj();
         obj.player.setUserId(data.player_Id);
         obj.player.GameSetting.setData(
           user.bg_color,

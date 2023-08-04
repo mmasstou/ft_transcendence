@@ -1,8 +1,10 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import Friend from './Friend';
 import Historique from './Historique';
+import Achpage from './Achpage';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import Statistics from './Statistics';
+import Friend from './Friend';
 
 interface Props {
   mobile: boolean;
@@ -10,29 +12,12 @@ interface Props {
 }
 
 export const Navbar: React.FC<Props> = (info): JSX.Element => {
-  const links = ['Statistics', 'Friend', 'History'];
-  const [isActive, setActive] = useState<string>(links[0]);
-  const [url, setUrl] = useState<string>('');
+  let router = usePathname();
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setUrl(window.location.toString());
-    }
-    const currentHash = window.location.hash.substring(1);
-    if (links.includes(currentHash)) {
-      setActive(currentHash);
-    } else {
-      setActive(links[0]);
-    }
-  }, []);
+  const updateRouter = (url: string) => {
+    router = url;
+  };
 
-  const handleClick =
-    (link: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      setActive(link);
-      window.location.hash = link;
-      setUrl(window.location.toString());
-    };
   return (
     <>
       <div className={`bg-[#243230] ${info.style}`}>
@@ -43,26 +28,49 @@ export const Navbar: React.FC<Props> = (info): JSX.Element => {
         )}
         <nav className={`flex items-center justify-start px-5 py-2 `}>
           <ul className="flex items-center gap-5 text-white">
-            {links.map((link) => (
-              <li className="pointer-cursor" key={link}>
-                <a
-                  href={`#${link}`}
-                  className={`${isActive === link && 'text-secondary '}`}
-                  onClick={handleClick(link)}
-                >
-                  {link}
-                </a>
-              </li>
-            ))}
+            <li
+              className={
+                router == '/profile' || router == '/profile/statistics'
+                  ? 'text-secondary'
+                  : ''
+              }
+            >
+              <Link href="/profile/statistics">Statistics</Link>
+            </li>
+
+            <li
+              className={router == '/profile/history' ? 'text-secondary ' : ''}
+            >
+              <Link href="/profile/history">History</Link>
+            </li>
+
+            <li className={router == '/profile/friend' ? 'text-secondary' : ''}>
+              <Link href="/profile/friend">Friend</Link>
+            </li>
+
+            <li
+              className={
+                router == '/profile/achievements' ? 'text-secondary' : ''
+              }
+            >
+              <Link
+                onClick={() => updateRouter('/profile/achievements')}
+                href="/profile/achievements"
+              >
+                Achievements
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>
       <div className="">
-        {(url === 'http://localhost:8080/profile' ||
-          url === 'http://localhost:8080/profile#Statistics') && <Statistics />}
+        {(router === '/profile' || router === '/profile/statistics') && (
+          <Statistics />
+        )}
 
-        {url === 'http://localhost:8080/profile#History' && <Historique />}
-        {url === 'http://localhost:8080/profile#Friend' && <Friend />}
+        {router === '/profile/history' && <Historique />}
+        {router === '/profile/friend' && <Friend />}
+        {router === '/profile/achievements' && <Achpage />}
       </div>
     </>
   );

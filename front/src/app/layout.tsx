@@ -8,11 +8,6 @@ const changa = Changa({
   variable: '--font-changa',
 });
 
-const metadata = {
-  title: 'Transcendence',
-  description: 'Online Pong Game',
-};
-
 export default function RootLayout({
   children,
 }: {
