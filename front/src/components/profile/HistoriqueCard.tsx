@@ -1,6 +1,5 @@
 import MyAvatar from './MyAvatar';
 
-
 const HistoriqueCard = () => {
   return (
     <div className="bg-[#3E504D]  w-full flex justify-between py-3 lg:py-4 rounded-md">
