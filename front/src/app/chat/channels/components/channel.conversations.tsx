@@ -19,6 +19,7 @@ import Cookies from "js-cookie";
 import getMemberWithId from "../actions/getMemberWithId";
 import { membersType } from "@/types/types";
 import ChanneLsettingsHook from "../hooks/channel.settings";
+import getChannelWithId from "../actions/getChannelWithId";
 
 
 export default function Conversations({ socket }: { socket: Socket | null }) {
@@ -46,25 +47,12 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         const token: any = room && Cookies.get('token');
         room && (async () => {
             const response = await getChanneLMessages(room, token)
-            if (response && response.ok) {
-                console.log("= await getChanneLMessage :", response)
-                const data = await response.json()
-                console.log("= await getChanneLMessage :", data)
-                setMessages(data.messages)
-            }
+            if (!response) return
+            console.log("= await getChanneLMessage :", response)
+            setMessages(response.messages)
 
             // get room data :
-            const response2 = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/${room}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            if (!response2.ok) {
-                return setChanneLinfo(null)
-            }
-            const _roomInfo = await response2.json()
+            const _roomInfo = await getChannelWithId(room, token)
             setChanneLinfo(_roomInfo)
         })();
 
@@ -109,7 +97,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
             {/* <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} /> */}
             {
-                messages.length ?
+                messages && messages.length ?
                     messages.map((message, index) => (
                         <Message
                             key={index}

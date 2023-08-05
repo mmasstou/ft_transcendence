@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react'
 import Dashboard from '@/app/Dashboard';
 import { RoomsType, membersType } from '@/types/types';
-import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { notFound, useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
 import ChanneLIndex from './components/channel.index';
 import LoginHook from '@/hooks/auth/login';
@@ -13,6 +13,7 @@ import getMemberWithId from './actions/getMemberWithId';
 import getChannelMembersWithId from './actions/getChannelmembers';
 import ChanneLaccessDeniedHook from './hooks/ChanneL.access.denied.hook';
 import getChannels from './actions/getChanneLs';
+import { toast } from 'react-hot-toast';
 const metadata = {
   title: 'Transcendence',
   description: 'Online Pong Game',
@@ -26,14 +27,16 @@ export default function page() {
   const params = useSearchParams()
   const token: any = Cookies.get('token');
   const loginhook = LoginHook()
+  const router = useRouter()
   const channeLaccessDeniedHook = ChanneLaccessDeniedHook()
 
-  if (IsMounted){
+  if (IsMounted) {
     document.title = "Transcendence - Chat/channeL"
   }
 
 
 
+  // create chat client socket
   useEffect(() => {
     if (!token)
       return;
@@ -43,7 +46,11 @@ export default function page() {
         token: token,
       },
     });
-
+    socket.on('jwt_expired', () => {
+      console.log("jwt_expired")
+      Cookies.remove('token')
+      Cookies.remove('_id')
+    })
     // Handle socket events here
     socket.on('connect', () => {
 
@@ -56,12 +63,21 @@ export default function page() {
     };
   }, [token]);
 
+  // render components when the body is render 
+  useEffect(() => setIsMounted(true), [])
+  // check if channel param is selected ?
   useEffect(() => {
     const token: any = Cookies.get('token');
-    console.log("token :", token)
-    // if (!token)
-    //   loginhook.onOpen()
-    setIsMounted(true)
+    const channeLid = params.get('r')
+    if (!channeLid || !token) return;
+    setChanneLsActive(channeLid);
+    (async () => {
+      const ChanneLselectedInfo = await getChannelWithId(channeLid, token)
+      if (!ChanneLselectedInfo) {
+        toast.error(`there's no channel with that name : ${channeLid}`)
+        router.push('/chat/channels')
+      }
+    })();
   }, [])
 
   useEffect(() => {
@@ -78,7 +94,7 @@ export default function page() {
       const room = await getChannelWithId(_ChanneLsActiveID, token)
       const userId = Cookies.get('_id')
       if (userId) {
-        
+
         const Logedmemder = await getMemberWithId(userId, _ChanneLsActiveID, token)
         if (!Logedmemder) return
         const activeChannelsMembers = await getChannelMembersWithId(_ChanneLsActiveID, token)
@@ -96,37 +112,39 @@ export default function page() {
     })();
   }, [_ChanneLsActiveID, socket])
 
-  // React.useEffect(() => {
-  //   console.log("+page+> memberHasAccess :", memberHasAccess)
-  //   console.log("+page+> _ChanneLsActiveID :", _ChanneLsActiveID)
-  //   if (_ChanneLsActiveID && !memberHasAccess) {
-  //     channeLaccessDeniedHook.onOpen()
-  //   }
-  // }, [memberHasAccess, _ChanneLsActiveID])
-
   useEffect(() => {
-    if (!IsMounted)
+
+    // get toaster loading id :
+    const toastId = toast.loading('Finding all your Channels ...')
+    // const ToasterId = toast.loading('Finding all your Channels ...')
+
+
+    if (!IsMounted) {
+      toast.remove(toastId)
       return
+    }
     try {
       const token: any = Cookies.get('token');
       (async () => {
-        if (!token)
-          return;
-        const resp = await getChannels(token)
-        if (resp && resp.ok) {
-          const data = await resp.json()
-          // console.log("data :", data)
-          setChannel(data);
-        }
+        if (!token) throw new Error('no token')
+        const response = await getChannels(token)
+        if (!response) throw new Error('not fond')
         // console.log("resp :", resp)
+        setTimeout(() => {
+          setChannel(response);
+          toast.remove(toastId)
+          toast.success(`find ${response.length} channel`)
+        }, 2000)
       })();
     } catch (error) {
-      // console.log("error :", error)
+      console.log("error :", error)
+      toast.remove(toastId)
+      toast.error("no channels for now")
     }
 
     setIsMounted(true);
     return () => setIsMounted(false)
-  }, [IsMounted])
+  }, [])
 
 
   if (!IsMounted)

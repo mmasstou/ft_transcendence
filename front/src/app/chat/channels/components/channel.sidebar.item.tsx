@@ -15,6 +15,7 @@ interface ChanneLSidebarItemProps {
 }
 const ChanneLSidebarItem = ({ room, active, onClick, socket, viewd }: ChanneLSidebarItemProps) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedchanneL, setSelectedchanneL] = useState<RoomsType | null>(null)
   const leftSidebar = LeftSidebarHook()
   const router = useRouter()
   const params = useSearchParams()
@@ -42,22 +43,28 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket, viewd }: ChanneLSid
     };
   }, []);
 
-  const onClickHandler = () => {
-    if (room.hasAccess === true && room.id !== params.get('r')) {
-      console.log("room  :%s cliecked and hasAccessPassrod : ", room.name, room.hasAccess)
-      channeLPasswordAccessHook.onOpen(room, socket)
-    }
-    else if (room.hasAccess === false) {
-      console.log("room  :%s cliecked and hasAccessPassrod : ", room.name, room.hasAccess)
-      room && socket?.emit('joinroom', room, (response: any) => { })
-      router.push(`/chat/channels?r=${room.id}`)
-    }
+  useEffect(() => {
+    // if (selectedchanneL) {
+    //   if (selectedchanneL.hasAccess === true && selectedchanneL.id !== params.get('r')) {
+    //     console.log("selectedchanneL  :%s cliecked and hasAccessPassrod : ", selectedchanneL.name, selectedchanneL.hasAccess)
+    //     channeLPasswordAccessHook.onOpen(selectedchanneL, socket)
+    //   }
+    //   else if (selectedchanneL.hasAccess === false) {
+    //     console.log("selectedchanneL  :%s cliecked and hasAccessPassrod : ", selectedchanneL.name, selectedchanneL.hasAccess)
+    //     selectedchanneL && socket?.emit('joinroom', selectedchanneL, (response: any) => { })
+    //     router.push(`/chat/channels?r=${selectedchanneL.id}`)
+    //   }
+    // }
+    if (!selectedchanneL) return
+    selectedchanneL && socket?.emit('joinroom', selectedchanneL, (response: any) => { })
+    router.push(`/chat/channels?r=${selectedchanneL.id}`)
     if (isMobile) leftSidebar.onClose()
-  }
+  }, [selectedchanneL])
+
 
   socket?.on('joinroomResponseEvent', (data) => {
     console.log("joinroomResponseEvent :", data)
-    
+
   })
 
   useEffect(() => {
@@ -70,8 +77,10 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket, viewd }: ChanneLSid
     }
   }, [params])
 
+
+
   return <button
-    onClick={onClickHandler}
+    onClick={() => setSelectedchanneL(room)}
     className={`flex flex-row gap-3 justify-between px-1 items-center w-full  ${active ? ' text-secondary' : 'text-white'}`}>
     <div className="flex flex-row justify-start gap-3 items-center">
       <span className={` text-2xl `}>#</span>

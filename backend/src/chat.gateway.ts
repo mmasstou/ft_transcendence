@@ -24,7 +24,7 @@ import {
   UpdateChanneLSendData,
   UpdateChanneLSendEnum,
 } from './rooms/types/upatecahnnel';
-export let _User: User | null = null;
+import { AppService } from './app.service';
 
 enum updatememberEnum {
   SETADMIN = 'SETADMIN',
@@ -44,34 +44,16 @@ export class ChatGateway implements OnGatewayConnection {
     private messageservice: MessagesService,
     private memberService: MembersService,
     private prisma: PrismaService,
+    private readonly appservice: AppService,
   ) {}
   @WebSocketServer()
   server: Server;
 
   async handleConnection(socket: Socket) {
-    const { token } = socket.handshake.auth; // Extract the token from the auth object
-    let payload: any = '';
-    try {
-      if (!token) {
-        throw new UnauthorizedException();
-      }
-      payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      const id: string = payload.login;
-      console.log('Chat-> handleConnection +> payload :', payload.login);
-      _User = await this.usersService.findOne({ id });
-      // console server socket id :
-    } catch {
-      console.log('Chat-handleConnection> error- +>', error);
-    }
-    // Perform any necessary validation or authorization checks with the token
-    // ...
-
-    // Proceed with the connection handling
-    // ...
+    // const status = await this.appservice.handleSocketConnection(socket);
+    // if (!status) socket.disconnect();
+    const User = await this.usersService.getUserInClientSocket(socket);
+    console.log('Chat-> %s connected +> socket :', User.login, socket.id);
   }
 
   @SubscribeMessage('updatemember')
@@ -197,6 +179,9 @@ export class ChatGateway implements OnGatewayConnection {
       if (!LogedUser) {
         return;
       }
+      // check if room name is exist :
+      const ExistChannel = await this.roomservice.findOne(data.name);
+      if (ExistChannel) client.emit('createroomResponseEvent', null);
       // console.log(
       //   'Chat-> createroom +> user :%s has create room :%s',
       //   _User.login,
@@ -204,9 +189,9 @@ export class ChatGateway implements OnGatewayConnection {
       // );
       // create room :
       const newRoom = await this.roomservice.create(data, LogedUser.login);
-
+      client.emit('createroomResponseEvent', newRoom);
       // send message that room is created :
-      this.server.emit('createroomResponseEvent', newRoom);
+      this.server.emit('ChatUpdate', newRoom);
     } catch (error) {
       console.log('Chat-createRoom> error- +>', error);
     }
@@ -257,9 +242,15 @@ export class ChatGateway implements OnGatewayConnection {
         await client.join(data.id);
         // send response to client :
         client.emit('joinroomResponseEvent', room);
-      }
+      } else
+        client.emit('joinroomResponseEvent', {
+          error: 'you are not member or not in the socket channel yet',
+        });
     } catch (error) {
       console.log('Chat-joinRoom> error- +>', error);
+      client.emit('joinroomResponseEvent', {
+        error: 'somthing worreng in the server',
+      });
     }
   }
 

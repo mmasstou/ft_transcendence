@@ -2,7 +2,7 @@
 import ContactHook from "@/hooks/contactHook"
 import { TiArrowMinimise } from "react-icons/ti"
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler, useFieldArray, set } from "react-hook-form"
-import { MouseEvent, useEffect, useState } from "react"
+import { MouseEvent, useCallback, useEffect, useState } from "react"
 import { userType } from "@/types/types"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
@@ -22,6 +22,7 @@ import { GoEyeClosed } from "react-icons/go"
 import { HiLockClosed, HiLockOpen } from "react-icons/hi"
 import getUsers from "../actions/getUsers"
 import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
+import { toast } from "react-hot-toast"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',
@@ -32,67 +33,74 @@ const ChanneLPasswordAccessModaL = () => {
     const [aLLfriends, setfriends] = useState<any[] | null>(null)
     const [userId, setuserId] = useState<userType | null>(null)
     const [InputValue, setInputValue] = useState("")
+    const [IsMounted, setIsMounted] = useState<boolean>(false)
 
     let users: any[] = []
-    useEffect(() => { }, [])
-
-
-    const {
-        control,
-        register,
-        handleSubmit,
-        setValue,
-        watch,
-        reset,
-        formState: { errors },
-    } = useForm<FieldValues>({
-        defaultValues: {
-            ChanneLAccessPassword: "",
-        },
-    });
-
-    const _channeLAccessPassword = watch('ChanneLAccessPassword')
-
-
-    // Argument of type 'string' is not assignable to parameter of type '"channel_name" | "friends" | `friends.${number}` | `friends.${number}.id` | `friends.${number}.login` | `friends.${number}.email` | `friends.${number}.password` | `friends.${number}.first_name` | `friends.${number}.last_name` | `friends.${number}.kind` | `friends.${number}.image` | `friends.${number}.is_active`
-    const setcustomvalue = (key: any, value: any) => {
-        setValue(key, value, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
-    }
-
-
-
-    const onSubmit = (password: string) => {
+    useEffect(() => { setIsMounted(true) }, [])
+    const onSubmit = () => {
         // create private room : createroom
-        reset();
         // check if passaword is room password
-        if (password !== room?.accesspassword) return
+        console.log("Acces password :", room?.accesspassword)
+        console.log("InputValue :", InputValue)
+        if (InputValue !== room?.accesspassword) {
+            toast.error('the password not match');
+            return
+        }
+        console.log("the password is match you can acces now!")
         room && socket?.emit('joinroom', room, (response: any) => {
+            if (response.error) {
+                toast.error(response.error);
+            }
+            console.log("the response is receved from socket")
             console.log("joinroom response :", response)
+            onClose()
             route.push(`/chat/channels?r=${room.id}`)
+            route.refresh()
         })
-
     }
 
-    socket?.on('joinroomResponseEvent', (data) => {
-        console.log("joinroomResponseEvent :", data)
-        onClose()
-    })
+    if (!IsMounted) return
 
     const bodyContent = (
         <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[9rem]">
             <div className="body flex flex-col gap-4">
                 <div className="body flex flex-col gap-2 py-4">
-                    {/* <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel name </h1> */}
-                    <Input
-                        onChange={(e: any) => { setInputValue(e.target.value) }}
-                        id={"ChanneLAccessPassword"} lable={"ChanneL password"}
-                        register={register}
-                        type={"password"}
-                        errors={errors} />
+                    <div className=" relative w-full">
+                        <input
+                            id={room?.id}
+                            placeholder=" "
+                            type='password'
+                            value={InputValue}
+                            onChange={(e) => { setInputValue(e.target.value) }}
+                            className={`
+             peer w-full pl-3 pt-6 text-xl bg-transparent text-white border text-[var(--white)] focus:bg-transparent font-light   rounded-md outline-none transition disabled:opacity-70 disabled:cursor-not-allowed
+              border-ç focus:border-teal-500`}
+                        />
+                        <label htmlFor=""
+                            className={`
+                text-[var(--white)]
+                absolute
+                text-md
+                duration-150
+                transform
+                -translate-x-3
+                top-5
+                z-10
+                origin-[0]
+                left-7
+                peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0
+                peer-focus:scale-75 peer-focus:-translate-y-4
+                ${(InputValue.length !== 0 || !InputValue) ? 'scale-75 -translate-y-4' : ''}
+                text-zinc-500`}>
+                            Access Password
+                        </label>
+                    </div>
                 </div>
             </div>
             <div className="w-full">
-                <button onClick={() => onSubmit(InputValue)} className="text-white hover:text-black border border-secondary hover:bg-secondary text-sm font-bold capitalize px-7 py-3 rounded-[12px]  w-max">
+                <button onClick={() => {
+                    onSubmit()
+                }} className="text-white hover:text-black border border-secondary hover:bg-secondary text-sm font-bold capitalize px-7 py-3 rounded-[12px]  w-max">
                     Access to room
                 </button>
             </div>

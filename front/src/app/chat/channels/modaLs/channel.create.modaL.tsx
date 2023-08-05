@@ -127,7 +127,8 @@ const ChanneLCreateModaL = () => {
         console.log('join response : ', response)
       });
     socket?.on('createroomResponseEvent', (room: any) => {
-      // route.push(`/chat/channels?r=${room.id}`)
+      if (!room) return
+      route.push(`/chat/channels?r=${room.id}`)
       onClose()
     })
   }

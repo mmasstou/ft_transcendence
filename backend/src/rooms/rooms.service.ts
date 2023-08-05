@@ -49,7 +49,8 @@ export class RoomsService {
       if (!room) throw new Error('');
       return room;
     } catch (error) {
-      throw new NotFoundException();
+      console.log('Rooms-findOne> error- +>', error);
+      return null;
     }
   }
 

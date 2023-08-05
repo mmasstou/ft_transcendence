@@ -312,7 +312,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             OnBack={OnBack} LogedMember={LogedMember} members={members}
         /> : (<div></div >)
     }
-    if (step === SETTINGSTEPS.ACCESSPASSWORD) {
+    if (step === SETTINGSTEPS.ACCESSPASSWORD && ChanneLinfo?.hasAccess === false) {
         _body = <ChanneLSettingsChanneLAccessPassword
             setUpdate={setUpdate}
             socket={socket}

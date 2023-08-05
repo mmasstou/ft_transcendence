@@ -45,10 +45,7 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
 
     }, [loginHook, update])
 
-    socket?.on('updateChanneLResponseEvent', (data) => { setUpdate(update) })
-    socket?.on('createroomResponseEvent', (data) => { setUpdate(update ? false : true) })
-    socket?.on('deleteChannelResponseEvent', (data) => { setUpdate(update ? false : true) })
-    socket?.on('updatememberResponseEvent', (data) => { setUpdate(update ? false : true) })
+    socket?.on('ChatUpdate', (data) => { setUpdate(update ? false : true) })
 
     useEffect(() => {
 
