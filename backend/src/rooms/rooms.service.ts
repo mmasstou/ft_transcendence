@@ -4,12 +4,13 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Members, Messages, Rooms, UserType } from '@prisma/client';
+import { Members, Messages, Rooms, User, UserType } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateRoomDto } from './dtos/UpdateRoomDto';
 import { MembersService } from 'src/members/members.service';
 import { MessagesService } from 'src/messages/messages.service';
 import { membersType } from 'src/users/user.type';
+import { UserService } from 'src/users/user.service';
 
 enum RoomType {
   PUBLIC = 'PUBLIC',
@@ -21,6 +22,7 @@ export class RoomsService {
     private prisma: PrismaService,
     private membersservice: MembersService,
     private messageservice: MessagesService,
+    private readonly userService: UserService,
   ) {}
   // check if member is in room
   async isMemberInRoom(roomId: string, userId: string) {
@@ -372,16 +374,48 @@ export class RoomsService {
     return newMember;
   }
 
-  async findPublicAndProtected() {
+  async findPublicAndProtected(login: string) {
+    // git user :
+    const User = await this.userService.findOneLogin({ login });
+    // check if user is member
+    console.log('User :', User);
+
     const rooms = await this.prisma.rooms.findMany({
       where: {
         type: {
           in: ['PUBLIC', 'PROTECTED'],
         },
       },
+      include: {
+        members: true,
+      },
+    });
+    const _filterRooms: Rooms[] = [];
+    rooms.forEach((room) => {
+      let IsMember = false;
+      room.members.forEach((member) => {
+        if (member.userId === User.id) {
+          IsMember = true;
+        }
+      });
+      !IsMember && _filterRooms.push(room);
     });
     if (!rooms) null;
-    return rooms;
+    // rooms = rooms.filter((room: Rooms) => {
+    //   const member : Members = room.members.
+
+    // });
+
+    // const _filterRooms = rooms.filter((room: Rooms) => {
+    //   const member = room.members.find(
+    //     (member: Members) => member.userId === User.id,
+    //   );
+    //   if (member) return true;
+    //   return false;
+    // });
+    console.log('findPublicAndProtected :', rooms);
+    console.log('findPublicAndProtected _filterRooms :', _filterRooms);
+    return _filterRooms;
   }
 
   // git all owner roomsÍ

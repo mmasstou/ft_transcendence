@@ -32,8 +32,10 @@ export class RoomsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('public&protected')
-  findPublicAndProtected() {
-    return this.roomsService.findPublicAndProtected();
+  findPublicAndProtected(@Req() request: Request) {
+    const userIds: any = request.user;
+    const login: string = userIds.login;
+    return this.roomsService.findPublicAndProtected(login);
   }
   @UseGuards(JwtAuthGuard)
   @Get()

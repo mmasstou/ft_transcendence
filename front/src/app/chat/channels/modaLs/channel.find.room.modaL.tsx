@@ -14,6 +14,7 @@ export default function ChanneLFindRoommodaL() {
     const [rooms, setrooms] = useState<RoomsType[] | null>(null)
     const [roomsFiltered, setroomsFiltered] = useState<RoomsType[] | null>(null)
     const [InputValue, setInputValue] = useState("")
+    const [Update, setUpdate] = useState<boolean>(false)
     const UserId = Cookies.get("_id")
     useEffect(() => {
         (async () => {
@@ -29,10 +30,13 @@ export default function ChanneLFindRoommodaL() {
             //     if (!isMember) return true
             // })
             console.log("response : -> ", response)
-            setrooms(response.filter((room: RoomsType) => room.type === "PUBLIC" || room.type === "PROTECTED"))
+            setrooms(response)
         })();
-    }, [])
+    }, [Update])
 
+    socket?.on('ChatUpdate', () => {
+        setUpdate(Update ? false : true)
+    })
     useEffect(() => {
         if (!rooms) return
         if (!InputValue) return setroomsFiltered(null)

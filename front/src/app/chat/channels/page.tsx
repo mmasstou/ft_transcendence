@@ -74,7 +74,7 @@ export default function page() {
     (async () => {
       const ChanneLselectedInfo = await getChannelWithId(channeLid, token)
       if (!ChanneLselectedInfo) {
-        toast.error(`there's no channel with that name : ${channeLid}`)
+        toast.error(`there's no channel with that param : ${channeLid}`)
         router.push('/chat/channels')
       }
     })();

@@ -28,6 +28,7 @@ import { GrSecure, GrInsecure } from 'react-icons/gr';
 import { GoEyeClosed } from 'react-icons/go';
 import { HiLockClosed, HiLockOpen } from 'react-icons/hi';
 import getUsers from '../actions/getUsers';
+import { toast } from 'react-hot-toast';
 
 const ChanneLCreateModaL = () => {
   const { IsOpen, onClose, onOpen, socket, selectedFriends } =
@@ -36,20 +37,13 @@ const ChanneLCreateModaL = () => {
   const [aLLfriends, setfriends] = useState<any[] | null>(null);
   const [userId, setuserId] = useState<userType | null>(null);
   const [InputValue, setInputValue] = useState('');
+  const [IsLoading, setIsLoading] = useState<boolean>(false)
 
   let users: any[] = [];
   useEffect(() => {
     (async function getFriends() {
       const token: any = Cookies.get('token');
       const User_ID: string | undefined = Cookies.get('_id');
-      // if (!token)
-      //     return;
-      // await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
-      //     headers: { Authorization: `Bearer ${token}`, },
-      // }).then((resp) => resp.json()).then(data => {
-      //     const _list =data && data.filter((user: any) => user.id !== User_ID)
-      //     setfriends(_list)
-      // })
       const resp = await getUsers(token);
 
       console.log('+++++++++++++++++++++await getUsers(token) :', resp);
@@ -133,24 +127,23 @@ const ChanneLCreateModaL = () => {
     })
   }
 
+  if (IsLoading) {
+    toast.loading("fitching dependencies ... !")
+
+  }
   const bodyContent = (
-
     <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[34rem]">
-
       <div className="body flex flex-col gap-4">
-
         <div className="body flex flex-col gap-2 py-4">
           <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel name </h1>
           <Input
             onChange={(e: any) => { setcustomvalue(_channel_name, e.target.value) }}
             id={"channel_name"} lable={"channel name"}
             register={register}
-
             errors={errors} />
         </div>
         <div className="flex flex-col gap-3">
           <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel type </h1>
-
           <div className=" w-full flex flex-row justify-between items-center ">
             <Button
               icon={GoEyeClosed}
@@ -208,13 +201,13 @@ const ChanneLCreateModaL = () => {
       </div>
     </div>
   );
-return (
-  <ChanneLModal
-    IsOpen={IsOpen}
-    title={'create channel'}
-    children={bodyContent}
-    onClose={onClose}
-  />
-);
+  return (
+    <ChanneLModal
+      IsOpen={IsOpen}
+      title={'create channel'}
+      children={bodyContent}
+      onClose={onClose}
+    />
+  );
 };
 export default ChanneLCreateModaL;

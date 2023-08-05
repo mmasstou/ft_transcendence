@@ -1,6 +1,6 @@
 // imports :
 import { FC, MouseEvent, use, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 // components :
 import ChatNavbarLink from "../../components/chat.navbar.link";
@@ -39,6 +39,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
     const channeLsettingsHook = ChanneLsettingsHook()
     const rightsidebarHook = RightsidebarHook()
     const channeLFindRoommodaLHook = ChanneLFindRoommodaLHook()
+    const params = useSearchParams()
 
     useEffect(() => { setIsMounted(true) }, [])
 
@@ -93,12 +94,12 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
                         outline
                         onClick={() => {channeLcreatemodaLHook.onOpen([], socket) }}
                     />
-                    <Button
+                    {params && params.get('r') && <Button
                         icon={FiUsers}
                         small
                         outline
                         onClick={() => {rightsidebarHook.IsOpen ? rightsidebarHook.onClose() : rightsidebarHook.onOpen([]) }}
-                    />
+                    />}
                    
                 </div>
             </div>
