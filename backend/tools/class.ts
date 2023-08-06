@@ -1,4 +1,5 @@
 import { User, UserType } from '@prisma/client';
+import internal from 'stream';
 // type User = {
 //     id: string;
 //     login: string;
@@ -34,6 +35,9 @@ type table_obj = {
     tableId: string
     GameMode: string
     imageLoad: number
+    time: number
+    countdown: number
+    intervaldelay: number
   }
 
 type Random_Obj = {

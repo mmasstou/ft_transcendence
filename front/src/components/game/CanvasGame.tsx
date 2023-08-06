@@ -6,25 +6,27 @@ import Cookies from "js-cookie";
 import LoginHook from '@/hooks/auth/login';
 import {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall} from './gameFunc';
 import LeaveButton from '@/components/game/LeaveButton';
+import { set } from "react-hook-form";
 
 const TableMap: TableMap = new Map();
-const IPmachine = '127.0.0.1/game';
-const IPmachineBall = '127.0.0.1/ball';
+const IPmachine = '10.13.1.9/game';
+const IPmachineBall = '10.13.1.9/ball';
+const AllTime = 30;
 
 /// game settings /// on % of the canvas
 var player_width = 6.25;
 
 function pongFunc(divRef: RefObject<HTMLDivElement>) {
   
-    const DivCanvas = document.getElementById('CanvasGameDiv');
-    const  canvasRef = useRef<HTMLCanvasElement>(null);
-    const [isMounted, setIsMounted] = useState(false);
-    const [Table_obj, setTable_obj] = useState<any>(null);
-    const [Status, setStatus] = useState(false);
-    const [socket, setSocket] = useState<any>(null);
-    const [ballSocket, setBallSocket] = useState<any>(null);
-    const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-    const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null}>({
+  const  canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const DivCanvas = isMounted ? document.getElementById('CanvasGameDiv'): null;
+  const [Table_obj, setTable_obj] = useState<any>(null);
+  const [Status, setStatus] = useState(false);
+  const [socket, setSocket] = useState<any>(null);
+  const [ballSocket, setBallSocket] = useState<any>(null);
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null}>({
         img1: null,
         img2: null,
         pause: null,
@@ -42,7 +44,23 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         height: 0,
     });
     const [isReady, setIsReady] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const [timer, setTimer] = useState(AllTime);
+    let interval: any = null;
     const loginhook = LoginHook();
+    const [YouWin, setYouWin] = useState(false);
+    const [YouLose, setYouLose] = useState(false);
+    const [YouDraw, setYouDraw] = useState(false);
+    let listenGameOver = false;
+    // const [listenGameOver, setListenGameOver] = useState(false);
+
+    // useEffect(() => {
+    //   const userAgent = window.navigator.userAgent;
+    //   const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    //   const isMobileDevice = mobileRegex.test(userAgent);
+  
+    //   setIsMobile(isMobileDevice);
+    // }, []);
 
     function handleRemoveCanvas() {
       // canvas?.parentNode?.contains(canvas) && canvas?.parentNode?.removeChild(canvas);
@@ -271,29 +289,19 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
 
     // useEffect for Score
     useEffect(() => {
-      // if (LeaveGame){
-      //   console.log("Score useEffect return --------leaveGame-----------")
-      //   objScore && objScore.ScoreCtx && objScore.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-      //     canvas?.parentNode && canvas.parentNode.removeChild(objScore.ScoreLayer);
-      //     return;
-      // }
-      // let obj: any;
-      // if (LeaveGame) {
-      //   // handleRemoveCanvas();
-      //   return
-      // }
+      const userAgent = window.navigator.userAgent;
+      const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      const isMobileDevice = mobileRegex.test(userAgent);
+      setIsMobile(isMobileDevice);
+
       if (isReady) {
-        const obj = drawScore(canvas, images, Table_obj, Status, socket);
+        const obj = drawScore(canvas, images, Table_obj, Status, isMobile, timer, socket);
         return () => {
-          // handleRemoveCanvas();
-          // console.log("Score useEffect return -------------------");
             obj && obj.ScoreCtx && obj.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ScoreLayer);
-            // handleResize();
-            // canvas?.parentNode && canvas.parentNode.removeChild();
         }
       }
-    }, [canvasSize, images, Score, Status, isReady, LeaveGame]) 
+    }, [canvasSize, images, Score, Status, isReady, LeaveGame, timer]) 
 
     // useEffect for Player
     useEffect(() => {
@@ -313,6 +321,18 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     }, [canvasSize, Player1, Player2, Status, LeaveGame])
 
 
+
+    // useEffect(() => {
+    //   if (!Status)
+    //     Table_obj && clearInterval(Table_obj.currentTimer);
+    //   if (Status && isReady && Table_obj.countdown > 0 && socket.id == Table_obj.player1.UserId) {
+    //     clearInterval(Table_obj.currentTimer);
+    //     Table_obj.currentTimer = setInterval(() => {
+    //       Table_obj.countdown -= 1;
+    //       console.log("timing: ", Table_obj.countdown);
+    //     }, 1000);
+    //   }
+    // }, [Status])
     // useEffect for ball
     useEffect(() => {
       if (isReady) {
@@ -333,6 +353,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       ////////////////////// emit from the server ///////////////////////
 
       isMounted && socket.on('joinRoomGame', (table: any) => {
+        console.log("test join room")
         if (table) {
           TableMap.set(table.tableId, table);
           setTable_obj(table);
@@ -361,9 +382,39 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
           setPlayer2(player);
         })
 
-      isMounted && ballSocket.on('setBall', (ballPos: any) => {
-        setBallObj(ballPos);
+      isMounted && ballSocket.on('setBall', (ball: any) => {
+        if (!Status && isReady)
+        setBallObj(ball);
         })
+      
+
+      isMounted && ballSocket.on('timer', (time: number) => {
+        if (!Math.floor(AllTime - time) && Status) {
+          // setStatus(false);
+          socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
+          socket.emit('GameOver', {tableId: Table_obj.tableId});
+        }
+        else
+          setTimer(Math.floor(AllTime - time));
+      })
+
+      if (!listenGameOver) {
+        console.log('test game over');
+        isMounted && socket.on('GameOver', (Winner: any) => {
+          // if (!listenGameOver) {
+            listenGameOver = true;
+            setLeaveGame(true);
+            console.log('test game over', LeaveGame, YouWin, YouLose, YouDraw);
+            if (socket.auth.UserId == Winner)
+              setYouWin(true);
+            else if (Winner == 'no one')
+              setYouDraw(true);
+            else
+              setYouLose(true);
+            socket.emit('deletePlayer');
+          // }
+        })
+      }
 
       isMounted && socket.on('setStatus', (status: boolean) => {
         setStatus(status);
@@ -390,9 +441,11 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       else
           var isvertical = false;
     return (
-      LeaveGame ? <h1 className=" font-bold text-white">WIN</h1> :
+      LeaveGame && (YouWin || (!YouWin && !YouLose && !YouDraw))  ? <h1 className=" font-bold text-white">WIN</h1> :
+      LeaveGame && YouLose ? <h1 className=" font-bold text-white">LOSE</h1> :
+      LeaveGame && YouDraw ? <h1 className=" font-bold text-white">DRAW</h1> :
       <>
-        <LeaveButton isvertical={isvertical} isReady={isReady} />
+        <LeaveButton isvertical={isvertical} isReady={isReady} isMobile={isMobile} />
         <div id="CanvasGameDiv">
           <canvas id="GameCanvas" ref={canvasRef} width={isvertical ? canvasSize.width * 1.15 : canvasSize.width} height={isvertical ? canvasSize.height : canvasSize.height * 1.15} />
         </div>

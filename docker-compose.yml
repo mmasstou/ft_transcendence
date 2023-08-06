@@ -13,7 +13,7 @@ services:
   #   #   - database
   #   volumes:
   #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front:/frontend:rw
-  #    # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
+  #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
   backend:
     build: backend/
     container_name: backend
