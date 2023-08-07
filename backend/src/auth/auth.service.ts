@@ -20,7 +20,7 @@ export class AuthService {
     // if (!user) {
     //   throw new BadRequestException('Unauthenticated');
     // }
-
+    console.log('+++++++++++++++> ana hna');
     const userExists = await this.usersService.findOneLogin({
       login: user.login,
     });

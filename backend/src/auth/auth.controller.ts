@@ -34,6 +34,7 @@ export class AuthController {
   @Get('callback')
   async IntraAuthCallback(@Req() req: any, @Res() res: Response) {
     try {
+      console.log('async IntraAuthCallback');
       const result = await this.authService.signIn(req.user);
       const { accessToken } = result;
       res.cookie('token', accessToken, {

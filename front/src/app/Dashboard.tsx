@@ -33,6 +33,7 @@ const Dashboard = ({ children }: Props) => {
   }, [token]);
   useEffect(() => {
 
+    if (!token) return
     const socket: Socket = io(`${process.env.NEXT_PUBLIC_USERSOCKET_URL_WS}`, {
       auth: {
         token: `${token}`,

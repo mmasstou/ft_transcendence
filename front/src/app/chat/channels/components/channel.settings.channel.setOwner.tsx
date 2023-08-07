@@ -4,6 +4,7 @@ import { IoChevronBackOutline } from "react-icons/io5";
 import { membersType, updatememberEnum } from "@/types/types";
 import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import Image from "next/image";
+import ChanneLSettingsBody from "./channel.settings.body";
 interface ChanneLsettingsChanneLsetOwnerProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -14,50 +15,41 @@ interface ChanneLsettingsChanneLsetOwnerProps {
 
 export default function ChanneLsettingsChanneLsetOwner(
     { socket, OnBack, LogedMember, members, setUpdate }: ChanneLsettingsChanneLsetOwnerProps) {
-        const handlOnclick = (data: any) => {
+    const handlOnclick = (data: any) => {
 
-            socket?.emit('updatemember', data)
-    
-        }
-    
-        socket?.on('updatememberResponseEvent', (data) => {
+        socket?.emit('updatemember', data)
 
-            setUpdate(true)
-        })
-        return (
-            <div className="flex flex-col justify-between min-h-[34rem]">
-            <div>
-                <Button
-                    icon={IoChevronBackOutline}
-                    label={"Back"}
-                    outline
-                    onClick={OnBack}
-                />
+    }
 
-                <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
-                    {(LogedMember?.isban === false && (LogedMember?.type === "OWNER")) ?
-                        members && members.map((member, index) => (
-                            <ChannelSettingsUserMemberItem
-                                key={index}
-                                member={member}
-                                socket={socket}
-                                UserJoin={false}
-                                UserOwne
-                                OnClick={(data) => {
+    socket?.on('updatememberResponseEvent', (data) => {
 
-                                    handlOnclick({ updateType: updatememberEnum.SETOWNER, member: member })
-                                }} />
+        setUpdate(true)
+    })
+    return (
+        <ChanneLSettingsBody title={"set Owner"} OnBack={OnBack}>
+            <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
+                {(LogedMember?.isban === false && (LogedMember?.type === "OWNER")) ?
+                    members && members.map((member, index) => (
+                        <ChannelSettingsUserMemberItem
+                            key={index}
+                            member={member}
+                            socket={socket}
+                            UserJoin={false}
+                            UserOwne
+                            OnClick={(data) => {
 
-                        ))
-                        : <div className="flex h-full w-full justify-center items-center min-h-[34rem] ">
-                            <div className="flex flex-col justify-center items-center gap-3">
-                                <Image src="/access_denied.svg" width={200} height={200} alt={""} />
-                                <h2 className=" capitalize font-extrabold text-white">permission denied</h2>
-                            </div>
+                                handlOnclick({ updateType: updatememberEnum.SETOWNER, member: member })
+                            }} />
+
+                    ))
+                    : <div className="flex h-full w-full justify-center items-center min-h-[34rem] ">
+                        <div className="flex flex-col justify-center items-center gap-3">
+                            <Image src="/access_denied.svg" width={200} height={200} alt={""} />
+                            <h2 className=" capitalize font-extrabold text-white">permission denied</h2>
                         </div>
-                    }
-                </div>
+                    </div>
+                }
             </div>
-        </div>
-        )
+        </ChanneLSettingsBody>
+    )
 }

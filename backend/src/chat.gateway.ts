@@ -53,7 +53,8 @@ export class ChatGateway implements OnGatewayConnection {
     // const status = await this.appservice.handleSocketConnection(socket);
     // if (!status) socket.disconnect();
     const User = await this.usersService.getUserInClientSocket(socket);
-    console.log('Chat-> %s connected +> socket :', User.login, socket.id);
+    User &&
+      console.log('Chat-> %s connected +> socket :', User.login, socket.id);
   }
 
   @SubscribeMessage('updatemember')
@@ -162,6 +163,7 @@ export class ChatGateway implements OnGatewayConnection {
       }
       // create room :
       // const newRoom = await this.roomservice.create(data, _User.login);
+      this.server.emit('ChatUpdate', member);
 
       // send message that room is created :
       // this.server.emit('createroomResponseEvent', newRoom);
@@ -215,7 +217,8 @@ export class ChatGateway implements OnGatewayConnection {
     if (responseMemberData && responseMemberData.type === UserType.OWNER) {
       const deleteRoom = await this.roomservice.remove(room.id);
       if (deleteRoom) {
-        this.server.emit('deleteChannelResponseEvent', deleteRoom);
+        client.emit('deleteChannelResponseEvent', deleteRoom);
+        this.server.emit('ChatUpdate', deleteRoom);
       }
       this.server.emit('deleteroomResponseEvent', null);
     }
@@ -227,6 +230,7 @@ export class ChatGateway implements OnGatewayConnection {
       const room = await this.roomservice.findOne({ name: data.id });
       // get user from client :
       const LogedUser = await this.usersService.getUserInClientSocket(client);
+      if (!LogedUser) return;
       console.log(
         'Chat-> joinRoom +> user :%s has join to room :%s',
         LogedUser.login,
@@ -292,6 +296,7 @@ export class ChatGateway implements OnGatewayConnection {
       console.log('Chat-> updateChanneL +> data :', data);
       const room = await this.roomservice.findOne({ name: data.room.id });
       const LogedUser = await this.usersService.getUserInClientSocket(client);
+      if (!LogedUser) return;
       const responseMemberData = await this.roomservice.isMemberInRoom(
         room.id,
         LogedUser.id,
@@ -314,7 +319,8 @@ export class ChatGateway implements OnGatewayConnection {
             },
           });
           console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
-          this.server.emit('updateChanneLResponseEvent', updateRoom);
+          client.emit('updateChanneLResponseEvent', updateRoom);
+          this.server.emit('ChatUpdate', updateRoom);
         }
         // set access password :
         if (data.Updatetype === UpdateChanneLSendEnum.SETACCESSEPASSWORD) {
@@ -329,7 +335,8 @@ export class ChatGateway implements OnGatewayConnection {
             },
           });
           console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
-          this.server.emit('updateChanneLResponseEvent', updateRoom);
+          client.emit('updateChanneLResponseEvent', updateRoom);
+          this.server.emit('ChatUpdate', updateRoom);
         }
       }
     } catch (error) {

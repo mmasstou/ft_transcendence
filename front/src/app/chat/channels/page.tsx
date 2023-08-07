@@ -46,11 +46,11 @@ export default function page() {
         token: token,
       },
     });
-    socket.on('jwt_expired', () => {
-      console.log("jwt_expired")
-      Cookies.remove('token')
-      Cookies.remove('_id')
-    })
+    // socket.on('jwt_expired', () => {
+    //   console.log("jwt_expired")
+    //   Cookies.remove('token')
+    //   Cookies.remove('_id')
+    // })
     // Handle socket events here
     socket.on('connect', () => {
 

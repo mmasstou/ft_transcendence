@@ -6,6 +6,7 @@ import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import Image from "next/image";
 import { FieldValues, useForm } from "react-hook-form";
 import Input from "@/components/Input";
+import ChanneLSettingsBody from "./channel.settings.body";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -56,50 +57,43 @@ export default function ChanneLSettingsChanneLAccessPassword(
         //   reset data for password
         reset()
     }
+    const footer = (
+        <div className='flex flex-row justify-between items-center
+        '>
+            <Button
+                label={"Save Changes"}
+                outline
+                onClick={() => {
+                    room && onSubmit(
+                        {
+                            Updatetype: UpdateChanneLSendEnum.SETACCESSEPASSWORD,
+                            room: room,
+                            roomtype: room?.type === RoomTypeEnum.PUBLIC
+                                ? RoomTypeEnum.PUBLIC
+                                : room?.type === RoomTypeEnum.PROTECTED
+                                    ? RoomTypeEnum.PROTECTED
+                                    : RoomTypeEnum.PRIVATE,
+                            password: _newChanneLpassword,
+                            confirmpassword: _confirmChanneLpassword,
+                            accesspassword: '',
+                        }
+                    )
+                }}
+            />
+        </div>
+    )
     return (
-        <div className="flex flex-col justify-between min-h-[34rem]">
-            <div>
-                <Button
-                    icon={IoChevronBackOutline}
-                    label={"Back"}
-                    outline
-                    onClick={OnBack}
-                />
-
-                <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full p-6">
-                    <div className="flex flex-col gap-4 ">
-                        <Input id="newChanneLpassword" lable="new password" type="password" register={register} errors={errors} onChange={(e) => {
-                                    setValue('newChanneLpassword', e.target.value)
-                                }} />
-                        <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={(e) => {
-                                    setValue('confirmChanneLpassword', e.target.value)
-                                }} />
-                    </div>
+        <ChanneLSettingsBody title={"Access Password"} OnBack={OnBack} footer={footer}>
+            <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full p-6">
+                <div className="flex flex-col gap-4 ">
+                    <Input id="newChanneLpassword" lable="new password" type="password" register={register} errors={errors} onChange={(e) => {
+                        setValue('newChanneLpassword', e.target.value)
+                    }} />
+                    <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={(e) => {
+                        setValue('confirmChanneLpassword', e.target.value)
+                    }} />
                 </div>
             </div>
-            <div className='flex flex-row justify-between items-center
-               '>
-                <Button
-                    label={"Save Changes"}
-                    outline
-                    onClick={() => {
-                        room && onSubmit(
-                            {
-                                Updatetype: UpdateChanneLSendEnum.SETACCESSEPASSWORD,
-                                room: room,
-                                roomtype: room?.type === RoomTypeEnum.PUBLIC
-                                    ? RoomTypeEnum.PUBLIC
-                                    : room?.type === RoomTypeEnum.PROTECTED
-                                        ? RoomTypeEnum.PROTECTED
-                                        : RoomTypeEnum.PRIVATE,
-                                password: _newChanneLpassword,
-                                confirmpassword: _confirmChanneLpassword,
-                                accesspassword: '',
-                            }
-                        )
-                    }}
-                />
-            </div>
-        </div>
+        </ChanneLSettingsBody>
     )
 }

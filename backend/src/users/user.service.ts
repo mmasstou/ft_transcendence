@@ -80,25 +80,34 @@ export class UserService {
   async getUserInClientSocket(client: Socket) {
     const { token } = client.handshake.auth; // Extract the token from the auth object
     let payload: any = '';
-    if (!token) {
-      throw new UnauthorizedException();
+    try {
+      if (!token) {
+        throw new UnauthorizedException();
+      }
+      payload = await this.jwtService
+        .verifyAsync(token, {
+          secret: process.env.JWT_SECRET,
+        })
+        .catch((error) => {
+          console.log('token jwt expired');
+          throw new UnauthorizedException();
+        });
+      // 💡 We're assigning the payload to the request object here
+      // so that we can access it in our route handlers
+      const login: string = payload.login;
+      // Add your logic to fetch the direct messages for the user from the database or any other source
+      const user = await this.prisma.user.findUnique({
+        where: { login },
+        include: {
+          Rooms: true,
+          directMessage: true,
+          cursus_users: true,
+        },
+      });
+      return user;
+    } catch (error) {
+      client.disconnect();
     }
-    payload = await this.jwtService.verifyAsync(token, {
-      secret: process.env.JWT_SECRET,
-    });
-    // 💡 We're assigning the payload to the request object here
-    // so that we can access it in our route handlers
-    const login: string = payload.login;
-    // Add your logic to fetch the direct messages for the user from the database or any other source
-    const user = await this.prisma.user.findUnique({
-      where: { login },
-      include: {
-        Rooms: true,
-        directMessage: true,
-        cursus_users: true,
-      },
-    });
-    return user;
   }
 
   // get all clients socket from database; and return array of socket; if not return null

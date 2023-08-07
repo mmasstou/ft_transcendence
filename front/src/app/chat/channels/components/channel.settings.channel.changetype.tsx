@@ -17,6 +17,8 @@ import getChannelWithId from "../actions/getChannelWithId";
 import ChanneLSettingsAlert from "./channel.settings.alerts";
 import { setConstantValue } from "typescript";
 import Button from "../../components/Button";
+import ChanneLSettingsBody from "./channel.settings.body";
+import ChanneLSettingsTitle from "./channel.settings.title";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -92,90 +94,83 @@ export default function ChanneLSettingsChanneLChangeType(
     })
 
     return (
-        <div className="flex flex-col justify-between min-h-[34rem]">
-            <div>
-                <Button
-                    icon={IoChevronBackOutline}
-                    label={"Back"}
-                    outline
-                    onClick={OnBack}
-                />
-                {LogedMember?.type === UserTypeEnum.OWNER ? <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full p-6">
-                    <div className="flex flex-col gap-4 ">
-                        <ChanneLSettingsOptionItem
-                            onClick={function (): void {
+        <ChanneLSettingsBody title={"Change Type"} OnBack={OnBack} >
+            {LogedMember?.type === UserTypeEnum.OWNER ? <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full p-6">
+                <div className="flex flex-col gap-4 ">
+                    <ChanneLSettingsOptionItem
+                        onClick={function (): void {
 
-                                channeLLid && ChanneLinfo && onSubmit({
-                                    roomtype: RoomTypeEnum.PRIVATE,
-                                    room: ChanneLinfo,
-                                    Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
-                                    password: '',
-                                    confirmpassword: '',
-                                    accesspassword: ''
-                                });
-                            }}
-                            icon={GoEyeClosed}
-                            label={"Private"}
-                            IsActive={ChanneLinfo?.type === RoomTypeEnum.PRIVATE}
-                        />
-                        <ChanneLSettingsOptionItem
-                            onClick={() => {
-                                setPasswordPopup(true)
-                            }}
-                            icon={HiLockClosed}
-                            label={"protected"}
+                            channeLLid && ChanneLinfo && onSubmit({
+                                roomtype: RoomTypeEnum.PRIVATE,
+                                room: ChanneLinfo,
+                                Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
+                                password: '',
+                                confirmpassword: '',
+                                accesspassword: ''
+                            });
+                        }}
+                        icon={GoEyeClosed}
+                        label={"Private"}
+                        IsActive={ChanneLinfo?.type === RoomTypeEnum.PRIVATE}
+                    />
+                    <ChanneLSettingsOptionItem
+                        onClick={() => {
+                            setPasswordPopup(true)
+                        }}
+                        icon={HiLockClosed}
+                        label={"protected"}
 
-                            IsActive={ChanneLinfo?.type === RoomTypeEnum.PROTECTED} />
+                        IsActive={ChanneLinfo?.type === RoomTypeEnum.PROTECTED} />
 
-                        {/* if you whon to change channel type to protacted */}
-                        {
-                            passwordPopup && <div className="flex flex-col gap-3 w-full relative">
-                                <Input id="newChanneLpassword" lable="password" type="password" register={register} errors={errors} onChange={(e) => {
-                                    setValue('confirmChanneLpassword', e.target.value)
-                                }} />
-                                <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={(e) => {
-                                    setValue('confirmChanneLpassword', e.target.value)
-                                }} />
-                                <div className=" relative w-full flex justify-center items-center">
-                                    <Button
-                                        icon={BsSaveFill}
-                                        label={"save"}
-                                        outline
-                                        responsive
-                                        size={18}
-                                        onClick={() => {
-                                            channeLLid && ChanneLinfo && onSubmit({
-                                                roomtype: RoomTypeEnum.PROTECTED,
-                                                room: ChanneLinfo,
-                                                Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
-                                                password: _newChanneLpassword,
-                                                confirmpassword: _confirmChanneLpassword,
-                                                accesspassword: ''
-                                            });
-                                        }}
-                                    />
-                                </div>
+                    {/* if you whon to change channel type to protacted */}
+                    {
+                        passwordPopup && <div className="flex flex-col gap-3 w-full relative">
+                            <Input id="newChanneLpassword" lable="password" type="password" register={register} errors={errors} onChange={(e) => {
+                                setValue('confirmChanneLpassword', e.target.value)
+                            }} />
+                            <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={(e) => {
+                                setValue('confirmChanneLpassword', e.target.value)
+                            }} />
+                            <div className=" relative w-full flex justify-center items-center">
+                                <Button
+                                    icon={BsSaveFill}
+                                    label={"save"}
+                                    outline
+                                    responsive
+                                    size={18}
+                                    onClick={() => {
+                                        channeLLid && ChanneLinfo && onSubmit({
+                                            roomtype: RoomTypeEnum.PROTECTED,
+                                            room: ChanneLinfo,
+                                            Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
+                                            password: _newChanneLpassword,
+                                            confirmpassword: _confirmChanneLpassword,
+                                            accesspassword: ''
+                                        });
+                                    }}
+                                />
                             </div>
-                        }
-                        <ChanneLSettingsOptionItem
-                            onClick={function (): void {
-                                channeLLid && ChanneLinfo && onSubmit({
-                                    roomtype: RoomTypeEnum.PUBLIC,
-                                    room: ChanneLinfo,
-                                    Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
-                                    password: '',
-                                    confirmpassword: '',
-                                    accesspassword: ''
-                                });
-                            }}
-                            icon={HiLockOpen}
-                            label={"public"}
-                            IsActive={ChanneLinfo?.type === RoomTypeEnum.PUBLIC}
-                        />
-                    </div>
+                        </div>
+                    }
+                    <ChanneLSettingsOptionItem
+                        onClick={function (): void {
+                            channeLLid && ChanneLinfo && onSubmit({
+                                roomtype: RoomTypeEnum.PUBLIC,
+                                room: ChanneLinfo,
+                                Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
+                                password: '',
+                                confirmpassword: '',
+                                accesspassword: ''
+                            });
+                        }}
+                        icon={HiLockOpen}
+                        label={"public"}
+                        IsActive={ChanneLinfo?.type === RoomTypeEnum.PUBLIC}
+                    />
                 </div>
-                    : <ChanneLSettingsAlert message={'you are not the owner'} />}
             </div>
-        </div>
+                : <ChanneLSettingsAlert message={'you are not the owner'} />}
+        </ChanneLSettingsBody>
+
     )
 }
