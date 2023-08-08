@@ -44,14 +44,10 @@ export default function ChanneLFindRoommodaL() {
             }))
     }, [InputValue])
 
-    const OnJion = (param: { room: RoomsType, password: string }) => {
+    const OnJion = (param: { room: RoomsType}) => {
         // check if room is protacted :
-        const { room, password } = param
-        if (room.type === RoomTypeEnum.PROTECTED) {
-            if (room.password !== password) {
-                return toast.error("password is incorrect")
-            }
-        };
+        const { room } = param
+        if (room.type === RoomTypeEnum.PROTECTED) return
         // channel is public
         socket?.emit(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
@@ -103,9 +99,10 @@ export default function ChanneLFindRoommodaL() {
                                 return <ChannelFindRoomItem
                                     key={index}
                                     room={room}
-                                    onClick={(param: { room: RoomsType, password: string }) => {
-                                        const { room, password } = param
-                                        OnJion({ room, password })
+                                    socket={socket}
+                                    onClick={(param: { room: RoomsType}) => {
+                                        const { room } = param
+                                        OnJion({ room })
                                     }} />
                             })
                             : <Image src="/searching.svg" alt={"searching"} height={230} width={230} />

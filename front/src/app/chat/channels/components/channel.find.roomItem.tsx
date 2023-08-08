@@ -1,16 +1,20 @@
 import { RoomTypeEnum, RoomsType } from "@/types/types"
 import { on } from "events";
 import { use, useEffect, useRef, useState } from "react";
+import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook";
+import { Socket } from "socket.io-client";
 
 interface ChannelFindRoomItemProps {
     room: RoomsType;
-    onClick: (data: { room: RoomsType, password: string }) => void
+    onClick: (data: { room: RoomsType}) => void
+    socket : Socket | null
 }
-export default function ChannelFindRoomItem({ room, onClick }: ChannelFindRoomItemProps) {
+export default function ChannelFindRoomItem({ room, onClick , socket}: ChannelFindRoomItemProps) {
     const [InputValue, setInputValue] = useState("")
     const [joinBtn, setJoinBtn] = useState(false)
     const [passwordInput, setPasswordInput] = useState(false)
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const channeLPasswordAccessHook = ChanneLPasswordAccessHook()
 
 
     useEffect(() => {
@@ -36,14 +40,14 @@ export default function ChannelFindRoomItem({ room, onClick }: ChannelFindRoomIt
                 onClick={() => {
                     setJoinBtn(true)
                     if (room.type === RoomTypeEnum.PROTECTED) {
-                        setPasswordInput(true)
+                        channeLPasswordAccessHook.onOpen(room, socket)
                     }
-                    onClick({ room, password: '' })
+                    onClick({ room })
                 }}
                 className=" text-[#6CCCFE] border rounded-[15px] border-[#6CCCFE] p-1 min-w-[120px]">Join
             </button>
         </div>
-        {passwordInput && <input
+        {/* {passwordInput && <input
             ref={inputRef}
             className=" focus:outline-none rounded-[15px] bg-transparent border border-[#fdfdfd] text-[#ffffff] placeholder:text-white w-full p-3"
             onChange={(event) => { setInputValue(event.target.value); }}
@@ -58,6 +62,6 @@ export default function ChannelFindRoomItem({ room, onClick }: ChannelFindRoomIt
             placeholder="type password"
             type="password"
             name=""
-            id="" />}
+            id="" />} */}
     </div>
 }

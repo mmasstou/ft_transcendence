@@ -16,7 +16,7 @@ export default function ConversationsMessages({ Content, socket }: Conversations
         socket?.on('message', (message: any) => {
             if (chatContainerRef.current) {
                 chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight ;
-                chatContainerRef.current.scrollTop + 600
+                chatContainerRef.current.scrollTop - 600
                 console.log("chatContainerRef.current.scrollTop :",chatContainerRef.current.scrollTop)
                 console.log("chatContainerRef.current.scrollHeight :",chatContainerRef.current.scrollHeight)
             }

@@ -3,7 +3,7 @@ import ContactHook from "@/hooks/contactHook"
 import { TiArrowMinimise } from "react-icons/ti"
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler, useFieldArray, set } from "react-hook-form"
 import { MouseEvent, useCallback, useEffect, useState } from "react"
-import { userType } from "@/types/types"
+import { RoomsType, userType } from "@/types/types"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
 
@@ -28,41 +28,58 @@ enum RoomType {
     PRIVATE = 'PRIVATE',
 }
 const ChanneLPasswordAccessModaL = () => {
-    const { IsOpen, onClose, onOpen, socket, room } = ChanneLPasswordAccessHook()
+    const { IsOpen, onClose, onOpen, socket, room, OnSave, password } = ChanneLPasswordAccessHook()
     const route = useRouter()
     const [aLLfriends, setfriends] = useState<any[] | null>(null)
     const [userId, setuserId] = useState<userType | null>(null)
     const [InputValue, setInputValue] = useState("")
     const [IsMounted, setIsMounted] = useState<boolean>(false)
+    const UserId = Cookies.get('_id')
 
     let users: any[] = []
     useEffect(() => { setIsMounted(true) }, [])
     const onSubmit = () => {
+        if (!UserId) return;
         // create private room : createroom
         // check if passaword is room password
-        console.log("Acces password :", room?.accesspassword)
+        console.log("Acces password :", room?.password)
         console.log("InputValue :", InputValue)
-        if (InputValue !== room?.accesspassword) {
+        if (InputValue !== room?.password) {
             toast.error('the password not match');
+            setInputValue('')
             return
         }
         console.log("the password is match you can acces now!")
-        room && socket?.emit('accessToroom', room, (response: any) => {
-            if (response.error) {
-                toast.error(response.error);
-            }
-            console.log("the response is receved from socket")
-            console.log("accessToroom response :", response)
-            onClose()
-            route.push(`/chat/channels?r=${room.id}`)
-            route.refresh()
-        })
+        socket?.emit(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
+            { userId: UserId, roomId: room.id });
+        onClose()
     }
+
+    // useEffect(() => {
+    //     socket?.on(
+    //         `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+    //         (data: {
+    //             message: string,
+    //             status: any,
+    //             data: RoomsType,
+    //         }) => {
+    //             console.log("RESPONSE_CHAT_MEMBER_UPDATE :", data)
+    //             if (!data) {
+    //                 toast.error('error')
+    //             }
+    //             if (data) {
+    //                 toast.success(data.message)
+    //                 route.push(`/chat/channels?r=${data.data.id}`)
+    //                 onClose()
+    //             }
+    //         });
+    // }, [socket])
 
     if (!IsMounted) return
 
     const bodyContent = (
-        <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[9rem]">
+        <div className="  w-full p-4 md:p-2 flex flex-col justify-between min-h-[5rem]">
             <div className="body flex flex-col gap-4">
                 <div className="body flex flex-col gap-2 py-4">
                     <div className=" relative w-full">
@@ -71,6 +88,7 @@ const ChanneLPasswordAccessModaL = () => {
                             placeholder=" "
                             type='password'
                             value={InputValue}
+                            onKeyDown={(event) => event.key === "Enter" ? onSubmit() : null}
                             onChange={(e) => { setInputValue(e.target.value) }}
                             className={`
              peer w-full pl-3 pt-6 text-xl bg-transparent text-white border text-[var(--white)] focus:bg-transparent font-light   rounded-md outline-none transition disabled:opacity-70 disabled:cursor-not-allowed
@@ -92,22 +110,24 @@ const ChanneLPasswordAccessModaL = () => {
                 peer-focus:scale-75 peer-focus:-translate-y-4
                 ${(InputValue.length !== 0 || !InputValue) ? 'scale-75 -translate-y-4' : ''}
                 text-zinc-500`}>
-                            Access Password
+                            type Password
                         </label>
                     </div>
                 </div>
             </div>
             <div className="w-full">
-                <button onClick={() => {
-                    onSubmit()
-                }} className="text-white hover:text-black border border-secondary hover:bg-secondary text-sm font-bold capitalize px-7 py-3 rounded-[12px]  w-max">
-                    Access to room
+                <button
+                    onClick={() => {
+                        onSubmit()
+                    }}
+                    className="text-white hover:text-black border border-secondary hover:bg-secondary text-sm font-bold capitalize px-7 py-3 rounded-[12px]  w-full">
+                    Join
                 </button>
             </div>
         </div>
     )
 
-    return <ChanneLModal IsOpen={IsOpen} title={"Access ChanneL password"} children={bodyContent} onClose={onClose} />
+    return <ChanneLModal IsOpen={IsOpen} title={`Toin To ${room?.name}`} children={bodyContent} onClose={onClose} />
 
 }
 export default ChanneLPasswordAccessModaL
