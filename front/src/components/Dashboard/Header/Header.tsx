@@ -51,25 +51,29 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
                   sideOffset={5}
                 >
                   <div className="flex flex-col gap-2.5">
-                    <h1 className='tracking-wide ml-2 font-bold sm:text-lg 2xl:text-xl'>Notifications</h1>
-
-                    {/* <MyToast isOpen={false} user={''} message={''} /> */}
-                    {
-                      Notifications && Notifications.map((notification: {
-                        message: string, User: userType,
-                        member: membersType,
-                        sendedUser: userType
-                      }, index: number) => {
-                        return (
-                          <Notification key={index} avatar={notification.sendedUser.avatar} name={notification.sendedUser.login} message={notification.message} />
-                          // <MyToast key={index} isOpen user={notification.sendedUser.login} message={notification.message} />
-                        )
-                      }
-                      )
-                    }
-                    <Notification avatar='/avatar.jpg' name='mehdi' message='send a friend request.' isFriend isOnline />
-                    <Notification avatar='/avatar.jpg' name='mehdi' message='send a friend request.' isFriend />
-                    <Notification avatar='/avatar.jpg' name='mehdi' message='send a friend request.' />
+                    <h1 className="tracking-wide ml-2 font-bold sm:text-lg 2xl:text-xl">
+                      Notifications
+                    </h1>
+                    <Notification
+                      avatar="/avatar.jpg"
+                      name="mehdi"
+                      message="send a friend request."
+                      isFriend
+                      isOnline
+                    />
+                    <Notification
+                      avatar="/avatar.jpg"
+                      name="mehdi"
+                      message="send a friend request."
+                      isFriend
+                    />
+                    <Notification
+                      isFriend
+                      directMessage
+                      avatar="/avatar.jpg"
+                      name="mehdi"
+                      message="send a friend request."
+                    />
                   </div>
                   <Popover.Arrow className="fill-[#2B504B]" />
                 </Popover.Content>
