@@ -4,8 +4,15 @@ import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import Image from 'next/image';
+import Cookies from 'js-cookie';
 
-const page = () => {
+const page = ({ params }: { params: { mode: string } }) => {
+  // body resquest example
+  // const body = {
+  //   playerId: Cookies.get('_id'),
+  //   mode: params.mode,
+  // };
+
   return (
     <Dashboard>
       <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide text-white">
@@ -22,9 +29,13 @@ const page = () => {
             </p>
             <p>
               To start playing, simply choose your preferred game mode. Are you
-              up for a quick practice session to warm up? Select the <strong className='text-yellow-500'>Robot</strong> and hone your techniques against our responsive AI
-              opponents. Want to challenge friends ? Click on <strong className='text-secondary'>Random</strong> or <strong className='text-orange-500'>Friend</strong> 
-              {" "}to enter our vibrant community and engage in exhilarating matches.
+              up for a quick practice session to warm up? Select the{' '}
+              <strong className="text-yellow-500">Robot</strong> and hone your
+              techniques against our responsive AI opponents. Want to challenge
+              friends ? Click on{' '}
+              <strong className="text-secondary">Random</strong> or{' '}
+              <strong className="text-orange-500">Friend</strong> to enter our
+              vibrant community and engage in exhilarating matches.
             </p>
             <div className="flex gap-10 my-4 w-full justify-center">
               <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-yellow-500 rounded-xl font-bold text-yellow-500">
@@ -46,7 +57,9 @@ const page = () => {
                   shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px]
                   focus:outline-none"
                   >
-                    <Dialog.Title className="text-lg lg:text-xl 2xl:text-2xl">Invite a friend !</Dialog.Title>
+                    <Dialog.Title className="text-lg lg:text-xl 2xl:text-2xl">
+                      Invite a friend !
+                    </Dialog.Title>
                     <Dialog.Close asChild>
                       <button className="text-white top-5 right-5 absolute">
                         <Cross2Icon />
