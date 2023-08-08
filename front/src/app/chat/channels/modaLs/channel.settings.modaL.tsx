@@ -28,6 +28,7 @@ import ChanneLUserSettings from "../components/channel.settings.User"
 import { TbInfoSquareRoundedFilled, TbUserPlus } from "react-icons/tb"
 import getChannelWithId from "../actions/getChannelWithId"
 import ChanneLChatSettings from "../components/channel.settings.channel"
+import ChanneLSettingsInfo from "../components/channel.settings.info"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',
@@ -36,7 +37,7 @@ const ChanneLSettingsModaL = () => {
     const [Ismounted, setIsmounted] = useState<boolean>(false)
     const { IsOpen, onClose, onOpen, selectedchanneL, socket } = ChanneLsettingsHook()
     const [selectedUser, setselectedUser] = useState<userType | null>(null)
-    const [memberselected, setmemberselected] = useState<membersType[]>([])
+    const [memberselected, setmemberselected] = useState<membersType | null>(null)
     const [roomquery, setroomquery] = useState<string | null>(null)
     const [userCookieId, setuserCookieId] = useState<string | undefined>(undefined)
     const [roomInfo, setroomInfo] = useState<RoomsType | null>(null)
@@ -123,7 +124,7 @@ const ChanneLSettingsModaL = () => {
     }
 
     const bodyContent = (
-        <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col min-h-[44rem] h-full">
+        <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col min-h-[40rem] h-full">
             <div className=" w-full flex flex-row h-max justify-around items-center mb-5 text-white ">
                 <Button
                     icon={TbInfoSquareRoundedFilled}
@@ -150,19 +151,18 @@ const ChanneLSettingsModaL = () => {
                 />
             </div>
 
-            <div className={`body flex flex-col gap-4 h-full w-full min-h-[38rem] 
-            ${(_channeLtype !== "UserSettings" && _channeLtype !== "ChatSettings") ? ' justify-center items-center' : ''} `}>
+            <div className={`body flex flex-col gap-4 h-full w-full min-h-[38rem]`}>
                 {
                     _channeLtype === "UserSettings"
                         ? <ChanneLUserSettings socket={socket} />
                         : _channeLtype === "ChatSettings"
                             ? <ChanneLChatSettings socket={socket} />
-                            : <Image
-                                    className="flex justify-center items-center"
-                                    src="/channelsettings.svg"
-                                    alt="avatar"
-                                    width={160}
-                                    height={160} />}
+                            : roomInfo && <ChanneLSettingsInfo
+                                socket={socket}
+                                room={roomInfo}
+                                User={selectedUser}
+                                member={memberselected}
+                            />}
             </div>
         </div>
     )

@@ -14,6 +14,8 @@ import Cookies from 'js-cookie';
 import ChanneLFindRoommodaL from './chat/channels/modaLs/channel.find.room.modaL';
 import { Socket, io } from 'socket.io-client';
 import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
+import { membersType, userType } from '@/types/types';
+import MyToast from '@/components/ui/Toast/MyToast';
 interface Props {
   children: React.ReactNode;
 }
@@ -21,6 +23,17 @@ interface Props {
 const Dashboard = ({ children }: Props) => {
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const router = useRouter();
+  const [Notifications, setNotifications] = React.useState<any[] | null>(null)
+
+  socket?.on('notificationEvent', (data) => {
+    console.log("notificationEvent data :", data)
+    setNotifications([data])
+    setTimeout(() => {
+      setNotifications(null)
+    }
+      , 1000)
+
+  })
 
   const token: any = Cookies.get('token');
   useEffect(() => {
@@ -58,6 +71,18 @@ const Dashboard = ({ children }: Props) => {
       <ChanneLFindRoommodaL />
       <ChanneLaccessDeniedModaL />
       <ChanneLPasswordAccessModaL />
+      {
+        Notifications && Notifications.map((notification: {
+          message: string, User: userType,
+          member: membersType,
+          sendedUser: userType
+        }, index: number) => {
+          return (
+            <MyToast key={index} isOpen user={notification.sendedUser.login} message={notification.message} />
+          )
+        }
+        )
+      }
       <div className="dashboard bg-primary">
         <header className="bg-transparent flex items-center justify-between px-5 ">
           <Header socket={socket} />

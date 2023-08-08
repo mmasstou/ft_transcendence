@@ -5,7 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Members, Prisma } from '@prisma/client';
+import { Members, Prisma, UserType } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -65,30 +65,34 @@ export class MembersService {
         },
       });
     } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.FORBIDDEN,
-          error: "CAN'T CREATE THIS MESSAGE",
-        },
-        HttpStatus.FORBIDDEN,
-        {
-          cause: error,
-        },
-      );
+      return null;
     }
   }
 
   async update(params: {
     id: string;
-    type: Prisma.EnumUserTypeFieldUpdateOperationsInput;
-  }): Promise<Members> {
-    const { id, type } = params;
-    // console.log('++update++>', id);
+    type?: UserType | Prisma.EnumUserTypeFieldUpdateOperationsInput;
+    isban?: boolean;
+    ismute?: boolean;
+  }): Promise<Members | null> {
+    try {
+      const { id, type, isban, ismute } = params;
+      // console.log('++update++>', id);
 
-    return await this.prisma.members.update({
-      data: { type },
-      where: { id },
-    });
+      const oLdMember = await this.prisma.members.findUnique({
+        where: { id },
+      });
+      if (!oLdMember) throw new NotFoundException();
+      const __isBan = isban ? isban : oLdMember.isban;
+      const __isMute = ismute ? ismute : oLdMember.ismute;
+      const __type = type ? type : oLdMember.type;
+      return await this.prisma.members.update({
+        data: { type: __type, isban: __isBan, ismute: __isMute },
+        where: { id },
+      });
+    } catch (error) {
+      return null;
+    }
   }
 
   async remove(id: string): Promise<Members> {

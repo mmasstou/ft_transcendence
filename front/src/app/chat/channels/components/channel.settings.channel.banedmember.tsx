@@ -1,10 +1,13 @@
 import { IoChevronBackOutline } from "react-icons/io5";
 import { Socket } from "socket.io-client";
 import Button from "../../components/Button";
-import { UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
+import { UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types";
 import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import Image from "next/image";
 import ChanneLSettingsBody from "./channel.settings.body";
+import React from "react";
+import getUserWithId from "../actions/getUserWithId";
+import Cookies from "js-cookie";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -21,14 +24,27 @@ export default function ChanneLSettingsChanneLBanedMember(
 
     }
 
+    const [User, setUser] = React.useState<userType | null>(null)
+
+    React.useEffect(() => {
+        if (LogedMember) {
+            (async () => {
+                const token = Cookies.get('token')
+                if (!token) return  // if no token found, do nothing
+                const res = await getUserWithId(LogedMember.userId, token)
+                if (res) setUser(res)
+
+            })();
+        }
+    })
     socket?.on('updatememberResponseEvent', (data) => {
         setUpdate(true)
     })
     return (
         <ChanneLSettingsBody
-            title={"Baned Members"}
+            title={`Baned Members Memeber :${User?.login}`}
             OnBack={OnBack}
-            HasPermission={LogedMember?.isban || LogedMember?.type === UserTypeEnum.OWNER || LogedMember?.type === UserTypeEnum.ADMIN}>
+            HasPermission={LogedMember?.type === UserTypeEnum.OWNER || LogedMember?.type === UserTypeEnum.ADMIN}>
             <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
                 {members && members.map((member, index) => (
                     <ChannelSettingsUserMemberItem

@@ -7,24 +7,24 @@ import { useRouter } from 'next/navigation';
 import router from 'next/router';
 
 export const Logout: React.FC = (props): JSX.Element => {
-  const logoutHandle = () => {
-    (async () => {
-      const resp = await fetch('http://localhost:80/api/auth/logout', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${Cookies.get('token')}`,
-        },
-      });
-      if (resp.status === 200) {
-        // Cookies.remove('token');
-        // Cookies.remove('_id');
-        // Cookies.remove('tableId');
-        router.push('/')
+  // const logoutHandle = () => {
+  //   (async () => {
+  //     const resp = await fetch('http://localhost:80/api/auth/logout', {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Authorization: `Bearer ${Cookies.get('token')}`,
+  //       },
+  //     });
+  //     if (resp.status === 200) {
+  //       // Cookies.remove('token');
+  //       // Cookies.remove('_id');
+  //       // Cookies.remove('tableId');
+  //       router.push('/')
         
-      }
-    })();
-  };
+  //     }
+  //   })();
+  // };
 
   return (
     <Popover.Root>
@@ -46,7 +46,7 @@ export const Logout: React.FC = (props): JSX.Element => {
             </p>
             <div className="w-3/4 border-b-[0.1vh] border-white opacity-50"></div>
             <a
-              onClick={logoutHandle}
+              onClick={() => {}}
               href="/"
               className="flex justify-between items-center my-1 hover:text-red-500"
             >

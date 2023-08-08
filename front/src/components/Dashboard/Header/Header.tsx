@@ -9,16 +9,20 @@ import Notification from '@/components/profile/Notification';
 import { Socket } from 'socket.io-client';
 import React from 'react';
 import { membersType, userType } from '@/types/types';
+import MyToast from '@/components/ui/Toast/MyToast';
 
 
 const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
-  const [Notifications, setNotifications] = React.useState<any[]>([])
+  const [Notifications, setNotifications] = React.useState<any[] | null>(null)
 
-  socket?.on('notificationEvent', (data) => {
-    console.log("notificationEvent data :", data)
-    setNotifications([...Notifications, data])
-  })
-  
+  // socket?.on('notificationEvent', (data) => {
+  //   console.log("notificationEvent data :", data)
+  //   Notifications !== null
+  //   ? setNotifications([...Notifications, data])
+  //   : setNotifications([data])
+  //   setshownotification(true)
+  // })
+
   return (
     <>
       <div className="flex justify-center items-center">
@@ -48,21 +52,24 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
                 >
                   <div className="flex flex-col gap-2.5">
                     <h1 className='tracking-wide ml-2 font-bold sm:text-lg 2xl:text-xl'>Notifications</h1>
+
+                    {/* <MyToast isOpen={false} user={''} message={''} /> */}
                     {
-                      Notifications.map((notification: {
+                      Notifications && Notifications.map((notification: {
                         message: string, User: userType,
                         member: membersType,
                         sendedUser: userType
-                      }, index) => {
+                      }, index: number) => {
                         return (
                           <Notification key={index} avatar={notification.sendedUser.avatar} name={notification.sendedUser.login} message={notification.message} />
+                          // <MyToast key={index} isOpen user={notification.sendedUser.login} message={notification.message} />
                         )
                       }
                       )
                     }
-                    {/* <Notification avatar='/avatar.jpg' name='mehdi' message='send a friend request.' isFriend isOnline />
-          <Notification avatar='/avatar.jpg' name='mehdi' message='send a friend request.' isFriend />
-          <Notification avatar='/avatar.jpg' name='mehdi' message='send a friend request.'/> */}
+                    <Notification avatar='/avatar.jpg' name='mehdi' message='send a friend request.' isFriend isOnline />
+                    <Notification avatar='/avatar.jpg' name='mehdi' message='send a friend request.' isFriend />
+                    <Notification avatar='/avatar.jpg' name='mehdi' message='send a friend request.' />
                   </div>
                   <Popover.Arrow className="fill-[#2B504B]" />
                 </Popover.Content>

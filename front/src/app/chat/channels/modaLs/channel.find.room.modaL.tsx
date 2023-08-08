@@ -1,48 +1,86 @@
 import ChanneLFindRoommodaLHook from "../hooks/channel.find.room.hook"
-import { use, useEffect, useState } from "react"
-import { RoomsType } from "@/types/types"
+import { useEffect, useRef, useState } from "react"
+import { RoomTypeEnum, RoomsType } from "@/types/types"
 import Cookies from "js-cookie"
 import ChanneLModal from "./channel.modal"
 import ChannelFindRoomItem from "../components/channel.find.roomItem"
 import getPublicProtactedChannels from "../actions/getPublicProtactedChannels"
 import Image from "next/image"
-import { sync } from "framer-motion"
-import IsMember from "../actions/IsMember"
+import { toast } from "react-hot-toast"
+import { useRouter } from "next/navigation"
+import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
 
 export default function ChanneLFindRoommodaL() {
     const { IsOpen, onClose, onOpen, socket } = ChanneLFindRoommodaLHook()
+    const channeLPasswordAccessHook = ChanneLPasswordAccessHook()
     const [rooms, setrooms] = useState<RoomsType[] | null>(null)
     const [roomsFiltered, setroomsFiltered] = useState<RoomsType[] | null>(null)
     const [InputValue, setInputValue] = useState("")
     const [Update, setUpdate] = useState<boolean>(false)
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
     const UserId = Cookies.get("_id")
+    const route = useRouter()
     useEffect(() => {
         (async () => {
             const token: any = Cookies.get('token');
-            if (!token) return
-            if (!UserId) return
+            if (!token || !UserId) return
             let response = await getPublicProtactedChannels(token)
             if (!response) return
-            console.log("response :", response)
-            // check if user is member of room
-            // response = response.map(async (room: RoomsType) => {
-            //     const isMember = await IsMember(room.id, UserId, token)
-            //     if (!isMember) return true
-            // })
-            console.log("response : -> ", response)
             setrooms(response)
         })();
     }, [Update])
 
-    socket?.on('ChatUpdate', () => {
-        setUpdate(Update ? false : true)
-    })
+    useEffect(() => {
+        if (searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
+    }, [])
     useEffect(() => {
         if (!rooms) return
         if (!InputValue) return setroomsFiltered(null)
-        setroomsFiltered(rooms.filter((room: RoomsType) => room.name.toLowerCase().includes(InputValue.toLowerCase())))
+        setroomsFiltered(
+            rooms.filter((room: RoomsType) => {
+                return room.name.toLowerCase().includes(InputValue.toLowerCase())
+            }))
     }, [InputValue])
 
+    const OnJion = (param: { room: RoomsType, password: string }) => {
+        // check if room is protacted :
+        const { room, password } = param
+        if (room.type === RoomTypeEnum.PROTECTED) {
+            if (room.password !== password) {
+                return toast.error("password is incorrect")
+            }
+        };
+        // channel is public
+        socket?.emit(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
+            { userId: UserId, roomId: room.id })
+    }
+
+    // listen to socket event :
+    useEffect(() => {
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            (data: {
+                message: string,
+                status: any,
+                data: RoomsType,
+            }) => {
+                console.log("RESPONSE_CHAT_MEMBER_UPDATE :", data)
+                if (!data) {
+                    toast.error('error')
+                }
+                if (data) {
+                    toast.success(data.message)
+                    route.push(`/chat/channels?r=${data.data.id}`)
+                    onClose()
+                }
+            });
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, () => {
+            setUpdate(Update ? false : true)
+        })
+    }, [socket])
     const bodyContent = (
         <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[34rem]">
 
@@ -50,28 +88,26 @@ export default function ChanneLFindRoommodaL() {
 
                 <div className="body flex flex-col gap-2 py-4">
                     <input
+                        ref={searchInputRef}
                         className="p-3 focus:outline-none rounded-[15px] bg-transparent border border-[#fdfdfd] text-[#ffffff] placeholder:text-white"
-                        onSubmit={(event: any) => { }
-                        }
-                        onKeyDown={(event) => { }}
-                        onChange={(event) => {
-                            setInputValue(event.target.value);
-                        }}
+                        onChange={(event) => { setInputValue(event.target.value); }}
                         placeholder="Type the name of channel"
                         type="search"
                         name=""
                         id="" />
                 </div>
                 <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-scroll justify-center items-center">
-
                     {
-                        roomsFiltered ? roomsFiltered.map((room: RoomsType, index: number) => {
-                            return <ChannelFindRoomItem key={index} room={room} onClick={(room: RoomsType) => {
-                                socket?.emit("sendNotification", { userId: UserId, room: room })
-                                console.log("selected room :", room.name)
-                            }} />
-                        }
-                        )
+                        roomsFiltered && roomsFiltered.length
+                            ? roomsFiltered.map((room: RoomsType, index: number) => {
+                                return <ChannelFindRoomItem
+                                    key={index}
+                                    room={room}
+                                    onClick={(param: { room: RoomsType, password: string }) => {
+                                        const { room, password } = param
+                                        OnJion({ room, password })
+                                    }} />
+                            })
                             : <Image src="/searching.svg" alt={"searching"} height={230} width={230} />
                     }
                 </div>

@@ -45,7 +45,7 @@ model User {
   paddle_color  String?         @default("#E0E0E0")
   ball_color    String?         @default("#E0E0E0")
   location      String?
-  cursus_users  Cursus?          @relation(fields: [cursusId], references: [id])
+  cursus_users  Cursus?         @relation(fields: [cursusId], references: [id])
   intraId       Int?
   banner        String?
   is_active     Boolean         @default(false)
@@ -57,6 +57,25 @@ model User {
   directMessage DirectMessage[]
   UserSocket    UserSocket[]
   cursusId      String?
+  Notification  Notification[]
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  content    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  User       User     @relation(fields: [userId], references: [id])
+  userId     String
+}
+
+model ChanneLNotifications {
+  id         String   @id @default(uuid())
+  content    String
+  channel    Rooms    @relation(fields: [channelId], references: [id])
+  channelId  String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Cursus {
@@ -68,18 +87,19 @@ model Cursus {
 }
 
 model Rooms {
-  id             String     @id @default(uuid())
-  name           String     @unique
-  type           RoomType   @default(PUBLIC)
-  members        Members[]
-  messages       Messages[]
-  viewedmessage  Int        @default(0)
-  password       String?
-  hasAccess      Boolean    @default(false)
-  accesspassword String?    @default("")
-  created_at     DateTime   @default(now())
-  updated_at     DateTime   @updatedAt
-  User           User[]
+  id                   String                 @id @default(uuid())
+  name                 String                 @unique
+  type                 RoomType               @default(PUBLIC)
+  members              Members[]
+  messages             Messages[]
+  viewedmessage        Int                    @default(0)
+  password             String?
+  hasAccess            Boolean                @default(false)
+  accesspassword       String?                @default("")
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @updatedAt
+  User                 User[]
+  ChanneLNotifications ChanneLNotifications[]
 }
 
 model DirectMessage {

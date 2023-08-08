@@ -105,7 +105,7 @@ export default function page() {
             setmemberHasAccess(true)
           }
         });
-        room && socket?.emit('joinroom', room, (response: any) => {
+        room && socket?.emit('accessToroom', room, (response: any) => {
 
         })
       }

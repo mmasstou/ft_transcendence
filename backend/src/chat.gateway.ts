@@ -10,7 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from './users/user.service';
-import { Members, RoomType, User, UserType } from '@prisma/client';
+import { Members, RoomType, Rooms, User, UserType } from '@prisma/client';
 import { error } from 'console';
 import { RoomsService } from './rooms/rooms.service';
 import { MessagesService } from './messages/messages.service';
@@ -25,6 +25,8 @@ import {
   UpdateChanneLSendEnum,
 } from './rooms/types/upatecahnnel';
 import { AppService } from './app.service';
+import { JoinStatusEnum } from './rooms/types/room.joinStatus';
+import e from 'express';
 
 enum updatememberEnum {
   SETADMIN = 'SETADMIN',
@@ -35,6 +37,26 @@ enum updatememberEnum {
   SETOWNER = 'SETOWNER',
   ACCESSPASSWORD = 'ACCESSPASSWORD',
 }
+export enum responseEventStatusEnum {
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR',
+}
+export enum responseEventMessageEnum {
+  WELLCOMEBACK = 'Wellcom back to room',
+  WELLCOME = 'Wellcome to room',
+  BAN = 'you are ban from this room',
+  MUTED = 'you are muted from this room',
+  KIKED = 'you are kiked from this room',
+  SETADMIN = 'you are admin now',
+  SETOWNER = 'you are owner now',
+  PLAYGAME = 'playing game now',
+  CANTJOIN = 'you cant join to this room',
+}
+export type responseEvent = {
+  status: responseEventStatusEnum;
+  message: responseEventMessageEnum;
+  data: Rooms | Members | User | null;
+};
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway implements OnGatewayConnection {
   constructor(
@@ -126,50 +148,96 @@ export class ChatGateway implements OnGatewayConnection {
       console.log('Chat-updatemember> error- +>', error);
     }
   }
-  @SubscribeMessage('joinmember')
+  @SubscribeMessage(`${process.env.SOCKET_EVENT_JOIN_MEMBER}`)
   async joinmember(
     @ConnectedSocket() client: Socket,
     @MessageBody()
     data: {
-      userid: string;
-      roomid: string;
+      userId: string;
+      roomId: string;
     },
   ) {
+    const ResponseEventData: responseEvent = {
+      status: responseEventStatusEnum.SUCCESS,
+      message: responseEventMessageEnum.WELLCOME,
+      data: null,
+    };
     try {
-      let member: any = null;
-      // check if member is already in room database :
-      try {
-        const room = await this.roomservice.findOne({ name: data.roomid });
-        member = await this.prisma.members.findFirst({
-          where: { userId: data.userid, roomsId: room.id },
-        });
-        if (!member) {
-          member = await this.memberService.create({
-            type: UserType.USER,
-            user: data.userid,
-            roomId: room.id,
-          });
-        }
-        await this.prisma.rooms.update({
-          where: { id: room.id },
-          data: {
-            members: { connect: { id: member.id } },
-            User: { connect: { id: data.userid } },
-          },
-        });
-        client.emit('joinmemberResponseEvent', member);
-      } catch (error) {
-        console.log('Chat-> joinmember error- +>', error);
-      }
-      // create room :
-      // const newRoom = await this.roomservice.create(data, _User.login);
-      this.server.emit('ChatUpdate', member);
+      const room = await this.roomservice.findOne({ id: data.roomId });
 
-      // send message that room is created :
-      // this.server.emit('createroomResponseEvent', newRoom);
+      // check if member is already in room database :
+      const existMember = await this.memberService.findOne({
+        userId: data.userId,
+        roomId: room.id,
+      });
+      if (existMember) {
+        // check if member is ban :
+        if (existMember.isban) {
+          ResponseEventData.status = responseEventStatusEnum.ERROR;
+          ResponseEventData.message = responseEventMessageEnum.BAN;
+          ResponseEventData.data = existMember;
+          client.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            ResponseEventData,
+          );
+          return;
+        }
+        // update member :
+        const member = await this.memberService.update({
+          id: existMember.id,
+          ismute: false,
+          type: UserType.USER,
+        });
+        // add member to room :
+        const roomJoined = await this.roomservice.joinToRoom(
+          data.userId,
+          member.id,
+          room.id,
+        );
+        ResponseEventData.status = responseEventStatusEnum.SUCCESS;
+        ResponseEventData.message = responseEventMessageEnum.WELLCOMEBACK;
+        ResponseEventData.data = roomJoined;
+        // send response to client :
+        client.emit(
+          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+          ResponseEventData,
+        );
+        return;
+      }
+      // create member :
+      const member = await this.memberService.create({
+        user: data.userId,
+        roomId: data.roomId,
+        type: UserType.USER,
+      });
+      // add member to room :
+      const roomJoined = await this.roomservice.joinToRoom(
+        data.userId,
+        member.id,
+        room.id,
+      );
+      ResponseEventData.status = responseEventStatusEnum.SUCCESS;
+      ResponseEventData.message = responseEventMessageEnum.WELLCOME;
+      ResponseEventData.data = roomJoined;
+      // send response to client :
+      client.emit(
+        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+        ResponseEventData,
+      );
+      return;
     } catch (error) {
-      console.log('Chat-joinmember> error- +>', error);
+      console.log('Chat-> joinmember error- +>', error);
+      // send response to client :
+      ResponseEventData.status = responseEventStatusEnum.ERROR;
+      ResponseEventData.message = responseEventMessageEnum.CANTJOIN;
+      ResponseEventData.data = null;
+      client.emit(
+        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+        ResponseEventData,
+      );
     }
+    // send event to all client  that member is join to room :
+    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, null);
   }
   @SubscribeMessage('createroom')
   async createRoom(
@@ -193,7 +261,10 @@ export class ChatGateway implements OnGatewayConnection {
       const newRoom = await this.roomservice.create(data, LogedUser.login);
       client.emit('createroomResponseEvent', newRoom);
       // send message that room is created :
-      this.server.emit('ChatUpdate', newRoom);
+      this.server.emit(
+        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+        newRoom,
+      );
     } catch (error) {
       console.log('Chat-createRoom> error- +>', error);
     }
@@ -205,7 +276,7 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() data: any,
   ) {
     console.log('Chat-> responseMemberData- +>', data);
-    const room = await this.roomservice.findOne({ name: data.room.id });
+    const room = await this.roomservice.findOne({ id: data.room.id });
     const LogedUser = await this.usersService.getUserInClientSocket(client);
     if (!LogedUser) {
       return;
@@ -223,11 +294,41 @@ export class ChatGateway implements OnGatewayConnection {
       this.server.emit('deleteroomResponseEvent', null);
     }
   }
-  @SubscribeMessage('joinroom')
-  async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+
+  @SubscribeMessage('JoinRoom')
+  async JoinRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { userId: string; roomId: string },
+  ) {
+    const User = await this.usersService.findOne({ id: data.userId });
+    const Room = await this.roomservice.findOne({ id: data.roomId });
+    if (!User || !Room) return;
+
+    // check if member is already in room database :
+    const _isMemberInRoom = await this.roomservice.isMemberInRoom(
+      data.roomId,
+      data.userId,
+    );
+    console.log('Chat-> responseMemberData- +>', _isMemberInRoom);
+    if (_isMemberInRoom !== null && !client.rooms.has(data.roomId)) {
+      // await client.join(data.roomId);
+      // send response to client :
+      console.log('Chat-> JoinRoom +> user :', User.login);
+    }
+    client.emit('JoinRoomResponseEvent', {
+      status: JoinStatusEnum.JOINED,
+      message: 'you are not member or not in the socket channel yet',
+    });
+  }
+
+  @SubscribeMessage('accessToroom')
+  async AccesstoRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
     try {
       // get room from database :
-      const room = await this.roomservice.findOne({ name: data.id });
+      const room = await this.roomservice.findOne({ id: data.id });
       // get user from client :
       const LogedUser = await this.usersService.getUserInClientSocket(client);
       if (!LogedUser) return;
@@ -294,7 +395,7 @@ export class ChatGateway implements OnGatewayConnection {
   ) {
     try {
       console.log('Chat-> updateChanneL +> data :', data);
-      const room = await this.roomservice.findOne({ name: data.room.id });
+      const room = await this.roomservice.findOne({ id: data.room.id });
       const LogedUser = await this.usersService.getUserInClientSocket(client);
       if (!LogedUser) return;
       const responseMemberData = await this.roomservice.isMemberInRoom(

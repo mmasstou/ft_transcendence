@@ -1,6 +1,6 @@
 "use client"
 // imports :
-import { FormEvent, use, useEffect, useState } from "react";
+import { FormEvent, use, useEffect, useRef, useState } from "react";
 
 // components :
 import ConversationsInput from "./channel.conversations.input";
@@ -33,6 +33,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const [message, setMessage] = useState("")
     const [InputValue, setInputValue] = useState("")
     const [viewed, setviewed] = useState<number>(0)
+    const [scrollmessage, setscrollmessage] = useState(false)
     const [reload, setreload] = useState<boolean>(false)
     const [LogedMember, setLogedMember] = useState<membersType | null>(null)
     const params = useSearchParams()
@@ -65,9 +66,10 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
     useEffect(() => {
         socket?.on('message', (message: any) => {
-
+            setscrollmessage(!scrollmessage)
             setMessages([...messages, message])
         })
+        setscrollmessage(!scrollmessage)
     }, [messages, InputValue])
 
 
@@ -92,8 +94,11 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             setreload(reload ? false : true)
         })
     }, [socket, channeLsettingsHook])
+    
+
+ 
     const content = (
-        <div className="flex flex-col gap-3">
+        <div  className="flex flex-col gap-3">
 
             {/* <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} /> */}
             {
@@ -141,7 +146,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     border-orange-300
     sm:flex`}>
             <ConversationsTitlebar LogedMember={LogedMember} socket={socket} channeLId={room} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
-            <ConversationsMessages Content={content} />
+            <ConversationsMessages socket={socket} Content={content} />
             <div className="w-full absolute bottom-4 left-0">
                 <input
                     className="ConversationsInput w-full h-[54px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"

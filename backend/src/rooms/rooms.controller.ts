@@ -44,6 +44,17 @@ export class RoomsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('notification/:channeLId')
+  findNotifications(
+    @Req() request: Request,
+    @Param('channeLId') channeLId: string,
+  ) {
+    const userIds: any = request.user;
+    const login: string = userIds.login;
+    return this.roomsService.findNotifications({ login, channeLId });
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('user')
   findALLUser(@Req() request: Request) {
     const userIds: any = request.user;
@@ -52,9 +63,14 @@ export class RoomsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':name')
-  findOne(@Param('name') name: string) {
-    return this.roomsService.findOne({ name });
+  @Get('owners/:channeLId')
+  findOwners(@Param('channeLId') channeLId: string) {
+    return this.roomsService.findOwners({ channeLId });
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.roomsService.findOne({ id });
   }
 
   @UseGuards(JwtAuthGuard)

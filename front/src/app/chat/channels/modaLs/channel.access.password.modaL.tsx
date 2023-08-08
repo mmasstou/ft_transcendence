@@ -47,12 +47,12 @@ const ChanneLPasswordAccessModaL = () => {
             return
         }
         console.log("the password is match you can acces now!")
-        room && socket?.emit('joinroom', room, (response: any) => {
+        room && socket?.emit('accessToroom', room, (response: any) => {
             if (response.error) {
                 toast.error(response.error);
             }
             console.log("the response is receved from socket")
-            console.log("joinroom response :", response)
+            console.log("accessToroom response :", response)
             onClose()
             route.push(`/chat/channels?r=${room.id}`)
             route.refresh()

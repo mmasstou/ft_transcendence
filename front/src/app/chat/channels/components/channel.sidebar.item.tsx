@@ -51,12 +51,12 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket, viewd }: ChanneLSid
     //   }
     //   else if (selectedchanneL.hasAccess === false) {
     //     console.log("selectedchanneL  :%s cliecked and hasAccessPassrod : ", selectedchanneL.name, selectedchanneL.hasAccess)
-    //     selectedchanneL && socket?.emit('joinroom', selectedchanneL, (response: any) => { })
+    //     selectedchanneL && socket?.emit('accessToroom', selectedchanneL, (response: any) => { })
     //     router.push(`/chat/channels?r=${selectedchanneL.id}`)
     //   }
     // }
     if (!selectedchanneL) return
-    selectedchanneL && socket?.emit('joinroom', selectedchanneL, (response: any) => { })
+    selectedchanneL && socket?.emit('accessToroom', selectedchanneL, (response: any) => { })
     router.push(`/chat/channels?r=${selectedchanneL.id}`)
     if (isMobile) leftSidebar.onClose()
   }, [selectedchanneL])
@@ -70,7 +70,7 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket, viewd }: ChanneLSid
   useEffect(() => {
     if (params) {
       if (params.get('r') === room.id) {
-        room && socket?.emit('joinroom', room, (response: any) => {
+        room && socket?.emit('accessToroom', room, (response: any) => {
           router.push(`/chat/channels?r=${params.get('r')}`)
         })
       }

@@ -1,7 +1,7 @@
 import React, { use, useEffect } from "react";
 import LefttsideModaL from "../modaLs/LeftsideModal";
 import ChanneLSidebarItem from "./channel.sidebar.item";
-import { RoomsType, membersType, messagesType } from "@/types/types";
+import { RoomsType, membersType, messagesType, userType } from "@/types/types";
 import { useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { Socket } from "socket.io-client";
@@ -13,6 +13,7 @@ import RightsidebarHook from "../hooks/RightSidebarHook";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import LoginHook from "@/hooks/auth/login";
 import getChannels from "../actions/getChanneLs";
+import MyToast from "@/components/ui/Toast/MyToast";
 
 export default function ChanneLbody({ children, socket }: { children: React.ReactNode; socket: Socket | null }) {
     const [IsMounted, setIsMounted] = React.useState(false)
@@ -26,6 +27,12 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     const channelsettingsHook = ChanneLsettingsHook()
     const rightsidebar = RightsidebarHook()
     const loginHook = LoginHook()
+    const [Notifications, setNotifications] = React.useState<any[]>([])
+
+    socket?.on('notificationEvent', (data) => {
+        console.log("notificationEvent data :", data)
+        setNotifications([...Notifications, data])
+    })
 
     useEffect(() => {
         const token: any = Cookies.get('token');
@@ -45,8 +52,13 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
 
     }, [loginHook, update])
 
-    socket?.on('ChatUpdate', (data) => { setUpdate(update ? false : true) })
 
+    useEffect(() => {
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, () => {
+            setUpdate(update ? false : true)
+        })
+
+    }, [socket])
     useEffect(() => {
 
         if (params) {
@@ -73,6 +85,23 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
         return null
     return (
         <div className="channeLbody relative h-full flex ">
+            {
+                Notifications.map((notification: {
+                    message: string, User: userType,
+                    member: membersType,
+                    sendedUser: userType
+                }, index) => {
+                    return (
+                        // <Notification key={index} avatar={notification.sendedUser.avatar} name={notification.sendedUser.login} message={notification.message} />
+                        <MyToast
+                            key={index}
+                            isOpen={true}
+                            user={notification.sendedUser.login}
+                            message={notification.message} />
+                    )
+                }
+                )
+            }
             <LefttsideModaL>
                 {
                     ChanneLs && ChanneLs.map((room: RoomsType, key) => (
