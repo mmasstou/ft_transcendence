@@ -25,7 +25,7 @@ export default function ConversationsMessages({ Content, socket }: Conversations
 
     // Scroll to the last message when new messages are added
 
-    return <div ref={chatContainerRef} className="ConversationsMessages relative h-[71vh] md:h-[71vh] p-4 overflow-y-scroll gap-2" >
+    return <div ref={chatContainerRef} className="ConversationsMessages relative h-[74vh] md:h-[74vh] p-4 overflow-y-scroll gap-2" >
         {Content}
     </div>
 }
