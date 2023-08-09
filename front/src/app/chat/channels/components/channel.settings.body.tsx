@@ -4,8 +4,8 @@ import PermissionDenied from "./channel.settings.permissiondenied";
 
 interface channeLSettingsBodyProps {
     children: React.ReactNode;
-    title: string;
-    OnBack: () => void;
+    title?: string;
+    OnBack?: () => void;
     footer?: React.ReactNode;
     HasPermission?: boolean;
 }
@@ -13,15 +13,18 @@ export default function ChanneLSettingsBody(
     { children, title, OnBack, footer, HasPermission }: channeLSettingsBodyProps
 ) {
     return <div className="flex flex-col justify-start">
+        <div>
+            error message
+        </div>
         <div className=" flex flex-row items-center justify-start gap-3">
-            <Button
+            {OnBack && <Button
                 icon={IoChevronBackOutline}
                 outline
                 size={21}
                 labelsize={8}
                 onClick={OnBack}
-            />
-            <h3 className="capitalize text-md text-[#FFFFFF] font-semibold"> {title} </h3>
+            />}
+            {title && <h3 className="capitalize text-md text-[#FFFFFF] font-semibold"> {title} </h3>}
         </div>
         <div className="overflow-y-scroll max-h-[28rem] flex flex-col w-full">
             <div className="flex flex-col h-full w-full justify-start gap-6 items-center p-4">

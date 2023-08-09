@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
@@ -19,7 +19,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { MembersService } from './members/members.service';
 import { PrismaService } from './prisma.service';
 import { clientOnLigne } from './user.gateway';
-import { RoomsType, membersType } from './users/user.type';
+import { RoomsType, UserTypeEnum, membersType } from './users/user.type';
 import {
   UpdateChanneLSendData,
   UpdateChanneLSendEnum,
@@ -51,6 +51,8 @@ export enum responseEventMessageEnum {
   SETOWNER = 'you are owner now',
   PLAYGAME = 'playing game now',
   CANTJOIN = 'you cant join to this room',
+  CANTDELETE = 'you cant delete this room',
+  DELETESECCESS = 'room deleted',
 }
 export type responseEvent = {
   status: responseEventStatusEnum;
@@ -271,29 +273,51 @@ export class ChatGateway implements OnGatewayConnection {
     this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, null);
   }
 
-  @SubscribeMessage('deleteChannel')
+  @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_DELETE}`)
   async deleteRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: any,
+    @MessageBody()
+    data: {
+      userId: string;
+      roomId: string;
+    },
   ) {
-    console.log('Chat-> responseMemberData- +>', data);
-    const room = await this.roomservice.findOne({ id: data.room.id });
-    const LogedUser = await this.usersService.getUserInClientSocket(client);
-    if (!LogedUser) {
-      return;
-    }
-    const responseMemberData = await this.roomservice.isMemberInRoom(
-      room.id,
-      LogedUser.id,
-    );
-    if (responseMemberData && responseMemberData.type === UserType.OWNER) {
+    const ResponseEventData: responseEvent = {
+      status: responseEventStatusEnum.SUCCESS,
+      message: responseEventMessageEnum.DELETESECCESS,
+      data: null,
+    };
+    try {
+      // check if member is already in room database and is owner :
+      const User = await this.usersService.findOne({ id: data.userId });
+      // get room from database :
+      const room = await this.roomservice.findOne({ id: data.roomId });
+      // get member from database :
+      const member = await this.memberService.findOne({
+        userId: User.id,
+        roomId: room.id,
+      });
+      // chck if no User or room or member or this member is not Owner
+      if (!User || !room || !member || member.type !== UserTypeEnum.OWNER)
+        throw new NotFoundException();
+      // delete room :
       const deleteRoom = await this.roomservice.remove(room.id);
-      if (deleteRoom) {
-        client.emit('deleteChannelResponseEvent', deleteRoom);
-        this.server.emit('ChatUpdate', deleteRoom);
-      }
-      this.server.emit('deleteroomResponseEvent', null);
+      ResponseEventData.data = deleteRoom;
+      client.emit(
+        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_DELETE}`,
+        ResponseEventData,
+      );
+    } catch (error) {
+      ResponseEventData.data = null;
+      ResponseEventData.status = responseEventStatusEnum.ERROR;
+      ResponseEventData.message = responseEventMessageEnum.CANTDELETE;
+      client.emit(
+        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_DELETE}`,
+        ResponseEventData,
+      );
     }
+    // send event to all client  that owner delete room :
+    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, null);
   }
 
   @SubscribeMessage('JoinRoom')

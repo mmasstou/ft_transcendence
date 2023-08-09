@@ -32,6 +32,7 @@ import getChannelWithId from '../actions/getChannelWithId';
 import ChanneLSettingsOptionItem from './channel.settings.optionItem';
 import { AiOutlineDelete } from 'react-icons/ai';
 import ChanneLSettingsChanneLDeleteChannel from './channel.settings.channel.deletechannel';
+import PermissionDenied from './channel.settings.permissiondenied';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
@@ -268,7 +269,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                 {
                     LogedMember && LogedMember.type === UserTypeEnum.OWNER &&
                     <button
-                        onClick={() => { setStep(SETTINGSTEPS.DELETECHANNEL)}}
+                        onClick={() => { setStep(SETTINGSTEPS.DELETECHANNEL) }}
                         className="flex flex-row justify-between items-center shadow p-2 rounded">
                         <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
                             <AiOutlineDelete size={32} />
@@ -282,22 +283,13 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                     </button>
                 }
             </div>
-            {/* <button
-                onClick={() => {
-
-                    OnEditPassword()
-                }}
-                className="flex flex-row gap-6  items-center shadow p-1 rounded bg-isban px-4">
-                <div className='flex justify-center items-center p-1 rounded text-white'>
-                    <IoLogOut size={24} />
-                </div>
-                <div>
-                    <h2 className='text-white'>leave Channel</h2>
-                </div>
-            </button> */}
         </div>
-
     )
+    
+    if (LogedMember?.type !== UserTypeEnum.OWNER && LogedMember?.type !== UserTypeEnum.ADMIN) {
+        _body = (<PermissionDenied />)
+     }
+
     if (step === SETTINGSTEPS.BANEDMEMBERS) {
         _body = members ? <ChanneLSettingsChanneLBanedMember
             setUpdate={setUpdate}
@@ -356,11 +348,12 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         )
     }
     if (step === SETTINGSTEPS.DELETECHANNEL) {
-        _body = <ChanneLSettingsChanneLDeleteChannel room={ChanneLinfo} OnBack={OnBack} socket={socket} />}
-        // if (step === SETTINGSTEPS.CHANGECHANNEL) {
-        //     _body = ()
-        // }
-        return <ChanneLSettingsEditModaL >
-            {_body}
-        </ChanneLSettingsEditModaL>
+        _body = <ChanneLSettingsChanneLDeleteChannel room={ChanneLinfo} OnBack={OnBack} socket={socket} />
     }
+    // if (step === SETTINGSTEPS.CHANGECHANNEL) {
+    //     _body = ()
+    // }
+    return <ChanneLSettingsEditModaL >
+        {_body}
+    </ChanneLSettingsEditModaL>
+}

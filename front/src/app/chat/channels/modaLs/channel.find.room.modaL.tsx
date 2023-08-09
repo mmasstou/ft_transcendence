@@ -66,10 +66,10 @@ export default function ChanneLFindRoommodaL() {
                 data: RoomsType,
             }) => {
                 console.log("RESPONSE_CHAT_MEMBER_UPDATE :", data)
-                if (!data) {
+                if (!data.data) {
                     toast.error('error')
                 }
-                if (data) {
+                if (data.data) {
                     toast.success(data.message)
                     route.push(`/chat/channels?r=${data.data.id}`)
                     onClose()

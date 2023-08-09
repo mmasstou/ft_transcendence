@@ -16,6 +16,7 @@ import { Socket, io } from 'socket.io-client';
 import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
 import { membersType, userType } from '@/types/types';
 import MyToast from '@/components/ui/Toast/MyToast';
+import ChanneLConfirmActionModaL from './chat/channels/modaLs/channel.confirm.action';
 interface Props {
   children: React.ReactNode;
 }
@@ -65,6 +66,7 @@ const Dashboard = ({ children }: Props) => {
     <>
       <Login />
       {/* <ChanneLModal /> */}
+      <ChanneLConfirmActionModaL />
       <ChanneLPasswordAccessModaL />
       <ChanneLCreateModaL />
       <ChanneLSettingsModaL />

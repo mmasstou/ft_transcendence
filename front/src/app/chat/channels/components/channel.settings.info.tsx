@@ -15,13 +15,18 @@ import React from "react";
 import { RoomsType, UserTypeEnum, membersType, userType } from "@/types/types";
 import { Socket } from "socket.io-client";
 import Cookies from "js-cookie";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import getChanneLOwners from "../actions/getChannelOwner";
 import getUserWithId from "../actions/getUserWithId";
 import { space } from "postcss/lib/list";
 import getChannelMembersWithId from "../actions/getChannelmembers";
 import getChanneLNotifications from "../actions/getChanneLNotifications";
 import ChanneLSettingsInfonotifications from "./channel.settings.info.notifications";
+import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
+import ChanneLConfirmActionBtn from "./channel.confirm.action.Btn";
+import { toast } from "react-hot-toast";
+import ChanneLsettingsHook from "../hooks/channel.settings";
+import ChanneLSettingsBody from "./channel.settings.body";
 
 interface Props {
     room: RoomsType;
@@ -38,6 +43,9 @@ export default function ChanneLSettingsInfo(
     const [ownerUserList, setownerUserList] = React.useState<userType[]>([])
     const [ChanneLNotifications, setChanneLNotifications] = React.useState<any>(null)
     const [updaterequestNotification, setupdaterequestNotification] = React.useState<boolean>(false)
+    const channeLConfirmActionHook = ChanneLConfirmActionHook()
+    const channeLsettingsHook = ChanneLsettingsHook()
+    const route = useRouter()
     const params = useSearchParams()
 
     React.useEffect(() => {
@@ -72,9 +80,32 @@ export default function ChanneLSettingsInfo(
         })();
     }, [updaterequestNotification])
 
-    socket?.on("channeLnotifications", (data: any) => {
-        setupdaterequestNotification(!updaterequestNotification)
-    })
+    React.useEffect(() => {
+
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_DELETE}`,
+            (data: {
+                message: string,
+                status: any,
+                data: RoomsType,
+            }) => {
+                if (data.data) {
+
+                    // toast.success(data.message)
+                    channeLConfirmActionHook.onClose()
+                    channeLsettingsHook.onClose()
+                    route.push(`/chat/channels`)
+                    route.refresh();
+
+                    return
+                }
+                // console.log("+++++++++++++++++++++++++++++++++data :", data)
+                // toast.error("can't delete this channel")
+                channeLConfirmActionHook.onClose()
+            }
+        );
+        route.refresh();
+    }, [socket])
 
     React.useEffect(() => setLoading(false))
     if (Isloading) return
@@ -118,11 +149,34 @@ export default function ChanneLSettingsInfo(
             </div>}
         </div>
         <div className="channeLActions flex flex-row items-center gap-6 justify-start w-full">
-            <button className="btn btn-primary flex flex-col w-full bg-[#161f1e54] p-3 justify-center items-center rounded text-white">
+            <button
+                onClick={() => {
+                    channeLConfirmActionHook.onOpen(
+                        <button
+                            onClick={() => {
+                                console.log("confirm Leave")
+                            }}
+                            className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold capitalize px-7 py-3 rounded-[12px]  w-full">
+                            confirm
+                        </button>, `Are you sure you want to permanently leave '${room.name}' ?`
+                    )
+                }}
+                className="btn btn-primary flex flex-col w-full bg-[#161f1e54] p-3 justify-center items-center rounded text-white">
                 <IoLogOut />
                 <span>Leave</span>
             </button>
-            <button className="btn btn-primary flex flex-col w-full bg-[#161f1e54] p-3 justify-center items-center rounded text-white">
+            <button
+                onClick={() => {
+                    channeLConfirmActionHook.onOpen(
+                        <ChanneLConfirmActionBtn onClick={() => {
+                            socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_DELETE_CHAT}`, {
+                                userId: User?.id,
+                                roomId: room.id
+                            },)
+                        }} />,
+                        `Are you sure you want to permanently delete ${room.name} ?`)
+                }}
+                className="btn btn-primary flex flex-col w-full bg-[#161f1e54] p-3 justify-center items-center rounded text-white">
                 <AiFillDelete />
                 <span>Delete</span>
             </button>

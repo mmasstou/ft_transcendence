@@ -9,7 +9,7 @@ import ConversationsMessages from "./channel.conversations.messages";
 // hooks :
 import { Socket } from "socket.io-client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Message from "./channel.message";
 import LeftSidebarHook from "../hooks/LeftSidebarHook";
@@ -17,7 +17,7 @@ import ConversationsTitlebar from "./channel.conversations.titlebar";
 import getChanneLMessages from "../actions/getChanneLMessages";
 import Cookies from "js-cookie";
 import getMemberWithId from "../actions/getMemberWithId";
-import { membersType } from "@/types/types";
+import { RoomsType, membersType } from "@/types/types";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import getChannelWithId from "../actions/getChannelWithId";
 
@@ -39,6 +39,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const params = useSearchParams()
     const room = params.get('r')
     const __userId = Cookies.get('_id')
+    const router = useRouter()
     const channeLsettingsHook = ChanneLsettingsHook()
 
     // console.log("Conversations socket :", socket?.id)
@@ -88,6 +89,24 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
     }, [socket, channeLsettingsHook])
 
+    useEffect(() => {
+
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            (data: {
+                message: string,
+                status: any,
+                data: RoomsType,
+            }) => {
+                (async () => {
+                    const token = Cookies.get('token')
+                    if (!token || !room) return
+                    const checkExistRoom = getChannelWithId(room, token)
+                    if (!checkExistRoom) router.push('chat/channels')
+                })
+            }
+        );
+    }, [socket])
     // chack if remove channle is sended :
     useEffect(() => {
         socket?.on("removeChannelResponseEvent", (data) => {
