@@ -14,6 +14,7 @@ import getChannelMembersWithId from './actions/getChannelmembers';
 import ChanneLaccessDeniedHook from './hooks/ChanneL.access.denied.hook';
 import getChannels from './actions/getChanneLs';
 import { toast } from 'react-hot-toast';
+import MemberHasPermissionToAccess from './actions/MemberHasPermissionToAccess';
 const metadata = {
   title: 'Transcendence',
   description: 'Online Pong Game',
@@ -26,6 +27,7 @@ export default function page() {
   const [socket, setSocket] = React.useState<Socket | null>(null)
   const params = useSearchParams()
   const token: any = Cookies.get('token');
+  const UserId: any = Cookies.get('_id');
   const loginhook = LoginHook()
   const router = useRouter()
   const channeLaccessDeniedHook = ChanneLaccessDeniedHook()
@@ -60,6 +62,7 @@ export default function page() {
     // Clean up the socket connection when the component unmounts
     return () => {
       socket.disconnect();
+      socket.close()
     };
   }, [token]);
 
@@ -69,11 +72,16 @@ export default function page() {
   useEffect(() => {
     const token: any = Cookies.get('token');
     const channeLid = params.get('r')
-    if (!channeLid || !token) return;
+    if (!channeLid || !token || !UserId) return;
     setChanneLsActive(channeLid);
     (async () => {
       const ChanneLselectedInfo = await getChannelWithId(channeLid, token)
       if (!ChanneLselectedInfo) {
+        toast.error(`there's no channel with that param : ${channeLid}`)
+        router.push('/chat/channels')
+      }
+      const selectedInfo = await MemberHasPermissionToAccess(token, channeLid, UserId)
+      if (!selectedInfo) {
         toast.error(`there's no channel with that param : ${channeLid}`)
         router.push('/chat/channels')
       }

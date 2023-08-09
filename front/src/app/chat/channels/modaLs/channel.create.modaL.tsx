@@ -111,7 +111,7 @@ const ChanneLCreateModaL = () => {
     }
     _friends.push(LoginUser)
 
-    socket?.emit('createroom', {
+    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_CREATE}`, {
       name: UserId.channel_name,
       friends: _friends,
       type: UserId.channeLtype,
@@ -120,9 +120,13 @@ const ChanneLCreateModaL = () => {
       (response: any) => {
         console.log('join response : ', response)
       });
-    socket?.on('createroomResponseEvent', (room: any) => {
-      if (!room) return
-      route.push(`/chat/channels?r=${room.id}`)
+    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, (room: any) => {
+      if (!room.data) {
+        console.log("room.message :", room.message)
+        toast(room.message)
+        return 
+      }
+      route.push(`/chat/channels?r=${room.data.id}`)
       onClose()
     })
   }

@@ -53,6 +53,8 @@ export enum responseEventMessageEnum {
   CANTJOIN = 'you cant join to this room',
   CANTDELETE = 'you cant delete this room',
   DELETESECCESS = 'room deleted',
+  CHANNELEXIST = 'the channel name exist',
+  CHANNELCREATED = 'Channel created success',
 }
 export type responseEvent = {
   status: responseEventStatusEnum;
@@ -78,7 +80,7 @@ export class ChatGateway implements OnGatewayConnection {
     // if (!status) socket.disconnect();
     const User = await this.usersService.getUserInClientSocket(socket);
     User &&
-      console.log('Chat-> %s connected +> socket :', User.login, socket.id);
+      console.log('Chat-> %s connected with socketId :', User.login, socket.id);
   }
 
   @SubscribeMessage('updatemember')
@@ -241,36 +243,73 @@ export class ChatGateway implements OnGatewayConnection {
     // send event to all client  that member is join to room :
     this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, null);
   }
-  @SubscribeMessage('createroom')
+  @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_CREATE}`)
   async createRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: any,
+    @MessageBody()
+    data: {
+      name: string;
+      type: RoomType;
+      friends: UserType[];
+      channeLpassword?: string;
+    },
   ) {
+    const ResponseEventData: responseEvent = {
+      status: responseEventStatusEnum.SUCCESS,
+      message: responseEventMessageEnum.DELETESECCESS,
+      data: null,
+    };
     try {
+      const { name, type, friends, channeLpassword } = data;
       const LogedUser = await this.usersService.getUserInClientSocket(client);
-      if (!LogedUser) {
+      if (!LogedUser) throw new Error();
+      // check if the room name exist :
+      const existChanneLname = await this.roomservice.findOneByName({ name });
+      if (existChanneLname) {
+        ResponseEventData.status = responseEventStatusEnum.ERROR;
+        ResponseEventData.message = responseEventMessageEnum.CHANNELEXIST;
+        ResponseEventData.data = null;
+        // send response to the client that the name exist
+        client.emit(
+          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`,
+          ResponseEventData,
+        );
+        this.server.emit(
+          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+          null,
+        );
         return;
       }
-      // check if room name is exist :
-      const ExistChannel = await this.roomservice.findOne(data.name);
-      if (ExistChannel) client.emit('createroomResponseEvent', null);
-      // console.log(
-      //   'Chat-> createroom +> user :%s has create room :%s',
-      //   _User.login,
-      //   data,
-      // );
-      // create room :
-      const newRoom = await this.roomservice.create(data, LogedUser.login);
-      client.emit('createroomResponseEvent', newRoom);
+      const newRoom = await this.roomservice.create({
+        name,
+        type,
+        friends,
+        channeLpassword,
+      });
+      if (!newRoom) throw new Error();
+      console.log('newRoom :', newRoom);
+      ResponseEventData.status = responseEventStatusEnum.SUCCESS;
+      ResponseEventData.message = responseEventMessageEnum.CHANNELCREATED;
+      ResponseEventData.data = newRoom;
+      // send response to the client that the name exist
+      client.emit(
+        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`,
+        ResponseEventData,
+      );
       // send message that room is created :
       this.server.emit(
         `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
         newRoom,
       );
     } catch (error) {
-      console.log('Chat-createRoom> error- +>', error);
+      ResponseEventData.status = responseEventStatusEnum.ERROR;
+      ResponseEventData.message = responseEventMessageEnum.CHANNELEXIST;
+      ResponseEventData.data = null;
+      this.server.emit(
+        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+        ResponseEventData,
+      );
     }
-    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, null);
   }
 
   @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_DELETE}`)
@@ -384,13 +423,61 @@ export class ChatGateway implements OnGatewayConnection {
     }
   }
 
-  @SubscribeMessage('leaveroom')
+  // Leave ChanneL :
+  @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_MEMBER_LEAVE}`)
   async LeaveRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomId: string; messageContent: string },
+    @MessageBody() data: { roomId: string },
   ) {
+    const ResponseEventData: responseEvent = {
+      status: responseEventStatusEnum.SUCCESS,
+      message: responseEventMessageEnum.DELETESECCESS,
+      data: null,
+    };
     try {
-      client.leave(data.roomId);
+      const LogedUser = await this.usersService.getUserInClientSocket(client);
+      const room = await this.roomservice.findOne({ id: data.roomId });
+      const member = await this.memberService.findOne({
+        userId: LogedUser.id,
+        roomId: room.id,
+      });
+      if (!LogedUser || !room || !member) throw new Error();
+      const User = await this.prisma.user.findUnique({
+        where: { id: LogedUser.id },
+        include: { Rooms: true },
+      });
+      console.log('process.env.SOCKET_EVENT_CHAT_MEMBER_LEAVE :', room);
+      console.log('process.env.SOCKET_EVENT_CHAT_MEMBER_ :', User);
+      // disconnect the member from the room :
+      const result = await this.prisma.$transaction(async (prisma) => {
+        const channel = await this.prisma.rooms.update({
+          where: { id: room.id },
+          data: {
+            members: {
+              disconnect: {
+                id: member.id,
+              },
+            },
+          },
+          include: {
+            members: true,
+          },
+        });
+        const _User = await prisma.user.update({
+          where: { id: LogedUser.id },
+          data: {
+            Rooms: {
+              disconnect: {
+                id: channel.id,
+              },
+            },
+          },
+          include: { Rooms: true },
+        });
+        console.log('SOCKET_EVENT_CHAT_MEMBER_LEAVE :', _User);
+        return channel;
+      });
+      // client.leave(data.roomId);
     } catch (error) {}
   }
 

@@ -104,6 +104,26 @@ export default function ChanneLSettingsInfo(
                 channeLConfirmActionHook.onClose()
             }
         );
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`,
+            (data: {
+                message: string,
+                status: any,
+                data: RoomsType,
+            }) => {
+                if (data.data) {
+
+                    // toast.success(data.message)
+                    channeLConfirmActionHook.onClose()
+                    channeLsettingsHook.onClose()
+                    route.push(`/chat/channels`)
+                    route.refresh();
+
+                    return
+                }
+                channeLConfirmActionHook.onClose()
+            }
+        );
         route.refresh();
     }, [socket])
 
@@ -152,13 +172,11 @@ export default function ChanneLSettingsInfo(
             <button
                 onClick={() => {
                     channeLConfirmActionHook.onOpen(
-                        <button
-                            onClick={() => {
-                                console.log("confirm Leave")
-                            }}
-                            className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold capitalize px-7 py-3 rounded-[12px]  w-full">
-                            confirm
-                        </button>, `Are you sure you want to permanently leave '${room.name}' ?`
+                        <ChanneLConfirmActionBtn onClick={() => {
+                            socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_LEAVE}`, {
+                                roomId: room.id
+                            },)
+                        }} />, `Are you sure you want to permanently leave '${room.name}' ?`
                     )
                 }}
                 className="btn btn-primary flex flex-col w-full bg-[#161f1e54] p-3 justify-center items-center rounded text-white">

@@ -36,6 +36,6 @@ import { UserGateway } from './user.gateway';
     MembersService,
     MessagesService,
   ],
-  exports: [UserService, PrismaService],
+  exports: [UserService, PrismaService, MembersService],
 })
 export class AppModule {}

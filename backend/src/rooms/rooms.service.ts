@@ -8,6 +8,7 @@ import {
   ChanneLNotifications,
   Members,
   Messages,
+  RoomType,
   Rooms,
   User,
   UserType,
@@ -19,10 +20,6 @@ import { MessagesService } from 'src/messages/messages.service';
 import { UserTypeEnum, membersType } from 'src/users/user.type';
 import { UserService } from 'src/users/user.service';
 
-enum RoomType {
-  PUBLIC = 'PUBLIC',
-  PRIVATE = 'PRIVATE',
-}
 @Injectable()
 export class RoomsService {
   constructor(
@@ -31,6 +28,29 @@ export class RoomsService {
     private messageservice: MessagesService,
     private readonly userService: UserService,
   ) {}
+
+  async HasPermissionToAccess(params: { roomId: string; userId: string }) {
+    try {
+      const User = await this.userService.findOne({ id: params.userId });
+      const Room = await this.prisma.rooms.findUnique({
+        where: { id: params.roomId },
+        include: { members: true },
+      });
+      if (!User || !Room) throw new Error();
+
+      const _member = await this.membersservice.findOne({
+        userId: User.id,
+        roomId: Room.id,
+      });
+      if (!_member) throw new Error();
+      Room.members.forEach((member: Members) => {
+        if (member.id === _member.id) return _member;
+      });
+      throw new NotFoundException();
+    } catch (error) {
+      throw new NotFoundException();
+    }
+  }
   // check if member is in room
   async isMemberInRoom(roomId: string, userId: string) {
     const room = await this.prisma.rooms.findUnique({
@@ -48,12 +68,29 @@ export class RoomsService {
     }
     return member;
   }
+
   async findOne(params: { id: string }): Promise<Rooms> {
     try {
       const { id } = params;
       // console.log('++findOne++>', name);
       const room = await this.prisma.rooms.findUnique({
         where: { id },
+        include: { members: true },
+      });
+      if (!room) throw new Error('');
+      return room;
+    } catch (error) {
+      console.log('Rooms-findOne> error- +>', error);
+      return null;
+    }
+  }
+
+  async findOneByName(params: { name: string }): Promise<Rooms | null> {
+    try {
+      const { name } = params;
+      // console.log('++findOne++>', name);
+      const room = await this.prisma.rooms.findUnique({
+        where: { name },
       });
       if (!room) throw new Error('');
       return room;
@@ -151,16 +188,14 @@ export class RoomsService {
 
     return rooms;
   }
+
   // this is the function that create room and add members to it
-  async create(
-    _data: {
-      name: string;
-      type: RoomType;
-      friends: UserType[];
-      channeLpassword?: string;
-    },
-    userId: string,
-  ) {
+  async create(_data: {
+    name: string;
+    type: RoomType;
+    friends: UserType[];
+    channeLpassword?: string;
+  }) {
     try {
       // console.log('++create+data+>', _data);
       // console.log('++create+userId+>', userId);
@@ -179,6 +214,10 @@ export class RoomsService {
                 type: friend.role,
               })),
             },
+          },
+          include: {
+            members: true,
+            ChanneLNotifications: true,
           },
         });
         // console.log('***** +> _data.friends.length :', _data.friends.length);
@@ -352,6 +391,7 @@ export class RoomsService {
       );
     }
   }
+
   async UpdateMessage(params: {
     messageId: string;
     content: string;
@@ -397,6 +437,7 @@ export class RoomsService {
       );
     }
   }
+
   async getaLLmessages(messageId: string) {
     try {
       const message = await this.prisma.rooms.findUnique({
@@ -441,8 +482,6 @@ export class RoomsService {
     // git user :
     const User = await this.userService.findOneLogin({ login });
     // check if user is member
-    console.log('User :', User);
-
     const rooms = await this.prisma.rooms.findMany({
       where: {
         type: {

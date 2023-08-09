@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { Members, Prisma, UserType } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { RoomsService } from 'src/rooms/rooms.service';
+import { UserService } from 'src/users/user.service';
 
 @Injectable()
 export class MembersService {

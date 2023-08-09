@@ -67,6 +67,16 @@ export class RoomsController {
   findOwners(@Param('channeLId') channeLId: string) {
     return this.roomsService.findOwners({ channeLId });
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('HasPermissionToAccess')
+  HasPermissionToAccess(
+    @Body('roomId') roomId: string,
+    @Body('userId') userId: string,
+  ) {
+    return this.roomsService.HasPermissionToAccess({ roomId, userId });
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
