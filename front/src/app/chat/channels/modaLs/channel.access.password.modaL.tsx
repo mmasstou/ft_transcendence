@@ -2,7 +2,7 @@
 import ContactHook from "@/hooks/contactHook"
 import { TiArrowMinimise } from "react-icons/ti"
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler, useFieldArray, set } from "react-hook-form"
-import { MouseEvent, useCallback, useEffect, useState } from "react"
+import { MouseEvent, useCallback, useEffect, useRef, useState } from "react"
 import { RoomsType, userType } from "@/types/types"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
@@ -34,10 +34,17 @@ const ChanneLPasswordAccessModaL = () => {
     const [userId, setuserId] = useState<userType | null>(null)
     const [InputValue, setInputValue] = useState("")
     const [IsMounted, setIsMounted] = useState<boolean>(false)
+    const InputRef = useRef<HTMLInputElement | null>(null);
+
     const UserId = Cookies.get('_id')
 
     let users: any[] = []
     useEffect(() => { setIsMounted(true) }, [])
+    useEffect(() => {
+        if (InputRef.current) {
+            InputRef.current.focus();
+        }
+    }, [IsOpen])
     const onSubmit = () => {
         if (!UserId) return;
         // create private room : createroom
@@ -84,6 +91,7 @@ const ChanneLPasswordAccessModaL = () => {
                 <div className="body flex flex-col gap-2 py-4">
                     <div className=" relative w-full">
                         <input
+                            ref={InputRef}
                             id={room?.id}
                             placeholder=" "
                             type='password'

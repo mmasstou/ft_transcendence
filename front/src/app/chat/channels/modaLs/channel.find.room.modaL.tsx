@@ -1,3 +1,4 @@
+'use client'
 import ChanneLFindRoommodaLHook from "../hooks/channel.find.room.hook"
 import { useEffect, useRef, useState } from "react"
 import { RoomTypeEnum, RoomsType } from "@/types/types"
@@ -9,6 +10,7 @@ import Image from "next/image"
 import { toast } from "react-hot-toast"
 import { useRouter } from "next/navigation"
 import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
+import { env } from "process"
 
 export default function ChanneLFindRoommodaL() {
     const { IsOpen, onClose, onOpen, socket } = ChanneLFindRoommodaLHook()
@@ -44,7 +46,7 @@ export default function ChanneLFindRoommodaL() {
             }))
     }, [InputValue])
 
-    const OnJion = (param: { room: RoomsType}) => {
+    const OnJion = (param: { room: RoomsType }) => {
         // check if room is protacted :
         const { room } = param
         if (room.type === RoomTypeEnum.PROTECTED) return
@@ -74,7 +76,8 @@ export default function ChanneLFindRoommodaL() {
                 }
             });
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, () => {
-            setUpdate(Update ? false : true)
+
+            setUpdate(!Update)
         })
     }, [socket])
     const bodyContent = (
@@ -100,7 +103,7 @@ export default function ChanneLFindRoommodaL() {
                                     key={index}
                                     room={room}
                                     socket={socket}
-                                    onClick={(param: { room: RoomsType}) => {
+                                    onClick={(param: { room: RoomsType }) => {
                                         const { room } = param
                                         OnJion({ room })
                                     }} />

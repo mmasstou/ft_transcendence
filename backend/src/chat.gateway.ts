@@ -268,6 +268,7 @@ export class ChatGateway implements OnGatewayConnection {
     } catch (error) {
       console.log('Chat-createRoom> error- +>', error);
     }
+    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, null);
   }
 
   @SubscribeMessage('deleteChannel')
