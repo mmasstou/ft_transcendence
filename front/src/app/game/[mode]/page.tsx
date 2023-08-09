@@ -5,14 +5,16 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 import Cookies from 'js-cookie';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const page = ({ params }: { params: { mode: string } }) => {
+  const router = useRouter();
   // body resquest example
-  // const body = {
-  //   playerId: Cookies.get('_id'),
-  //   mode: params.mode,
-  // };
-
+  const body = {
+    playerId: Cookies.get('_id'),
+    mode: params.mode,
+  };
   return (
     <Dashboard>
       <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide text-white">
@@ -38,10 +40,18 @@ const page = ({ params }: { params: { mode: string } }) => {
               vibrant community and engage in exhilarating matches.
             </p>
             <div className="flex gap-10 my-4 w-full justify-center">
-              <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-yellow-500 rounded-xl font-bold text-yellow-500">
+              <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-yellow-500 rounded-xl font-bold text-yellow-500" onClick={() => {
+                axios.post('http://127.0.0.1:80/api/game/BotGame', body).then((res) => {
+                  router.push(`/game/${params.mode}/robot`)
+                })
+              }}>
                 Robot
               </button>
-              <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-secondary rounded-xl font-bold text-secondary">
+              <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-secondary rounded-xl font-bold text-secondary" onClick={() => {
+                axios.post('http://127.0.0.1:80/api/game/RandomGame', body).then((res) => {
+                  router.push(`/game/${params.mode}/random`)
+                })
+              }}>
                 Random
               </button>
               <Dialog.Root>

@@ -14,7 +14,7 @@ function LeaveButton({ isvertical, isReady, isMobile }: Props) {
 //   const [data, setData] = useState('');
 
   const handleClick = async () => {
-    router.push('/game/modes');
+    router.push('/game');
     const response = await fetch('http://127.0.0.1:80/api/game/leaveGame', {
       method: 'POST',
       headers: {

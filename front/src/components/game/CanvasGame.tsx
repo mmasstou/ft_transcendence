@@ -12,7 +12,7 @@ const TableMap: TableMap = new Map();
 const url = process.env.NEXT_PUBLIC_GAMESOCKET_URL_WS;
 const IPmachine = url + '/game';
 const IPmachineBall = url + '/ball';
-const AllTime = 20;
+const AllTime = 5;
 const targetScore = 5;
 
 /// game settings /// on % of the canvas
