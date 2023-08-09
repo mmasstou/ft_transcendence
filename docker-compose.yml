@@ -21,6 +21,7 @@ services:
       - backend/.env
     ports:
       - 80:80
+      - 5555:5555
     networks:
       - APInetwork
     depends_on:

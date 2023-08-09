@@ -1,4 +1,4 @@
- "use client"
+"use client"
 import {RefObject, useEffect, useRef, useState } from "react";
 import {Socket, io} from 'socket.io-client';
 import {Player, Ball, ballSpeed, TableMap} from '../../../tools/class';
@@ -6,18 +6,20 @@ import Cookies from "js-cookie";
 import LoginHook from '@/hooks/auth/login';
 import {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall} from './gameFunc';
 import LeaveButton from '@/components/game/LeaveButton';
-import { set } from "react-hook-form";
+import { cookies } from "next/dist/client/components/headers";
 
 const TableMap: TableMap = new Map();
-const IPmachine = '10.13.1.9/game';
-const IPmachineBall = '10.13.1.9/ball';
-const AllTime = 30;
+const url = process.env.NEXT_PUBLIC_GAMESOCKET_URL_WS;
+const IPmachine = url + '/game';
+const IPmachineBall = url + '/ball';
+const AllTime = 20;
+const targetScore = 5;
 
 /// game settings /// on % of the canvas
 var player_width = 6.25;
 
 function pongFunc(divRef: RefObject<HTMLDivElement>) {
-  
+
   const  canvasRef = useRef<HTMLCanvasElement>(null);
   const [isMounted, setIsMounted] = useState(false);
   const DivCanvas = isMounted ? document.getElementById('CanvasGameDiv'): null;
@@ -46,24 +48,11 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     const [isReady, setIsReady] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [timer, setTimer] = useState(AllTime);
-    let interval: any = null;
-    const loginhook = LoginHook();
     const [YouWin, setYouWin] = useState(false);
     const [YouLose, setYouLose] = useState(false);
     const [YouDraw, setYouDraw] = useState(false);
-    let listenGameOver = false;
-    // const [listenGameOver, setListenGameOver] = useState(false);
-
-    // useEffect(() => {
-    //   const userAgent = window.navigator.userAgent;
-    //   const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-    //   const isMobileDevice = mobileRegex.test(userAgent);
-  
-    //   setIsMobile(isMobileDevice);
-    // }, []);
 
     function handleRemoveCanvas() {
-      // canvas?.parentNode?.contains(canvas) && canvas?.parentNode?.removeChild(canvas);
       DivCanvas?.parentNode?.contains(DivCanvas) && DivCanvas?.parentNode?.removeChild(DivCanvas);
     };
 
@@ -173,12 +162,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
           })
       }
     }
-    
-    // check if the user is logged in
-    useEffect(() => {
-        if (!Cookies.get('token'))
-            loginhook.onOpen();
-    }, [])
 
     // useEffect for loading the images and initializing the canvas
     useEffect(() => {
@@ -246,17 +229,11 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       setIsMounted(true);
 
       return () => {
-          // socket && socket.on("disconnecting", () => {
-          //     socket.emit("disconnecting", "test printing");
-          // })
           Cookies.remove('tableId');
           socket && socket.disconnect();
           socketBall && socketBall.disconnect();
       };
-      // socket && socket.on("connected", (data) => {
-      //     console.log("socket %s connected", socket.id);
-      // })
-  
+
   //client namespace disconnect
   // transport close
   }, [])
@@ -295,7 +272,13 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       setIsMobile(isMobileDevice);
 
       if (isReady) {
-        const obj = drawScore(canvas, images, Table_obj, Status, isMobile, timer, socket);
+        const obj = drawScore(canvas, images, Table_obj, Status, isMobile, timer, targetScore, socket);
+        console.log("Score useEffect: ", timer);
+        if (Score.first == targetScore || Score.second == targetScore) {
+          // console.log("Game Over emiting 000000");
+          socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
+          socket.emit('GameOver', {tableId: Table_obj.tableId});
+        }
         return () => {
             obj && obj.ScoreCtx && obj.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ScoreLayer);
@@ -310,7 +293,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
           const obj2 = Player2Draw(canvas, socket, Table_obj, canvasSize, player_width, Player1, Player2);
           window.addEventListener("keydown", keyFunction);
           return () => {
-            // handleRemoveCanvas();
               obj1 && obj1.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
               canvas?.parentNode && obj1 && canvas.parentNode.removeChild(obj1.playerLayer);
               obj2 && obj2.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
@@ -320,19 +302,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       }
     }, [canvasSize, Player1, Player2, Status, LeaveGame])
 
-
-
-    // useEffect(() => {
-    //   if (!Status)
-    //     Table_obj && clearInterval(Table_obj.currentTimer);
-    //   if (Status && isReady && Table_obj.countdown > 0 && socket.id == Table_obj.player1.UserId) {
-    //     clearInterval(Table_obj.currentTimer);
-    //     Table_obj.currentTimer = setInterval(() => {
-    //       Table_obj.countdown -= 1;
-    //       console.log("timing: ", Table_obj.countdown);
-    //     }, 1000);
-    //   }
-    // }, [Status])
     // useEffect for ball
     useEffect(() => {
       if (isReady) {
@@ -350,96 +319,119 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       ballSocket && isReady &&  ballSocket.emit('moveBall', Table_obj.tableId);
     }, [Status])
 
-      ////////////////////// emit from the server ///////////////////////
 
-      isMounted && socket.on('joinRoomGame', (table: any) => {
-        console.log("test join room")
-        if (table) {
-          TableMap.set(table.tableId, table);
-          setTable_obj(table);
-          socket.emit('joinToRoomGame', table.tableId);
-        }
-      })
-
-      isMounted && ballSocket.on('joinRoomBall', (table: string) => {
-        // console.log("check--------");
-        ballSocket.emit('joinToRoomBall', table);
-      })
-
-      isMounted && socket.on('ready', (check: boolean) => {
-        setIsReady(check);
-      })
-
-      // isMounted && socket.on('reload', (table: any) => {
-
-      // })
-
-      isMounted && socket.on('setPlayer1', (Player:number) => {
-        setPlayer1(Player);
-      })
-
-      isMounted && socket.on('setPlayer2', (player: number) => {
-          setPlayer2(player);
+    ////////////////////// emit from the server ///////////////////////
+    useEffect(() => {
+      if (isMounted) {
+        socket.on('joinRoomGame', (table: any) => {
+          if (table) {
+            TableMap.set(table.tableId, table);
+            setTable_obj(table);
+            socket.emit('joinToRoomGame', table.tableId);
+          }
+        })
+        
+        ballSocket.on('joinRoomBall', (table: string) => {
+          ballSocket.emit('joinToRoomBall', table);
+        })
+  
+        socket.on('ready', (check: boolean) => {
+          setIsReady(check);
+        })
+  
+        isMounted && socket.on('setPlayer1', (Player:number) => {
+          setPlayer1(Player);
         })
 
-      isMounted && ballSocket.on('setBall', (ball: any) => {
-        if (!Status && isReady)
-        setBallObj(ball);
+        socket.on('setPlayer2', (player: number) => {
+            setPlayer2(player);
         })
-      
 
-      isMounted && ballSocket.on('timer', (time: number) => {
-        if (!Math.floor(AllTime - time) && Status) {
-          // setStatus(false);
-          socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
-          socket.emit('GameOver', {tableId: Table_obj.tableId});
-        }
-        else
-          setTimer(Math.floor(AllTime - time));
-      })
+        // ballSocket.on('timer', (time: number) => {
+        //   if (Status) {
+        //     if (!Math.floor(AllTime - time) && Status) {
+        //       // console.log('game over');
+        //       socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
+        //       socket.emit('GameOver', {tableId: Table_obj.tableId});
+        //     }
+        //     else
+        //       setTimer(Math.floor(AllTime - time));
+        //   }
+        // })
 
-      if (!listenGameOver) {
-        console.log('test game over');
-        isMounted && socket.on('GameOver', (Winner: any) => {
-          // if (!listenGameOver) {
-            listenGameOver = true;
-            setLeaveGame(true);
-            console.log('test game over', LeaveGame, YouWin, YouLose, YouDraw);
-            if (socket.auth.UserId == Winner)
-              setYouWin(true);
-            else if (Winner == 'no one')
-              setYouDraw(true);
-            else
-              setYouLose(true);
-            socket.emit('deletePlayer');
-          // }
+        // socket.on('GameOver', (Winner: any) => {
+        //   setLeaveGame(true);
+        //   if (socket.auth.UserId == Winner)
+        //     setYouWin(true);
+        //   else if (Winner == 'no one')
+        //     setYouDraw(true);
+        //   else
+        //     setYouLose(true);
+        //   socket.emit('deletePlayer');
+        // })
+  
+        socket.on('setStatus', (status: boolean) => {
+          setStatus(status);
+        })
+  
+        Table_obj && ballSocket.on('setScore1', (score: number) => {
+          Table_obj.player1.score = score;
+          setScore({first: score, second: Table_obj.player2.score});
+        })
+        
+        Table_obj && ballSocket.on('setScore2', (score: number) => {
+          Table_obj.player2.score = score;
+          setScore({first: Table_obj.player1.score, second: score});
+        })
+
+        isMounted && socket.on('leaveGame', (id: string) => {
+            if (socket.id != id)
+              setLeaveGame(true);
+        })
+        //ballObj: any, socket: Socket, Table_obj: any, canvasSize: any, setPlayer2: any, isReady: any, canvas: any
+        ballSocket.on('setBall', (ball: any) => {
+          if (!Status && isReady)
+          setBallObj(ball);
+          // handleBall(ball, socket, Table_obj, canvasSize, setPlayer2, isReady, canvas);
         })
       }
+    }, [isMounted, isReady, Status, Table_obj])
 
-      isMounted && socket.on('setStatus', (status: boolean) => {
-        setStatus(status);
+    useEffect(() => {
+      if (isReady) {
+        ballSocket.on('timer', (time: number) => {
+          if (Status) {
+            if (!Math.floor(AllTime - time) && Status) {
+              socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
+              socket.emit('GameOver', {tableId: Table_obj.tableId});
+            }
+            else
+              setTimer(Math.floor(AllTime - time));
+          }
         })
-
-      isMounted && isReady && ballSocket && ballSocket.on('setScore1', (score: number) => {
-        Table_obj.player1.score = score;
-        setScore({first: score, second: Table_obj.player2.score});
-      })
-      
-      isMounted && isReady && ballSocket && ballSocket.on('setScore2', (score: number) => {
-        Table_obj.player2.score = score;
-        setScore({first: Table_obj.player1.score, second: score});
-      })
-
-      isMounted && socket.on('leaveGame', (id: string) => {
-        if (socket.id != id)
+        socket.on('GameOver', (Winner: any) => {
           setLeaveGame(true);
-        // console.log("leaveGame");
-      })
+          if (socket.auth.UserId == Winner)
+            setYouWin(true);
+          else if (Winner == 'no one')
+            setYouDraw(true);
+          else
+            setYouLose(true);
+        })
+      }
+    }, [isReady, Status])
+    
+    useEffect(() => {
+      if (isReady && (YouWin || YouLose || YouDraw)) {
+        Cookies.remove('tableId');
+        socket.emit('deletePlayer');
+      }
+    }, [YouWin, YouLose, YouDraw])
 
-      if (canvasSize.width < canvasSize.height)
-          var isvertical = true;
-      else
-          var isvertical = false;
+    if (canvasSize.width < canvasSize.height)
+        var isvertical = true;
+    else
+        var isvertical = false;
     return (
       LeaveGame && (YouWin || (!YouWin && !YouLose && !YouDraw))  ? <h1 className=" font-bold text-white">WIN</h1> :
       LeaveGame && YouLose ? <h1 className=" font-bold text-white">LOSE</h1> :

@@ -34,6 +34,7 @@ type table_obj = {
     current: any
     tableId: string
     GameMode: string
+    GameType: string
     imageLoad: number
     time: number
     countdown: number

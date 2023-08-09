@@ -15,7 +15,7 @@ const MyAvatar = () => {
       const userId = Cookies.get('_id');
       if (!token || !userId) return;
       const res = await getUserWithId(userId, token);
-      console.log('const MyAvatar = () :', res);
+      // console.log('const MyAvatar = () :', res);
       if (res) setLogedUser(res);
     })();
   }, []);

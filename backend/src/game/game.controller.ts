@@ -7,11 +7,11 @@ export class GameController {
         private GameGateway: MyGateway,
         private BallGateway: BallGateway,
         ) {}
-
     @Post('/FriendGame')
-    selectFriendGame(@Body() body: any) {
+    async selectFriendGame(@Body() body: any) {
         const promise = this.GameGateway.CreateFriendTable(body);
         promise.then((tableId) => {
+            console.log("tableId: ", tableId);
             this.BallGateway.CreateFriendTable(body, tableId);
         });
     }
@@ -34,7 +34,7 @@ export class GameController {
         } */
     
     @Post('/RandomGame')
-    async selectRandomGame(@Body() body: any) {
+    async selectRandomGame(@Body() body: any) { 
         const promise = this.GameGateway.CreateRandomTable(body);
         promise.then((res) => {
             this.BallGateway.CreateRandomTable(body, res);
