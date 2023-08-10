@@ -7,7 +7,6 @@ import toast from 'react-hot-toast';
 
 interface Props {}
 
-
 let currentOtpIndex: number = 0;
 const Otp: React.FC<Props> = () => {
   const [qrCode, setQrCode] = useState<string | null>(null);
@@ -59,20 +58,25 @@ const Otp: React.FC<Props> = () => {
       .then((response) => {
         if (response.status === 200) {
           router.push('/profile');
+          toast.success('Your profile is verified');
         }
       })
       .catch((err) => {
         if (err.response && err.response.status === 401) {
           toast.error(err.response.data.message);
+          return;
         }
+        return;
+      })
+      .finally(() => {
+        setOtp(new Array(6).fill(''));
       });
-    setOtp(new Array(6).fill(''));
   };
 
   const handleQrCode = () => {
     axios
       .get('http://localhost:80/api/2fa/generate', {
-        responseType: "blob",
+        responseType: 'blob',
         headers: {
           Authorization: `Bearer ${yourJwtToken}`,
         },
@@ -80,7 +84,6 @@ const Otp: React.FC<Props> = () => {
       .then((response) => {
         if (response.status === 200) {
           const srcImg = URL.createObjectURL(response.data);
-          console.log(srcImg);
           setQrCode(srcImg);
         }
       })

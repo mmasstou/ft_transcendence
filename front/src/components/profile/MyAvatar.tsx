@@ -15,7 +15,6 @@ const MyAvatar = () => {
       const userId = Cookies.get('_id');
       if (!token || !userId) return;
       const res = await getUserWithId(userId, token);
-      console.log('const MyAvatar = () :', res);
       if (res) setLogedUser(res);
     })();
   }, []);
@@ -28,6 +27,7 @@ const MyAvatar = () => {
       <Avatar.Image
         className="w-[100%] h-[100%] object-cover rounded-[inherit] border-secondary"
         src={LogedUser?.avatar}
+        sizes="100%"
         alt="User Avatar"
       />
     </Avatar.Root>

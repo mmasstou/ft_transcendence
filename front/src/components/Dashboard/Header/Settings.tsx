@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RiSettingsLine } from 'react-icons/ri';
 import axios from 'axios';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -8,17 +8,43 @@ import * as Switch from '@radix-ui/react-switch';
 import toast from 'react-hot-toast';
 import AvatarUpload from './AvatarUpload';
 import UserInput from './UserInput';
+import { userType } from '@/types/types';
+import Cookies from 'js-cookie';
+
+function getUserData(): userType | null {
+  const [user, setUser] = useState<userType | null>(null);
+  const jwtToken = Cookies.get('token');
+  useEffect(() => {
+    axios
+      .get<userType | null>('http://localhost:80/api/auth/status', {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          setUser(response.data);
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  }, [jwtToken]);
+  return user;
+}
 
 const Settings: React.FC = () => {
+  // fetch user data
+  const userData: userType | null = getUserData();
+  const jwtToken = Cookies.get('token');
+
   const [isOpen, setOpen] = useState<boolean>(false);
   const [selectedFile, setFile] = useState<File | null>(null);
-  // default will be user avatar rather than undefined
-  const [imgProp, setImage] = useState<string | undefined>(undefined);
-  // default will be intra username
-  const [user, setUser] = useState<string>('');
+  const [imgProp, setImage] = useState<string | undefined>(userData?.avatar);
+  const [user, setUser] = useState<string>(userData?.login || '');
   const [validName, setValidName] = useState<boolean>(false);
-  // default will be fetched
-  const [twoFa, setTwoFA] = useState<boolean>(false);
+  const [twoFa, setTwoFA] = useState<boolean | undefined>(userData?.twoFA);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleModal = (): void => {
@@ -70,8 +96,41 @@ const Settings: React.FC = () => {
   };
 
   const handleTwoFa = (): void => {
+    const headers = {
+      Authorization: `Bearer ${jwtToken}`,
+      'Content-Type': 'application/json',
+    };
+
+    if (twoFa) {
+      // Turn off 2FA
+      axios
+        .post('http://localhost:80/api/2fa/turn-off', {}, { headers })
+        .catch((err) => {
+          toast.error(err.response.data.message);
+          return;
+        });
+    } else {
+      // // Turn on 2FA
+      // i should pop a modal to show the QR code to make sure qr code is displayed every time 2fa is turned on
+      // axios
+      //   .post('http://localhost:80/api/2fa/turn-on', {}, { headers })
+      //   .catch((err) => {
+      //     toast.error(err.response.data.message);
+      //     return;
+      //   });
+    }
     setTwoFA(!twoFa);
   };
+
+  useEffect(() => {
+    setImage(userData?.avatar);
+    setUser(userData?.login || '');
+    setTwoFA(userData?.twoFA);
+  }, [userData]);
+
+  useEffect(() => {
+    setTwoFA(twoFa);
+  }, [twoFa]);
 
   return (
     <>
@@ -132,19 +191,35 @@ const Settings: React.FC = () => {
                   >
                     TWO-FACTOR AUTH
                   </label>
-                  <Switch.Root
-                    className="w-[42px] h-[25px] bg-blackA9 rounded-full relative shadow-[0_2px_10px] shadow-blackA7 
-                      focus:shadow-[0_0_0_2px] focus:shadow-black data-[state=checked]:focus:shadow-secondary
-                    data-[state=checked]:bg-secondary outline-none cursor-default"
-                    id="airplane-mode"
-                    onClick={handleTwoFa}
-                  >
-                    <Switch.Thumb
-                      className="block w-[21px] h-[21px] bg-white rounded-full shadow-[0_2px_2px] shadow-blackA7 
-                                          transition-transform duration-100 translate-x-0.5 will-change-transform 
-                                            data-[state=checked]:translate-x-[19px]"
-                    />
-                  </Switch.Root>
+                  {twoFa ? (
+                    <Switch.Root
+                      className="w-[42px] h-[25px] bg-blackA9 rounded-full relative shadow-[0_2px_10px] shadow-blackA7 
+                      focus:shadow-[0_0_0_2px]  focus:shadow-secondary
+                    bg-secondary outline-none cursor-default"
+                      id="airplane-mode"
+                      onClick={handleTwoFa}
+                    >
+                      <Switch.Thumb
+                        className="block w-[21px] h-[21px] bg-white rounded-full shadow-[0_2px_2px] shadow-blackA7 
+                                          transition-transform duration-100  will-change-transform 
+                                            translate-x-[19px]"
+                      />
+                    </Switch.Root>
+                  ) : (
+                    <Switch.Root
+                      className="w-[42px] h-[25px] bg-blackA9 rounded-full relative shadow-[0_2px_10px] shadow-blackA7
+                      focus:shadow-[0_0_0_2px] focus:shadow-black
+                      outline-none cursor-default"
+                      id="airplane-mode"
+                      onClick={handleTwoFa}
+                    >
+                      <Switch.Thumb
+                        className="block w-[21px] h-[21px] bg-white rounded-full shadow-[0_2px_2px] shadow-blackA7
+                      transition-transform duration-100 translate-x-0.5 will-change-transform
+                      "
+                      />
+                    </Switch.Root>
+                  )}
                 </div>
               </form>
               <Dialog.Close asChild>

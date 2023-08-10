@@ -10,6 +10,7 @@ import {
   HttpCode,
   Body,
   Get,
+  HttpException,
 } from '@nestjs/common';
 import { TwoFactorAuthenticationService } from './twoFactorAuthentication.service';
 import { Response } from 'express';
@@ -35,6 +36,7 @@ export class TwoFactorAuthenticationController {
     @Req() request: RequestWithUser,
     @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
   ) {
+    console.log('authenticate');
     const isCodeValid =
       await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
         twoFactorAuthenticationCode,
@@ -42,7 +44,7 @@ export class TwoFactorAuthenticationController {
       );
 
     if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
+      throw new HttpException('Wrong authentication code', 401);
     }
 
     const accessTokenData = await this.authService.generateJwt(request.user);
@@ -76,16 +78,16 @@ export class TwoFactorAuthenticationController {
   @UseGuards(JwtAuthGuard)
   async turnOffTwoFactorAuthentication(
     @Req() request: RequestWithUser,
-    @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
+    //@Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
   ) {
-    const isCodeValid =
-      await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-        twoFactorAuthenticationCode,
-        request.user,
-      );
-    if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
-    }
+    // const isCodeValid =
+    //   await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+    //     twoFactorAuthenticationCode,
+    //     request.user,
+    //   );
+    // if (!isCodeValid) {
+    //   throw new UnauthorizedException('Wrong authentication code');
+    // }
     await this.usersService.turnOffTwoFactorAuthentication(request.user.login);
   }
 
