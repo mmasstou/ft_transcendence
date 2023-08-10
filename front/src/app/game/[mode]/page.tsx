@@ -1,17 +1,25 @@
 'use client';
 import Dashboard from '@/app/Dashboard';
-import React from 'react';
+import Modal from '@/components/modals/Modal';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import Image from 'next/image';
 import Cookies from 'js-cookie';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { PiSpinnerGap } from 'react-icons/pi';
 
 const page = ({ params }: { params: { mode: string } }) => {
+  const router = useRouter();
+  if (params.mode !== 'time' && params.mode !== 'score') router.push('/404');
+
   // body resquest example
-  // const body = {
-  //   playerId: Cookies.get('_id'),
-  //   mode: params.mode,
-  // };
+  const body = {
+    playerId: Cookies.get('_id'),
+    mode: params.mode,
+  };
+
+  const [open, setOpen] = useState(false);
 
   return (
     <Dashboard>
@@ -38,12 +46,32 @@ const page = ({ params }: { params: { mode: string } }) => {
               vibrant community and engage in exhilarating matches.
             </p>
             <div className="flex gap-10 my-4 w-full justify-center">
-              <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-yellow-500 rounded-xl font-bold text-yellow-500">
+              <button
+                onClick={() => console.log(body)}
+                className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-yellow-500 rounded-xl font-bold text-yellow-500"
+              >
                 Robot
               </button>
-              <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-secondary rounded-xl font-bold text-secondary">
+              <button
+                onClick={() => setOpen(true)}
+                className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-secondary rounded-xl font-bold text-secondary"
+              >
                 Random
               </button>
+              <Modal isVisible={open} onClose={() => setOpen(false)}>
+                <div className="flex flex-col items-center justify-center gap-4 md:gap-8 lg:gap-12 h-full w-full">
+                  <h1 className="text-2xl md:text-3xl xl:text-4xl tracking-wider">
+                    Matchmaking Queue
+                  </h1>
+                  <PiSpinnerGap className="animate-spin w-14 h-14 xl:w-20 xl:h-20 fill-secondary" />
+                  <button
+                    onClick={() => setOpen(false)}
+                    className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-danger rounded-xl font-bold text-danger focus:outline-none"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </Modal>
               <Dialog.Root>
                 <Dialog.Trigger asChild>
                   <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-orange-500 rounded-xl font-bold text-orange-500 focus:outline-none">
@@ -51,9 +79,9 @@ const page = ({ params }: { params: { mode: string } }) => {
                   </button>
                 </Dialog.Trigger>
                 <Dialog.Portal>
-                  <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0" />
+                  <Dialog.Overlay className="bg-black opacity-60 data-[state=open]:animate-overlayShow fixed inset-0" />
                   <Dialog.Content
-                    className="data-[state=open]:animate-contentShow text-white rounded-lg bg-[#243230] p-6 fixed top-[25%] left-[50%] max-h-full w-[90vw] max-w-[800px] translate-x-[-50%] lg:translate-x-[-45%] xl:translate-x-[-35%] translate-y-[-50%] 
+                    className="data-[state=open]:animate-contentShow text-white rounded-lg bg-[#243230] p-6 fixed top-[25%] left-1/2 max-h-full w-[90vw] max-w-[800px] translate-x-[-50%] translate-y-[-50%] 
                   shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px]
                   focus:outline-none"
                   >
@@ -71,7 +99,13 @@ const page = ({ params }: { params: { mode: string } }) => {
             </div>
           </div>
           <div className="relative h-[400px] md:h-[500px] xl:h-[600px] w-full">
-            <Image fill src="/game-mode 1.svg" alt="game-mode" className="" />
+            <Image
+              fill
+              src="/game-mode 1.svg"
+              alt="game-mode"
+              className=""
+              priority
+            />
           </div>
         </div>
       </div>
