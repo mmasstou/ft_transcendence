@@ -69,12 +69,13 @@ export class RoomsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('HasPermissionToAccess')
-  HasPermissionToAccess(
-    @Body('roomId') roomId: string,
-    @Body('userId') userId: string,
+  @Get('HasPermissionToAccess/:userId/:roomId')
+  async HasPermissionToAccess(
+    @Param('roomId') roomId: string,
+    @Param('userId') userId: string,
   ) {
-    return this.roomsService.HasPermissionToAccess({ roomId, userId });
+    console.log(' async HasPermissionToAccess controller ');
+    return await this.roomsService.HasPermissionToAccess({ roomId, userId });
   }
 
   @UseGuards(JwtAuthGuard)

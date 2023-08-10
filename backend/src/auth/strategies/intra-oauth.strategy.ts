@@ -11,7 +11,6 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     private readonly authService: AuthService,
     private readonly prisma: PrismaService,
   ) {
-    console.log('export class IntraStrategy extends PassportStrategy');
     super({
       clientID: process.env.INTRA_UID,
       clientSecret: process.env.INTRA_SECRET,
@@ -26,9 +25,6 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    console.log(
-      ' async validate( accessToken: string, refreshToken: string, profile: any, done: VerifyCallback, )',
-    );
     const _UserExist = await this.prisma.user.findUnique({
       where: { login: profile._json.login },
     });

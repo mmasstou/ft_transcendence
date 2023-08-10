@@ -7,7 +7,7 @@ const MemberHasPermissionToAccess = async (
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/rooms/HasPermissionToAccess`,
+      `${process.env.NEXT_PUBLIC_API_URL}/rooms/HasPermissionToAccess/${userId}/${channeLId}`,
       {
         method: 'GET',
         headers: {
@@ -17,7 +17,9 @@ const MemberHasPermissionToAccess = async (
       }
     );
     if (response.status === 200) {
-      return await response.json();
+      const data = await response.json();
+      console.log('MemberHasPermissionToAccess :', data);
+      return data;
     }
     return null;
   } catch (err) {

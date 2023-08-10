@@ -43,12 +43,16 @@ export class RoomsService {
         roomId: Room.id,
       });
       if (!_member) throw new Error();
-      Room.members.forEach((member: Members) => {
-        if (member.id === _member.id) return _member;
-      });
+      for (let index = 0; index < Room.members.length; index++) {
+        const element = Room.members[index];
+        if (element.userId === User.id) {
+          return true;
+          console.log('element :', element);
+        }
+      }
       throw new NotFoundException();
     } catch (error) {
-      throw new NotFoundException();
+      return false;
     }
   }
   // check if member is in room
@@ -559,7 +563,7 @@ export class RoomsService {
         if (!member)
           throw new NotFoundException(`Member with ID ${memberId} not found`);
       }
-      console.log('Chat -- joinToRoom +> :', room, User, member);
+      // console.log('Chat -- joinToRoom +> :', room, User, member);
       const result = await this.prisma.$transaction(async (prisma) => {
         const room = await prisma.rooms.update({
           where: { id: roomId },
@@ -575,10 +579,10 @@ export class RoomsService {
         });
         return room;
       });
-      console.log('Chat -- joinToRoom +> :', result);
+      // console.log('Chat -- joinToRoom +> :', result);
       return result;
     } catch (error) {
-      console.log('Chat -error- joinToRoom +> :', error);
+      console.log('Chat - error -> joinToRoom');
       return null;
     }
   }

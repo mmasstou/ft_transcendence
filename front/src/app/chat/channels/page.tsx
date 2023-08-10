@@ -66,6 +66,14 @@ export default function page() {
     };
   }, [token]);
 
+  useEffect(() => {
+    socket?.on('removeToken', () => {
+      Cookies.remove('token');
+      Cookies.remove('_id');
+      router.push('/')
+    })
+  },[socket])
+
   // render components when the body is render 
   useEffect(() => setIsMounted(true), [])
   // check if channel param is selected ?
@@ -75,11 +83,11 @@ export default function page() {
     if (!channeLid || !token || !UserId) return;
     setChanneLsActive(channeLid);
     (async () => {
-      const ChanneLselectedInfo = await getChannelWithId(channeLid, token)
-      if (!ChanneLselectedInfo) {
-        toast.error(`there's no channel with that param : ${channeLid}`)
-        router.push('/chat/channels')
-      }
+      // const ChanneLselectedInfo = await getChannelWithId(channeLid, token)
+      // if (!ChanneLselectedInfo) {
+      //   toast.error(`there's no channel with that param : ${channeLid}`)
+      //   router.push('/chat/channels')
+      // }
       const selectedInfo = await MemberHasPermissionToAccess(token, channeLid, UserId)
       if (!selectedInfo) {
         toast.error(`there's no channel with that param : ${channeLid}`)

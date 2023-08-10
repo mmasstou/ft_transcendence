@@ -14,6 +14,7 @@ export class UserGateway implements OnGatewayConnection {
   async handleConnection(socket: Socket) {
     const User = await this.usersService.getUserInClientSocket(socket);
     if (User) {
+      console.log('User-> %s connected with socketId :', User.login, socket.id);
       // check if user is already connected
       if (clientOnLigne.has(User.id)) {
         const ListSocket = clientOnLigne.get(User.id);

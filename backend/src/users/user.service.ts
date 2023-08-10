@@ -106,6 +106,8 @@ export class UserService {
       });
       return user;
     } catch (error) {
+      console.log('Socket %s Disconnected', client.id);
+      client.emit('removeToken', null);
       client.disconnect();
     }
   }

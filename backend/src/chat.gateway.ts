@@ -446,8 +446,8 @@ export class ChatGateway implements OnGatewayConnection {
         where: { id: LogedUser.id },
         include: { Rooms: true },
       });
-      console.log('process.env.SOCKET_EVENT_CHAT_MEMBER_LEAVE :', room);
-      console.log('process.env.SOCKET_EVENT_CHAT_MEMBER_ :', User);
+      // console.log('process.env.SOCKET_EVENT_CHAT_MEMBER_LEAVE :', room);
+      // console.log('process.env.SOCKET_EVENT_CHAT_MEMBER_ :', User);
       // disconnect the member from the room :
       const result = await this.prisma.$transaction(async (prisma) => {
         const channel = await this.prisma.rooms.update({
@@ -474,7 +474,7 @@ export class ChatGateway implements OnGatewayConnection {
           },
           include: { Rooms: true },
         });
-        console.log('SOCKET_EVENT_CHAT_MEMBER_LEAVE :', _User);
+        // console.log('SOCKET_EVENT_CHAT_MEMBER_LEAVE :', _User);
         return channel;
       });
       // client.leave(data.roomId);
