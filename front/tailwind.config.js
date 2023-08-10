@@ -69,6 +69,8 @@ module.exports = {
                 slideRightAndFade: 'slideRightAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
                 slideDownAndFade: 'slideDownAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
                 slideLeftAndFade: 'slideLeftAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
+                spin: 'spin 1s linear infinite',
+
         
               },
               slideUpAndFade: {
