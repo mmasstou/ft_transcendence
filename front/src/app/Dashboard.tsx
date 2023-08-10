@@ -4,7 +4,7 @@ import Sidebar from '@/components/Dashboard/sidebar/Sidebar';
 import Login from '@/components/auth/modaLs/Login';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
 import ChanneLPasswordAccessModaL from './chat/channels/modaLs/channel.access.password.modaL';
@@ -12,6 +12,8 @@ import { useEffect } from 'react';
 import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
 import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
 import './dashboard.css';
+import OtpField from '@/components/ui/otpField/OtpField';
+
 interface Props {
   children: React.ReactNode;
 }
@@ -37,7 +39,7 @@ const Dashboard = ({ children }: Props) => {
       <ChanneLCreateModaL />
       <ChanneLSettingsModaL />
       <ChanneLaccessDeniedModaL />
-      <div className="dashboard bg-primary relative">
+      <div className="dashboard bg-primary overflow-y-auto">
         <header className="bg-transparent flex items-center justify-between px-5 ">
           <Header />
         </header>

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Bar, Pie } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { UserData } from './Data';
 import { Chart, registerables } from 'chart.js';
 
@@ -27,7 +27,6 @@ const Statistics = () => {
           text-white min-h-[250px] overflow-hidden lg:p-6 xl:p-6 2xl:p-6"
     >
       <Bar data={userData} />
-      {/* <Pie data={userData} /> */}
     </div>
   );
 };

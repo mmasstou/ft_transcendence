@@ -34,29 +34,31 @@ model UserSocket {
 
 // models :
 model User {
-  id            String          @id @default(uuid())
-  login         String          @unique
-  email         String          @unique
-  password      String?
-  name          String?
-  kind          String?
-  avatar        String?
-  bg_color      String[]        @default(["#918CA9", "#211F2F"])
-  paddle_color  String?         @default("#E0E0E0")
-  ball_color    String?         @default("#E0E0E0")
-  location      String?
-  cursus_users  Cursus?          @relation(fields: [cursusId], references: [id])
-  intraId       Int?
-  banner        String?
-  is_active     Boolean         @default(false)
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @updatedAt
-  Members       Members[]
-  Messages      Messages[]
-  Rooms         Rooms[]
-  directMessage DirectMessage[]
-  UserSocket    UserSocket[]
-  cursusId      String?
+  id                            String          @id @default(uuid())
+  login                         String          @unique
+  email                         String          @unique
+  password                      String?
+  name                          String?
+  kind                          String?
+  avatar                        String?
+  bg_color                      String[]        @default(["#918CA9", "#211F2F"])
+  paddle_color                  String?         @default("#E0E0E0")
+  ball_color                    String?         @default("#E0E0E0")
+  location                      String?
+  cursus_users                  Cursus?         @relation(fields: [cursusId], references: [id])
+  intraId                       Int?
+  banner                        String?
+  is_active                     Boolean         @default(false)
+  created_at                    DateTime        @default(now())
+  updated_at                    DateTime        @updatedAt
+  Members                       Members[]
+  Messages                      Messages[]
+  Rooms                         Rooms[]
+  directMessage                 DirectMessage[]
+  UserSocket                    UserSocket[]
+  cursusId                      String?
+  twoFactorAuthenticationSecret String?
+  twoFA                         Boolean         @default(false)
 }
 
 model Cursus {

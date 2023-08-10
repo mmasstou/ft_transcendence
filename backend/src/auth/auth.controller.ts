@@ -13,9 +13,13 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { JwtAuthGuard } from './guards/jwt-oauth.guard';
+import { UserService } from 'src/users/user.service';
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   // @HttpCode(HttpStatus.OK)
   // @Post('login')
@@ -44,7 +48,11 @@ export class AuthController {
         httpOnly: false,
         sameSite: false,
       });
-      res.redirect(`${process.env.AUTH_REDIRECT_URI}`);
+      if (req.user.twoFA) {
+        return res.redirect(`${process.env.AUTH_REDIRECT_2FA}`);
+      } else {
+        return res.redirect(`${process.env.AUTH_REDIRECT_URI}`);
+      }
     } catch (error) {
       res.status(400).json(error);
     }
@@ -60,8 +68,11 @@ export class AuthController {
   }
 
   @Get('status')
-  // @UseGuards(JwtAuthGuard)
-  status(@Req() req: any) {
-    return req.user;
+  @UseGuards(JwtAuthGuard)
+  async status(@Req() req: any) {
+    const _user = await this.userService.findOneLogin({
+      login: req.user.login,
+    });
+    return _user;
   }
 }
