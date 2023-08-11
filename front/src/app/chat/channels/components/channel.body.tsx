@@ -35,15 +35,26 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     })
 
     useEffect(() => {
-        const token: any = Cookies.get('token');
         (async () => {
+            const token: any = Cookies.get('token');
             if (!token)
                 return;
-            const resp = await getChannels(token)
+            const resp: RoomsType[] | null = await getChannels(token)
             if (resp) {
 
                 console.log("getChannels data :", resp)
-                setChannel(resp);
+                setChannel(resp.sort((a, b) => {
+                    const nameA = a.name.toLowerCase();
+                    const nameB = b.name.toLowerCase();
+
+                    if (nameA < nameB) {
+                        return -1;
+                    }
+                    if (nameA > nameB) {
+                        return 1;
+                    }
+                    return 0;
+                }));
             }
             // console.log("resp :", resp)
         }
@@ -55,6 +66,19 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
 
     useEffect(() => {
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, () => {
+            // (async () => {
+            //     const token: any = Cookies.get('token');
+            //     if (!token)
+            //         return;
+            //     const resp = await getChannels(token)
+            //     if (resp) {
+
+            //         console.log("getChannels data :", resp)
+            //         setChannel(resp);
+            //     }
+            //     // console.log("resp :", resp)
+            // }
+            // )();
             setUpdate(update ? false : true)
         })
 

@@ -44,7 +44,7 @@ export default function ChanneLFindRoommodaL() {
             rooms.filter((room: RoomsType) => {
                 return room.name.toLowerCase().includes(InputValue.toLowerCase())
             }))
-    }, [InputValue])
+    }, [InputValue, rooms])
 
     const OnJion = (param: { room: RoomsType }) => {
         // check if room is protacted :
@@ -77,6 +77,13 @@ export default function ChanneLFindRoommodaL() {
             });
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, () => {
 
+            (async () => {
+                const token: any = Cookies.get('token');
+                if (!token || !UserId) return
+                let response = await getPublicProtactedChannels(token)
+                if (!response) return
+                setrooms(response)
+            })();
             setUpdate(!Update)
         })
     }, [socket])

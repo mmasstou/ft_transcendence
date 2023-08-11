@@ -5,7 +5,7 @@ import { IoLogOut } from "react-icons/io5";
 import { AiFillDelete, AiOutlineUsergroupAdd } from "react-icons/ai";
 import { MdNotificationsActive } from "react-icons/md";
 import Button from "../../components/Button";
-import { MouseEvent } from "react";
+import { MouseEvent, use } from "react";
 import { ImUserCheck } from "react-icons/im";
 import { CgClose } from "react-icons/cg";
 import { Avatar } from "@radix-ui/react-avatar";
@@ -37,12 +37,15 @@ interface Props {
 export default function ChanneLSettingsInfo(
     { room, socket, User, member }: Props
 ) {
+
     const [Isloading, setLoading] = React.useState<boolean>(true)
     const [ownersList, setownersList] = React.useState<userType[] | null>(null)
     const [aLLMembersList, setaLLMembersList] = React.useState<membersType[] | null>(null)
     const [ownerUserList, setownerUserList] = React.useState<userType[]>([])
     const [ChanneLNotifications, setChanneLNotifications] = React.useState<any>(null)
     const [updaterequestNotification, setupdaterequestNotification] = React.useState<boolean>(false)
+    const [onLineMembers, setonLineMembers] = React.useState<number>(0)
+    const [onGameMembers, setonGameMembers] = React.useState<number>(0)
     const channeLConfirmActionHook = ChanneLConfirmActionHook()
     const channeLsettingsHook = ChanneLsettingsHook()
     const route = useRouter()
@@ -64,6 +67,28 @@ export default function ChanneLSettingsInfo(
             const aLLMembersList = await getChannelMembersWithId(ChanneLId, token)
             if (!aLLMembersList) return
             setaLLMembersList(aLLMembersList)
+            const ListUser: userType[] = []
+            // get User data for every member  :
+            for (let index = 0; index < aLLMembersList.length; index++) {
+                const member: membersType = aLLMembersList[index];
+                const user = await getUserWithId(member.userId, token)
+                user && ListUser.push(user)
+            }
+
+            // count OnLine members :
+            let _onLineMembers = 0;
+            let _onGameMembers = 0;
+            for (let index = 0; index < ListUser.length; index++) {
+                const _user = ListUser[index];
+                // check if status is online :
+                _onLineMembers++;
+                // check if status is onGame
+                _onGameMembers++;
+                
+            }
+            setonGameMembers(_onGameMembers)
+            setonLineMembers(_onLineMembers)
+
 
         })();
     }, [])
@@ -118,7 +143,6 @@ export default function ChanneLSettingsInfo(
                     channeLsettingsHook.onClose()
                     route.push(`/chat/channels`)
                     route.refresh();
-
                     return
                 }
                 channeLConfirmActionHook.onClose()
@@ -152,8 +176,8 @@ export default function ChanneLSettingsInfo(
                 </div>
                 <div className="MembersInfo flex flex-row gap-6">
                     <span className=" text-white">{aLLMembersList?.length} Members</span>
-                    <div className="flex flex-row items-center gap-2 fill-secondary text-secondary"><RiRadioButtonLine size={12} /> <span className=" text-white">200 Online</span></div>
-                    <div className="flex flex-row items-center gap-2 fill-danger text-danger"><PiGameControllerFill /> <span className=" text-white">123 on game</span></div>
+                    <div className="flex flex-row items-center gap-2 fill-secondary text-secondary"><RiRadioButtonLine size={12} /> <span className=" text-white">{onLineMembers} Online</span></div>
+                    <div className="flex flex-row items-center gap-2 fill-danger text-danger"><PiGameControllerFill /> <span className=" text-white">{onGameMembers} on game</span></div>
                 </div>
 
             </div>
@@ -169,35 +193,23 @@ export default function ChanneLSettingsInfo(
             </div>}
         </div>
         <div className="channeLActions flex flex-row items-center gap-6 justify-start w-full">
-            <button
-                onClick={() => {
-                    channeLConfirmActionHook.onOpen(
-                        <ChanneLConfirmActionBtn onClick={() => {
-                            socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_LEAVE}`, {
-                                roomId: room.id
-                            },)
-                        }} />, `Are you sure you want to permanently leave '${room.name}' ?`
-                    )
-                }}
-                className="btn btn-primary flex flex-col w-full bg-[#161f1e54] p-3 justify-center items-center rounded text-white">
-                <IoLogOut />
-                <span>Leave</span>
-            </button>
-            <button
-                onClick={() => {
-                    channeLConfirmActionHook.onOpen(
-                        <ChanneLConfirmActionBtn onClick={() => {
-                            socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_DELETE_CHAT}`, {
-                                userId: User?.id,
-                                roomId: room.id
-                            },)
-                        }} />,
-                        `Are you sure you want to permanently delete ${room.name} ?`)
-                }}
-                className="btn btn-primary flex flex-col w-full bg-[#161f1e54] p-3 justify-center items-center rounded text-white">
-                <AiFillDelete />
-                <span>Delete</span>
-            </button>
+            {User && <ChanneLConfirmActionBtn
+                socket={socket}
+                message={`Are you sure you want to permanently leave '${room.name}' ?`}
+                event={`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_LEAVE}`}
+                label={"Leave"}
+                data={{
+                    roomId: room.id
+                }} />}
+            {User && <ChanneLConfirmActionBtn
+                socket={socket}
+                message={`Are you sure you want to permanently delete ${room.name} ?`}
+                event={`${process.env.NEXT_PUBLIC_SOCKET_EVENT_DELETE_CHAT}`}
+                label={"Delete"}
+                data={{
+                    userId: User?.id,
+                    roomId: room.id
+                }} />}
         </div>
     </div>
 }
