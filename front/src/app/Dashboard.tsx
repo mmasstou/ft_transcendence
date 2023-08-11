@@ -12,7 +12,6 @@ import { useEffect } from 'react';
 import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
 import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
 import './dashboard.css';
-import OtpField from '@/components/ui/otpField/OtpField';
 
 interface Props {
   children: React.ReactNode;

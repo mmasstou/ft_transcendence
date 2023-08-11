@@ -10,6 +10,7 @@ import AvatarUpload from './AvatarUpload';
 import UserInput from './UserInput';
 import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
+import OtpModal from './OtpModal';
 
 function getUserData(): userType | null {
   const [user, setUser] = useState<userType | null>(null);
@@ -46,6 +47,7 @@ const Settings: React.FC = () => {
   const [validName, setValidName] = useState<boolean>(false);
   const [twoFa, setTwoFA] = useState<boolean | undefined>(userData?.twoFA);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   const handleModal = (): void => {
     setOpen(!isOpen);
@@ -102,7 +104,6 @@ const Settings: React.FC = () => {
     };
 
     if (twoFa) {
-      // Turn off 2FA
       axios
         .post('http://localhost:80/api/2fa/turn-off', {}, { headers })
         .catch((err) => {
@@ -112,12 +113,16 @@ const Settings: React.FC = () => {
     } else {
       // // Turn on 2FA
       // i should pop a modal to show the QR code to make sure qr code is displayed every time 2fa is turned on
+      setOpenModal(true);
       // axios
       //   .post('http://localhost:80/api/2fa/turn-on', {}, { headers })
       //   .catch((err) => {
       //     toast.error(err.response.data.message);
       //     return;
       //   });
+    }
+    if (openModal) {
+      setOpenModal(false);
     }
     setTwoFA(!twoFa);
   };
@@ -134,109 +139,120 @@ const Settings: React.FC = () => {
 
   return (
     <>
-      <Dialog.Root>
-        <Dialog.Trigger asChild>
-          <RiSettingsLine
-            size={32}
-            className="cursor-pointer hover:text-white text-[#E0E0E0]"
-            onClick={handleModal}
-          />
-        </Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Overlay
-            className="data-[state=open]:animate-overlayShow fixed inset-0 
+      {openModal ? (
+        <OtpModal />
+      ) : (
+        <Dialog.Root>
+          <Dialog.Trigger asChild>
+            <RiSettingsLine
+              size={32}
+              className="cursor-pointer hover:text-white text-[#E0E0E0]"
+              onClick={handleModal}
+            />
+          </Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Overlay
+              className="data-[state=open]:animate-overlayShow fixed inset-0 
                         w-screen h-screen bg-[#161F1E]/80 z-20"
-          />
-          <Dialog.Content
-            className="data-[state=open]:animate-contentShow text-white rounded-lg bg-[#2B504B] p-6 absolute 
+            />
+            <Dialog.Content
+              className="data-[state=open]:animate-contentShow text-white rounded-lg bg-[#2B504B] p-6 absolute 
           top-[40%] left-[50%] max-h-full w-[80%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[35%] translate-x-[-50%] lg:translate-x-[-50%] xl:translate-x-[-35%] translate-y-[-50%] 
           shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px]
           focus:outline-none z-50 overflow-scroll"
-          >
-            <Dialog.Title className="">Settings</Dialog.Title>
-            <Dialog.Close asChild>
-              <button className="text-white top-5 right-5 absolute">
-                <Cross2Icon />
-              </button>
-            </Dialog.Close>
-            <div className=" p-4 m-4 flex flex-col justify-center items-center gap-6 md:gap-8 xl:gap-10">
-              <div className="flex justify-between gap-6 md:gap-8 xl:gap-10 items-center">
-                <div className="h-[60px] w-[60px]">
-                  <AvatarUpload image={imgProp} />
-                </div>
-                <input
-                  style={{ display: 'none' }}
-                  type="file"
-                  onChange={fileSelect}
-                  ref={fileInputRef}
-                />
-                <button
-                  className="bg-[#939DA3] px-[8px] w-[130px] h-[40px] py-1 font-normal rounded-lg text-[1.25em]"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  UPLOAD
-                </button>
-              </div>
-
-              <UserInput getUserInfo={getUserInfo} />
-
-              <form>
-                <div
-                  className="flex items-center"
-                  style={{ display: 'flex', alignItems: 'center' }}
-                >
-                  <label
-                    className="text-white text-[20px] leading-none pr-[15px] font-bold"
-                    htmlFor="airplane-mode"
-                  >
-                    TWO-FACTOR AUTH
-                  </label>
-                  {twoFa ? (
-                    <Switch.Root
-                      className="w-[42px] h-[25px] bg-blackA9 rounded-full relative shadow-[0_2px_10px] shadow-blackA7 
-                      focus:shadow-[0_0_0_2px]  focus:shadow-secondary
-                    bg-secondary outline-none cursor-default"
-                      id="airplane-mode"
-                      onClick={handleTwoFa}
-                    >
-                      <Switch.Thumb
-                        className="block w-[21px] h-[21px] bg-white rounded-full shadow-[0_2px_2px] shadow-blackA7 
-                                          transition-transform duration-100  will-change-transform 
-                                            translate-x-[19px]"
-                      />
-                    </Switch.Root>
-                  ) : (
-                    <Switch.Root
-                      className="w-[42px] h-[25px] bg-blackA9 rounded-full relative shadow-[0_2px_10px] shadow-blackA7
-                      focus:shadow-[0_0_0_2px] focus:shadow-black
-                      outline-none cursor-default"
-                      id="airplane-mode"
-                      onClick={handleTwoFa}
-                    >
-                      <Switch.Thumb
-                        className="block w-[21px] h-[21px] bg-white rounded-full shadow-[0_2px_2px] shadow-blackA7
-                      transition-transform duration-100 translate-x-0.5 will-change-transform
-                      "
-                      />
-                    </Switch.Root>
-                  )}
-                </div>
-              </form>
+            >
+              <Dialog.Title className="">Settings</Dialog.Title>
               <Dialog.Close asChild>
-                <button
-                  className="bg-transparent text-secondary border border-secondary 
-                              px-[8px] w-1/2 h-[40px] font-normal rounded-lg text-[1.25em] hover:bg-secondary hover:text-white"
-                  onClick={fileUpload}
-                >
-                  CONFIRM
+                <button className="text-white top-5 right-5 absolute">
+                  <Cross2Icon />
                 </button>
               </Dialog.Close>
-            </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+              <div className=" p-4 m-4 flex flex-col justify-center items-center gap-6 md:gap-8 xl:gap-10">
+                <div className="flex justify-between gap-6 md:gap-8 xl:gap-10 items-center">
+                  <div className="h-[60px] w-[60px]">
+                    <AvatarUpload image={imgProp} />
+                  </div>
+                  <input
+                    style={{ display: 'none' }}
+                    type="file"
+                    onChange={fileSelect}
+                    ref={fileInputRef}
+                  />
+                  <button
+                    className="bg-[#939DA3] px-[8px] w-[130px] h-[40px] py-1 font-normal rounded-lg text-[1.25em]"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    UPLOAD
+                  </button>
+                </div>
+
+                <UserInput
+                  getUserInfo={getUserInfo}
+                  oldName={userData?.login}
+                />
+
+                <form>
+                  <div
+                    className="flex items-center"
+                    style={{ display: 'flex', alignItems: 'center' }}
+                  >
+                    <label
+                      className="text-white text-[20px] leading-none pr-[15px] font-bold"
+                      htmlFor="airplane-mode"
+                    >
+                      TWO-FACTOR AUTH
+                    </label>
+                    {twoFa ? (
+                      <Switch.Root
+                        className="w-[42px] h-[25px] bg-blackA9 rounded-full relative shadow-[0_2px_10px] shadow-blackA7 
+                      focus:shadow-[0_0_0_2px]  focus:shadow-secondary
+                    bg-secondary outline-none cursor-default"
+                        id="airplane-mode"
+                        onClick={handleTwoFa}
+                      >
+                        <Switch.Thumb
+                          className="block w-[21px] h-[21px] bg-white rounded-full shadow-[0_2px_2px] shadow-blackA7 
+                                          transition-transform duration-100  will-change-transform 
+                                            translate-x-[19px]"
+                        />
+                      </Switch.Root>
+                    ) : (
+                      <Switch.Root
+                        className="w-[42px] h-[25px] bg-blackA9 rounded-full relative shadow-[0_2px_10px] shadow-blackA7
+                      focus:shadow-[0_0_0_2px] focus:shadow-black
+                      outline-none cursor-default"
+                        id="airplane-mode"
+                        onClick={handleTwoFa}
+                      >
+                        <Switch.Thumb
+                          className="block w-[21px] h-[21px] bg-white rounded-full shadow-[0_2px_2px] shadow-blackA7
+                      transition-transform duration-100 translate-x-0.5 will-change-transform
+                      "
+                        />
+                      </Switch.Root>
+                    )}
+                  </div>
+                </form>
+                <Dialog.Close asChild>
+                  <button
+                    className="bg-transparent text-secondary border border-secondary 
+                              px-[8px] w-1/2 h-[40px] font-normal rounded-lg text-[1.25em] hover:bg-secondary hover:text-white"
+                    onClick={fileUpload}
+                  >
+                    CONFIRM
+                  </button>
+                </Dialog.Close>
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      )}
     </>
   );
 };
 
 export default Settings;
+
+// i can make call to otp modall after submit if 2fa is turned on
+// the problem is how how to get otp code from the modal
+// can i user useContext to get the otp code from the modal

@@ -3,18 +3,17 @@ import { useRef, useState, useEffect } from 'react';
 import { FaTimes, FaInfoCircle, FaCheck } from 'react-icons/fa';
 
 export interface userInfo {
-  // username: string,
-  // validusername: boolean,
+  oldName: string | undefined;
   getUserInfo: (username: string, validusername: boolean) => void;
 }
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{5,7}$/;
 
-const UserInput = ({ getUserInfo }: userInfo): JSX.Element => {
+const UserInput = ({ oldName, getUserInfo }: userInfo): JSX.Element => {
   const userRef = useRef<HTMLInputElement>(null);
   const errRef = useRef<HTMLParagraphElement>(null);
 
-  const [user, setUser] = useState<string>('test');
+  const [user, setUser] = useState<string>(oldName || '');
   const [validName, setValidName] = useState<boolean>(false);
   const [userFocus, setUserFocus] = useState<boolean>(false);
 
@@ -60,6 +59,7 @@ const UserInput = ({ getUserInfo }: userInfo): JSX.Element => {
         </label>
         <div className="flex flex-col justify-between gap-2 items-center">
           <input
+            value={user}
             placeholder="USERNAME"
             className="bg-transparent border rounded-md px-2 outline-none w-full py-1"
             type="text"

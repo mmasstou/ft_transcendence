@@ -83,6 +83,13 @@
   appearance: none;
 }
 
+.twoFactor {
+  position: absolute;
+  top: 40%;
+  left: 56%;
+  transform: translate(-50%, -50%);
+}
+
 *::-webkit-scrollbar {
   display: none;
 }
