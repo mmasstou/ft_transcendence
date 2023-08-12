@@ -16,8 +16,8 @@ const RandomListScore = new UniqueSet();    ////////// list of random score obj 
 var currents: NodeJS.Timeout;
 var table_obj = new TableObj(currents);
 
-
 export let _User: User | null = null;
+
 
 function check_col(table: any){
     if (table.ball.y <= 3 || table.ball.y >= 97.5) // colleg with wall
@@ -66,7 +66,6 @@ function moveBall(server: Server, table: any){
         }
       }
     }
-
 
 @WebSocketGateway({namespace: 'ball'})
 class BallGateway implements OnGatewayConnection {

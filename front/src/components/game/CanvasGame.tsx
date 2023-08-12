@@ -5,6 +5,8 @@ import {TableMap} from '../../../tools/class';
 import Cookies from "js-cookie";
 import {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall} from './gameFunc';
 import LeaveButton from '@/components/game/LeaveButton';
+import GameResult from "./GameResult";
+import MatchMaking from "./MatchMaking";
 
 const TableMap: TableMap = new Map();
 const url = process.env.NEXT_PUBLIC_GAMESOCKET_URL_WS;
@@ -406,10 +408,10 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     else
         var isvertical = false;
     return (
-      !isReady ? <h1 className=" font-bold text-white">Loading...</h1> :
-      LeaveGame && (YouWin || (!YouWin && !YouLose && !YouDraw))  ? <h1 className=" font-bold text-white">WIN</h1> :
-      LeaveGame && YouLose ? <h1 className=" font-bold text-white">LOSE</h1> :
-      LeaveGame && YouDraw ? <h1 className=" font-bold text-white">DRAW</h1> :
+      !isReady ? <MatchMaking/> :
+      LeaveGame && (YouWin || (!YouWin && !YouLose && !YouDraw))  ? <GameResult result="win" /> :
+      LeaveGame && YouLose ? <GameResult result="lose" /> :
+      LeaveGame && YouDraw ? <GameResult result="draw" /> :
       <>
         <LeaveButton isvertical={isvertical} isReady={isReady} isMobile={isMobile} />
         <div id="CanvasGameDiv">
