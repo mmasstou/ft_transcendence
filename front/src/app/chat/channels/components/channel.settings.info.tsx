@@ -99,8 +99,10 @@ export default function ChanneLSettingsInfo(
             const ChanneLId: string | null = params ? params.get('r') : null
             if (!token || !ChanneLId) return
             // get channel notifications
-            const channeLNotifications = await getChanneLNotifications(ChanneLId, token)
+            const channeLNotifications  = await getChanneLNotifications(ChanneLId, token)
+
             if (!channeLNotifications) return
+            console.log("channeLNotifications :",channeLNotifications)
             setChanneLNotifications(channeLNotifications)
         })();
     }, [updaterequestNotification])
@@ -181,9 +183,9 @@ export default function ChanneLSettingsInfo(
                 </div>
 
             </div>
-            {member?.type === UserTypeEnum.OWNER && ChanneLNotifications && <div className="ChanneLInvitaionsBox flex flex-col gap-4">
-                <h2 className="flex flex-row items-center text-white gap-2 text-xl font-semibold"><MdNotificationsActive size={21} />requestes</h2>
-                <div className="ChanneLInvitaions p-4 flex flex-col gap-4 max-h-[44vh] overflow-y-scroll py-4 px-1">
+            {member?.type === UserTypeEnum.OWNER && ChanneLNotifications && <div className="ChanneLInvitaionsBox flex flex-col gap-2">
+                <h2 className="flex flex-row items-center text-white gap-2 text-xl font-semibold lowercase"><MdNotificationsActive size={21} />Notifications</h2>
+                <div className="ChanneLInvitaions flex flex-col gap-2 max-h-[44vh] overflow-y-scroll py-2 px-1">
                     {
                         ChanneLNotifications.map((item: any, index: number) => (
                             <ChanneLSettingsInfonotifications key={index} notification={item} socket={socket} />

@@ -20,7 +20,6 @@ import Cookies from 'js-cookie';
 import getChannelMembersWithId from '../actions/getChannelmembers';
 import { RoomTypeEnum, RoomsType, UserTypeEnum, membersType } from '@/types/types';
 import getMemberWithId from '../actions/getMemberWithId';
-import ChannelSettingsUserMemberItem from './channel.settings.user.memberItem';
 import { Socket } from 'socket.io-client';
 import Image from 'next/image';
 import ChanneLSettingsChanneLBanedMember from './channel.settings.channel.banedmember';

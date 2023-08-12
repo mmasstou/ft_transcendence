@@ -2,7 +2,6 @@ import { IoChevronBackOutline } from "react-icons/io5";
 import { Socket } from "socket.io-client";
 import Button from "../../components/Button";
 import { RoomTypeEnum, RoomsType, UpdateChanneLSendData, UpdateChanneLSendEnum, membersType, updatememberEnum } from "@/types/types";
-import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import Image from "next/image";
 import { FieldValues, useForm } from "react-hook-form";
 import Input from "@/components/Input";
@@ -39,7 +38,7 @@ export default function ChanneLSettingsChanneLAccessPassword(
     const _newChanneLpassword = watch('newChanneLpassword')
     const _confirmChanneLpassword = watch('confirmChanneLpassword')
 
-    socket?.on('updatememberResponseEvent', (data) => {
+    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
         setUpdate(true)
     })
     const onSubmit = (data: UpdateChanneLSendData) => {

@@ -5,7 +5,7 @@ import Button from "../../components/Button";
 import { IoChevronBackOutline } from "react-icons/io5";
 import ChannelSettingsUserMemberItem from "../components/channel.settings.user.memberItem";
 import React from "react";
-import { membersType, userType } from "@/types/types";
+import { membersType, updatememberEnum, userType } from "@/types/types";
 import Cookies from "js-cookie";
 import getUsers from "../actions/getUsers";
 import Image from "next/image";
@@ -16,7 +16,7 @@ import LeftSidebarHook from "../hooks/LeftSidebarHook";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 
 interface IChannelSettingsMemberJoinModalProps {
-    OnClick: () => void,
+    OnClick: (data: any) => void;
     socket: Socket | null
 }
 export default function ChanneLSettingsMemberJoinModaL(
@@ -86,46 +86,47 @@ export default function ChanneLSettingsMemberJoinModaL(
         })();
     }, [searchInput, update])
 
-    const handlOnclick = (data: {userid : string, roomid : string}) => {
+    const handlOnclick = (data: { userid: string, roomid: string }) => {
 
-        socket?.emit('joinmember', data)
+        socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`, data)
 
     }
 
-    socket?.on('joinmemberResponseEvent', (data) => {
+    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
 
         setUpdate(true)
-        router.refresh()
-        channeLsettingsHook.onClose()
+        // router.refresh()
+        // channeLsettingsHook.onClose()
+
     })
     if (!IsMounted) return null
     return (
         <div className="flex flex-col w-full">
-        <Button
-            icon={IoChevronBackOutline}
-            label={"Back"}
-            outline
-            onClick={OnClick}
-        />
-        <div className=" p-5 flex flex-col">
+            <Button
+                icon={IoChevronBackOutline}
+                label={"Back"}
+                outline
+                onClick={OnClick}
+            />
+            <div className=" p-5 flex flex-col">
 
-            <div className=" relative w-full">
-                <input
-                    id={'searchInput'}
-                    {...register('searchInput', { required: false })}
-                    placeholder=" "
-                    type="search"
-                    value={searchInput}
-                    onChange={(e) => {
-                        e.preventDefault()
-                        setsearchInput(e.target.value)
-                    }}
-                    className={`
+                <div className=" relative w-full">
+                    <input
+                        id={'searchInput'}
+                        {...register('searchInput', { required: false })}
+                        placeholder=" "
+                        type="search"
+                        value={searchInput}
+                        onChange={(e) => {
+                            e.preventDefault()
+                            setsearchInput(e.target.value)
+                        }}
+                        className={`
              peer w-full pl-3 pt-6 text-xl bg-transparent text-white border text-[var(--white)] focus:bg-transparent font-light   rounded-md outline-none transition disabled:opacity-70 disabled:cursor-not-allowed
              ${errors['searchInput'] ? ' border-rose-500 focus:border-rose-500' : ' border-ç focus:border-teal-500'}`}
-                />
-                <label htmlFor=""
-                    className={`
+                    />
+                    <label htmlFor=""
+                        className={`
                 text-[var(--white)]
                 absolute
                 text-md
@@ -141,48 +142,63 @@ export default function ChanneLSettingsMemberJoinModaL(
                 ${(searchInput.length !== 0 || !searchInput) ? 'scale-75 -translate-y-4' : ''}
                 ${errors['searchInput'] ? 'text-rose-500' : 'text-zinc-500'}
                 `}>
-                    find member
-                </label>
+                        find member
+                    </label>
+                </div>
+            </div>
+            <div className=" p-5 overflow-y-scroll max-h-[28rem] flex flex-col w-full">
+
+                {(users && users.length > 0)
+                    ? users.map((user, index) => (
+                        <ChannelSettingsUserMemberItem
+                            key={index}
+                            member={
+                                {
+                                    id: "yyyy",
+                                    type: "",
+                                    userId: user.id,
+                                    isban: false,
+                                    ismute: false,
+                                    roomsId: "",
+                                    directmessageId: "",
+                                    created_at: "",
+                                    updated_at: "",
+                                    mute_at: ''
+                                }
+                            }
+                            UserJoin={true}
+                            socket={null}
+                            OnClick={(data) => {
+                                const channeLId = params.get('r')
+                                if (!channeLId)
+                                    return;
+                                handlOnclick({
+                                    userid: user.id,
+                                    roomid: channeLId
+                                })
+                                OnClick({
+                                    updateType: updatememberEnum.MUTEMEMBER, member:
+                                    {
+                                        id: "yyyy",
+                                        type: "",
+                                        userId: user.id,
+                                        isban: false,
+                                        ismute: false,
+                                        roomsId: "",
+                                        directmessageId: "",
+                                        created_at: "",
+                                        updated_at: "",
+                                        mute_at: ''
+                                    }
+                                })
+                            }} />
+
+                    ))
+                    : <div className="flex flex-col w-full justify-center items-center h-auto">
+                        <Image src={"/not_found.svg"} width={200} height={200} alt={"not_found"} />
+                        <h2 className=" capitalize font-extrabold text-white">no result</h2>
+                    </div>}
             </div>
         </div>
-        <div className=" p-5 overflow-y-scroll max-h-[28rem] flex flex-col w-full">
-
-            {(users && users.length > 0)
-                ? users.map((user, index) => (
-                    <ChannelSettingsUserMemberItem
-                        key={index}
-                        member={
-                            {
-                                id: "",
-                                type: "",
-                                userId: user.id,
-                                isban: false,
-                                ismute: false,
-                                roomsId: "",
-                                directmessageId: "",
-                                created_at: "",
-                                updated_at: "",
-                                CanEdit: false
-                            }
-                        }
-                        UserJoin={true}
-                        socket={null}
-                        OnClick={(data) => {
-                            const channeLId = params.get('r')
-                            if (!channeLId)
-                                return;
-                            handlOnclick({
-                                userid : user.id,
-                                roomid : channeLId
-                            })
-                        }} />
-
-                ))
-                : <div className="flex flex-col w-full justify-center items-center h-auto">
-                    <Image src={"/not_found.svg"} width={200} height={200} alt={"not_found"} />
-                    <h2 className=" capitalize font-extrabold text-white">no result</h2>
-                </div>}
-        </div>
-    </div>
     )
 }

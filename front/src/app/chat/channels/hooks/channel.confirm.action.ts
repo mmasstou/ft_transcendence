@@ -1,10 +1,11 @@
+import { updatememberEnum } from '@/types/types';
 import React from 'react';
 import { create } from 'zustand';
 //
 
 interface IChanneLConfirmAction {
   IsOpen: boolean;
-  message: string;
+  message: string | updatememberEnum;
   ConfirmBtn: React.ReactNode | null;
   onOpen: (ConfirmBtn: React.ReactNode | null, message : string) => void;
   onClose: () => void;

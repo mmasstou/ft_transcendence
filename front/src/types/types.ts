@@ -9,6 +9,14 @@ export type Message = {
   content: string;
 };
 
+export type ChanneLnotificationType = {
+  id: string;
+  content: string;
+  channelId: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type membersType = {
   id: string;
   type: string;
@@ -19,6 +27,7 @@ export type membersType = {
   directmessageId: string;
   created_at: string;
   updated_at: string;
+  mute_at: string;
 };
 export type messagesType = {
   viewed: number;
@@ -51,7 +60,7 @@ export type RoomsType = {
   hasAccess: boolean;
   members: membersType[];
   messages: Message[];
-  accesspassword:string
+  accesspassword: string;
 };
 
 export type userType = {
@@ -62,9 +71,9 @@ export type userType = {
   name: string;
   kind: null;
   avatar: string | '';
-  bg_color: string[] | null
-  paddle_color: string | null
-  ball_color: string | null
+  bg_color: string[] | null;
+  paddle_color: string | null;
+  ball_color: string | null;
   intraId: number;
   banner: string | '';
   is_active: boolean;
@@ -73,15 +82,14 @@ export type userType = {
   Rooms: RoomsType[];
   location: string;
   cursus_users: cursusType[];
-
 };
 
 export type cursusType = {
   id: string;
-    grade: string,
-    level: Float32Array,
-    blackholed_at: string
-}
+  grade: string;
+  level: Float32Array;
+  blackholed_at: string;
+};
 export type messageSocket = {
   roomId: string;
   messageContent: string;
@@ -111,6 +119,7 @@ export enum updatememberEnum {
   PLAYGAME = 'PLAYGAME',
   SETOWNER = 'SETOWNER',
   ACCESSPASSWORD = 'ACCESSPASSWORD',
+  ADDMEMBER = "ADDMEMBER"
 }
 
 export enum UpdateChanneLSendEnum {
@@ -120,10 +129,10 @@ export enum UpdateChanneLSendEnum {
   EDITACCESSEPASSWORD = 'EDITACCESSEPASSWORD',
 }
 export type UpdateChanneLSendData = {
-  Updatetype: UpdateChanneLSendEnum,
-  password?: string,
-  confirmpassword?: string,
-  accesspassword?: string,
-  roomtype?: RoomTypeEnum,
-  room: RoomsType
-}
+  Updatetype: UpdateChanneLSendEnum;
+  password?: string;
+  confirmpassword?: string;
+  accesspassword?: string;
+  roomtype?: RoomTypeEnum;
+  room: RoomsType;
+};

@@ -76,7 +76,7 @@ export class RoomsService {
   async findOne(params: { id: string }): Promise<Rooms> {
     try {
       const { id } = params;
-      // console.log('++findOne++>', name);
+      console.log('++findOne++>', id);
       const room = await this.prisma.rooms.findUnique({
         where: { id },
         include: { members: true },

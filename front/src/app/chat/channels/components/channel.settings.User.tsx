@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
-import { membersType } from "@/types/types";
+import { UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import Cookies from "js-cookie";
 import { useSearchParams } from "next/navigation";
@@ -17,7 +17,9 @@ import { IoChevronBackOutline } from "react-icons/io5";
 import { BsArrowRightShort } from "react-icons/bs";
 import { MdOutlineScoreboard } from "react-icons/md";
 import { TfiTimer } from "react-icons/tfi";
-import { channel } from "diagnostics_channel";
+import ChanneLConfirmActionBtn from "./channel.confirm.action.Btn";
+import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
+import getmessage from "../actions/member.action.message";
 
 interface ChanneLUserSettingsProps {
     socket: Socket | null
@@ -36,6 +38,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
     const [step, setStep] = React.useState<USERSETTINGSTEPS>(USERSETTINGSTEPS.INDEX)
     const [PlayGameWith, setPlayGameWith] = React.useState<membersType | null>(null)
+    const channeLConfirmActionHook = ChanneLConfirmActionHook()
     const [update, setUpdate] = React.useState<boolean>(false)
     const channeLsettingsHook = ChanneLsettingsHook()
     const params = useSearchParams()
@@ -85,9 +88,16 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
 
     }
 
-    socket?.on('updatememberResponseEvent', (data) => {
-        setUpdate(true)
-    })
+    useEffect(() => {
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+            setUpdate(!update)
+            // const channeLLMembers = __userId && await getMemberWithId(__userId, channeLLid, token)
+            // if (channeLLMembers && channeLLMembers.statusCode !== 200) {
+            //     setLogedMember(channeLLMembers)
+            // }
+            channeLConfirmActionHook.onClose()
+        })
+    }, [socket])
 
     if (!IsMounted)
         return <div className="Members flex p-4">
@@ -98,7 +108,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
 
     let bodyContent = (
         <>
-            <div className="flex flex-row justify-center items-center gap-2">
+            {LogedMember?.type !== UserTypeEnum.USER && <div className="flex flex-row justify-center items-center gap-2">
                 <Button
                     icon={TbUserPlus}
                     label={"Add member"}
@@ -109,37 +119,63 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                         setStep(USERSETTINGSTEPS.MEMBERJOIN)
                     }}
                 />
-            </div>
+            </div>}
 
 
 
 
             <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
-                {(LogedMember?.type === "ADMIN" || LogedMember?.type === "OWNER") ?
-                    members && members.map((member, index) => (
-                        <ChannelSettingsUserMemberItem
-                            key={index}
-                            member={member}
-                            socket={socket}
-                            UserJoin={false}
-                            UserOwne={false}
-                            OnClick={(data) => {
+                {members && members.map((member: membersType, index) => (
+                    <ChannelSettingsUserMemberItem
+                        key={index}
+                        member={member}
+                        socket={socket}
+                        UserJoin={false}
+                        UserOwne={false}
+                        OnClick={(data: { updateType: updatememberEnum, member: membersType }) => {
+                            console.log("ana hanananananan")
+                            if (!data) return;
+                            if (data.updateType === "PLAYGAME") {
+                                setStep(USERSETTINGSTEPS.PLAYGAME)
+                                setPlayGameWith(data.member)
+                                return;
+                            }
+                            if (data.updateType === updatememberEnum.ADDMEMBER) {
+                                console.log("------data.updateType === ADDMEMBER")
+                                return
+                            }
+                            // handlOnclick(data)
+                            const __message = getmessage(data.updateType);
+                            console.log("const __message = getmessage(data.updateType) :", __message)
+                            console.log("const __message = getmessage(data.updateType) :", data.updateType)
+                            __message && channeLConfirmActionHook.onOpen(
+                                <button
+                                    onClick={() => {
+                                        socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_UPDATE}`, data)
+                                    }}
+                                    className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
+                                    {data.updateType === updatememberEnum.SETADMIN
+                                        ? data.member.type !== UserTypeEnum.ADMIN ? 'set Admin' : 'remove as admin'
+                                        : data.updateType === updatememberEnum.BANMEMBER
+                                            ? 'Ban'
+                                            : data.updateType === updatememberEnum.KIKMEMBER
+                                                ? 'Kick'
+                                                : data.updateType === updatememberEnum.MUTEMEMBER
+                                                    && data.member.ismute ? 'Unmute' : 'Mute'}
+                                </button>
 
-                                if (data.updateType === "PLAYGAME") {
-                                    setStep(USERSETTINGSTEPS.PLAYGAME)
-                                    setPlayGameWith(data.member)
-                                    return;
-                                }
-                                handlOnclick(data)
-                            }} />
+                                // <ChanneLConfirmActionBtn 
+                                // onClick={() => {
+                                //     socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_LEAVE}`, {
+                                //         roomId: room.id
+                                //     },)
+                                // }} 
+                                // />
+                                , __message
+                            )
+                        }} />
 
-                    ))
-                    : <div className="flex h-full w-full justify-center items-center min-h-[34rem] ">
-                        <div className="flex flex-col justify-center items-center gap-3">
-                            <Image src="/access_denied.svg" width={200} height={200} alt={""} />
-                            <h2 className=" capitalize font-extrabold text-white">permission denied</h2>
-                        </div>
-                    </div>
+                ))
                 }
             </div>
 

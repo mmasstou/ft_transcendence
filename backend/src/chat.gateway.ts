@@ -26,7 +26,6 @@ import {
 } from './rooms/types/upatecahnnel';
 import { AppService } from './app.service';
 import { JoinStatusEnum } from './rooms/types/room.joinStatus';
-import e from 'express';
 
 enum updatememberEnum {
   SETADMIN = 'SETADMIN',
@@ -86,7 +85,7 @@ export class ChatGateway implements OnGatewayConnection {
       console.log('Chat-> %s connected with socketId :', User.login, socket.id);
   }
 
-  @SubscribeMessage('updatemember')
+  @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_MEMBER_UPDATE}`)
   async updatemember(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -107,7 +106,10 @@ export class ChatGateway implements OnGatewayConnection {
           where: { id: data.member.id },
           data: { type: type },
         });
-        this.server.emit('updatememberResponseEvent', member);
+        this.server.emit(
+          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+          member,
+        );
       }
       // ban member :
       if (data.updateType === updatememberEnum.BANMEMBER) {
@@ -116,16 +118,40 @@ export class ChatGateway implements OnGatewayConnection {
           where: { id: data.member.id },
           data: { isban: __isBan },
         });
-        this.server.emit('updatememberResponseEvent', member);
+        // this.server.emit('updatememberResponseEvent', member);
+        this.server.emit(
+          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+          member,
+        );
       }
       // mute member :
       if (data.updateType === updatememberEnum.MUTEMEMBER) {
         const __isMute: boolean = __member.ismute === true ? false : true;
         const member = await this.prisma.members.update({
           where: { id: data.member.id },
-          data: { ismute: __isMute },
+          data: {
+            ismute: __isMute,
+            // mute_at: Date.now().toString(),
+          },
         });
-        this.server.emit('updatememberResponseEvent', member);
+        this.server.emit(
+          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+          member,
+        );
+        if (member.ismute) {
+          setTimeout(() => {
+            const member = (async () => {
+              return await this.prisma.members.update({
+                where: { id: data.member.id },
+                data: { ismute: false },
+              });
+            })();
+            this.server.emit(
+              `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+              member,
+            );
+          }, 10000);
+        }
       }
       // kick member :
       if (data.updateType === updatememberEnum.KIKMEMBER) {
@@ -138,7 +164,10 @@ export class ChatGateway implements OnGatewayConnection {
             where: { id: data.member.id },
           }),
         ]);
-        this.server.emit('updatememberResponseEvent', result);
+        this.server.emit(
+          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+          result,
+        );
       }
       // set owner :
       if (data.updateType === updatememberEnum.SETOWNER) {
@@ -148,7 +177,10 @@ export class ChatGateway implements OnGatewayConnection {
           where: { id: data.member.id },
           data: { type: type },
         });
-        this.server.emit('updatememberResponseEvent', member);
+        this.server.emit(
+          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+          member,
+        );
       }
       // create room :
     } catch (error) {
@@ -160,21 +192,22 @@ export class ChatGateway implements OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody()
     data: {
-      userId: string;
-      roomId: string;
+      userid: string;
+      roomid: string;
     },
   ) {
+    console.log('SOCKET_EVENT_JOIN_MEMBER:', data);
+
     const ResponseEventData: responseEvent = {
       status: responseEventStatusEnum.SUCCESS,
       message: responseEventMessageEnum.WELLCOME,
       data: null,
     };
     try {
-      const room = await this.roomservice.findOne({ id: data.roomId });
-
+      const room = await this.roomservice.findOne({ id: data.roomid });
       // check if member is already in room database :
       const existMember = await this.memberService.findOne({
-        userId: data.userId,
+        userId: data.userid,
         roomId: room.id,
       });
       if (existMember) {
@@ -197,10 +230,11 @@ export class ChatGateway implements OnGatewayConnection {
         });
         // add member to room :
         const roomJoined = await this.roomservice.joinToRoom(
-          data.userId,
+          data.userid,
           member.id,
           room.id,
         );
+        console.log('roomJoined :', roomJoined);
         ResponseEventData.status = responseEventStatusEnum.SUCCESS;
         ResponseEventData.message = responseEventMessageEnum.WELLCOMEBACK;
         ResponseEventData.data = roomJoined;
@@ -213,13 +247,13 @@ export class ChatGateway implements OnGatewayConnection {
       }
       // create member :
       const member = await this.memberService.create({
-        user: data.userId,
-        roomId: data.roomId,
+        user: data.userid,
+        roomId: data.roomid,
         type: UserType.USER,
       });
       // add member to room :
       const roomJoined = await this.roomservice.joinToRoom(
-        data.userId,
+        data.userid,
         member.id,
         room.id,
       );

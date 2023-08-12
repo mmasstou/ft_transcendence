@@ -21,7 +21,7 @@ export default function ChanneLsettingsChanneLsetOwner(
 
     }
 
-    socket?.on('updatememberResponseEvent', (data) => {
+    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
 
         setUpdate(true)
     })
