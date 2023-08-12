@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 const page = ({ params }: { params: { mode: string } }) => {
   const router = useRouter();
@@ -44,6 +45,10 @@ const page = ({ params }: { params: { mode: string } }) => {
                 axios.post('http://127.0.0.1:80/api/game/BotGame', body).then((res) => {
                   router.push(`/game/${params.mode}/robot`)
                 })
+                .catch((err) => {
+                  router.push('/game');
+                  toast.error(err.response.data.reason);
+                });
               }}>
                 Robot
               </button>
@@ -51,6 +56,11 @@ const page = ({ params }: { params: { mode: string } }) => {
                 axios.post('http://127.0.0.1:80/api/game/RandomGame', body).then((res) => {
                   router.push(`/game/${params.mode}/random`)
                 })
+                .catch((err) => {
+                  // console.log('CreateRandomTable-----------', err.response.data.reason);
+                  router.push('/game');
+                  toast.error(err.response.data.reason);
+                });
               }}>
                 Random
               </button>

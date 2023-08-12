@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from '@nestjs/jwt';
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { User } from '@prisma/client';
@@ -6,7 +6,7 @@ import { error } from 'console';
 import { Server, Socket } from "socket.io";
 import { UserService } from "src/users/user.service";
 import { v4 as uuidv4 } from 'uuid';
-import { Ball, Player, TableMap, UniqueSet, UserMap, random_obj } from '../../tools/class';
+import {TableMap, UniqueSet, UserMap, random_obj, TableObj } from '../../tools/class';
 import { GameService } from "./game.service";
 
 const UserMap: UserMap = new Map();    ////////// list of user connected to the game
@@ -14,20 +14,7 @@ const TableMap: TableMap = new Map();    ////////// list of table obj created
 const RandomListTime = new UniqueSet();    ////////// list of random time obj created
 const RandomListScore = new UniqueSet();    ////////// list of random score obj created
 var currents: NodeJS.Timeout;
-var table_obj = {
-    player1: new Player(),
-    player2: new Player(),
-    ball: new Ball(),
-    Status: false,
-    current: currents,
-    tableId: '',
-    GameMode: '',
-    GameType: '',
-    imageLoad: 0,
-    time: 0,
-    countdown: 45,
-    intervaldelay:30
-}
+var table_obj = new TableObj(currents);
 
 
 export let _User: User | null = null;
@@ -44,9 +31,6 @@ function check_col(table: any){
         var angle = ballPositionOnPaddle * maxAngle;
         table.ball.ball_speed.x = -Math.cos(angle);
         table.ball.ball_speed.y = Math.sin(angle);
-        table.ball.ball_speed.x += table.ball.ball_speed.x > 0 ? table.ball.ballIcrement : -table.ball.ballIcrement;
-        table.ball.ball_speed.y += table.ball.ball_speed.y > 0 ? table.ball.ballIcrement : -table.ball.ballIcrement;
-        // table.ball.ballIcrement += 0.1;
     }
     else if (table.ball.x <= 4.7 && table.ball.y > table.player2.position && table.ball.y < (table.player2.position + 16)) // colleg with player2
     {
@@ -57,11 +41,7 @@ function check_col(table: any){
         var angle = ballPositionOnPaddle * maxAngle;
         table.ball.ball_speed.x = Math.cos(angle);
         table.ball.ball_speed.y = Math.sin(angle);
-        table.ball.ball_speed.x += table.ball.ball_speed.x > 0 ? table.ball.ballIcrement : -table.ball.ballIcrement;
-        table.ball.ball_speed.y += table.ball.ball_speed.y > 0 ? table.ball.ballIcrement : -table.ball.ballIcrement;
-        // table.ball.ballIcrement += 0.05;
     }
-
 }
 
 function moveBall(server: Server, table: any){
@@ -87,16 +67,112 @@ function moveBall(server: Server, table: any){
       }
     }
 
+
+@WebSocketGateway({namespace: 'ball'})
+class BallGateway implements OnGatewayConnection {
+    constructor(private jwtService: JwtService,private readonly usersService: UserService) {}
+    @WebSocketServer()
+    server: Server;
+
+    async CreateFriendTable(data: any, id: any) {
+      if (UserMap.get(data.player1_Id) && UserMap.get(data.player1_Id).SocketId && UserMap.get(data.player1_Id).BallSocketId && UserMap.get(data.player2_Id) && UserMap.get(data.player2_Id).SocketId && UserMap.get(data.player2_Id).BallSocketId)
+      {
+        this.server.to(UserMap.get(data.player1_Id).BallSocketId).emit('joinRoomBall', id);
+        this.server.to(UserMap.get(data.player2_Id).BallSocketId).emit('joinRoomBall', id);
+      }
+    }
+
+    async CreateRandomTable(data: any, Tableobj: any) {
+      if (Tableobj.player1 && UserMap.get(Tableobj.player1.UserId) && UserMap.get(Tableobj.player1.UserId).SocketId && UserMap.get(Tableobj.player1.UserId).BallSocketId
+       && Tableobj.player2 && UserMap.get(Tableobj.player2.UserId) && UserMap.get(Tableobj.player2.UserId).SocketId && UserMap.get(Tableobj.player2.UserId).BallSocketId)
+      {
+        this.server.to(UserMap.get(Tableobj.player1.UserId).BallSocketId).emit('joinRoomBall', Tableobj.tableId);
+        this.server.to(UserMap.get(Tableobj.player2.UserId).BallSocketId).emit('joinRoomBall', Tableobj.tableId);
+      }
+    }
+
+    async CreateBotTable(data: any, id: any) {
+      if (UserMap.get(data.playerId) && UserMap.get(data.playerId).SocketId && UserMap.get(data.playerId).BallSocketId) {
+        this.server.to(UserMap.get(data.playerId).BallSocketId).emit('joinRoomBall', id);
+      }
+    }
+    async handleConnection(socket: Socket) {
+        const { token } = socket.handshake.auth; // Extract the token from the auth object
+        let payload: any = '';
+        try {
+          if (!token) {
+            throw new UnauthorizedException();
+          }
+          payload = await this.jwtService.verifyAsync(token, {
+            secret: process.env.JWT_SECRET,
+          });
+          const login: string = payload.login;
+          _User = await this.usersService.findOneLogin({ login });
+        } catch {
+          console.log('+> not valid token', error);
+        }
+        if (!_User)
+          return
+        console.log('+-> Client',_User.login , 'connected to Game');
+        if (!UserMap.has(_User.id))
+          UserMap.set(_User.id, {User: _User, BallSocketId: socket.id, Status: 'online'});
+        else
+          UserMap.get(_User.id).BallSocketId = socket.id;
+        if (socket.handshake.auth.tableId) {
+          socket.emit('joinRoomBall', socket.handshake.auth.tableId);
+        }
+    }
+
+    @SubscribeMessage('moveBall')
+    MoveBall(client: any, data: any) {
+      if (TableMap.get(data)) {
+        clearInterval(TableMap.get(data).current);
+        if (TableMap.get(data).Status) {
+          TableMap.get(data).current = setInterval(() => {
+            check_col(TableMap.get(data));
+            moveBall(this.server, TableMap.get(data));
+                if (TableMap.get(data).Status == false){
+                  clearInterval(TableMap.get(data).current);
+                }
+                // increment the ball speed buy changing the interval delay every 10 seconds
+                else if (TableMap.get(data).time % 1000 && TableMap.get(data).time != 0 && TableMap.get(data).intervaldelay > 14) {
+                  TableMap.get(data).intervaldelay -= 1;
+                  clearInterval(TableMap.get(data).current);
+                  this.server.to(data + 'ball').emit('timer', TableMap.get(data).time / 1000);
+                  this.MoveBall(client, data);
+                }
+                else if (TableMap.get(data).time % 1000 && TableMap.get(data).time != 0 && TableMap.get(data).intervaldelay == 14) {
+                  TableMap.get(data).intervaldelay += 1;
+                  this.server.to(data + 'ball').emit('timer', TableMap.get(data).time / 1000);
+                  clearInterval(TableMap.get(data).current);
+                  this.MoveBall(client, data);
+                }
+                TableMap.get(data).time += TableMap.get(data).intervaldelay;
+                this.server.to(data + 'ball').emit('setBall', TableMap.get(data).ball);
+            }, TableMap.get(data).intervaldelay);
+        }
+      }
+    }
+    @SubscribeMessage('joinToRoomBall')
+    JoinToRoomBall(client: any, data: any) {
+      client.join(data + 'ball');
+    }
+}
+
+
 @Injectable()
 @WebSocketGateway({namespace: 'game'})
 class MyGateway implements OnGatewayConnection {
-    constructor(private jwtService: JwtService,private readonly usersService: UserService, private GameService: GameService) {}
+    constructor(private jwtService: JwtService,
+      private readonly usersService: UserService,
+      private GameService: GameService,
+      private BallGateway: BallGateway) {}
     
     @WebSocketServer()
     server: Server;
-    
+
     async CreateFriendTable(data: any) {
-      return new Promise(async (resolve, reject) => {
+      // return new Promise(async (resolve, reject) => {
         if (!UserMap.has(data.player1_Id))
         {
             const _User = await this.usersService.findOne({ id: data.player1_Id });
@@ -106,8 +182,8 @@ class MyGateway implements OnGatewayConnection {
           const _User = await this.usersService.findOne({ id: data.player2_Id });
           _User && UserMap.set(_User.id, {User: _User, Status: 'online'});
         }
-        if ((UserMap.get(data.player1_Id) && UserMap.get(data.player1_Id).Status != 'online') || (UserMap.get(data.player2_Id) && UserMap.get(data.player2_Id).Status != 'online')) {
-          console.log('user is not online');
+        if ((UserMap.get(data.player1_Id) && UserMap.get(data.player1_Id).Status == 'InGame') || (UserMap.get(data.player2_Id) && UserMap.get(data.player2_Id).Status == 'InGame')) {
+          return new Error('User already in game');
         }
         else {
           table_obj.tableId = uuidv4();
@@ -133,162 +209,116 @@ class MyGateway implements OnGatewayConnection {
             this.server.to(UserMap.get(data.player1_Id).SocketId).emit('joinRoomGame', table_obj);
             this.server.to(UserMap.get(data.player2_Id).SocketId).emit('joinRoomGame', table_obj);
             TableMap.set(table_obj.tableId, table_obj);
-            resolve(table_obj.tableId);
-            table_obj = {
-              player1: new Player(),
-              player2: new Player(),
-              ball: new Ball(),
-              Status: false,
-              current: currents,
-              tableId: '',
-              GameMode: '',
-              GameType: '',
-              imageLoad: 0,
-              time: 0,
-              countdown: 45,
-              intervaldelay:30,
-            }
+            this.BallGateway.MoveBall(this.server, table_obj.tableId);
+            table_obj = new TableObj(currents);
           }
           else
             {
               setTimeout(() => {
-                this.CreateFriendTable(data).then(resolve).catch(reject);
+                this.CreateFriendTable(data);
             }, 1000);
             }
         }
-      });
+      // });
     }
     async CreateBotTable(data: any) {
-      return new Promise(async (resolve, reject) => {
+      if (!UserMap.has(data.playerId)) {
+        const _User = await this.usersService.findOne({ id: data.playerId });
+        _User && UserMap.set(_User.id, {User: _User, Status: 'online'});
+      }
+      if (UserMap.get(data.playerId).Status == 'InGame')
+        return new Error('User already in game');
+      else {
+        if (UserMap.get(data.playerId) && UserMap.get(data.playerId).SocketId && UserMap.get(data.playerId).BallSocketId) {
+          const user = await this.GameService.updateStatus({id:data.playerId, status:'InGame'});
+          UserMap.get(data.playerId).Status = 'InGame';
+          table_obj.tableId = uuidv4();
+          UserMap.get(data.playerId).TableId = table_obj.tableId;
+          table_obj.GameMode = data.mode;
+          table_obj.GameType = 'Bot';
+          table_obj.player1.setUserId(data.playerId);
+          table_obj.player2.setUserId('Bot');
+          table_obj.player1.GameSetting.setData(user.bg_color, user.ball_color, user.paddle_color, user.avatar);
+          table_obj.player2.GameSetting.setData(user.bg_color, user.ball_color, user.paddle_color, "/avatarBot.png");
+          this.server.to(UserMap.get(data.playerId).SocketId).emit('joinRoomGame', table_obj);
+          TableMap.set(table_obj.tableId, table_obj);
+          this.BallGateway.CreateBotTable(data, table_obj.tableId);
+          table_obj = new TableObj(currents);
+        return null;
+        }
+          else {
+          setTimeout(() => {
+            this.CreateBotTable(data)
+          }, 1000);
+        }
+      }
+    }
+
+
+    async CreateRandomTable(data: any) {
+      // return new Promise(async (resolve, reject) => {
         if (!UserMap.has(data.playerId)) {
           const _User = await this.usersService.findOne({ id: data.playerId });
           _User && UserMap.set(_User.id, {User: _User, Status: 'online'});
         }
-        if (UserMap.get(data.playerId).Status != 'online') {
-          console.log('user is not online ', UserMap.get(data.playerId).Status);
+        if (UserMap.get(data.playerId).Status == 'InGame') {
+          return new Error('User already in game');
         }
         else {
           if (UserMap.get(data.playerId) && UserMap.get(data.playerId).SocketId && UserMap.get(data.playerId).BallSocketId) {
             const user = await this.GameService.updateStatus({id:data.playerId, status:'InGame'});
             UserMap.get(data.playerId).Status = 'InGame';
-            table_obj.tableId = uuidv4();
-            UserMap.get(data.playerId).TableId = table_obj.tableId;
-            table_obj.GameMode = data.mode;
-            table_obj.GameType = 'Bot';
-            table_obj.player1.setUserId(data.playerId);
-            table_obj.player2.setUserId('Bot');
-            table_obj.player1.GameSetting.setData(user.bg_color, user.ball_color, user.paddle_color, user.avatar);
-            table_obj.player2.GameSetting.setData(user.bg_color, user.ball_color, user.paddle_color, "/avatarBot.png");
-            this.server.to(UserMap.get(data.playerId).SocketId).emit('joinRoomGame', table_obj);
-            TableMap.set(table_obj.tableId, table_obj);
-            resolve(table_obj.tableId);
-            table_obj = {
-              player1: new Player(),
-              player2: new Player(),
-              ball: new Ball(),
-              Status: false,
-              current: currents,
-              tableId: '',
-              GameMode: '',
-              GameType: '',
-              imageLoad: 0,
-              time: 0,
-              countdown: 45,
-              intervaldelay:30,
-          }
-          }
-           else {
+            let obj = new random_obj();
+            obj.player.setUserId(data.playerId);
+            obj.player.GameSetting.setData(user.bg_color, user.ball_color, user.paddle_color, user.avatar);
+              if (data.mode === 'time')
+                RandomListTime.add(obj);
+              else
+                RandomListScore.add(obj);
+              if (RandomListTime.length >= 2 || RandomListScore.length >= 2) {
+                table_obj.tableId = uuidv4();
+                if (RandomListTime.length >= 2) {
+                  table_obj.GameMode = 'time';
+                  table_obj.GameType = 'random';
+                  table_obj.player1 = RandomListTime.getfirst.player;
+                  table_obj.player2 = RandomListTime.getfirst.player;
+                  UserMap.get(table_obj.player1.UserId) && (UserMap.get(table_obj.player1.UserId).TableId = table_obj.tableId);
+                  UserMap.get(table_obj.player2.UserId) && (UserMap.get(table_obj.player2.UserId).TableId = table_obj.tableId);
+                  this.server.to(UserMap.get(table_obj.player1.UserId).SocketId).emit('joinRoomGame', table_obj);
+                  this.server.to(UserMap.get(table_obj.player2.UserId).SocketId).emit('joinRoomGame', table_obj);
+                  TableMap.set(table_obj.tableId, table_obj);
+                  this.BallGateway.CreateRandomTable(data, table_obj);
+                  table_obj = new TableObj(currents);
+                  return null;
+                }
+                else {
+                  table_obj.GameMode = 'score';
+                  table_obj.player1 = RandomListScore.getfirst.player;
+                  table_obj.player2 = RandomListScore.getfirst.player;
+                  UserMap.get(data.player1_Id) && (UserMap.get(data.player1_Id).TableId = table_obj.tableId);
+                  UserMap.get(data.player2_Id) && (UserMap.get(data.player2_Id).TableId = table_obj.tableId);
+                  this.server.to(UserMap.get(table_obj.player1.UserId).SocketId).emit('joinRoomGame', table_obj);
+                  this.server.to(UserMap.get(table_obj.player2.UserId).SocketId).emit('joinRoomGame', table_obj);
+                  TableMap.set(table_obj.tableId, table_obj);
+                  this.BallGateway.CreateRandomTable(data, table_obj.tableId);
+                  table_obj = new TableObj(currents);
+                }
+              }
+            return null;
+              }
+          else {
             setTimeout(() => {
-              this.CreateBotTable(data).then(resolve).catch(reject);
+              this.CreateRandomTable(data);
             }, 1000);
           }
         }
-      });
+      // });
     }
 
-    async CreateRandomTable(data: any) {
-      return new Promise(async (resolve, reject) => {
-        if (!UserMap.has(data.playerId)) {
-          const _User = await this.usersService.findOne({ id: data.playerId });
-          _User && UserMap.set(_User.id, {User: _User, Status: 'online'});
-        }
-        if (UserMap.get(data.playerId) && UserMap.get(data.playerId).SocketId && UserMap.get(data.playerId).BallSocketId) {
-          const user = await this.GameService.updateStatus({id:data.playerId, status:'InGame'});
-          let obj = new random_obj();
-          obj.player.setUserId(data.playerId);
-          obj.player.GameSetting.setData(user.bg_color, user.ball_color, user.paddle_color, user.avatar);
-            if (data.mode === 'time')
-              RandomListTime.add(obj);
-            else
-              RandomListScore.add(obj);
-            if (RandomListTime.length >= 2 || RandomListScore.length >= 2) {
-              table_obj.tableId = uuidv4();
-              if (RandomListTime.length >= 2) {
-                table_obj.GameMode = 'time';
-                table_obj.GameType = 'random';
-                table_obj.player1 = RandomListTime.getfirst.player;
-                table_obj.player2 = RandomListTime.getfirst.player;
-                UserMap.get(table_obj.player1.UserId) && (UserMap.get(table_obj.player1.UserId).TableId = table_obj.tableId);
-                UserMap.get(table_obj.player2.UserId) && (UserMap.get(table_obj.player2.UserId).TableId = table_obj.tableId);
-                this.server.to(UserMap.get(table_obj.player1.UserId).SocketId).emit('joinRoomGame', table_obj);
-                this.server.to(UserMap.get(table_obj.player2.UserId).SocketId).emit('joinRoomGame', table_obj);
-                TableMap.set(table_obj.tableId, table_obj);
-                // console.log("table created: ", TableMap);
-                resolve(table_obj);
-                table_obj = {
-                  player1: new Player(),
-                  player2: new Player(),
-                  ball: new Ball(),
-                  Status: false,
-                  current: currents,
-                  tableId: '',
-                  GameMode: '',
-                  GameType: '',
-                  imageLoad: 0,
-                  time: 0,
-                  countdown: 45,
-                  intervaldelay:30,
-                }
-              }
-              //UserId
-            else {
-              table_obj.GameMode = 'score';
-              table_obj.player1 = RandomListScore.getfirst.player;
-              table_obj.player2 = RandomListScore.getfirst.player;
-              UserMap.get(data.player1_Id) && (UserMap.get(data.player1_Id).TableId = table_obj.tableId);
-              UserMap.get(data.player2_Id) && (UserMap.get(data.player2_Id).TableId = table_obj.tableId);
-              this.server.to(UserMap.get(table_obj.player1.UserId).SocketId).emit('joinRoomGame', table_obj);
-              this.server.to(UserMap.get(table_obj.player2.UserId).SocketId).emit('joinRoomGame', table_obj);
-              TableMap.set(table_obj.tableId, table_obj);
-              resolve(table_obj);
-              table_obj = {
-                player1: new Player(),
-                player2: new Player(),
-                ball: new Ball(),
-                Status: false,
-                current: currents,
-                tableId: '',
-                GameMode: '',
-                GameType: '',
-                imageLoad: 0,
-                time: 0,
-                countdown: 45,
-                intervaldelay:30,
-              }
-            }
-          }
-            }
-        else {
-          setTimeout(() => {
-            this.CreateRandomTable(data).then(resolve).catch(reject);
-          }, 1000);
-        }
-      });
-    }
 
     async LeaveGame(data: any) {
       const table = TableMap.get(data.TableId);
-      if (table) {
+      if (table) { 
         await this.GameService.updateStatus({id:table.player1.UserId, status:'online'});
         if (table.player2.UserId !== 'Bot')
           await this.GameService.updateStatus({id:table.player2.UserId, status:'online'});
@@ -297,6 +327,7 @@ class MyGateway implements OnGatewayConnection {
         UserMap.get(data.UserId) && this.server.to(table.tableId).emit('leaveGame',UserMap.get(data.UserId).SocketId);
       }
     }
+
 
     async handleConnection(socket: Socket) {
       const { token } = socket.handshake.auth; // Extract the token from the auth object
@@ -315,7 +346,6 @@ class MyGateway implements OnGatewayConnection {
       }
       if (!_User)
         return
-      console.log('+-> Client',_User.login , 'connected ', _User.id);
       if (!UserMap.has(_User.id))
         UserMap.set(_User.id, {User: _User, SocketId: socket.id, Status: 'online'});
       else
@@ -354,11 +384,14 @@ class MyGateway implements OnGatewayConnection {
       else {
         console.log("the client id: ",UsId," logout from the game page");
         await this.GameService.updateStatus({id:UsId, status:'online'});
-        if (UserMap.get(UsId) && UserMap.get(UsId).TableId && TableMap.get(UserMap.get(UsId).TableId)) {
-          console.log("before deleting table")
+        if (UserMap.get(UsId)) {
           this.server.to(TableId).emit('leaveGame');
-          clearInterval(TableMap.get(UserMap.get(UsId).TableId).current);
-          TableMap.delete(UserMap.get(UsId).TableId);
+          if (UserMap.get(UsId).TableId && TableMap.get(UserMap.get(UsId).TableId)) {
+            clearInterval(TableMap.get(UserMap.get(UsId).TableId).current);
+            TableMap.delete(UserMap.get(UsId).TableId);
+          }
+          RandomListScore.deleteElement(UsId);
+          RandomListTime.deleteElement(UsId);
           UserMap.delete(UsId);
         }
       }
@@ -368,7 +401,6 @@ class MyGateway implements OnGatewayConnection {
       let type;
       if (UserMap.get(client.handshake.auth.UserId)) {
         const tableId = UserMap.get(client.handshake.auth.UserId).TableId;
-        // console.log("delete player", UserMap.get(client.handshake.auth.UserId) ," - ");
         if (TableMap.get(tableId) && TableMap.get(tableId).player1 && TableMap.get(tableId).player2) {
           const player1 = TableMap.get(tableId).player1;
           const player2 = TableMap.get(tableId).player2;
@@ -383,7 +415,6 @@ class MyGateway implements OnGatewayConnection {
           }
           if (UserMap.get(player2.UserId)) {
             UserMap.delete(player2.UserId);
-            // console.log("stocking the score in the database");
             await this.GameService.updateStatus({id:player2.UserId, status:'online'});
           }
         }
@@ -406,7 +437,6 @@ class MyGateway implements OnGatewayConnection {
     @SubscribeMessage('setStatus')  ///// done
     SetStatus(client:any, data: any) {
       if (TableMap.get(data.tableId) && TableMap.get(data.tableId).Status != data.status) {
-        console.log('setStatus', data);
         const table = TableMap.get(data.tableId);
         table && (table.Status = data.status);
         this.server.to(data.tableId).emit('setStatus', data.status);
@@ -421,96 +451,6 @@ class MyGateway implements OnGatewayConnection {
       winner = TableMap.get(data.tableId).player1.score == TableMap.get(data.tableId).player2.score ? 'no one' : winner;
       this.server.to(data.tableId).emit('GameOver', winner);
       }
-    }
-}
-@WebSocketGateway({namespace: 'ball'})
-class BallGateway implements OnGatewayConnection {
-    constructor(private jwtService: JwtService,private readonly usersService: UserService) {}
-    @WebSocketServer()
-    server: Server;
-
-    async CreateFriendTable(data: any, id: any) {
-      if (UserMap.get(data.player1_Id) && UserMap.get(data.player1_Id).SocketId && UserMap.get(data.player1_Id).BallSocketId && UserMap.get(data.player2_Id) && UserMap.get(data.player2_Id).SocketId && UserMap.get(data.player2_Id).BallSocketId)
-      {
-        this.server.to(UserMap.get(data.player1_Id).BallSocketId).emit('joinRoomBall', id);
-        this.server.to(UserMap.get(data.player2_Id).BallSocketId).emit('joinRoomBall', id);
-      }
-    }
-
-    async CreateRandomTable(data: any, Tableobj: any) {
-      if (UserMap.get(Tableobj.player1.UserId) && UserMap.get(Tableobj.player1.UserId).SocketId && UserMap.get(Tableobj.player1.UserId).BallSocketId
-       && UserMap.get(Tableobj.player2.UserId) && UserMap.get(Tableobj.player2.UserId).SocketId && UserMap.get(Tableobj.player2.UserId).BallSocketId)
-      {
-        this.server.to(UserMap.get(Tableobj.player1.UserId).BallSocketId).emit('joinRoomBall', Tableobj.tableId);
-        this.server.to(UserMap.get(Tableobj.player2.UserId).BallSocketId).emit('joinRoomBall', Tableobj.tableId);
-      }
-    }
-
-    async CreateBotTable(data: any, id: any) {
-      if (UserMap.get(data.playerId) && UserMap.get(data.playerId).SocketId && UserMap.get(data.playerId).BallSocketId) {
-        this.server.to(UserMap.get(data.playerId).BallSocketId).emit('joinRoomBall', id);
-      }
-    }
-    async handleConnection(socket: Socket) {
-        const { token } = socket.handshake.auth; // Extract the token from the auth object
-        let payload: any = '';
-        try {
-          if (!token) {
-            throw new UnauthorizedException();
-          }
-          payload = await this.jwtService.verifyAsync(token, {
-            secret: process.env.JWT_SECRET,
-          });
-          const login: string = payload.login;
-          _User = await this.usersService.findOneLogin({ login });
-        } catch {
-          console.log('+> not valid token', error);
-        }
-        if (!_User)
-          return
-        console.log('+-> Client',_User.login , 'connected to ball ', _User.id);
-        if (!UserMap.has(_User.id))
-          UserMap.set(_User.id, {User: _User, BallSocketId: socket.id, Status: 'online'});
-        else
-          UserMap.get(_User.id).BallSocketId = socket.id;
-        if (socket.handshake.auth.tableId) {
-          socket.emit('joinRoomBall', socket.handshake.auth.tableId);
-        }
-    }
-
-    @SubscribeMessage('moveBall')
-    MoveBall(client: any, data: any) {
-      if (TableMap.get(data)) {
-        clearInterval(TableMap.get(data).current);
-        if (TableMap.get(data).Status) {
-          TableMap.get(data).current = setInterval(() => {
-            check_col(TableMap.get(data));
-            moveBall(this.server, TableMap.get(data));
-                if (TableMap.get(data).Status == false){
-                  clearInterval(TableMap.get(data).current);
-                }
-                // increment the ball speed buy changing the interval delay every 10 seconds
-                else if (TableMap.get(data).GameMode == "time" && TableMap.get(data).time % 1000 && TableMap.get(data).time != 0 && TableMap.get(data).intervaldelay > 16) {
-                  TableMap.get(data).intervaldelay -= 1;
-                  clearInterval(TableMap.get(data).current);
-                  this.server.to(data + 'ball').emit('timer', TableMap.get(data).time / 1000);
-                  this.MoveBall(client, data);
-                }
-                else if (TableMap.get(data).GameMode == "time" && TableMap.get(data).time % 1000 && TableMap.get(data).time != 0 && TableMap.get(data).intervaldelay == 16) {
-                  TableMap.get(data).intervaldelay += 1;
-                  this.server.to(data + 'ball').emit('timer', TableMap.get(data).time / 1000);
-                  clearInterval(TableMap.get(data).current);
-                  this.MoveBall(client, data);
-                }
-                TableMap.get(data).time += TableMap.get(data).intervaldelay;
-                this.server.to(data + 'ball').emit('setBall', TableMap.get(data).ball);
-            }, TableMap.get(data).intervaldelay);
-        }
-      }
-    }
-    @SubscribeMessage('joinToRoomBall')
-    JoinToRoomBall(client: any, data: any) {
-      client.join(data + 'ball');
     }
 }
 

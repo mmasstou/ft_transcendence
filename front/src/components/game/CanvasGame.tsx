@@ -1,18 +1,16 @@
 "use client"
 import {RefObject, useEffect, useRef, useState } from "react";
 import {Socket, io} from 'socket.io-client';
-import {Player, Ball, ballSpeed, TableMap} from '../../../tools/class';
+import {TableMap} from '../../../tools/class';
 import Cookies from "js-cookie";
-import LoginHook from '@/hooks/auth/login';
 import {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall} from './gameFunc';
 import LeaveButton from '@/components/game/LeaveButton';
-import { cookies } from "next/dist/client/components/headers";
 
 const TableMap: TableMap = new Map();
 const url = process.env.NEXT_PUBLIC_GAMESOCKET_URL_WS;
 const IPmachine = url + '/game';
 const IPmachineBall = url + '/ball';
-const AllTime = 5;
+const AllTime = 75;
 const targetScore = 5;
 
 /// game settings /// on % of the canvas
@@ -273,9 +271,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
 
       if (isReady) {
         const obj = drawScore(canvas, images, Table_obj, Status, isMobile, timer, targetScore, socket);
-        console.log("Score useEffect: ", timer);
-        if (Score.first == targetScore || Score.second == targetScore) {
-          // console.log("Game Over emiting 000000");
+        if (Table_obj.GameMode == 'score' && (Score.first == targetScore || Score.second == targetScore)) {
           socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
           socket.emit('GameOver', {tableId: Table_obj.tableId});
         }
@@ -346,29 +342,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         socket.on('setPlayer2', (player: number) => {
             setPlayer2(player);
         })
-
-        // ballSocket.on('timer', (time: number) => {
-        //   if (Status) {
-        //     if (!Math.floor(AllTime - time) && Status) {
-        //       // console.log('game over');
-        //       socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
-        //       socket.emit('GameOver', {tableId: Table_obj.tableId});
-        //     }
-        //     else
-        //       setTimer(Math.floor(AllTime - time));
-        //   }
-        // })
-
-        // socket.on('GameOver', (Winner: any) => {
-        //   setLeaveGame(true);
-        //   if (socket.auth.UserId == Winner)
-        //     setYouWin(true);
-        //   else if (Winner == 'no one')
-        //     setYouDraw(true);
-        //   else
-        //     setYouLose(true);
-        //   socket.emit('deletePlayer');
-        // })
   
         socket.on('setStatus', (status: boolean) => {
           setStatus(status);
@@ -385,14 +358,14 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         })
 
         isMounted && socket.on('leaveGame', (id: string) => {
-            if (socket.id != id)
+            if (socket.id != id) {
               setLeaveGame(true);
+            }
         })
         //ballObj: any, socket: Socket, Table_obj: any, canvasSize: any, setPlayer2: any, isReady: any, canvas: any
         ballSocket.on('setBall', (ball: any) => {
           if (!Status && isReady)
           setBallObj(ball);
-          // handleBall(ball, socket, Table_obj, canvasSize, setPlayer2, isReady, canvas);
         })
       }
     }, [isMounted, isReady, Status, Table_obj])
@@ -401,7 +374,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       if (isReady) {
         ballSocket.on('timer', (time: number) => {
           if (Status) {
-            if (!Math.floor(AllTime - time) && Status) {
+            if (Table_obj.GameMode == 'time' && !Math.floor(AllTime - time) && Status) {
               socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
               socket.emit('GameOver', {tableId: Table_obj.tableId});
             }
@@ -433,6 +406,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     else
         var isvertical = false;
     return (
+      !isReady ? <h1 className=" font-bold text-white">Loading...</h1> :
       LeaveGame && (YouWin || (!YouWin && !YouLose && !YouDraw))  ? <h1 className=" font-bold text-white">WIN</h1> :
       LeaveGame && YouLose ? <h1 className=" font-bold text-white">LOSE</h1> :
       LeaveGame && YouDraw ? <h1 className=" font-bold text-white">DRAW</h1> :
