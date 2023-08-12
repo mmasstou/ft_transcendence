@@ -13,9 +13,6 @@ export default function ChanneLSettingsBody(
     { children, title, OnBack, footer, HasPermission }: channeLSettingsBodyProps
 ) {
     return <div className="flex flex-col justify-start">
-        <div>
-            error message
-        </div>
         <div className=" flex flex-row items-center justify-start gap-3">
             {OnBack && <Button
                 icon={IoChevronBackOutline}

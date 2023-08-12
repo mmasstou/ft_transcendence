@@ -143,6 +143,14 @@ export default function ChannelSettingsUserMemberItem(
                             OnClick({ member })
                         }}
                     />}
+                    {UserOwne && <ChannelSettingsUserMemberItemOption
+                        icon={FaChessQueen}
+                        size={24}
+                        background
+                        Onclick={() => {
+                            OnClick({ updateType: updatememberEnum.SETOWNER, member: member })
+                        }}
+                    />}
 
                 </div>
             </div>
