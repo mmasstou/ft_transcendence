@@ -51,8 +51,6 @@ const ChanneLCreateModaL = () => {
       //     setfriends(_list)
       // })
       const resp = await getUsers(token);
-
-      console.log('+++++++++++++++++++++await getUsers(token) :', resp);
       const _list = resp && resp.filter((user: any) => user.id !== User_ID);
       setfriends(_list);
     })();

@@ -73,25 +73,6 @@ const Otp: React.FC<Props> = () => {
       });
   };
 
-  const handleQrCode = () => {
-    axios
-      .get('http://localhost:80/api/2fa/generate', {
-        responseType: 'blob',
-        headers: {
-          Authorization: `Bearer ${yourJwtToken}`,
-        },
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          const srcImg = URL.createObjectURL(response.data);
-          setQrCode(srcImg);
-        }
-      })
-      .catch((err) => {
-        toast.error(err.response.data.message);
-      });
-  };
-
   return (
     <>
       <h1 className="text-white font-bold">Hi, Aouhadou</h1>
@@ -120,24 +101,9 @@ const Otp: React.FC<Props> = () => {
         })}
       </div>
       <p className="text-[#cccccc] text-center font-medium">
-        Please enter your passcode.
+        Please enter your OtpCod.
       </p>
-      {qrCode ? (
-        <div className="">
-          <img src={qrCode} alt="" />
-        </div>
-      ) : (
-        <p className="text-[#cccccc] text-center font-medium">
-          generate{' '}
-          <span
-            onClick={handleQrCode}
-            className="text-white cursor-pointer border-b font-semibold"
-          >
-            QR code
-          </span>{' '}
-          🕵️.
-        </p>
-      )}
+
       <button
         onClick={handlSave}
         className="border-2 border-secondary rounded-md w-1/2 p-2 text-secondary font-semibold hover:bg-secondary hover:text-white transition"

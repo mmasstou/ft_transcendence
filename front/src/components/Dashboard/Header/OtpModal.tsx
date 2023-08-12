@@ -1,19 +1,18 @@
 'use client';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface Props {
-  setOtpValue: (otpValue: string) => void;
   setOpenModal: (openModal: boolean) => void;
 }
 
+export const otpContext = React.createContext<Props | null>(null);
+
 let currentOtpIndex: number = 0;
-const Otp: React.FC<Props> = ({ setOtpValue, setOpenModal }) => {
+const Otp: React.FC<Props> = ({ setOpenModal }) => {
   const [qrCode, setQrCode] = useState<string | null>(null);
-  const router = useRouter();
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(''));
   const [activeOtp, setActiveOtp] = useState<number>(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -48,7 +47,6 @@ const Otp: React.FC<Props> = ({ setOtpValue, setOpenModal }) => {
 
   const handlSave = () => {
     const otpSend = otp.toString().replace(/,/g, '');
-    setOtpValue(otpSend);
     const userData = {
       twoFactorAuthenticationCode: otpSend,
     };
@@ -61,21 +59,40 @@ const Otp: React.FC<Props> = ({ setOtpValue, setOpenModal }) => {
       })
       .then((response) => {
         if (response.status === 200) {
-          setOpenModal(false);
-          toast.success('Two factor authentication enabled');
+          axios
+            .post('http://localhost:80/api/2fa/turn-on', userData, {
+              headers: {
+                Authorization: `Bearer ${yourJwtToken}`,
+                'Content-Type': 'application/json',
+              },
+            })
+            .then((response) => {
+              if (response.status === 200) {
+                toast.success('Two factor authentication enabled');
+              }
+            })
+            .catch((err) => {
+              if (err.response && err.response.status === 401) {
+                toast.error(`${err.response.data.message}`);
+                return;
+              }
+              return;
+            })
+            .finally(() => {
+              setOtp(new Array(6).fill(''));
+              setOpenModal(false);
+            });
         }
       })
       .catch((err) => {
         if (err.response && err.response.status === 401) {
+          setOtp(new Array(6).fill(''));
           toast.error(
-            `${err.response.data.message} 🤔 Please try again and don't forgor to scan Qr code first`
+            `${err.response.data.message} 🤔 Please try again and don't forget to scan Qr code first`
           );
           return;
         }
         return;
-      })
-      .finally(() => {
-        setOtp(new Array(6).fill(''));
       });
   };
 
@@ -104,14 +121,14 @@ const Otp: React.FC<Props> = ({ setOtpValue, setOpenModal }) => {
       <p className="text-[#cccccc] w-2/5 text-center font-medium">
         Authorization is required to access your profile.🔒
       </p>
-      <div className="flex justify-center items-center space-x-1">
+      <div className="flex justify-center items-center space-x-1 overflow-x-hidden">
         {otp.map((_, index) => {
           return (
             <React.Fragment key={index}>
               <input
                 ref={index === activeOtp ? inputRef : null}
                 type="number"
-                className={`w-12 h-12 border-2 rounded bg-transparent outline-none text-center font-semibold 
+                className={`w-8 h-8 md:w-12 md:h-12 border-2 rounded bg-transparent outline-none text-center font-semibold 
                         text-xl spin-button-none border-[#cccccc] focus:border-white 
                         focus:text-white text-[#cccccc] transition`}
                 onChange={handleOnCnage}
@@ -159,14 +176,13 @@ interface OtpModalProps {
 }
 
 const OtpModal: React.FC<OtpModalProps> = ({ setOpenModal }) => {
-  const [otpValue, setOtpValue] = useState<string>('');
   return (
     <>
       <div
-        className="bg-[#3E867C] w-[40vw] min-h-[35vh] flex flex-col justify-center items-center
+        className="bg-[#3E867C] w-full min-h-full flex flex-col justify-center items-center
         gap-4 py-4 z-[999] rounded-lg twoFactor"
       >
-        <Otp setOtpValue={setOtpValue} setOpenModal={setOpenModal} />
+        <Otp setOpenModal={setOpenModal} />
       </div>
     </>
   );

@@ -18,7 +18,6 @@ const UserInput = ({ oldName, getUserInfo }: userInfo): JSX.Element => {
   const [userFocus, setUserFocus] = useState<boolean>(false);
 
   const [errMsg, setErrMsg] = useState<string>('');
-  // const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     if (userRef.current != null) {
@@ -29,13 +28,16 @@ const UserInput = ({ oldName, getUserInfo }: userInfo): JSX.Element => {
   useEffect(() => {
     const result = USER_REGEX.test(user);
     setValidName(result);
+    if (result) {
+      getUserInfo(user, result);
+    }
   }, [user]);
 
   useEffect(() => {
     setErrMsg('');
   }, [user]);
 
-  getUserInfo(user, validName);
+  // getUserInfo(user, validName);
 
   return (
     <div className="text-white md:w-1/2">
