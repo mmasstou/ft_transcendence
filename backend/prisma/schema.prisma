@@ -45,6 +45,7 @@ model User {
   paddle_color                  String?                @default("#E0E0E0")
   ball_color                    String?                @default("#E0E0E0")
   location                      String?
+  status                        String?
   cursus_users                  Cursus?                @relation(fields: [cursusId], references: [id])
   intraId                       Int?
   banner                        String?
