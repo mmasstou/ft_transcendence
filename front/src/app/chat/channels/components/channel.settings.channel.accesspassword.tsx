@@ -52,7 +52,7 @@ export default function ChanneLSettingsChanneLAccessPassword(
         data.password = ''
         data.confirmpassword = ''
         // send data to server
-        socket?.emit('updateChanneL', data)
+        socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
         //   reset data for password
         reset()
     }

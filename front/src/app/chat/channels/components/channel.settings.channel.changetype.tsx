@@ -72,7 +72,7 @@ export default function ChanneLSettingsChanneLChangeType(
             return
         }
         // send data to server
-        socket?.emit('updateChanneL', data)
+        socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
         //   reset data for password
         reset()
         if (data.roomtype === RoomTypeEnum.PROTECTED) {
@@ -80,7 +80,7 @@ export default function ChanneLSettingsChanneLChangeType(
         }
     }
 
-    socket?.on('updateChanneLResponseEvent', (data) => {
+    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
         const token: any = Cookies.get('token');
         if (!channeLLid) return;
         if (!token) return;

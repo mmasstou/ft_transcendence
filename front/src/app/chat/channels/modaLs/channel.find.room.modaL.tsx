@@ -53,7 +53,7 @@ export default function ChanneLFindRoommodaL() {
         // channel is public
         socket?.emit(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
-            { userId: UserId, roomId: room.id })
+            { userid: UserId, roomid: room.id })
     }
 
     // listen to socket event :
@@ -67,7 +67,7 @@ export default function ChanneLFindRoommodaL() {
             }) => {
                 console.log("RESPONSE_CHAT_MEMBER_UPDATE :", data)
                 if (!data.data) {
-                    toast.error('error')
+                    toast.error(data.message)
                 }
                 if (data.data) {
                     toast.success(data.message)

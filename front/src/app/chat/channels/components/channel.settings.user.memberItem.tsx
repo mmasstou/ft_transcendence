@@ -29,9 +29,10 @@ interface IChannelSettingsUserMemberItemProps {
     OnClick: (data: any) => void;
     UserJoin?: boolean
     UserOwne?: boolean
+    UserBan?: boolean
 }
 export default function ChannelSettingsUserMemberItem(
-    { member, socket, UserJoin, OnClick, UserOwne }: IChannelSettingsUserMemberItemProps) {
+    { member, socket, UserJoin, OnClick, UserOwne, UserBan }: IChannelSettingsUserMemberItemProps) {
     const [IsMounted, setIsMounted] = React.useState(false)
     const [UserInfo, setUserInfo] = React.useState<userType | null>(null)
     const router = useRouter()
@@ -114,7 +115,7 @@ export default function ChannelSettingsUserMemberItem(
                     </>}
                 </div>
                 <div className="flex flex-row gap-3 justify-center items-center">
-                    {!UserJoin && !UserOwne && <>
+                    {!UserJoin && !UserOwne && !UserBan && <>
 
                         <ChanneLSettingsUserMemberItemActions
                             hasPermissions={LogedMember?.type !== UserTypeEnum.USER}
@@ -133,14 +134,17 @@ export default function ChannelSettingsUserMemberItem(
                         icon={VscPersonAdd}
                         size={24}
                         background
+                        Onclick={() => { OnClick({ member }) }}
+                    />}
+                    {UserBan && <ChannelSettingsUserMemberItemOption
+                        icon={SlBan}
+                        size={24}
+                        disabled={member.type === UserTypeEnum.OWNER}
+                        IsActivate={member.isban}
+                        background
                         Onclick={() => {
-                            const channeLLid = params.get('r')
-                            if (!channeLLid)
-                                return;
-                            console.log("updatememberEnum.ADDMEMBER member:", member)
-                            console.log("updatememberEnum.ADDMEMBER socket:", socket?.id)
-                            socket?.emit('JoinRoom', { userId: member.userId, roomId: channeLLid })
-                            OnClick({ member })
+
+                            OnClick({ updateType: updatememberEnum.BANMEMBER, member: member })
                         }}
                     />}
                     {UserOwne && <ChannelSettingsUserMemberItemOption

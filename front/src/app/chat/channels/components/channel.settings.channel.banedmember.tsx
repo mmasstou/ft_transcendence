@@ -5,9 +5,10 @@ import { UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/t
 import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import Image from "next/image";
 import ChanneLSettingsBody from "./channel.settings.body";
-import React from "react";
+import React, { useEffect } from "react";
 import getUserWithId from "../actions/getUserWithId";
 import Cookies from "js-cookie";
+import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -19,10 +20,29 @@ interface ChanneLUserSettingsProps {
 
 export default function ChanneLSettingsChanneLBanedMember(
     { socket, OnBack, LogedMember, members, setUpdate }: ChanneLUserSettingsProps) {
+    const channeLConfirmActionHook = ChanneLConfirmActionHook()
     const handlOnclick = (data: any) => {
+        const __message = 'are you sure you won to unban this member';
+        __message && channeLConfirmActionHook.onOpen(
+            <button
+                onClick={() => {
+                    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_UPDATE}`, data)
+                }}
+                className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
+                UnBan
+            </button>
+            , __message
+        )
         socket?.emit('updatemember', data)
 
     }
+    useEffect(() => {
+
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+            if (!data) return
+            channeLConfirmActionHook.onClose()
+        })
+    }, [socket])
 
     const [User, setUser] = React.useState<userType | null>(null)
 
@@ -44,7 +64,7 @@ export default function ChanneLSettingsChanneLBanedMember(
         <ChanneLSettingsBody
             title={`Baned Members Memeber :${User?.login}`}
             OnBack={OnBack}
-            HasPermission={LogedMember?.type === UserTypeEnum.OWNER || LogedMember?.type === UserTypeEnum.ADMIN}>
+            HasPermission={LogedMember?.type !== UserTypeEnum.OWNER && LogedMember?.type !== UserTypeEnum.ADMIN}>
             <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
                 {members && members.map((member, index) => (
                     <ChannelSettingsUserMemberItem
@@ -53,7 +73,9 @@ export default function ChanneLSettingsChanneLBanedMember(
                         socket={socket}
                         UserJoin={false}
                         UserOwne={false}
+                        UserBan
                         OnClick={(data) => {
+                            console.log("ChanneLSettingsChanneLBanedMember :", data)
                             handlOnclick({ updateType: updatememberEnum.BANMEMBER, member: member })
                         }} />
                 ))

@@ -32,6 +32,7 @@ import ChanneLSettingsOptionItem from './channel.settings.optionItem';
 import { AiOutlineDelete } from 'react-icons/ai';
 import ChanneLSettingsChanneLDeleteChannel from './channel.settings.channel.deletechannel';
 import PermissionDenied from './channel.settings.permissiondenied';
+import ChanneLSettingsChanneLChangePassword from './channel.settings.channel.changepassword';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
@@ -157,7 +158,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
 
 
     let _body = (
-        <div className="flex flex-col justify-between items-start min-h-[34rem] ">
+        <div className="flex h-full flex-col justify-between items-start min-h-[34rem] ">
             <div className="flex flex-col gap-2 w-full">
                 {ChanneLinfo && ChanneLinfo.type == RoomTypeEnum.PROTECTED &&
                     <ChanneLSettingsOptionItem
@@ -247,47 +248,13 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                         <BsArrowRightShort size={24} />
                     </div>
                 </button>
-
-                <button
-                    onClick={() => {
-
-                        OnBack()
-                    }}
-                    className="flex flex-row justify-between items-center shadow p-2 rounded">
-                    <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                        <IoLogOut size={32} />
-                    </div>
-                    <div>
-                        <h2 className='text-white font-semibold capitalize'>leave Channel</h2>
-                    </div>
-                    <div className='text-white'>
-                        <BsArrowRightShort size={24} />
-                    </div>
-                </button>
-                {/* delete channel */}
-                {
-                    LogedMember && LogedMember.type === UserTypeEnum.OWNER &&
-                    <button
-                        onClick={() => { setStep(SETTINGSTEPS.DELETECHANNEL) }}
-                        className="flex flex-row justify-between items-center shadow p-2 rounded">
-                        <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                            <AiOutlineDelete size={32} />
-                        </div>
-                        <div>
-                            <h2 className='text-white font-semibold capitalize'>Delete Channel</h2>
-                        </div>
-                        <div className='text-white'>
-                            <BsArrowRightShort size={24} />
-                        </div>
-                    </button>
-                }
             </div>
         </div>
     )
-    
+
     if (LogedMember?.type !== UserTypeEnum.OWNER && LogedMember?.type !== UserTypeEnum.ADMIN) {
         _body = (<PermissionDenied />)
-     }
+    }
 
     if (step === SETTINGSTEPS.BANEDMEMBERS) {
         _body = members ? <ChanneLSettingsChanneLBanedMember
@@ -312,39 +279,49 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         />
     }
     if (step === SETTINGSTEPS.CHANGECHANNEL) {
-        _body = <ChanneLSettingsChanneLChangeType setUpdate={setUpdate}
+        _body = <ChanneLSettingsChanneLChangeType
+            setUpdate={setUpdate}
             socket={socket}
-            OnBack={OnBack} LogedMember={LogedMember} members={members}
+            OnBack={OnBack}
+            LogedMember={LogedMember}
+            members={members}
         />
     }
     if (step === SETTINGSTEPS.EDITPASSWORD) {
-        _body = (
-            <div className="flex flex-col justify-between min-h-[34rem]">
-                <div>
-                    <Button
-                        icon={IoChevronBackOutline}
-                        label={"Back"}
-                        outline
-                        onClick={OnBack}
-                    />
+        _body = <ChanneLSettingsChanneLChangePassword
+            setUpdate={setUpdate}
+            socket={socket}
+            OnBack={OnBack}
+            LogedMember={LogedMember}
+            members={members}
+        />
+        // (
+        //     <div className="flex flex-col justify-between min-h-[34rem]">
+        //         <div>
+        //             <Button
+        //                 icon={IoChevronBackOutline}
+        //                 label={"Back"}
+        //                 outline
+        //                 onClick={OnBack}
+        //             />
 
-                    <div className='flex flex-col gap-5 p-4'>
-                        <Input id="ChanneLpassword" lable="password" type="password" register={register} errors={errors} onChange={() => { }} />
-                        <Input id="newChanneLpassword" lable="new password" type="password" register={register} errors={errors} onChange={() => { }} />
-                        <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={() => { }} />
-                    </div>
-                </div>
-                <div className='flex flex-row justify-between items-center
-               '>
+        //             <div className='flex flex-col gap-5 p-4'>
+        //                 <Input id="ChanneLpassword" lable="password" type="password" register={register} errors={errors} onChange={() => { }} />
+        //                 <Input id="newChanneLpassword" lable="new password" type="password" register={register} errors={errors} onChange={() => { }} />
+        //                 <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={() => { }} />
+        //             </div>
+        //         </div>
+        //         <div className='flex flex-row justify-between items-center
+        //        '>
 
-                    <Button
-                        label={"Save Changes"}
-                        outline
-                        onClick={() => { () => { } }}
-                    />
-                </div>
-            </div>
-        )
+        //             <Button
+        //                 label={"Save Changes"}
+        //                 outline
+        //                 onClick={() => { () => { } }}
+        //             />
+        //         </div>
+        //     </div>
+        // )
     }
     if (step === SETTINGSTEPS.DELETECHANNEL) {
         _body = <ChanneLSettingsChanneLDeleteChannel room={ChanneLinfo} OnBack={OnBack} socket={socket} />

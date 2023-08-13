@@ -14,7 +14,8 @@ interface ButtonProps {
     size?: number;
     IsBan?: boolean;
     labelsize?: number;
-    responsive ?: boolean;
+    responsive?: boolean;
+    type?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -27,13 +28,15 @@ const Button: React.FC<ButtonProps> = ({
     icon: Icon,
     border,
     IsActive,
+    type,
     size,
     IsBan,
     responsive
 }) => {
-    const _labelsise  :string | undefined = labelsize ? 'text-' + labelsize.toString() : undefined
+    const _labelsise: string | undefined = labelsize ? 'text-' + labelsize.toString() : undefined
     return (
         <button
+            type={type ? 'submit' : 'button'}
             disabled={disabled}
             onClick={onClick}
             className={`

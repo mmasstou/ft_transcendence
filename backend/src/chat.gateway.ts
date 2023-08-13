@@ -187,6 +187,7 @@ export class ChatGateway implements OnGatewayConnection {
       console.log('Chat-updatemember> error- +>', error);
     }
   }
+
   @SubscribeMessage(`${process.env.SOCKET_EVENT_JOIN_MEMBER}`)
   async joinmember(
     @ConnectedSocket() client: Socket,
@@ -550,7 +551,7 @@ export class ChatGateway implements OnGatewayConnection {
     }
   }
 
-  @SubscribeMessage('updateChanneL')
+  @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_UPDATE}`)
   async updateChanneL(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: UpdateChanneLSendData,
@@ -567,6 +568,27 @@ export class ChatGateway implements OnGatewayConnection {
       if (responseMemberData.type === UserType.OWNER) {
         // console.log('Chat-> responseMemberData- +>', responseMemberData);
         // check type of update :
+        // change protacted password :
+        if (data.Updatetype === UpdateChanneLSendEnum.CHANGEPROTACTEDPASSWORD) {
+          console.log('Update protacted password');
+          const dataRoom = {
+            name: room.name,
+            type: room.type,
+            accesspassword: room.accesspassword,
+            password: data.password,
+          };
+          const updateRoom = await this.prisma.rooms.update({
+            where: { id: room.id },
+            data: {
+              ...dataRoom,
+            },
+          });
+          console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
+          client.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            updateRoom,
+          );
+        }
         // change type of room :
         if (data.Updatetype === UpdateChanneLSendEnum.CHANGETYPE) {
           const dataRoom = {
@@ -582,7 +604,10 @@ export class ChatGateway implements OnGatewayConnection {
             },
           });
           console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
-          client.emit('updateChanneLResponseEvent', updateRoom);
+          client.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            updateRoom,
+          );
           this.server.emit('ChatUpdate', updateRoom);
         }
         // set access password :
@@ -598,7 +623,10 @@ export class ChatGateway implements OnGatewayConnection {
             },
           });
           console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
-          client.emit('updateChanneLResponseEvent', updateRoom);
+          client.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            updateRoom,
+          );
           this.server.emit('ChatUpdate', updateRoom);
         }
       }

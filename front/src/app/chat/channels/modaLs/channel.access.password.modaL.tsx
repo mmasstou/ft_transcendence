@@ -59,7 +59,7 @@ const ChanneLPasswordAccessModaL = () => {
         console.log("the password is match you can acces now!")
         socket?.emit(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
-            { userId: UserId, roomId: room.id });
+            { userid: UserId, roomid: room.id });
         onClose()
     }
 

@@ -113,11 +113,11 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             setreload(reload ? false : true)
         })
     }, [socket, channeLsettingsHook])
-    
 
- 
+
+
     const content = (
-        <div  className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
 
             {/* <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} /> */}
             {
@@ -165,29 +165,35 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     border-orange-300
     sm:flex`}>
             <ConversationsTitlebar LogedMember={LogedMember} socket={socket} channeLId={room} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
-            <ConversationsMessages socket={socket} Content={content} />
-            <div className="w-full absolute bottom-4 left-0">
-                <input
-                    className="ConversationsInput w-full h-[54px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
-                    onSubmit={(event: any) => {
-                        setMessage(event.target.value);
-                        OnSubmit(event)
-                        // onClickHandler(event)
-                    }
-                    }
-                    onKeyDown={(event) =>
-                        event.key === "Enter" ? OnSubmit(event) : null
-                    }
-                    onChange={(event) => {
-                        setInputValue(event.target.value);
-                        setMessage(event.target.value);
-                    }}
-                    value={InputValue}
-                    placeholder={`Message to @'${channeLinfo.name}'`}
-                    type="search"
-                    name=""
-                    id="" />
-            </div>
+            {!LogedMember?.isban ?
+                <>
+                    <ConversationsMessages socket={socket} Content={content} />
+                    <div className="w-full absolute bottom-4 left-0">
+                        <input
+                            className="ConversationsInput w-full h-[54px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
+                            onSubmit={(event: any) => {
+                                setMessage(event.target.value);
+                                OnSubmit(event)
+                                // onClickHandler(event)
+                            }
+                            }
+                            onKeyDown={(event) =>
+                                event.key === "Enter" ? OnSubmit(event) : null
+                            }
+                            onChange={(event) => {
+                                setInputValue(event.target.value);
+                                setMessage(event.target.value);
+                            }}
+                            value={InputValue}
+                            placeholder={`Message to @'${channeLinfo.name}'`}
+                            type="search"
+                            name=""
+                            id="" />
+                    </div></>
+                : <div>
+                    you are baned from this channel {LogedMember?.userId} -  {__userId}
+                </div>
+            }
         </div>
             : <div className="flex flex-col justify-center items-center h-full w-full">
                 <Image src="/no_conversations.svg" width={600} height={600} alt={""} />

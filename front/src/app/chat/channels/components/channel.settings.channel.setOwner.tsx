@@ -42,17 +42,8 @@ export default function ChanneLsettingsChanneLsetOwner(
                     && data.member.type === UserTypeEnum.OWNER ? 'remove as Owner' : 'set as admin'
                 }
             </button>
-
-            // <ChanneLConfirmActionBtn 
-            // onClick={() => {
-            //     socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_LEAVE}`, {
-            //         roomId: room.id
-            //     },)
-            // }} 
-            // />
             , __message
         )
-        // socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_UPDATE}`, data)
 
     }
 
@@ -61,7 +52,11 @@ export default function ChanneLsettingsChanneLsetOwner(
         setUpdate(true)
     })
     return (
-        <ChanneLSettingsBody title={"set Owner"} OnBack={OnBack}>
+        <ChanneLSettingsBody 
+        title={"set Owner"} 
+        HasPermission={LogedMember?.type !== UserTypeEnum.OWNER}
+        OnBack={OnBack}>
+            
             <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
                 {(LogedMember?.isban === false && (LogedMember?.type === "OWNER")) ?
                     members && members.map((member, index) => (
