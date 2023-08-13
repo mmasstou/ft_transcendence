@@ -26,7 +26,7 @@ const Header: React.FC = (): JSX.Element => {
           <Settings />
           <li>
             <Popover.Root>
-              <Popover.Trigger asChild>
+              <Popover.Trigger asChild aria-controls="radix-:R1mcq:">
                 <button>
                   <RiNotification2Fill size={32} color="#E0E0E0" />
                 </button>

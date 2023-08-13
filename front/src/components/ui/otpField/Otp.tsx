@@ -9,7 +9,6 @@ interface Props {}
 
 let currentOtpIndex: number = 0;
 const Otp: React.FC<Props> = () => {
-  const [qrCode, setQrCode] = useState<string | null>(null);
   const router = useRouter();
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(''));
   const [activeOtp, setActiveOtp] = useState<number>(0);
@@ -86,9 +85,9 @@ const Otp: React.FC<Props> = () => {
               <input
                 ref={index === activeOtp ? inputRef : null}
                 type="number"
-                className={`w-12 h-12 border-2 rounded bg-transparent outline-none text-center font-semibold 
-                        text-xl spin-button-none border-[#cccccc] focus:border-white 
-                        focus:text-white text-[#cccccc] transition`}
+                className={`w-8 h-8 md:w-12 md:h-12 border-2 bg-transparent outline-none text-center font-semibold 
+                text-xl spin-button-none border-[#cccccc] focus:border-white 
+                focus:text-white text-[#cccccc] transition rounded-md`}
                 onChange={handleOnCnage}
                 onKeyDown={(e) => handleKeyDown(e, index)}
                 value={otp[index]}

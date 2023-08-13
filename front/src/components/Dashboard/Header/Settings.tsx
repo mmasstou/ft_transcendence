@@ -11,6 +11,7 @@ import UserInput from './UserInput';
 import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import OtpModal from './OtpModal';
+export * from '@radix-ui/react-dialog';
 
 function getUserData(): userType | null {
   const [user, setUser] = useState<userType | null>(null);
@@ -132,12 +133,13 @@ const Settings: React.FC = () => {
   return (
     <>
       <Dialog.Root>
-        <Dialog.Trigger asChild>
-          <div
-            className="cursor-pointer hover:text-white text-[#E0E0E0]"
-            onClick={handleModal}
-          >
-            <RiSettingsLine size={32} />
+        <Dialog.Trigger asChild aria-controls="radix-:R1mcq:">
+          <div>
+            <RiSettingsLine
+              size={32}
+              className="cursor-pointer hover:text-white text-[#E0E0E0]"
+              onClick={handleModal}
+            />
           </div>
         </Dialog.Trigger>
         <Dialog.Portal>

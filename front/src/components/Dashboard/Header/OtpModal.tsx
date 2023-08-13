@@ -88,7 +88,7 @@ const Otp: React.FC<Props> = ({ setOpenModal }) => {
         if (err.response && err.response.status === 401) {
           setOtp(new Array(6).fill(''));
           toast.error(
-            `${err.response.data.message} 🤔 Please try again and don't forget to scan Qr code first`
+            `${err.response.data.message} 🤔 Please try again or generate new Qr code`
           );
           return;
         }
@@ -128,9 +128,9 @@ const Otp: React.FC<Props> = ({ setOpenModal }) => {
               <input
                 ref={index === activeOtp ? inputRef : null}
                 type="number"
-                className={`w-8 h-8 md:w-12 md:h-12 border-2 rounded bg-transparent outline-none text-center font-semibold 
+                className={`w-8 h-8 md:w-12 md:h-12 border-2 bg-transparent outline-none text-center font-semibold 
                         text-xl spin-button-none border-[#cccccc] focus:border-white 
-                        focus:text-white text-[#cccccc] transition`}
+                        focus:text-white text-[#cccccc] transition rounded-md`}
                 onChange={handleOnCnage}
                 onKeyDown={(e) => handleKeyDown(e, index)}
                 value={otp[index]}
