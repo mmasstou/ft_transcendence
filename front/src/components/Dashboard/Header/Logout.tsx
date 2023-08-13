@@ -20,15 +20,14 @@ export const Logout: React.FC = (props): JSX.Element => {
         Cookies.remove('token');
         Cookies.remove('_id');
         Cookies.remove('tableId');
-        router.push('/')
-        
+        router.push('/');
       }
     })();
   };
 
   return (
     <Popover.Root>
-      <Popover.Trigger asChild>
+      <Popover.Trigger asChild aria-controls="radix-:R1mcq:">
         <button aria-label="Update dimensions">
           <div className="cursor-pointer w-[32px] h-[32px">
             <MyAvatar />

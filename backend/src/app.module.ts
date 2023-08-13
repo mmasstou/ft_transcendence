@@ -15,6 +15,8 @@ import { RoomsService } from './rooms/rooms.service';
 import { MembersService } from './members/members.service';
 import { MessagesService } from './messages/messages.service';
 import { UserGateway } from './user.gateway';
+import { TwoFactorAuthenticationService } from './auth/2fa/twoFactorAuthentication.service';
+import { TwoFactorAuthenticationModule } from './auth/2fa/twoFactorAuthentication.module';
 @Module({
   imports: [
     AuthModule,
@@ -24,6 +26,7 @@ import { UserGateway } from './user.gateway';
     MessagesModule,
     MembersModule,
     GameModule,
+    TwoFactorAuthenticationModule,
   ],
   controllers: [AppController],
   providers: [
@@ -35,6 +38,7 @@ import { UserGateway } from './user.gateway';
     RoomsService,
     MembersService,
     MessagesService,
+    TwoFactorAuthenticationService,
   ],
   exports: [UserService, PrismaService],
 })

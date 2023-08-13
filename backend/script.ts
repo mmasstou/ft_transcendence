@@ -29,12 +29,13 @@ import { async } from 'rxjs';
 
 const prisma = new PrismaClient();
 
-let _data = [
+const _data = [
   {
     login: 'aboulhaj1',
     email: 'aboulhaj1@prisma.io',
     password: 'aboulhaj1',
-    image: "https://cdn.intra.42.fr/users/c9a6f9f9009e4112128b97aaa41460b3/aboulhaj.jpg",
+    image:
+      'https://cdn.intra.42.fr/users/c9a6f9f9009e4112128b97aaa41460b3/aboulhaj.jpg',
     is_active: true,
   },
   {
@@ -44,21 +45,22 @@ let _data = [
     bg_color: ['#B6F1E4', '#00AEA9'],
     paddle_color: '#E0E0E0',
     ball_color: '#E0E0E0',
-    image: "https://cdn.intra.42.fr/users/5f10eb429fc9ed4eb28c5850095a14cb/mmasstou.jpg",
+    image:
+      'https://cdn.intra.42.fr/users/5f10eb429fc9ed4eb28c5850095a14cb/mmasstou.jpg',
     is_active: true,
   },
   {
     login: 'aboulhaj2',
     email: 'aboulhaj2@prisma.io',
     password: 'aboulhaj2',
-    image: "pngavatar2.png",
+    image: 'pngavatar2.png',
     is_active: true,
   },
   {
     login: 'mmasstou2',
     email: 'mmasstou2@prisma.io',
     password: 'mmasstou2',
-    image: "pngavatar.png",
+    image: 'pngavatar.png',
     is_active: true,
   },
   {
