@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { RiNotification2Fill, RiSettingsLine } from 'react-icons/ri';
+import { RiNotification2Fill } from 'react-icons/ri';
 import logo from '@/../public/logo2.svg';
 import { Logout } from './Logout';
 import Settings from './Settings';
@@ -31,8 +31,9 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
           src={logo}
           height={32}
           width={79}
+          style={{ width: '15vw', height: '15vh' }}
           alt="Picture of the author"
-          priority={false}
+          priority
         />
       </div>
       <nav className="flex justify-center items-center">
@@ -40,7 +41,7 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
           <Settings />
           <li>
             <Popover.Root>
-              <Popover.Trigger asChild>
+              <Popover.Trigger asChild aria-controls="radix-:R1mcq:">
                 <button>
                   <RiNotification2Fill size={32} color="#E0E0E0" />
                 </button>

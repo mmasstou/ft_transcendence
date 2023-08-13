@@ -51,7 +51,7 @@ const MyToast: React.FC<toastInfo> = (props: toastInfo) => {
       width: '300px',
     },
     position: 'top-left',
-    duration: 7000,
+    duration: 8000,
   });
   return <>{toast}</>;
 };

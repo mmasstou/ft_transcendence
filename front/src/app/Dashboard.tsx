@@ -1,16 +1,16 @@
 'use client';
-import React from 'react';
 import './dashboard.css';
 import Sidebar from '@/components/Dashboard/sidebar/Sidebar';
 import Login from '@/components/auth/modaLs/Login';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
 import ChanneLPasswordAccessModaL from './chat/channels/modaLs/channel.access.password.modaL';
 import { useEffect } from 'react';
 import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
 import Header from '@/components/Dashboard/Header/Header';
-import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
 import ChanneLFindRoommodaL from './chat/channels/modaLs/channel.find.room.modaL';
 import { Socket, io } from 'socket.io-client';
 import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
@@ -85,7 +85,7 @@ const Dashboard = ({ children }: Props) => {
         }
         )
       }
-      <div className="dashboard bg-primary">
+      <div className="dashboard bg-primary overflow-y-auto">
         <header className="bg-transparent flex items-center justify-between px-5 ">
           <Header socket={socket} />
         </header>

@@ -10,6 +10,35 @@ import { JwtService } from '@nestjs/jwt';
 export class UserService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
+  async setTwoFactorAuthenticationSecret(secret: string, userLogin: string) {
+    return this.prisma.user.update({
+      where: {
+        login: userLogin,
+      },
+      data: {
+        twoFactorAuthenticationSecret: secret,
+      },
+    });
+  }
+
+  async turnOnTwoFactorAuthentication(userLogin: string) {
+    return this.prisma.user.update({
+      where: { login: userLogin },
+      data: {
+        twoFA: true,
+      },
+    });
+  }
+
+  async turnOffTwoFactorAuthentication(userLogin: string) {
+    return this.prisma.user.update({
+      where: { login: userLogin },
+      data: {
+        twoFA: false,
+      },
+    });
+  }
+
   async findOne(params: { id: string }): Promise<any> {
     const { id } = params;
     // console.log('++findOne++>', login);
@@ -49,7 +78,6 @@ export class UserService {
 
   async update(params: { id: string; data: UpdateUserDto }): Promise<User> {
     const { id, data } = params;
-    // console.log('++update++>', id);
 
     return await this.prisma.user.update({
       data,
@@ -58,8 +86,6 @@ export class UserService {
   }
 
   async remove(id: string): Promise<User> {
-    // console.log('++remove++>', id);
-
     return await this.prisma.user.delete({
       where: { id },
     });

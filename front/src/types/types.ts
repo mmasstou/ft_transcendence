@@ -82,7 +82,10 @@ export type userType = {
   Rooms: RoomsType[];
   location: string;
   cursus_users: cursusType[];
+  twoFactorAuthenticationSecret: string;
+  twoFA: boolean;
 };
+
 
 export type cursusType = {
   id: string;
