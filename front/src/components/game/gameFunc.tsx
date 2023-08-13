@@ -5,7 +5,16 @@ interface table_obj {
   Status: boolean;
   tableId: string;
   GameMode: string;
+  time: number;
 }
+
+function formatTime(seconds: number) {
+    let minutes = Math.floor(seconds / 60);
+    seconds = seconds % 60;
+  
+    let formattedTime = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+    return formattedTime;
+  }
 
 function draw_line(
   backgroundCtx: CanvasRenderingContext2D,
@@ -47,9 +56,6 @@ function drawBackground(
   DivCanvas: HTMLElement | null,) {
   const backgroundLayer = document.createElement('canvas');
   DivCanvas && DivCanvas.appendChild(backgroundLayer);
-//   backgroundLayer.setAttribute('id', 'GameCanvas');
-//   document.body.appendChild(backgroundLayer);
-//   backgroundLayer.setAttribute('id', 'GameCanvas');
   const backgroundCtx = backgroundLayer.getContext('2d');
   const is_vertical = canvas && canvas.height > canvas.width ? true : false;
 
@@ -81,6 +87,9 @@ function drawScore(
   images: { img1: CanvasImageSource | null; img2: CanvasImageSource | null; pause: CanvasImageSource | null},
   Table_obj: table_obj,
   Status: boolean,
+  isMobile: boolean,
+  timer: number,
+  targetScore: number,
   socket?: any,
   ){
       const ScoreLayer = document.createElement('canvas');
@@ -90,6 +99,7 @@ function drawScore(
       const second = socket && images.img1 && images.img2 && socket.auth.UserId == Table_obj.player1.UserId ? {score: Table_obj.player1.score, img: images.img1, color:''} : {score: Table_obj.player2.score, img: images.img2, color:''};
       first.score >= second.score ? first.color = '#1EF0AE' : first.color = '#F1453E';
       second.score >= first.score ? second.color = '#1EF0AE' : second.color = '#F1453E';
+      const timeColor = timer <= 15 ? '#FF6384' : '#36A2EB';
   if (canvas && ScoreCtx) {
       ScoreLayer.width = canvas.width;
       ScoreLayer.height = canvas.height;
@@ -98,21 +108,39 @@ function drawScore(
       ScoreLayer.style.zIndex = '4';
       canvas.parentNode && canvas.parentNode.insertBefore(ScoreLayer, canvas);
       if (is_vertical){
-        var rotation = Math.PI * 1.5;
-        const str = canvas.width / 20 + "px Arial";
-		ScoreCtx.translate(canvas.width/2, canvas.height/2);
-		ScoreCtx.rotate(rotation);
-		ScoreCtx.translate(-canvas.height/2, -canvas.width/2);
-        ScoreCtx && (ScoreCtx.fillStyle = '#fff') && (ScoreCtx.font = str);
-        ScoreCtx.beginPath();
-        ScoreCtx.arc(canvas.height - radius, canvas.width - radius, radius, 0, Math.PI * 2, true);
-        ScoreCtx.arc(radius,canvas.width - radius,radius, 0, Math.PI * 2, true);
-        ScoreCtx && (ScoreCtx.fillStyle = first.color) && ScoreCtx.fillText(first.score, canvas.height * 0.75, canvas.width - canvas.width * 0.04);
-        ScoreCtx && (ScoreCtx.fillStyle = second.color) && ScoreCtx.fillText(second.score, canvas.height / 4, canvas.width - canvas.width * 0.04);
-        ScoreCtx && images.pause && !Status && ScoreCtx.drawImage(images.pause, canvas.height / 2 - radius, canvas.width - radius * 2, radius * 2, radius * 2);
-        ScoreCtx.clip();
-        first.img && ScoreCtx.drawImage(first.img, canvas.height - radius * 2, canvas.width - radius * 2, radius * 2, radius * 2);
-        second.img && ScoreCtx.drawImage(second.img, 0, (canvas.width - radius * 2), radius * 2, radius * 2);
+          const str = canvas.width / 20 + "px Arial";
+          ScoreCtx && (ScoreCtx.fillStyle = '#fff') && (ScoreCtx.font = str);
+          ScoreCtx.beginPath();
+          if (isMobile){
+              var rotation = Math.PI * 1.5;
+              ScoreCtx.translate(canvas.width/2, canvas.height/2);
+              ScoreCtx.rotate(rotation);
+              ScoreCtx.translate(-canvas.height/2, -canvas.width/2);
+              ScoreCtx.arc(canvas.height - radius, canvas.width - radius, radius, 0, Math.PI * 2, true);
+              ScoreCtx.arc(radius,canvas.width - radius,radius, 0, Math.PI * 2, true);
+              ScoreCtx && (ScoreCtx.fillStyle = first.color) && ScoreCtx.fillText(first.score, canvas.height * 0.75, canvas.width - canvas.width * 0.04);
+              ScoreCtx && (ScoreCtx.fillStyle = second.color) && ScoreCtx.fillText(second.score, canvas.height / 4, canvas.width - canvas.width * 0.04);
+              ScoreCtx && images.pause && !Status && ScoreCtx.drawImage(images.pause, canvas.height / 2 - radius, canvas.width - radius * 2, radius * 2, radius * 2);
+              ScoreCtx && (ScoreCtx.fillStyle = timeColor) && Status && Table_obj.GameMode == "time" && ScoreCtx.fillText(timer.toString(), canvas.height / 2 - radius, canvas.width - radius * 2);
+              ScoreCtx && (ScoreCtx.fillStyle = '#ffffff') && Status && Table_obj.GameMode == "score" && ScoreCtx.fillText("Score " + targetScore, canvas.height / 2 - radius * 1.2, canvas.width - radius / 1.5);
+              ScoreCtx.clip();
+              first.img && ScoreCtx.drawImage(first.img, canvas.height - radius * 2, canvas.width - radius * 2, radius * 2, radius * 2);
+              second.img && ScoreCtx.drawImage(second.img, 0, (canvas.width - radius * 2), radius * 2, radius * 2);
+            }
+            else {
+            ScoreCtx.arc(canvas.width - radius, radius, radius, 0, Math.PI * 2, true);
+            ScoreCtx.arc(canvas.width - radius,canvas.height - radius,radius, 0, Math.PI * 2, true);
+            ScoreCtx && (ScoreCtx.fillStyle = first.color) && ScoreCtx.fillText(first.score, canvas.width - (canvas.width * 0.07), canvas.height / 4);
+            ScoreCtx && (ScoreCtx.fillStyle = second.color) && ScoreCtx.fillText(second.score, canvas.width - (canvas.width * 0.07), canvas.height - canvas.height / 4);
+            ScoreCtx && images.pause && !Status && ScoreCtx.drawImage(images.pause, canvas.width - radius * 2, (canvas.height / 2) - radius, radius * 2, radius * 2);
+            ScoreCtx && (ScoreCtx.fillStyle = timeColor) && Status && Table_obj.GameMode == "time" && ScoreCtx.fillText(formatTime(timer), canvas.width - (canvas.width * 0.13), canvas.height / 1.95);
+            ScoreCtx && (ScoreCtx.font = canvas.width / 22 + "px Arial") && (ScoreCtx.fillStyle = '#ffffff') && Status && Table_obj.GameMode == "score" && ScoreCtx.fillText("Score", canvas.width - (canvas.width * 0.125), canvas.height / 2.1);
+            ScoreCtx && (ScoreCtx.fillStyle = '#ffffff') && Status && Table_obj.GameMode == "score" && ScoreCtx.fillText(targetScore.toString(), canvas.width - (canvas.width * 0.08), canvas.height / 1.9);
+            ScoreCtx.clip();
+            first.img && ScoreCtx.drawImage(first.img, canvas.width - radius * 2, 0, radius * 2, radius * 2);
+            second.img && ScoreCtx.drawImage(second.img, (canvas.width - radius * 2), (canvas.height - radius * 2), radius * 2, radius * 2);
+
+        }
       }
       else {
           const str = canvas.height / 20 + "px Arial";
@@ -123,6 +151,8 @@ function drawScore(
           ScoreCtx && (ScoreCtx.fillStyle = first.color) && ScoreCtx.fillText(first.score, canvas.width / 4, canvas.height - canvas.height * 0.04);
           ScoreCtx && (ScoreCtx.fillStyle = second.color) && ScoreCtx.fillText(second.score, canvas.width - canvas.width / 4, canvas.height - canvas.height * 0.04);
           ScoreCtx && images.pause && !Status && ScoreCtx.drawImage(images.pause, (canvas.width / 2) - radius, canvas.height - radius * 2, radius * 2, radius * 2);
+          ScoreCtx && Status && (ScoreCtx.fillStyle = timeColor) && Table_obj.GameMode == "time" && ScoreCtx.fillText(formatTime(timer),canvas.width / 2 - radius, canvas.height - canvas.height * 0.04);
+          ScoreCtx && Status && (ScoreCtx.fillStyle = "#ffffff") && Table_obj.GameMode == "score" && ScoreCtx.fillText("Score " + targetScore,canvas.width / 2.1 - radius, canvas.height - canvas.height * 0.04);
           ScoreCtx.clip();
           first.img && ScoreCtx.drawImage(first.img, 0, (canvas.height - (radius * 2)), radius * 2, radius * 2);
           second.img && ScoreCtx.drawImage(second.img, canvas.width - radius * 2, (canvas.height - (radius * 2)), radius * 2, radius * 2);
@@ -183,9 +213,6 @@ function drawingBall(
     Table_obj: table_obj,
     canvasSize: {width:number, height: number},) {
     const ballLayer = document.createElement('canvas');
-    // ballLayer.setAttribute('id', 'GameCanvas');
-    // document.body.appendChild(ballLayer);
-    // ballLayer.setAttribute('id', 'GameCanvas');
     const ballCtx = ballLayer.getContext('2d');
     if (canvas) {
         var ball_rad = (canvas.width + canvas.height) / 120;
