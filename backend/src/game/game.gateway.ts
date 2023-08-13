@@ -18,7 +18,6 @@ var table_obj = new TableObj(currents);
 
 export let _User: User | null = null;
 
-
 function check_col(table: any){
     if (table.ball.y <= 3 || table.ball.y >= 97.5) // colleg with wall
             table.ball.ball_speed.y = -table.ball.ball_speed.y;
@@ -276,9 +275,9 @@ class MyGateway implements OnGatewayConnection {
                 RandomListScore.add(obj);
               if (RandomListTime.length >= 2 || RandomListScore.length >= 2) {
                 table_obj.tableId = uuidv4();
+                table_obj.GameType = 'random';
                 if (RandomListTime.length >= 2) {
                   table_obj.GameMode = 'time';
-                  table_obj.GameType = 'random';
                   table_obj.player1 = RandomListTime.getfirst.player;
                   table_obj.player2 = RandomListTime.getfirst.player;
                   UserMap.get(table_obj.player1.UserId) && (UserMap.get(table_obj.player1.UserId).TableId = table_obj.tableId);
@@ -299,7 +298,7 @@ class MyGateway implements OnGatewayConnection {
                   this.server.to(UserMap.get(table_obj.player1.UserId).SocketId).emit('joinRoomGame', table_obj);
                   this.server.to(UserMap.get(table_obj.player2.UserId).SocketId).emit('joinRoomGame', table_obj);
                   TableMap.set(table_obj.tableId, table_obj);
-                  this.BallGateway.CreateRandomTable(data, table_obj.tableId);
+                  this.BallGateway.CreateRandomTable(data, table_obj);
                   table_obj = new TableObj(currents);
                 }
               }
