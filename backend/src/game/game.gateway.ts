@@ -299,7 +299,7 @@ class MyGateway implements OnGatewayConnection {
                   this.server.to(UserMap.get(table_obj.player1.UserId).SocketId).emit('joinRoomGame', table_obj);
                   this.server.to(UserMap.get(table_obj.player2.UserId).SocketId).emit('joinRoomGame', table_obj);
                   TableMap.set(table_obj.tableId, table_obj);
-                  this.BallGateway.CreateRandomTable(data, table_obj.tableId);
+                  this.BallGateway.CreateRandomTable(data, table_obj);
                   table_obj = new TableObj(currents);
                 }
               }
