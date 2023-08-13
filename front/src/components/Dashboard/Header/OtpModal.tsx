@@ -55,21 +55,29 @@ const Otp: React.FC<Props> = ({ setOpenModal }) => {
       twoFactorAuthenticationCode: otpSend,
     };
     axios
-      .post('http://localhost:80/api/2fa/authenticate', userData, {
-        headers: {
-          Authorization: `Bearer ${yourJwtToken}`,
-          'Content-Type': 'application/json',
-        },
-      })
+      .post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/2fa/authenticate`,
+        userData,
+        {
+          headers: {
+            Authorization: `Bearer ${yourJwtToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
       .then((response) => {
         if (response.status === 200) {
           axios
-            .post('http://localhost:80/api/2fa/turn-on', userData, {
-              headers: {
-                Authorization: `Bearer ${yourJwtToken}`,
-                'Content-Type': 'application/json',
-              },
-            })
+            .post(
+              `${process.env.NEXT_PUBLIC_BASE_URL}api/2fa/turn-on`,
+              userData,
+              {
+                headers: {
+                  Authorization: `Bearer ${yourJwtToken}`,
+                  'Content-Type': 'application/json',
+                },
+              }
+            )
             .then((response) => {
               if (response.status === 200) {
                 toast.success('Two factor authentication enabled');
@@ -102,7 +110,7 @@ const Otp: React.FC<Props> = ({ setOpenModal }) => {
 
   const handleQrCode = () => {
     axios
-      .get('http://localhost:80/api/2fa/generate', {
+      .get(`${process.env.NEXT_PUBLIC_BASE_URL}api/2fa/generate`, {
         responseType: 'blob',
         headers: {
           Authorization: `Bearer ${yourJwtToken}`,
