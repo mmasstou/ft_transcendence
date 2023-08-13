@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import SocketAdapter from './Socket.Adapter';
 import { ValidationPipe } from '@nestjs/common';
-import { NestExpressApplication } from '@nestjs/platform-express';
 import * as bodyParser from 'body-parser';
 
 const _PORT = process.env.PORT || 80;

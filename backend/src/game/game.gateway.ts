@@ -39,11 +39,11 @@ function check_col(table: any) {
     table.ball.y < table.player1.position + 16
   ) {
     // colleg with player1
-    var centerPlayer = table.player1.position + 8;
-    var ballOffset = table.ball.y - centerPlayer;
-    var ballPositionOnPaddle = ballOffset / 16;
-    var maxAngle = Math.PI * 0.9;
-    var angle = ballPositionOnPaddle * maxAngle;
+    let centerPlayer = table.player1.position + 8;
+    let ballOffset = table.ball.y - centerPlayer;
+    let ballPositionOnPaddle = ballOffset / 16;
+    let maxAngle = Math.PI * 0.9;
+    let angle = ballPositionOnPaddle * maxAngle;
     table.ball.ball_speed.x = -Math.cos(angle);
     table.ball.ball_speed.y = Math.sin(angle);
   } else if (
@@ -52,11 +52,11 @@ function check_col(table: any) {
     table.ball.y < table.player2.position + 16
   ) {
     // colleg with player2
-    var centerPlayer = table.player2.position + 8;
-    var ballOffset = table.ball.y - centerPlayer;
-    var ballPositionOnPaddle = ballOffset / 16;
-    var maxAngle = Math.PI * 0.9;
-    var angle = ballPositionOnPaddle * maxAngle;
+    let centerPlayer = table.player2.position + 8;
+    let ballOffset = table.ball.y - centerPlayer;
+    let ballPositionOnPaddle = ballOffset / 16;
+    let maxAngle = Math.PI * 0.9;
+    let angle = ballPositionOnPaddle * maxAngle;
     table.ball.ball_speed.x = Math.cos(angle);
     table.ball.ball_speed.y = Math.sin(angle);
   }
@@ -238,7 +238,6 @@ class MyGateway implements OnGatewayConnection {
   server: Server;
 
   async CreateFriendTable(data: any) {
-    // return new Promise(async (resolve, reject) => {
     if (!UserMap.has(data.player1_Id)) {
       const _User = await this.usersService.findOne({ id: data.player1_Id });
       _User && UserMap.set(_User.id, { User: _User, Status: 'online' });
@@ -298,7 +297,7 @@ class MyGateway implements OnGatewayConnection {
           .to(UserMap.get(data.player2_Id).SocketId)
           .emit('joinRoomGame', table_obj);
         TableMap.set(table_obj.tableId, table_obj);
-        this.BallGateway.MoveBall(this.server, table_obj.tableId);
+        this.BallGateway.CreateFriendTable(data, table_obj.tableId);
         table_obj = new TableObj(currents);
       } else {
         setTimeout(() => {
@@ -306,7 +305,6 @@ class MyGateway implements OnGatewayConnection {
         }, 1000);
       }
     }
-    // });
   }
   async CreateBotTable(data: any) {
     if (!UserMap.has(data.playerId)) {
@@ -335,6 +333,7 @@ class MyGateway implements OnGatewayConnection {
         table_obj.player1.GameSetting.setData(
           user.bg_color,
           user.ball_color,
+
           user.paddle_color,
           user.avatar,
         );
