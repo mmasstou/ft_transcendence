@@ -18,12 +18,15 @@ function getUserData(): userType | null {
   const jwtToken = Cookies.get('token');
   useEffect(() => {
     axios
-      .get<userType | null>('http://localhost:80/api/auth/status', {
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-          'Content-Type': 'application/json',
-        },
-      })
+      .get<userType | null>(
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/auth/status`,
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
       .then((response) => {
         if (response.status === 200) {
           setUser(response.data);
@@ -106,7 +109,11 @@ const Settings: React.FC = () => {
 
     if (twoFa) {
       axios
-        .post('http://localhost:80/api/2fa/turn-off', {}, { headers })
+        .post(
+          `${process.env.NEXT_PUBLIC_BASE_URL}api/2fa/turn-off`,
+          {},
+          { headers }
+        )
         .catch((err) => {
           toast.error(err.response.data.message);
           return;
