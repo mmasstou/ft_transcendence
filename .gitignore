@@ -3,7 +3,7 @@
 */dist
 /node_modules
 */node_modules
-
+databases/data
 # Logs
 logs
 *.log
@@ -36,3 +36,14 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+
+# backend :
+backend/prisma/migrations
+
+# database:
+databases/data/
+
+
+*/package-lock.json
+.env

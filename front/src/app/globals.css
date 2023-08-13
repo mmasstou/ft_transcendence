@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.blue__gradient {
+  background: linear-gradient(180deg, rgba(135, 248, 218, 0) 0%, #2bedd7 100%);
+  filter: blur(123px);
+}
+
+.pink__gradient {
+  background: linear-gradient(90deg, #89ffdd 0%, #26ffe6 100%);
+  filter: blur(900px);
+}
+
+.white__gradient {
+  background: rgba(0, 228, 167, 0.6);
+  filter: blur(750px);
+}
+
+.gradient {
+  background: #4ca1af; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #c4e0e5, #4ca1af);
+  background: linear-gradient(to right, #c4e0e5, #4ca1af);
+}
+
+.bg-blue-gradient {
+  background: linear-gradient(
+    157.81deg,
+    #d1fdf8 -43.27%,
+    #b8f9f2 -21.24%,
+    #49ffea 12.19%,
+    #5ac4ba 29.82%,
+    #35a799 51.94%,
+    #36716a 90.29%
+  );
+}
+
+@media (max-width: 767px) {
+  .hitorique {
+    margin-top: 2rem;
+  }
+  .small-device {
+    display: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .banner {
+    height: 200px;
+  }
+}
+
+@media (min-width: 767px) {
+  .avatar-position {
+    display: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .avatar-position {
+    display: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+  }
+}
+
+@media (min-width: 1200px) {
+  .avatar-position {
+    display: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+  }
+}
+
+.spin-button-none::-webkit-inner-spin-button,
+.spin-button-none::-webkit-outer-spin-button {
+  appearance: none;
+}
+
+.twoFactor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* For IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
