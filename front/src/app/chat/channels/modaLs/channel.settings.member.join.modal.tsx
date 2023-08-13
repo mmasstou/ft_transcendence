@@ -4,7 +4,7 @@ import { FieldValues, RegisterOptions, UseFormRegisterReturn, useForm } from "re
 import Button from "../../components/Button";
 import { IoChevronBackOutline } from "react-icons/io5";
 import ChannelSettingsUserMemberItem from "../components/channel.settings.user.memberItem";
-import React from "react";
+import React, { useEffect } from "react";
 import { membersType, updatememberEnum, userType } from "@/types/types";
 import Cookies from "js-cookie";
 import getUsers from "../actions/getUsers";
@@ -14,6 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Socket } from "socket.io-client";
 import LeftSidebarHook from "../hooks/LeftSidebarHook";
 import ChanneLsettingsHook from "../hooks/channel.settings";
+import getChannelWithId from "../actions/getChannelWithId";
 
 interface IChannelSettingsMemberJoinModalProps {
     OnClick: (data: any) => void;
@@ -88,17 +89,34 @@ export default function ChanneLSettingsMemberJoinModaL(
 
     const handlOnclick = (data: { userid: string, roomid: string }) => {
 
-        socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`, data)
+        socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`, data);
+        (async () => {
+            const channeLId = params.get('r')
+            if (!channeLId)
+                return;
+            const token: any = Cookies.get('token');
+            if (!token)
+                return;
+            const room = getChannelWithId(channeLId, token)
+            if (!room) return
+            console.log("ChanneLSettingsMemberJoinModaL send notifications:",)
+            // socket?.emit('sendNotification', { userId: data.userid, room: room });
+        })();
 
     }
 
-    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+    useEffect(() => {
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
 
-        setUpdate(true)
-        // router.refresh()
-        // channeLsettingsHook.onClose()
+            setUpdate(true)
+            console.log("ChanneLSettingsMemberJoinModaL :", data);
 
-    })
+
+            // router.refresh()
+            // channeLsettingsHook.onClose()
+
+        })
+    }, [socket])
     if (!IsMounted) return null
     return (
         <div className="flex flex-col w-full">

@@ -204,8 +204,17 @@ export class ChatGateway implements OnGatewayConnection {
       message: responseEventMessageEnum.WELLCOME,
       data: null,
     };
+    const room = await this.roomservice.findOne({ id: data.roomid });
+    const senderinvit: any = await this.usersService.getUserInClientSocket(
+      client,
+    );
+    if (!senderinvit) return;
+    await this.sendNotification({
+      userId: data.userid,
+      room: room,
+      senderId: senderinvit.id,
+    });
     try {
-      const room = await this.roomservice.findOne({ id: data.roomid });
       // check if member is already in room database :
       const existMember = await this.memberService.findOne({
         userId: data.userid,
@@ -240,6 +249,8 @@ export class ChatGateway implements OnGatewayConnection {
         ResponseEventData.message = responseEventMessageEnum.WELLCOMEBACK;
         ResponseEventData.data = roomJoined;
         // send response to client :
+        // client.emit('sendNotification', { userId: data.userid, room: room });
+
         client.emit(
           `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
           ResponseEventData,
@@ -262,6 +273,8 @@ export class ChatGateway implements OnGatewayConnection {
       ResponseEventData.message = responseEventMessageEnum.WELLCOME;
       ResponseEventData.data = roomJoined;
       // send response to client :
+      // client.emit('sendNotification', { userId: data.userid, room: room });
+
       client.emit(
         `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
         ResponseEventData,
@@ -279,6 +292,7 @@ export class ChatGateway implements OnGatewayConnection {
       );
     }
     // send event to all client  that member is join to room :
+    // client.emit('sendNotification', { userId: data.userid, room: room });
     this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, null);
   }
   @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_CREATE}`)
@@ -655,35 +669,38 @@ export class ChatGateway implements OnGatewayConnection {
   }
   @SubscribeMessage('sendNotification')
   async sendNotification(
-    @MessageBody() data: { userId: string; room: RoomsType },
+    @MessageBody() data: { userId: string; room: Rooms; senderId: string },
   ) {
     try {
-      // console.log('Chat-> sendNotification +> data :', data);
+      console.log('Chat-> sendNotification +> data :', data);
+      const snderUser: User | null = await this.usersService.findOne({
+        id: data.senderId,
+      });
+      if (!snderUser) return;
       // git owner of room :
-      const sendedUser = await this.usersService.findOne({ id: data.userId });
-      const owner: Members[] = await this.roomservice.findOwnerRooms(
-        data.room.id,
-      );
-      if (owner) {
-        owner.forEach(async (member: Members) => {
-          const ListSocket = clientOnLigne.get(member.userId);
-          if (ListSocket) {
-            const User = await this.usersService.findOne({
-              id: member.userId,
+      const UserTOSendTo: User | null = await this.usersService.findOne({
+        id: data.userId,
+      });
+      console.log('Chat-> sendNotification +> sendedUser :', UserTOSendTo);
+
+      if (UserTOSendTo) {
+        const ListSocket = clientOnLigne.get(UserTOSendTo.id);
+        console.log('Chat-> sendNotification +> ListSocket :', ListSocket);
+
+        if (ListSocket) {
+          ListSocket.forEach((socket) => {
+            socket.emit('notificationEvent', {
+              message: `wants to play game with you`,
+              sender: snderUser,
             });
-            ListSocket.forEach((socket) => {
-              socket.emit('notificationEvent', {
-                message: `ask to join to room ${data.room.name}`,
-                User: User,
-                member: member,
-                sendedUser: sendedUser,
-              });
-            });
-          }
-        });
+          });
+        }
       }
     } catch (error) {
       console.log('Chat-sendNotification> error- +>', error);
     }
   }
+
+  // @SubscribeMessage('askToPlayGameWith')
+  // async askToPlayGameWith(@MessageBody() data: {}) {}
 }

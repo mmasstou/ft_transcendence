@@ -3,7 +3,7 @@ import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import { UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import Cookies from "js-cookie";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import getChannelMembersWithId from "../actions/getChannelmembers";
 import { Socket } from "socket.io-client";
 import getUserWithId from "../actions/getUserWithId";
@@ -20,6 +20,9 @@ import { TfiTimer } from "react-icons/tfi";
 import ChanneLConfirmActionBtn from "./channel.confirm.action.Btn";
 import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
 import getmessage from "../actions/member.action.message";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import StartGame from "../actions/startgame";
 
 interface ChanneLUserSettingsProps {
     socket: Socket | null
@@ -44,6 +47,7 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
     const params = useSearchParams()
     const channeLLid = params.get('r')
     const __userId = Cookies.get('_id')
+    const router = useRouter()
 
     React.useEffect(() => { setIsMounted(true) }, [])
 
@@ -202,10 +206,35 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                             <Image src="/game-mode.svg" width={200} height={200} alt={""} />
                             {/* <h2 className=" capitalize font-extrabold text-white">permission denied</h2> */}
                         </div>
+                        <h2>
+                            P1 :{PlayGameWith?.userId} <br />
+                            p2 : {LogedMember?.userId}
+                        </h2>
                         <div className="flex flex-col gap-3  w-full">
                             <button
                                 onClick={() => {
+                                    (async () => {
+                                        const body = {       ///////////////////////////////////////////////////////// body
+                                            player_Id: LogedMember?.userId,
+                                            player2Id: PlayGameWith?.userId,
+                                            mode: "time"
+                                        }
+                                        // await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, body).then((result) => {
+                                        //     console.log("await axios.post(`${process.env.NEXT_PUBLIC :", result)
+                                        //     router.push('/game/score/robot')
+                                        // }).catch(() => {
+                                        //     toast.error("error")
+                                        // })
 
+                                        const token: any = Cookies.get('token');
+                                        if (!token) return;
+                                        const g = await StartGame({       ///////////////////////////////////////////////////////// body
+                                            player_Id: LogedMember?.userId,
+                                            mode: "time"
+                                        }, token);
+                                        if (!g) return;
+                                        router.push('/game/score/robot')
+                                    })
                                 }}
                                 className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-[#FFCC00] hover:border">
                                 <div className='flex justify-center items-center p-3 rounded bg-[#FFCC00] text-white'>
@@ -220,7 +249,27 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
                             </button>
                             <button
                                 onClick={() => {
-
+                                    // const body = {       ///////////////////////////////////////////////////////// body
+                                    //     player_Id: LogedMember?.userId,
+                                    //     player2Id: PlayGameWith?.userId,
+                                    //     mode: "score"
+                                    // }
+                                    // axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, body).then((result) => {
+                                    //     router.push('/game/score/robot')
+                                    // })
+                                    (async () => {
+                                        console.log("${process.env.NEXT_PUBLIC_API_URL}/game/BotGame :", `${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`)
+                                        const token: any = Cookies.get('token');
+                                        if (!token) return;
+                                        const g = await StartGame({       ///////////////////////////////////////////////////////// body
+                                            player_Id: LogedMember?.userId,
+                                            mode: "time"
+                                        }, token);
+                                        console.log("++++++++++++++++++++++++++++++> game:",g)
+                                        if (!g) return;
+                                        toast.success("play ....")
+                                        router.push('/game/score/robot')
+                                    })
                                 }}
                                 className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-secondary hover:border">
                                 <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>

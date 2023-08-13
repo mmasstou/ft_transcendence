@@ -24,11 +24,11 @@ interface Props {
 const Dashboard = ({ children }: Props) => {
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const router = useRouter();
-  const [Notifications, setNotifications] = React.useState<any[] | null>(null)
+  const [Notifications, setNotifications] = React.useState<any>(null)
 
   socket?.on('notificationEvent', (data) => {
     console.log("notificationEvent data :", data)
-    setNotifications([data])
+    setNotifications(data)
     setTimeout(() => {
       setNotifications(null)
     }
@@ -74,16 +74,7 @@ const Dashboard = ({ children }: Props) => {
       <ChanneLaccessDeniedModaL />
       <ChanneLPasswordAccessModaL />
       {
-        Notifications && Notifications.map((notification: {
-          message: string, User: userType,
-          member: membersType,
-          sendedUser: userType
-        }, index: number) => {
-          return (
-            <MyToast key={index} isOpen user={notification.sendedUser.login} message={notification.message} />
-          )
-        }
-        )
+        Notifications && <MyToast  isOpen user={Notifications.sender.login} message={Notifications.message} />
       }
       <div className="dashboard bg-primary overflow-y-auto">
         <header className="bg-transparent flex items-center justify-between px-5 ">

@@ -85,6 +85,7 @@ export default function ChanneLFindRoommodaL() {
             setUpdate(!Update)
         })
     }, [socket])
+    
     const bodyContent = (
         <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[34rem]">
 
