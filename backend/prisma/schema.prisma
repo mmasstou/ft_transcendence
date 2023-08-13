@@ -61,6 +61,7 @@ model User {
   twoFA                         Boolean         @default(false)
   MyScore                       Match[]         @relation("Player1")
   Other                         Match[]         @relation("Player2")
+  status                        String          @default("online") // need to be checked
 }
 
 model Match {

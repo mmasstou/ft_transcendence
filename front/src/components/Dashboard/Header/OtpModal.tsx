@@ -47,6 +47,10 @@ const Otp: React.FC<Props> = ({ setOpenModal }) => {
 
   const handlSave = () => {
     const otpSend = otp.toString().replace(/,/g, '');
+    if (otpSend.length !== 6) {
+      toast.error('Please enter a valid otp code');
+      return;
+    }
     const userData = {
       twoFactorAuthenticationCode: otpSend,
     };
