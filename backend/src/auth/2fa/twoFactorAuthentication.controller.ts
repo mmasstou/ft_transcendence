@@ -36,7 +36,6 @@ export class TwoFactorAuthenticationController {
     @Req() request: RequestWithUser,
     @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
   ) {
-    console.log('authenticate');
     const isCodeValid =
       await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
         twoFactorAuthenticationCode,
@@ -68,7 +67,7 @@ export class TwoFactorAuthenticationController {
         request.user,
       );
     if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
+      throw new HttpException('Wrong authentication code', 401);
     }
     await this.usersService.turnOnTwoFactorAuthentication(request.user.login);
   }

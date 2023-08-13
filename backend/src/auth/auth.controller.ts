@@ -59,7 +59,7 @@ export class AuthController {
   }
 
   @Get('logout')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async logout(@Req() req: any, @Res() res: Response): Promise<any> {
     // res.clearCookie('token');
     // res.clearCookie('_id');

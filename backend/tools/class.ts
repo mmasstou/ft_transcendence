@@ -1,29 +1,4 @@
-import { User, UserType } from '@prisma/client';
-// type User = {
-//     id: string;
-//     login: string;
-//     email: string;
-//     password: string | null;
-//     name: string;
-//     kind: null;
-//     avatar: string | '';
-//     bg_color: string[] | null
-//     paddle_color: string | null
-//     ball_color: string | null
-//     intraId: number;
-//     banner: string | '';
-//     is_active: boolean;
-//     created_at: string;
-//     updated_at: string;
-//     Rooms: any;
-//     location: string;
-//     cursus_users: any;
-//     Members: any;
-//     Messages: any;
-//     directMessage: any;
-//     UserSocket: any;
-//     cursusId: any;
-//   }
+import { User } from '@prisma/client';
 
 type table_obj = {
     player1: Player
@@ -33,13 +8,24 @@ type table_obj = {
     current: any
     tableId: string
     GameMode: string
+    GameType: string
     imageLoad: number
+    time: number
+    countdown: number
+    intervaldelay: number
   }
 
 type Random_Obj = {
     player: Player
     GameMode: string
-}
+  }
+
+type UserMap = Map<string, {User: User, SocketId?: string, BallSocketId?: string, Status: string, TableId?: string}>;
+
+type TableMap = Map<string, table_obj>;
+
+type RandomPlayer = Array<Random_Obj>;
+
 class GameSetting {
     table: string[];
     ball: string;
@@ -99,12 +85,10 @@ class Ball {
     x: number;
     y: number;
     ball_speed: ballSpeed;
-    ballIcrement: number;
     constructor() {
         this.x = 50.0,
-        this.y = 50.0,
+        this.y = 50.0
         this.ball_speed = new ballSpeed()
-        this.ballIcrement = 0.2;
     }
     setBall(x: number, y: number) {
         this.x = x;
@@ -134,6 +118,14 @@ class UniqueSet {
         this.set.delete(first.player.UserId);
         return first;
     }
+
+    deleteElement(key: string) {
+        if (this.set.has(key)) {
+            this.set.delete(key);
+            this.array = this.array.filter((obj) => obj.player.UserId !== key);
+        }
+    }
+
     get length() {
       return this.array.length;
     }
@@ -148,13 +140,36 @@ class UniqueSet {
     }
 }
 
+    class TableObj {
+        player1: Player;
+        player2: Player;
+        ball: Ball;
+        Status: boolean;
+        current: any; // Replace 'any' with the appropriate type for 'currents'
+        tableId: string;
+        GameMode: string;
+        GameType: string;
+        imageLoad: number;
+        time: number;
+        countdown: number;
+        intervaldelay: number;
+    
+        constructor(currents: NodeJS.Timeout) {
+        this.player1 = new Player();
+        this.player2 = new Player();
+        this.ball = new Ball();
+        this.Status = false;
+        this.current = currents;
+        this.tableId = '';
+        this.GameMode = '';
+        this.GameType = '';
+        this.imageLoad = 0;
+        this.time = 0;
+        this.countdown = 45;
+        this.intervaldelay = 30;
+        }
+    }
 
 
-type UserMap = Map<string, {User: User, SocketId?: string, BallSocketId?: string, Status: string, TableId?: string}>;
-
-type TableMap = Map<string, table_obj>;
-
-type RandomPlayer = Array<Random_Obj>;
-
-export { Player, Ball, ballSpeed, UniqueSet, random_obj}
+export {UniqueSet, random_obj, TableObj}
 export type { UserMap, TableMap, RandomPlayer}

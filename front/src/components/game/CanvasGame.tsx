@@ -1,30 +1,34 @@
- "use client"
+"use client"
 import {RefObject, useEffect, useRef, useState } from "react";
 import {Socket, io} from 'socket.io-client';
-import {Player, Ball, ballSpeed, TableMap} from '../../../tools/class';
+import {TableMap} from '../../../tools/class';
 import Cookies from "js-cookie";
-import LoginHook from '@/hooks/auth/login';
 import {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall} from './gameFunc';
 import LeaveButton from '@/components/game/LeaveButton';
+import GameResult from "./GameResult";
+import MatchMaking from "./MatchMaking";
 
 const TableMap: TableMap = new Map();
-const IPmachine = '127.0.0.1/game';
-const IPmachineBall = '127.0.0.1/ball';
+const url = process.env.NEXT_PUBLIC_GAMESOCKET_URL_WS;
+const IPmachine = url + '/game';
+const IPmachineBall = url + '/ball';
+const AllTime = 75;
+const targetScore = 5;
 
 /// game settings /// on % of the canvas
 var player_width = 6.25;
 
 function pongFunc(divRef: RefObject<HTMLDivElement>) {
-  
-    const DivCanvas = document.getElementById('CanvasGameDiv');
-    const  canvasRef = useRef<HTMLCanvasElement>(null);
-    const [isMounted, setIsMounted] = useState(false);
-    const [Table_obj, setTable_obj] = useState<any>(null);
-    const [Status, setStatus] = useState(false);
-    const [socket, setSocket] = useState<any>(null);
-    const [ballSocket, setBallSocket] = useState<any>(null);
-    const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-    const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null}>({
+
+  const  canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const DivCanvas = isMounted ? document.getElementById('CanvasGameDiv'): null;
+  const [Table_obj, setTable_obj] = useState<any>(null);
+  const [Status, setStatus] = useState(false);
+  const [socket, setSocket] = useState<any>(null);
+  const [ballSocket, setBallSocket] = useState<any>(null);
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null}>({
         img1: null,
         img2: null,
         pause: null,
@@ -42,10 +46,13 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         height: 0,
     });
     const [isReady, setIsReady] = useState(false);
-    const loginhook = LoginHook();
+    const [isMobile, setIsMobile] = useState(false);
+    const [timer, setTimer] = useState(AllTime);
+    const [YouWin, setYouWin] = useState(false);
+    const [YouLose, setYouLose] = useState(false);
+    const [YouDraw, setYouDraw] = useState(false);
 
     function handleRemoveCanvas() {
-      // canvas?.parentNode?.contains(canvas) && canvas?.parentNode?.removeChild(canvas);
       DivCanvas?.parentNode?.contains(DivCanvas) && DivCanvas?.parentNode?.removeChild(DivCanvas);
     };
 
@@ -155,12 +162,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
           })
       }
     }
-    
-    // check if the user is logged in
-    useEffect(() => {
-        if (!Cookies.get('token'))
-            loginhook.onOpen();
-    }, [])
 
     // useEffect for loading the images and initializing the canvas
     useEffect(() => {
@@ -228,17 +229,11 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       setIsMounted(true);
 
       return () => {
-          // socket && socket.on("disconnecting", () => {
-          //     socket.emit("disconnecting", "test printing");
-          // })
           Cookies.remove('tableId');
           socket && socket.disconnect();
           socketBall && socketBall.disconnect();
       };
-      // socket && socket.on("connected", (data) => {
-      //     console.log("socket %s connected", socket.id);
-      // })
-  
+
   //client namespace disconnect
   // transport close
   }, [])
@@ -271,29 +266,23 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
 
     // useEffect for Score
     useEffect(() => {
-      // if (LeaveGame){
-      //   console.log("Score useEffect return --------leaveGame-----------")
-      //   objScore && objScore.ScoreCtx && objScore.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-      //     canvas?.parentNode && canvas.parentNode.removeChild(objScore.ScoreLayer);
-      //     return;
-      // }
-      // let obj: any;
-      // if (LeaveGame) {
-      //   // handleRemoveCanvas();
-      //   return
-      // }
+      const userAgent = window.navigator.userAgent;
+      const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      const isMobileDevice = mobileRegex.test(userAgent);
+      setIsMobile(isMobileDevice);
+
       if (isReady) {
-        const obj = drawScore(canvas, images, Table_obj, Status, socket);
+        const obj = drawScore(canvas, images, Table_obj, Status, isMobile, timer, targetScore, socket);
+        if (Table_obj.GameMode == 'score' && (Score.first == targetScore || Score.second == targetScore)) {
+          socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
+          socket.emit('GameOver', {tableId: Table_obj.tableId});
+        }
         return () => {
-          // handleRemoveCanvas();
-          // console.log("Score useEffect return -------------------");
             obj && obj.ScoreCtx && obj.ScoreCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ScoreLayer);
-            // handleResize();
-            // canvas?.parentNode && canvas.parentNode.removeChild();
         }
       }
-    }, [canvasSize, images, Score, Status, isReady, LeaveGame]) 
+    }, [canvasSize, images, Score, Status, isReady, LeaveGame, timer]) 
 
     // useEffect for Player
     useEffect(() => {
@@ -302,7 +291,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
           const obj2 = Player2Draw(canvas, socket, Table_obj, canvasSize, player_width, Player1, Player2);
           window.addEventListener("keydown", keyFunction);
           return () => {
-            // handleRemoveCanvas();
               obj1 && obj1.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
               canvas?.parentNode && obj1 && canvas.parentNode.removeChild(obj1.playerLayer);
               obj2 && obj2.playerCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
@@ -311,7 +299,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
           }
       }
     }, [canvasSize, Player1, Player2, Status, LeaveGame])
-
 
     // useEffect for ball
     useEffect(() => {
@@ -330,69 +317,103 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       ballSocket && isReady &&  ballSocket.emit('moveBall', Table_obj.tableId);
     }, [Status])
 
-      ////////////////////// emit from the server ///////////////////////
 
-      isMounted && socket.on('joinRoomGame', (table: any) => {
-        if (table) {
-          TableMap.set(table.tableId, table);
-          setTable_obj(table);
-          socket.emit('joinToRoomGame', table.tableId);
-        }
-      })
-
-      isMounted && ballSocket.on('joinRoomBall', (table: string) => {
-        // console.log("check--------");
-        ballSocket.emit('joinToRoomBall', table);
-      })
-
-      isMounted && socket.on('ready', (check: boolean) => {
-        setIsReady(check);
-      })
-
-      // isMounted && socket.on('reload', (table: any) => {
-
-      // })
-
-      isMounted && socket.on('setPlayer1', (Player:number) => {
-        setPlayer1(Player);
-      })
-
-      isMounted && socket.on('setPlayer2', (player: number) => {
-          setPlayer2(player);
+    ////////////////////// emit from the server ///////////////////////
+    useEffect(() => {
+      if (isMounted) {
+        socket.on('joinRoomGame', (table: any) => {
+          if (table) {
+            TableMap.set(table.tableId, table);
+            setTable_obj(table);
+            socket.emit('joinToRoomGame', table.tableId);
+          }
+        })
+        
+        ballSocket.on('joinRoomBall', (table: string) => {
+          ballSocket.emit('joinToRoomBall', table);
+        })
+  
+        socket.on('ready', (check: boolean) => {
+          setIsReady(check);
+        })
+  
+        isMounted && socket.on('setPlayer1', (Player:number) => {
+          setPlayer1(Player);
         })
 
-      isMounted && ballSocket.on('setBall', (ballPos: any) => {
-        setBallObj(ballPos);
+        socket.on('setPlayer2', (player: number) => {
+            setPlayer2(player);
+        })
+  
+        socket.on('setStatus', (status: boolean) => {
+          setStatus(status);
+        })
+  
+        Table_obj && ballSocket.on('setScore1', (score: number) => {
+          Table_obj.player1.score = score;
+          setScore({first: score, second: Table_obj.player2.score});
+        })
+        
+        Table_obj && ballSocket.on('setScore2', (score: number) => {
+          Table_obj.player2.score = score;
+          setScore({first: Table_obj.player1.score, second: score});
         })
 
-      isMounted && socket.on('setStatus', (status: boolean) => {
-        setStatus(status);
+        isMounted && socket.on('leaveGame', (id: string) => {
+            if (socket.id != id) {
+              setLeaveGame(true);
+            }
         })
+        //ballObj: any, socket: Socket, Table_obj: any, canvasSize: any, setPlayer2: any, isReady: any, canvas: any
+        ballSocket.on('setBall', (ball: any) => {
+          if (!Status && isReady)
+          setBallObj(ball);
+        })
+      }
+    }, [isMounted, isReady, Status, Table_obj])
 
-      isMounted && isReady && ballSocket && ballSocket.on('setScore1', (score: number) => {
-        Table_obj.player1.score = score;
-        setScore({first: score, second: Table_obj.player2.score});
-      })
-      
-      isMounted && isReady && ballSocket && ballSocket.on('setScore2', (score: number) => {
-        Table_obj.player2.score = score;
-        setScore({first: Table_obj.player1.score, second: score});
-      })
-
-      isMounted && socket.on('leaveGame', (id: string) => {
-        if (socket.id != id)
+    useEffect(() => {
+      if (isReady) {
+        ballSocket.on('timer', (time: number) => {
+          if (Status) {
+            if (Table_obj.GameMode == 'time' && !Math.floor(AllTime - time) && Status) {
+              socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
+              socket.emit('GameOver', {tableId: Table_obj.tableId});
+            }
+            else
+              setTimer(Math.floor(AllTime - time));
+          }
+        })
+        socket.on('GameOver', (Winner: any) => {
           setLeaveGame(true);
-        // console.log("leaveGame");
-      })
+          if (socket.auth.UserId == Winner)
+            setYouWin(true);
+          else if (Winner == 'no one')
+            setYouDraw(true);
+          else
+            setYouLose(true);
+        })
+      }
+    }, [isReady, Status])
+    
+    useEffect(() => {
+      if (isReady && (YouWin || YouLose || YouDraw)) {
+        Cookies.remove('tableId');
+        socket.emit('deletePlayer');
+      }
+    }, [YouWin, YouLose, YouDraw])
 
-      if (canvasSize.width < canvasSize.height)
-          var isvertical = true;
-      else
-          var isvertical = false;
+    if (canvasSize.width < canvasSize.height)
+        var isvertical = true;
+    else
+        var isvertical = false;
     return (
-      LeaveGame ? <h1 className=" font-bold text-white">WIN</h1> :
+      !isReady ? <MatchMaking/> :
+      LeaveGame && (YouWin || (!YouWin && !YouLose && !YouDraw))  ? <GameResult result="win" /> :
+      LeaveGame && YouLose ? <GameResult result="lose" /> :
+      LeaveGame && YouDraw ? <GameResult result="draw" /> :
       <>
-        <LeaveButton isvertical={isvertical} isReady={isReady} />
+        <LeaveButton isvertical={isvertical} isReady={isReady} isMobile={isMobile} />
         <div id="CanvasGameDiv">
           <canvas id="GameCanvas" ref={canvasRef} width={isvertical ? canvasSize.width * 1.15 : canvasSize.width} height={isvertical ? canvasSize.height : canvasSize.height * 1.15} />
         </div>

@@ -54,6 +54,8 @@ const Header: React.FC = (): JSX.Element => {
                       isFriend
                     />
                     <Notification
+                      isFriend
+                      directMessage
                       avatar="/avatar.jpg"
                       name="mehdi"
                       message="send a friend request."
