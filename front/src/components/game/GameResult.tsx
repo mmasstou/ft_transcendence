@@ -9,13 +9,13 @@ type GameResultProps = {
 const GameResult: FC<GameResultProps> = ({ result }) => {
   const router = useRouter();
   return (
-    <div className="flex flex-col gap-4 items-center text-white">
+    <div className="flex flex-col gap-4 md:gap-6 xl:gap-8 items-center justify-center text-white w-full h-full">
       <img
         src={`/${
           result === 'win' ? 'win' : result === 'lose' ? 'lose' : 'draw'
         }.svg`}
         alt=""
-        className="w-[20%] h-[20%] md:w-[15%] md:h-[15%] xl:w-[10%] xl:h-[10%]"
+        className="w-[20%] h-[10%] md:w-[15%] xl:w-[10%]"
       />
       <h1 className="uppercase tracking-wider text-3xl xl:text-5xl 2xl:text-6xl font-bold">
         {result === 'win' ? 'You Won' : result === 'lose' ? 'You Lost' : 'Draw'}
