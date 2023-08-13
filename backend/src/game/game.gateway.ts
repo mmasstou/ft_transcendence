@@ -238,7 +238,6 @@ class MyGateway implements OnGatewayConnection {
   server: Server;
 
   async CreateFriendTable(data: any) {
-    // return new Promise(async (resolve, reject) => {
     if (!UserMap.has(data.player1_Id)) {
       const _User = await this.usersService.findOne({ id: data.player1_Id });
       _User && UserMap.set(_User.id, { User: _User, Status: 'online' });
@@ -298,7 +297,7 @@ class MyGateway implements OnGatewayConnection {
           .to(UserMap.get(data.player2_Id).SocketId)
           .emit('joinRoomGame', table_obj);
         TableMap.set(table_obj.tableId, table_obj);
-        this.BallGateway.MoveBall(this.server, table_obj.tableId);
+        this.BallGateway.CreateFriendTable(data, table_obj.tableId);
         table_obj = new TableObj(currents);
       } else {
         setTimeout(() => {
@@ -306,7 +305,6 @@ class MyGateway implements OnGatewayConnection {
         }, 1000);
       }
     }
-    // });
   }
   async CreateBotTable(data: any) {
     if (!UserMap.has(data.playerId)) {

@@ -9,13 +9,16 @@ import router from 'next/router';
 export const Logout: React.FC = (props): JSX.Element => {
   const logoutHandle = () => {
     (async () => {
-      const resp = await fetch('http://localhost:80/api/auth/logout', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${Cookies.get('token')}`,
-        },
-      });
+      const resp = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/auth/logout`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${Cookies.get('token')}`,
+          },
+        }
+      );
       if (resp.status === 200) {
         Cookies.remove('token');
         Cookies.remove('_id');

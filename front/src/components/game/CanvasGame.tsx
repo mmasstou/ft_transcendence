@@ -16,10 +16,11 @@ const AllTime = 75;
 const targetScore = 5;
 
 /// game settings /// on % of the canvas
-var player_width = 6.25;
+let player_width = 6.25;
 
 function pongFunc(divRef: RefObject<HTMLDivElement>) {
-
+  
+  let isvertical;
   const  canvasRef = useRef<HTMLCanvasElement>(null);
   const [isMounted, setIsMounted] = useState(false);
   const DivCanvas = isMounted ? document.getElementById('CanvasGameDiv'): null;
@@ -67,16 +68,16 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     function MouseFunction(event: { clientX: number; clientY: number; }) {
       if (!Status)
       return;
-        var updatePlayer;
-        var max_variable = 100 - (100 / player_width);
+        let updatePlayer;
+        let max_variable = 100 - (100 / player_width);
         if (isMounted && canvas) {
           const rect = canvas.getBoundingClientRect();
           const x = event.clientX - rect.left;
           const y = event.clientY - rect.top;
           if (x >= 0 && y >= 0 && x <= rect.width && y <= rect.height) {
-            var position1 = Player1;
-            var position2 = Player2;
-            var is_vertical = canvas.height > canvas.width ? true : false;
+            let position1 = Player1;
+            let position2 = Player2;
+            let is_vertical = canvas.height > canvas.width ? true : false;
             if (is_vertical && isMounted && socket.auth.UserId == Table_obj.player1.UserId) {
                 updatePlayer = position1 >= 0 && position1 <= max_variable && (x / canvas.width) * 100 <= max_variable && (x / canvas.width) * 100 >= 0 ? Math.round((x / canvas.width) * 100) : position1;
                 if (updatePlayer != position1)
@@ -102,9 +103,9 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       }
 
     function keyFunction(e: KeyboardEvent) {
-      var position1 = Player1;
-      var position2 = Player2;
-        var max_variable = 100 - (100 / player_width);
+      let position1 = Player1;
+      let position2 = Player2;
+        let max_variable = 100 - (100 / player_width);
         if ((e.key == 'ArrowLeft' || e.key == 'ArrowRight') && Status) {
             if (e.key == 'ArrowLeft'){
               if (socket.auth.UserId == Table_obj.player1.UserId && position1 >= 1) {
@@ -137,12 +138,12 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         }
 
     function handleResize() {
-      var height = 0;
-      var width = 0;
+      let height = 0;
+      let width = 0;
       if (divRef.current && divRef.current.offsetParent) {
           const dashboardRect = divRef.current.offsetParent.getBoundingClientRect();
           const headerHeight = divRef.current.offsetParent.querySelector('header')?.getBoundingClientRect().height ?? 0;
-          var sideBarwidth = document.getElementById('Sidebar')?.getBoundingClientRect().width ?? 0;
+          let sideBarwidth = document.getElementById('Sidebar')?.getBoundingClientRect().width ?? 0;
           if (sideBarwidth === dashboardRect.width)
               sideBarwidth = 0;
           height = (dashboardRect.height - headerHeight) * 0.9;
@@ -404,9 +405,9 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     }, [YouWin, YouLose, YouDraw])
 
     if (canvasSize.width < canvasSize.height)
-        var isvertical = true;
+        isvertical = true;
     else
-        var isvertical = false;
+        isvertical = false;
     return (
       !isReady ? <MatchMaking/> :
       LeaveGame && (YouWin || (!YouWin && !YouLose && !YouDraw))  ? <GameResult result="win" /> :

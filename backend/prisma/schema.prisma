@@ -45,7 +45,6 @@ model User {
   paddle_color                  String?                @default("#E0E0E0")
   ball_color                    String?                @default("#E0E0E0")
   location                      String?
-  status                        String?
   cursus_users                  Cursus?                @relation(fields: [cursusId], references: [id])
   intraId                       Int?
   banner                        String?
@@ -61,9 +60,10 @@ model User {
   Notification                  Notification[]
   ChanneLNotifications          ChanneLNotifications[]
   twoFactorAuthenticationSecret String?
-  twoFA                         Boolean                @default(false)
-  MyScore                       Match[]                @relation("Player1")
-  Other                         Match[]                @relation("Player2")
+  twoFA                         Boolean         @default(false)
+  MyScore                       Match[]         @relation("Player1")
+  Other                         Match[]         @relation("Player2")
+  status                        String          @default("online") // need to be checked
 }
 
 model Match {

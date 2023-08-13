@@ -37,16 +37,19 @@ const page = () => {
                   </button>
                 </Dialog.Trigger>
                 <Dialog.Portal>
-                  <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0" />
+                  <Dialog.Overlay
+                    onPointerDown={(e) => e.stopPropagation()}
+                    className="bg-black opacity-60 data-[state=open]:animate-overlayShow fixed inset-0"
+                  />
                   <Dialog.Content
-                    className="data-[state=open]:animate-contentShow flex flex-col items-center gap-4 xl:gap-8 text-white rounded-lg bg-[#243230] p-6 fixed top-[25%] left-[50%] max-h-full w-[90vw] max-w-[800px] translate-x-[-50%] lg:translate-x-[-45%] xl:translate-x-[-35%] translate-y-[-50%] 
-                    shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px]
-                    focus:outline-none"
+                    className="flex flex-col items-center gap-6 lg:gap-8 xl:gap-10 data-[state=open]:animate-contentShow text-white rounded-lg bg-[#243230] p-6 fixed top-1/2 left-1/2 max-h-full w-[80vw] md:w-[50vw] xl:w-[35vw] translate-x-[-50%] translate-y-[-50%] 
+                  shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px]
+                  focus:outline-none"
                   >
-                    <Dialog.Title className="text-lg lg:text-xl 2xl:text-2xl self-start">
+                    <Dialog.Title className="text-xl lg:text-2xl xl:text-3xl font-bold tracking-wide">
                       Game settings
                     </Dialog.Title>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-4 md:gap-6 2xl:gap-10 xl:text-lg">
+                    <div className="grid grid-cols-3 gap-4 md:gap-6 2xl:gap-10 xl:text-lg">
                       {GameThemes.map((theme, index) => {
                         const gradientStyle = {
                           backgroundImage: `linear-gradient(to right, ${theme.left}, ${theme.right})`,
@@ -70,11 +73,6 @@ const page = () => {
                         </button>
                       </Dialog.Close>
                     </div>
-                    <Dialog.Close asChild>
-                      <button className="text-white top-5 right-5 absolute">
-                        <Cross2Icon />
-                      </button>
-                    </Dialog.Close>
                   </Dialog.Content>
                 </Dialog.Portal>
               </Dialog.Root>
