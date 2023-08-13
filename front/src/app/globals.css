@@ -78,6 +78,18 @@
   }
 }
 
+.spin-button-none::-webkit-inner-spin-button,
+.spin-button-none::-webkit-outer-spin-button {
+  appearance: none;
+}
+
+.twoFactor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 *::-webkit-scrollbar {
   display: none;
 }

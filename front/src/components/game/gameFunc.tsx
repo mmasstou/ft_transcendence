@@ -112,7 +112,7 @@ function drawScore(
           ScoreCtx && (ScoreCtx.fillStyle = '#fff') && (ScoreCtx.font = str);
           ScoreCtx.beginPath();
           if (isMobile){
-              var rotation = Math.PI * 1.5;
+              let rotation = Math.PI * 1.5;
               ScoreCtx.translate(canvas.width/2, canvas.height/2);
               ScoreCtx.rotate(rotation);
               ScoreCtx.translate(-canvas.height/2, -canvas.width/2);
@@ -166,7 +166,7 @@ function Player1Draw(canvas: HTMLCanvasElement | null, socket: any, table_obj: t
     const playerLayer = document.createElement('canvas');
     const playerCtx = playerLayer.getContext('2d');
     if (canvas && playerCtx) {
-        var is_vertical = canvas.height > canvas.width ? true : false;
+        let is_vertical = canvas.height > canvas.width ? true : false;
         playerLayer.width = canvas.width;
         playerLayer.height = canvas.height;
         playerLayer.style.position = 'absolute';
@@ -188,7 +188,7 @@ function Player2Draw(canvas: HTMLCanvasElement | null, socket: any, table_obj: t
     const playerLayer = document.createElement('canvas');
     const playerCtx = playerLayer.getContext('2d');
     if (canvas && playerCtx) {
-        var is_vertical = canvas.height > canvas.width ? true : false;
+        let is_vertical = canvas.height > canvas.width ? true : false;
         playerLayer.width = canvas.width;
         playerLayer.height = canvas.height;
         playerLayer.style.position = 'absolute';
@@ -215,14 +215,14 @@ function drawingBall(
     const ballLayer = document.createElement('canvas');
     const ballCtx = ballLayer.getContext('2d');
     if (canvas) {
-        var ball_rad = (canvas.width + canvas.height) / 120;
-        var ball = {
+        let ball_rad = (canvas.width + canvas.height) / 120;
+        let ball = {
             x:BallObj.x,
             y:BallObj.y,
         }
         if (socket && socket.auth.UserId === Table_obj.player2.UserId)
             ball.x = 100 - ball.x;
-        var is_vertical = canvas.height > canvas.width ? true : false;
+        let is_vertical = canvas.height > canvas.width ? true : false;
         ballLayer.width = canvas.width;
         ballLayer.height = canvas.height;
         ballLayer.style.position = 'absolute';

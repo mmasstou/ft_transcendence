@@ -36,6 +36,8 @@ services:
       - backend/.env
     networks:
       - APInetwork
+    ports:
+      - 5432:5432
     volumes:
       - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
   

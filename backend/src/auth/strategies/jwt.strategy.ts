@@ -18,6 +18,7 @@ export type JwtPayload = {
   id: number;
   intraId: number;
 };
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private prisma: PrismaService) {
@@ -43,6 +44,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
 
     if (!user) throw new UnauthorizedException('Please log in to continue');
+    if (!user.twoFA) return user;
 
     return {
       login: payload.login,
