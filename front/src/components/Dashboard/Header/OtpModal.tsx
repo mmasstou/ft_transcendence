@@ -6,12 +6,13 @@ import toast from 'react-hot-toast';
 
 interface Props {
   setOpenModal: (openModal: boolean) => void;
+  setTwoFA: (twoFA: boolean) => void;
 }
 
 export const otpContext = React.createContext<Props | null>(null);
 
 let currentOtpIndex: number = 0;
-const Otp: React.FC<Props> = ({ setOpenModal }) => {
+const Otp: React.FC<Props> = ({ setOpenModal, setTwoFA }) => {
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(''));
   const [activeOtp, setActiveOtp] = useState<number>(0);
@@ -80,6 +81,7 @@ const Otp: React.FC<Props> = ({ setOpenModal }) => {
             )
             .then((response) => {
               if (response.status === 200) {
+                setTwoFA(true);
                 toast.success('Two factor authentication enabled');
               }
             })
@@ -185,16 +187,27 @@ const Otp: React.FC<Props> = ({ setOpenModal }) => {
 
 interface OtpModalProps {
   setOpenModal: (openModal: boolean) => void;
+  setTwoFA: (twoFA: boolean) => void;
 }
 
-const OtpModal: React.FC<OtpModalProps> = ({ setOpenModal }) => {
+const OtpModal: React.FC<OtpModalProps> = ({ setOpenModal, setTwoFA }) => {
+  const handlClick = () => {
+    setOpenModal(false);
+  };
   return (
     <>
       <div
         className="bg-[#3E867C] w-full min-h-full flex flex-col justify-center items-center
-        gap-4 py-4 z-[999] rounded-lg twoFactor"
+        gap-4 py-5 z-[999] rounded-lg twoFactor"
       >
-        <Otp setOpenModal={setOpenModal} />
+        <button
+          onClick={handlClick}
+          className="absolute bg-secondary rounded-full top-2 right-4 w-5 h-5 
+            text-white flex items-center justify-center"
+        >
+          X
+        </button>
+        <Otp setOpenModal={setOpenModal} setTwoFA={setTwoFA} />
       </div>
     </>
   );
