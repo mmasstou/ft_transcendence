@@ -55,27 +55,43 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket, viewd }: ChanneLSid
     //     router.push(`/chat/channels?r=${selectedchanneL.id}`)
     //   }
     // }
+    if (selectedchanneL?.hasAccess) {
+      channeLPasswordAccessHook.onOpen(
+        selectedchanneL,
+        socket,
+        'accessToroom',
+        selectedchanneL,
+        "ACCESS"
+      )
+      return
+    }
     if (!selectedchanneL) return
     selectedchanneL && socket?.emit('accessToroom', selectedchanneL, (response: any) => { })
-    router.push(`/chat/channels?r=${selectedchanneL.id}`)
+
     if (isMobile) leftSidebar.onClose()
   }, [selectedchanneL])
 
 
-  socket?.on('joinroomResponseEvent', (data) => {
-    console.log("joinroomResponseEvent :", data)
-
-  })
-
   useEffect(() => {
-    if (params) {
-      if (params.get('r') === room.id) {
-        room && socket?.emit('accessToroom', room, (response: any) => {
-          router.push(`/chat/channels?r=${params.get('r')}`)
-        })
+    socket?.on('joinroomResponseEvent', (data) => {
+      console.log("joinroomResponseEvent :", data)
+      if (data) {
+        router.push(`/chat/channels?r=${data.id}`)
+        router.refresh()
       }
-    }
-  }, [params])
+
+    })
+  }, [socket])
+
+  // useEffect(() => {
+  //   if (params) {
+  //     if (params.get('r') === room.id) {
+  //       room && socket?.emit('accessToroom', room, (response: any) => {
+  //         router.push(`/chat/channels?r=${params.get('r')}`)
+  //       })
+  //     }
+  //   }
+  // }, [params])
 
 
 

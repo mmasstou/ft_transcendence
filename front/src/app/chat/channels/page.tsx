@@ -121,9 +121,9 @@ export default function page() {
             setmemberHasAccess(true)
           }
         });
-        room && socket?.emit('accessToroom', room, (response: any) => {
+        // room && socket?.emit('accessToroom', room, (response: any) => {
 
-        })
+        // })
       }
     })();
   }, [_ChanneLsActiveID, socket])

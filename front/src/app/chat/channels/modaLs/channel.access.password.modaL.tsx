@@ -28,7 +28,7 @@ enum RoomType {
     PRIVATE = 'PRIVATE',
 }
 const ChanneLPasswordAccessModaL = () => {
-    const { IsOpen, onClose, onOpen, socket, room, OnSave, password } = ChanneLPasswordAccessHook()
+    const { IsOpen, onClose, onOpen, socket, room, OnSave, password, event, accesstype, data } = ChanneLPasswordAccessHook()
     const route = useRouter()
     const [aLLfriends, setfriends] = useState<any[] | null>(null)
     const [userId, setuserId] = useState<userType | null>(null)
@@ -46,20 +46,27 @@ const ChanneLPasswordAccessModaL = () => {
         }
     }, [IsOpen])
     const onSubmit = () => {
-        if (!UserId) return;
+        if (!UserId || !room) return;
         // create private room : createroom
         // check if passaword is room password
-        console.log("Acces password :", room?.password)
-        console.log("InputValue :", InputValue)
-        if (InputValue !== room?.password) {
-            toast.error('the password not match');
-            setInputValue('')
-            return
+        if (accesstype === "JOIN") {
+            console.log("Acces password :", room?.password)
+            console.log("InputValue :", InputValue)
+            if (InputValue !== room?.password) {
+                toast.error('the password not match');
+                setInputValue('')
+                return
+            }
+        }
+        if (accesstype === "ACCESS") {
+            if (InputValue !== room?.accesspassword) {
+                toast.error('the password not match');
+                setInputValue('')
+                return
+            }
         }
         console.log("the password is match you can acces now!")
-        socket?.emit(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
-            { userid: UserId, roomid: room.id });
+        socket?.emit(event, data);
         onClose()
     }
 
@@ -135,7 +142,7 @@ const ChanneLPasswordAccessModaL = () => {
         </div>
     )
 
-    return <ChanneLModal IsOpen={IsOpen} title={`Toin To ${room?.name}`} children={bodyContent} onClose={onClose} />
+    return <ChanneLModal IsOpen={IsOpen} title={`Join To ${room?.name}`} children={bodyContent} onClose={onClose} />
 
 }
 export default ChanneLPasswordAccessModaL

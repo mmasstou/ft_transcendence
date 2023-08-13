@@ -445,7 +445,7 @@ export class ChatGateway implements OnGatewayConnection {
         LogedUser.id,
       );
       // console.log('Chat-> responseMemberData- +>', responseMemberData);
-      if (_isMemberInRoom !== null && !client.rooms.has(data.id)) {
+      if (_isMemberInRoom !== null) {
         await client.join(data.id);
         // send response to client :
         client.emit('joinroomResponseEvent', room);
@@ -624,7 +624,26 @@ export class ChatGateway implements OnGatewayConnection {
           });
           console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
           client.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            updateRoom,
+          );
+          this.server.emit('ChatUpdate', updateRoom);
+        }
+        // remove access password :
+        if (data.Updatetype === UpdateChanneLSendEnum.REMOVEACCESSEPASSWORD) {
+          const dataRoom = {
+            accesspassword: '',
+            hasAccess: false,
+          };
+          const updateRoom = await this.prisma.rooms.update({
+            where: { id: room.id },
+            data: {
+              ...dataRoom,
+            },
+          });
+          console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
+          client.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
             updateRoom,
           );
           this.server.emit('ChatUpdate', updateRoom);

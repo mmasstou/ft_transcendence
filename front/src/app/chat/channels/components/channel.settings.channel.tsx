@@ -18,7 +18,7 @@ import { FaChessQueen, FaUserTimes } from 'react-icons/fa';
 import { useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
 import getChannelMembersWithId from '../actions/getChannelmembers';
-import { RoomTypeEnum, RoomsType, UserTypeEnum, membersType } from '@/types/types';
+import { RoomTypeEnum, RoomsType, UpdateChanneLSendData, UpdateChanneLSendEnum, UserTypeEnum, membersType } from '@/types/types';
 import getMemberWithId from '../actions/getMemberWithId';
 import { Socket } from 'socket.io-client';
 import Image from 'next/image';
@@ -33,6 +33,8 @@ import { AiOutlineDelete } from 'react-icons/ai';
 import ChanneLSettingsChanneLDeleteChannel from './channel.settings.channel.deletechannel';
 import PermissionDenied from './channel.settings.permissiondenied';
 import ChanneLSettingsChanneLChangePassword from './channel.settings.channel.changepassword';
+import ChanneLConfirmActionHook from '../hooks/channel.confirm.action';
+import { PiPasswordBold } from 'react-icons/pi';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
@@ -47,7 +49,8 @@ export enum SETTINGSTEPS {
     LEAVECHANNEL = 5,
     ACCESSPASSWORD = 6,
     REMOVEACCESSPASSWORD = 7,
-    DELETECHANNEL = 8
+    DELETECHANNEL = 8,
+    EDITACCESSPASSWORD = 9
 }
 
 
@@ -57,6 +60,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     const [members, setMembers] = React.useState<membersType[] | null>(null)
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
     const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
+    const channeLConfirmActionHook = ChanneLConfirmActionHook()
     const params = useSearchParams()
     const channeLLid = params.get('r')
     const __userId = Cookies.get('_id')
@@ -95,6 +99,32 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
 
     }, [update])
 
+    const DeleteAccessPassword = async () => {
+        if (!ChanneLinfo) return;
+
+        const data: UpdateChanneLSendData = {
+            Updatetype: UpdateChanneLSendEnum.REMOVEACCESSEPASSWORD,
+            room: ChanneLinfo,
+        }
+        // chack if  password is not empty and if password is not equal to confirm password
+        console.log("DeleteAccessPassword :", ChanneLinfo)
+        const __message = 'are you sure you whon to access password`s for this channel';
+        __message && channeLConfirmActionHook.onOpen(
+            <button
+                onClick={() => {
+                    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+                }}
+                className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
+                remove Access password
+            </button>
+            , __message
+        )
+        // send data to server
+        // socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+        //   reset data for password
+        // reset()
+    }
+
     React.useEffect(() => {
         // get channel info :
         const token: any = Cookies.get('token');
@@ -107,6 +137,17 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             }
         })();
     }, [step])
+
+    React.useEffect(() => {
+
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+            if (!data) return
+            console.log("NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE :", data)
+            channeLConfirmActionHook.onClose()
+            setChanneLinfo(data);
+            OnBack()
+        })
+    }, [socket])
     const {
         control,
         register,
@@ -145,8 +186,8 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     const OnBack = () => {
         setStep(SETTINGSTEPS.CHOICE)
     }
-    const OnLeaveChannel = () => {
-
+    const OnEditAccessPassword = () => {
+        setStep(SETTINGSTEPS.EDITACCESSPASSWORD)
     }
     const OnAccessPassword = () => {
         setStep(SETTINGSTEPS.ACCESSPASSWORD)
@@ -216,7 +257,8 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                         <BsArrowRightShort size={24} />
                     </div>
                 </button>
-                <button
+                {/* set access password */}
+                {!ChanneLinfo?.hasAccess && <button
                     onClick={() => {
 
                         OnAccessPassword()
@@ -226,28 +268,38 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                         <TbPassword size={32} />
                     </div>
                     <div>
-                        <h2 className='text-white font-semibold capitalize'>access password</h2>
+                        <h2 className='text-white font-semibold capitalize'>set access password</h2>
                     </div>
                     <div className='text-white'>
                         <BsArrowRightShort size={24} />
                     </div>
-                </button>
-                <button
-                    onClick={() => {
-
-
-                    }}
+                </button>}
+                {ChanneLinfo?.hasAccess && <button
+                    onClick={ OnEditAccessPassword} 
+                    className="flex flex-row justify-between items-center shadow p-2 rounded">
+                    <div className='flex justify-center items-center p-3 rounded bg-secondary  text-white'>
+                        <PiPasswordBold size={32} />
+                    </div>
+                    <div>
+                        <h2 className='text-white font-semibold capitalize'>Edit access password</h2> 
+                    </div>
+                    <div className='text-white'>
+                        <BsArrowRightShort size={24} />
+                    </div>
+                </button>}
+                {ChanneLinfo?.hasAccess && <button
+                    onClick={DeleteAccessPassword} 
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
                     <div className='flex justify-center items-center p-3 rounded bg-secondary  text-white'>
                         <IoBagRemove size={32} />
                     </div>
                     <div>
-                        <h2 className='text-white font-semibold capitalize'>remove access password</h2>
+                        <h2 className='text-white font-semibold capitalize'>remove access password</h2> 
                     </div>
                     <div className='text-white'>
                         <BsArrowRightShort size={24} />
                     </div>
-                </button>
+                </button>}
             </div>
         </div>
     )
@@ -270,12 +322,23 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             OnBack={OnBack} LogedMember={LogedMember} members={members}
         /> : (<div></div >)
     }
-    if (step === SETTINGSTEPS.ACCESSPASSWORD && ChanneLinfo?.hasAccess === false) {
+    if (step === SETTINGSTEPS.ACCESSPASSWORD && !ChanneLinfo?.hasAccess) {
         _body = <ChanneLSettingsChanneLAccessPassword
             setUpdate={setUpdate}
             socket={socket}
-            room={ChanneLinfo}
-            OnBack={OnBack} LogedMember={LogedMember} members={members}
+            OnBack={OnBack}
+            LogedMember={LogedMember}
+            members={members}
+        />
+    }
+    if (step === SETTINGSTEPS.EDITACCESSPASSWORD && ChanneLinfo?.hasAccess) {
+        _body = <ChanneLSettingsChanneLAccessPassword
+            setUpdate={setUpdate}
+            socket={socket}
+            title="Edit Access Password"
+            OnBack={OnBack}
+            LogedMember={LogedMember}
+            members={members}
         />
     }
     if (step === SETTINGSTEPS.CHANGECHANNEL) {

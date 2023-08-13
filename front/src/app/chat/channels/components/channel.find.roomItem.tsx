@@ -3,18 +3,21 @@ import { on } from "events";
 import { use, useEffect, useRef, useState } from "react";
 import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook";
 import { Socket } from "socket.io-client";
+import { useSearchParams } from "next/navigation";
+import Cookies from "js-cookie";
 
 interface ChannelFindRoomItemProps {
     room: RoomsType;
-    onClick: (data: { room: RoomsType}) => void
-    socket : Socket | null
+    onClick: (data: { room: RoomsType }) => void
+    socket: Socket | null
 }
-export default function ChannelFindRoomItem({ room, onClick , socket}: ChannelFindRoomItemProps) {
+export default function ChannelFindRoomItem({ room, onClick, socket }: ChannelFindRoomItemProps) {
     const [InputValue, setInputValue] = useState("")
     const [joinBtn, setJoinBtn] = useState(false)
     const [passwordInput, setPasswordInput] = useState(false)
     const inputRef = useRef<HTMLInputElement | null>(null);
     const channeLPasswordAccessHook = ChanneLPasswordAccessHook()
+    const UserId = Cookies.get('_id')
 
 
     useEffect(() => {
@@ -40,7 +43,12 @@ export default function ChannelFindRoomItem({ room, onClick , socket}: ChannelFi
                 onClick={() => {
                     setJoinBtn(true)
                     if (room.type === RoomTypeEnum.PROTECTED) {
-                        channeLPasswordAccessHook.onOpen(room, socket)
+                        channeLPasswordAccessHook.onOpen(
+                            room,
+                            socket,
+                            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
+                            { userid: UserId, roomid: room.id },
+                            "JOIN")
                     }
                     onClick({ room })
                 }}

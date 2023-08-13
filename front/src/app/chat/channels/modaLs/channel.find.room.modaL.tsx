@@ -9,12 +9,10 @@ import getPublicProtactedChannels from "../actions/getPublicProtactedChannels"
 import Image from "next/image"
 import { toast } from "react-hot-toast"
 import { useRouter } from "next/navigation"
-import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
 import { env } from "process"
 
 export default function ChanneLFindRoommodaL() {
     const { IsOpen, onClose, onOpen, socket } = ChanneLFindRoommodaLHook()
-    const channeLPasswordAccessHook = ChanneLPasswordAccessHook()
     const [rooms, setrooms] = useState<RoomsType[] | null>(null)
     const [roomsFiltered, setroomsFiltered] = useState<RoomsType[] | null>(null)
     const [InputValue, setInputValue] = useState("")
