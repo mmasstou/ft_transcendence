@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
-import { UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
+import { USERSETTINGSTEPS, UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import Cookies from "js-cookie";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -23,16 +23,14 @@ import getmessage from "../actions/member.action.message";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import StartGame from "../actions/startgame";
+import ChanneLsettingsPlayGame from "./channel.settings.playgame";
+import { steps } from "framer-motion";
 
 interface ChanneLUserSettingsProps {
     socket: Socket | null
 }
 
-enum USERSETTINGSTEPS {
-    INDEX = 0,
-    PLAYGAME = 1,
-    MEMBERJOIN = 2,
-}
+
 
 export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps) {
 
@@ -100,6 +98,28 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
             //     setLogedMember(channeLLMembers)
             // }
             channeLConfirmActionHook.onClose()
+        })
+
+        socket?.on('notificationEvent',(data) => {
+            (async () => {
+                const body = {       ///////////////////////////////////////////////////////// body
+                    player1Id: PlayGameWith?.userId,
+                    player2Id: LogedMember?.userId,
+                    mode: "time"
+                }
+                // await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, body).then((result) => {
+                //     console.log("await axios.post(`${process.env.NEXT_PUBLIC :", result)
+                //     router.push('/game/score/robot')
+                // }).catch(() => {
+                //     toast.error("error")
+                // })
+
+                const token: any = Cookies.get('token');
+                if (!token) return;
+                const g = await StartGame(body, token);
+                if (!g) return;
+                router.push('/game/time/friend')
+            })();
         })
     }, [socket])
 
@@ -186,109 +206,15 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
         </>
     )
     if (step === USERSETTINGSTEPS.PLAYGAME) {
-        bodyContent = (
-            <>
-                <div className="flex flex-row justify-center items-center gap-2">
-                    <Button
-                        icon={IoChevronBackOutline}
-                        label={"back"}
-                        outline
-                        size={21}
-                        labelsize={8}
-                        onClick={() => {
-                            setStep(USERSETTINGSTEPS.INDEX)
-                        }}
-                    />
-                </div>
-                <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
-                    <div className="flex flex-col h-full w-full justify-start gap-4 items-center min-h-[34rem] ">
-                        <div className="flex flex-col justify-center items-center gap-3">
-                            <Image src="/game-mode.svg" width={200} height={200} alt={""} />
-                            {/* <h2 className=" capitalize font-extrabold text-white">permission denied</h2> */}
-                        </div>
-                        <h2>
-                            P1 :{PlayGameWith?.userId} <br />
-                            p2 : {LogedMember?.userId}
-                        </h2>
-                        <div className="flex flex-col gap-3  w-full">
-                            <button
-                                onClick={() => {
-                                    (async () => {
-                                        const body = {       ///////////////////////////////////////////////////////// body
-                                            player_Id: LogedMember?.userId,
-                                            player2Id: PlayGameWith?.userId,
-                                            mode: "time"
-                                        }
-                                        // await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, body).then((result) => {
-                                        //     console.log("await axios.post(`${process.env.NEXT_PUBLIC :", result)
-                                        //     router.push('/game/score/robot')
-                                        // }).catch(() => {
-                                        //     toast.error("error")
-                                        // })
+        bodyContent = <ChanneLsettingsPlayGame Onback={() => {setStep(USERSETTINGSTEPS.INDEX)}} onClick={function (): void {
 
-                                        const token: any = Cookies.get('token');
-                                        if (!token) return;
-                                        const g = await StartGame({       ///////////////////////////////////////////////////////// body
-                                            player_Id: LogedMember?.userId,
-                                            mode: "time"
-                                        }, token);
-                                        if (!g) return;
-                                        router.push('/game/score/robot')
-                                    })
-                                }}
-                                className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-[#FFCC00] hover:border">
-                                <div className='flex justify-center items-center p-3 rounded bg-[#FFCC00] text-white'>
-                                    <TfiTimer size={28} />
-                                </div>
-                                <div>
-                                    <h2 className='text-white'>Time Mode</h2>
-                                </div>
-                                <div className='text-white'>
-                                    <BsArrowRightShort size={24} />
-                                </div>
-                            </button>
-                            <button
-                                onClick={() => {
-                                    // const body = {       ///////////////////////////////////////////////////////// body
-                                    //     player_Id: LogedMember?.userId,
-                                    //     player2Id: PlayGameWith?.userId,
-                                    //     mode: "score"
-                                    // }
-                                    // axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, body).then((result) => {
-                                    //     router.push('/game/score/robot')
-                                    // })
-                                    (async () => {
-                                        console.log("${process.env.NEXT_PUBLIC_API_URL}/game/BotGame :", `${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`)
-                                        const token: any = Cookies.get('token');
-                                        if (!token) return;
-                                        const g = await StartGame({       ///////////////////////////////////////////////////////// body
-                                            player_Id: LogedMember?.userId,
-                                            mode: "time"
-                                        }, token);
-                                        console.log("++++++++++++++++++++++++++++++> game:",g)
-                                        if (!g) return;
-                                        toast.success("play ....")
-                                        router.push('/game/score/robot')
-                                    })
-                                }}
-                                className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-secondary hover:border">
-                                <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                                    <MdOutlineScoreboard size={28} />
-                                </div>
-                                <div>
-                                    <h2 className='text-white'>Score Mode</h2>
-                                </div>
-                                <div className='text-white'>
-                                    <BsArrowRightShort size={24} />
-                                </div>
-                            </button>
+            // send initaion to player 02
+            socket?.emit('sendNotification', {
+                userId: PlayGameWith?.userId,
+                senderId: LogedMember?.userId
+            })
 
-                        </div>
-                    </div>
-                </div>
-
-            </>
-        )
+        }} player1Id={PlayGameWith?.userId} player2Id={LogedMember?.userId} />
     }
     if (step === USERSETTINGSTEPS.MEMBERJOIN) {
         bodyContent = <ChanneLSettingsMemberJoinModaL socket={socket} OnClick={() => {

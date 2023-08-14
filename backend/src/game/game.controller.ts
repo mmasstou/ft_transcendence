@@ -28,7 +28,9 @@ export class GameController {
   @Post('/FriendGame')
   async selectFriendGame(@Body() body: any) {
     try {
+      console.log('selectFriendGame(@Body() body: any) :', body);
       const tableId = await this.GameGateway.CreateFriendTable(body);
+      console.log('this.GameGateway.CreateFriendTable(body); :', tableId);
       this.BallGateway.CreateFriendTable(body, tableId);
     } catch (err) {
       throw new HttpException({ reason: err }, HttpStatus.CONFLICT);

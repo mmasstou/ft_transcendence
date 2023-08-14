@@ -5,12 +5,14 @@ interface toastProps {
   t: Toast;
   user: string;
   message: string;
+  OnAccept : () => void;
 }
 
 const Invitation: React.FC<toastProps> = (props: toastProps) => {
   const handleAccept = (e: React.MouseEvent<HTMLButtonElement>, t: Toast) => {
     e.preventDefault();
     toast.dismiss(t.id);
+    props.OnAccept()
   };
   return (
     <div className="flex flex-col items-center gap-4 my-2">
@@ -39,11 +41,12 @@ interface toastInfo {
   isOpen: boolean;
   user: string;
   message: string;
+  OnAccept: () => void
 }
 
 const MyToast: React.FC<toastInfo> = (props: toastInfo) => {
   if (props.isOpen === false) return null;
-  toast((t) => <Invitation t={t} user={props.user} message={props.message} />, {
+  toast((t) => <Invitation OnAccept={props.OnAccept} t={t} user={props.user} message={props.message} />, {
     style: {
       background: '#2B504B',
       color: '#ffffff',

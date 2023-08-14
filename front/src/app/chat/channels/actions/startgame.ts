@@ -1,7 +1,7 @@
 
 const StartGame = async (body: any, token : string) => {
     try {
-        const response =  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, {
+        const response =  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/game/FriendGame`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

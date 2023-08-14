@@ -1,4 +1,6 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
@@ -45,6 +47,15 @@ export class UserGateway implements OnGatewayConnection {
       }
       return User;
     }
+  }
+
+  @SubscribeMessage('AcceptGame')
+  async handleAcceptGame(
+    @MessageBody() data: { userId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log('User-> data :', data);
+    client.emit('AcceptGameResponse', { response: 'ok' });
   }
 
   sendMessageToSocket(socket: Socket, message: any) {

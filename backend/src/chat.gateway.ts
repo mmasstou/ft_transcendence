@@ -211,7 +211,6 @@ export class ChatGateway implements OnGatewayConnection {
     if (!senderinvit) return;
     await this.sendNotification({
       userId: data.userid,
-      room: room,
       senderId: senderinvit.id,
     });
     try {
@@ -669,7 +668,7 @@ export class ChatGateway implements OnGatewayConnection {
   }
   @SubscribeMessage('sendNotification')
   async sendNotification(
-    @MessageBody() data: { userId: string; room: Rooms; senderId: string },
+    @MessageBody() data: { userId: string; senderId: string },
   ) {
     try {
       console.log('Chat-> sendNotification +> data :', data);

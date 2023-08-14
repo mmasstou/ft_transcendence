@@ -3,7 +3,7 @@ import './dashboard.css';
 import Sidebar from '@/components/Dashboard/sidebar/Sidebar';
 import Login from '@/components/auth/modaLs/Login';
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
@@ -24,6 +24,7 @@ interface Props {
 const Dashboard = ({ children }: Props) => {
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const router = useRouter();
+  const params = useSearchParams()
   const [Notifications, setNotifications] = React.useState<any>(null)
 
   socket?.on('notificationEvent', (data) => {
@@ -74,7 +75,13 @@ const Dashboard = ({ children }: Props) => {
       <ChanneLaccessDeniedModaL />
       <ChanneLPasswordAccessModaL />
       {
-        Notifications && <MyToast  isOpen user={Notifications.sender.login} message={Notifications.message} />
+        Notifications && <MyToast OnAccept={() => {
+          if (!params) return;
+          const userId = Cookies.get('_id')
+          if (!userId) return
+          console.log("++++++++++++++++++++++++>:", userId)
+          socket?.emit('AcceptGame', { userId: userId })
+        }} isOpen user={Notifications.sender.login} message={Notifications.message} />
       }
       <div className="dashboard bg-primary overflow-y-auto">
         <header className="bg-transparent flex items-center justify-between px-5 ">

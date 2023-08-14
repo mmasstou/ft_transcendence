@@ -140,3 +140,9 @@ export type UpdateChanneLSendData = {
   roomtype?: RoomTypeEnum;
   room: RoomsType;
 };
+
+export enum USERSETTINGSTEPS {
+  INDEX = 0,
+  PLAYGAME = 1,
+  MEMBERJOIN = 2,
+}
