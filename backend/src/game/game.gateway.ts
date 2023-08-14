@@ -20,7 +20,6 @@ import {
 } from '../../tools/class';
 import { GameService } from './game.service';
 
-
 const UserMap: UserMap = new Map(); ////////// list of user connected to the game
 const TableMap: TableMap = new Map(); ////////// list of table obj created
 const RandomListTime = new UniqueSet(); ////////// list of random time obj created
@@ -225,7 +224,6 @@ class BallGateway implements OnGatewayConnection {
   }
 }
 
-
 @Injectable()
 @WebSocketGateway({ namespace: 'game' })
 class MyGateway implements OnGatewayConnection {
@@ -257,7 +255,7 @@ class MyGateway implements OnGatewayConnection {
       return new Error('User already in game');
     } else {
       table_obj.tableId = uuidv4();
-      
+
       if (
         UserMap.get(data.player1Id) &&
         UserMap.get(data.player2Id) &&
@@ -265,12 +263,14 @@ class MyGateway implements OnGatewayConnection {
         UserMap.get(data.player2Id).SocketId &&
         table_obj.tableId
       ) {
-        UserMap.get(data.player1Id).User = await this.GameService.updateStatus(
-          { id: data.player1Id, status: 'InGame' },
-        );
-        UserMap.get(data.player2Id).User = await this.GameService.updateStatus(
-          { id: data.player2Id, status: 'InGame' },
-        );
+        UserMap.get(data.player1Id).User = await this.GameService.updateStatus({
+          id: data.player1Id,
+          status: 'InGame',
+        });
+        UserMap.get(data.player2Id).User = await this.GameService.updateStatus({
+          id: data.player2Id,
+          status: 'InGame',
+        });
         UserMap.get(data.player1Id).Status = 'InGame';
         UserMap.get(data.player2Id).Status = 'InGame';
         UserMap.get(data.player1Id).TableId = table_obj.tableId;
@@ -391,9 +391,9 @@ class MyGateway implements OnGatewayConnection {
         else RandomListScore.add(obj);
         if (RandomListTime.length >= 2 || RandomListScore.length >= 2) {
           table_obj.tableId = uuidv4();
+          table_obj.GameType = 'random';
           if (RandomListTime.length >= 2) {
             table_obj.GameMode = 'time';
-            table_obj.GameType = 'random';
             table_obj.player1 = RandomListTime.getfirst.player;
             table_obj.player2 = RandomListTime.getfirst.player;
             UserMap.get(table_obj.player1.UserId) &&
@@ -411,15 +411,16 @@ class MyGateway implements OnGatewayConnection {
             TableMap.set(table_obj.tableId, table_obj);
             this.BallGateway.CreateRandomTable(data, table_obj);
             table_obj = new TableObj(currents);
-            return null;
           } else {
             table_obj.GameMode = 'score';
             table_obj.player1 = RandomListScore.getfirst.player;
             table_obj.player2 = RandomListScore.getfirst.player;
-            UserMap.get(data.player1_Id) &&
-              (UserMap.get(data.player1_Id).TableId = table_obj.tableId);
-            UserMap.get(data.player2_Id) &&
-              (UserMap.get(data.player2_Id).TableId = table_obj.tableId);
+            UserMap.get(table_obj.player1.UserId) &&
+              (UserMap.get(table_obj.player1.UserId).TableId =
+                table_obj.tableId);
+            UserMap.get(table_obj.player2.UserId) &&
+              (UserMap.get(table_obj.player2.UserId).TableId =
+                table_obj.tableId);
             this.server
               .to(UserMap.get(table_obj.player1.UserId).SocketId)
               .emit('joinRoomGame', table_obj);
