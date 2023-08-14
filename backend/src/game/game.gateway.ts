@@ -20,6 +20,7 @@ import {
 } from '../../tools/class';
 import { GameService } from './game.service';
 
+
 const UserMap: UserMap = new Map(); ////////// list of user connected to the game
 const TableMap: TableMap = new Map(); ////////// list of table obj created
 const RandomListTime = new UniqueSet(); ////////// list of random time obj created
@@ -99,18 +100,18 @@ class BallGateway implements OnGatewayConnection {
 
   async CreateFriendTable(data: any, id: any) {
     if (
-      UserMap.get(data.player1_Id) &&
-      UserMap.get(data.player1_Id).SocketId &&
-      UserMap.get(data.player1_Id).BallSocketId &&
-      UserMap.get(data.player2_Id) &&
-      UserMap.get(data.player2_Id).SocketId &&
-      UserMap.get(data.player2_Id).BallSocketId
+      UserMap.get(data.player1Id) &&
+      UserMap.get(data.player1Id).SocketId &&
+      UserMap.get(data.player1Id).BallSocketId &&
+      UserMap.get(data.player2Id) &&
+      UserMap.get(data.player2Id).SocketId &&
+      UserMap.get(data.player2Id).BallSocketId
     ) {
       this.server
-        .to(UserMap.get(data.player1_Id).BallSocketId)
+        .to(UserMap.get(data.player1Id).BallSocketId)
         .emit('joinRoomBall', id);
       this.server
-        .to(UserMap.get(data.player2_Id).BallSocketId)
+        .to(UserMap.get(data.player2Id).BallSocketId)
         .emit('joinRoomBall', id);
     }
   }
@@ -224,6 +225,7 @@ class BallGateway implements OnGatewayConnection {
   }
 }
 
+
 @Injectable()
 @WebSocketGateway({ namespace: 'game' })
 class MyGateway implements OnGatewayConnection {
@@ -238,46 +240,47 @@ class MyGateway implements OnGatewayConnection {
   server: Server;
 
   async CreateFriendTable(data: any) {
-    if (!UserMap.has(data.player1_Id)) {
-      const _User = await this.usersService.findOne({ id: data.player1_Id });
+    if (!UserMap.has(data.player1Id)) {
+      const _User = await this.usersService.findOne({ id: data.player1Id });
       _User && UserMap.set(_User.id, { User: _User, Status: 'online' });
     }
-    if (!UserMap.has(data.player2_Id)) {
-      const _User = await this.usersService.findOne({ id: data.player2_Id });
+    if (!UserMap.has(data.player2Id)) {
+      const _User = await this.usersService.findOne({ id: data.player2Id });
       _User && UserMap.set(_User.id, { User: _User, Status: 'online' });
     }
     if (
-      (UserMap.get(data.player1_Id) &&
-        UserMap.get(data.player1_Id).Status == 'InGame') ||
-      (UserMap.get(data.player2_Id) &&
-        UserMap.get(data.player2_Id).Status == 'InGame')
+      (UserMap.get(data.player1Id) &&
+        UserMap.get(data.player1Id).Status == 'InGame') ||
+      (UserMap.get(data.player2Id) &&
+        UserMap.get(data.player2Id).Status == 'InGame')
     ) {
       return new Error('User already in game');
     } else {
       table_obj.tableId = uuidv4();
+      
       if (
-        UserMap.get(data.player1_Id) &&
-        UserMap.get(data.player2_Id) &&
-        UserMap.get(data.player1_Id).SocketId &&
-        UserMap.get(data.player2_Id).SocketId &&
+        UserMap.get(data.player1Id) &&
+        UserMap.get(data.player2Id) &&
+        UserMap.get(data.player1Id).SocketId &&
+        UserMap.get(data.player2Id).SocketId &&
         table_obj.tableId
       ) {
-        UserMap.get(data.player1_Id).User = await this.GameService.updateStatus(
-          { id: data.player1_Id, status: 'InGame' },
+        UserMap.get(data.player1Id).User = await this.GameService.updateStatus(
+          { id: data.player1Id, status: 'InGame' },
         );
-        UserMap.get(data.player2_Id).User = await this.GameService.updateStatus(
-          { id: data.player2_Id, status: 'InGame' },
+        UserMap.get(data.player2Id).User = await this.GameService.updateStatus(
+          { id: data.player2Id, status: 'InGame' },
         );
-        UserMap.get(data.player1_Id).Status = 'InGame';
-        UserMap.get(data.player2_Id).Status = 'InGame';
-        UserMap.get(data.player1_Id).TableId = table_obj.tableId;
-        UserMap.get(data.player2_Id).TableId = table_obj.tableId;
-        const user1 = UserMap.get(data.player1_Id).User;
-        const user2 = UserMap.get(data.player2_Id).User;
+        UserMap.get(data.player1Id).Status = 'InGame';
+        UserMap.get(data.player2Id).Status = 'InGame';
+        UserMap.get(data.player1Id).TableId = table_obj.tableId;
+        UserMap.get(data.player2Id).TableId = table_obj.tableId;
+        const user1 = UserMap.get(data.player1Id).User;
+        const user2 = UserMap.get(data.player2Id).User;
         table_obj.GameMode = data.mode;
         table_obj.GameType = 'friend';
-        table_obj.player1.setUserId(data.player1_Id);
-        table_obj.player2.setUserId(data.player2_Id);
+        table_obj.player1.setUserId(data.player1Id);
+        table_obj.player2.setUserId(data.player2Id);
         table_obj.player1.GameSetting.setData(
           user1.bg_color,
           user1.ball_color,
@@ -291,10 +294,10 @@ class MyGateway implements OnGatewayConnection {
           user2.avatar,
         );
         this.server
-          .to(UserMap.get(data.player1_Id).SocketId)
+          .to(UserMap.get(data.player1Id).SocketId)
           .emit('joinRoomGame', table_obj);
         this.server
-          .to(UserMap.get(data.player2_Id).SocketId)
+          .to(UserMap.get(data.player2Id).SocketId)
           .emit('joinRoomGame', table_obj);
         TableMap.set(table_obj.tableId, table_obj);
         this.BallGateway.CreateFriendTable(data, table_obj.tableId);
@@ -306,6 +309,7 @@ class MyGateway implements OnGatewayConnection {
       }
     }
   }
+
   async CreateBotTable(data: any) {
     if (!UserMap.has(data.playerId)) {
       const _User = await this.usersService.findOne({ id: data.playerId });
@@ -358,7 +362,6 @@ class MyGateway implements OnGatewayConnection {
   }
 
   async CreateRandomTable(data: any) {
-    // return new Promise(async (resolve, reject) => {
     if (!UserMap.has(data.playerId)) {
       const _User = await this.usersService.findOne({ id: data.playerId });
       _User && UserMap.set(_User.id, { User: _User, Status: 'online' });
@@ -435,7 +438,6 @@ class MyGateway implements OnGatewayConnection {
         }, 1000);
       }
     }
-    // });
   }
 
   async LeaveGame(data: any) {
