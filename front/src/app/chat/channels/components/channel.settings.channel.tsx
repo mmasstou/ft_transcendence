@@ -35,6 +35,7 @@ import PermissionDenied from './channel.settings.permissiondenied';
 import ChanneLSettingsChanneLChangePassword from './channel.settings.channel.changepassword';
 import ChanneLConfirmActionHook from '../hooks/channel.confirm.action';
 import { PiPasswordBold } from 'react-icons/pi';
+import toast from 'react-hot-toast';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
@@ -107,7 +108,6 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             room: ChanneLinfo,
         }
         // chack if  password is not empty and if password is not equal to confirm password
-        console.log("DeleteAccessPassword :", ChanneLinfo)
         const __message = 'are you sure you whon to access password`s for this channel';
         __message && channeLConfirmActionHook.onOpen(
             <button
@@ -140,14 +140,36 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
 
     React.useEffect(() => {
 
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+        // listen to channels actions response events :
+
+        // change channel password :
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`, (data) => {
+
+        })
+        // change type :
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, (data) => {
+            
+        })
+        // set access password :
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_SET_ACCESS_PASSWORD}`, (data) => {
+            
+        })
+        // remove access password :
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD}`, (data) => {
             if (!data) return
             console.log("NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE :", data)
             channeLConfirmActionHook.onClose()
             setChanneLinfo(data);
             OnBack()
+            toast("NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE")
+        })
+
+         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+            
         })
     }, [socket])
+
+
     const {
         control,
         register,
@@ -275,26 +297,26 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                     </div>
                 </button>}
                 {ChanneLinfo?.hasAccess && <button
-                    onClick={ OnEditAccessPassword} 
+                    onClick={OnEditAccessPassword}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
                     <div className='flex justify-center items-center p-3 rounded bg-secondary  text-white'>
                         <PiPasswordBold size={32} />
                     </div>
                     <div>
-                        <h2 className='text-white font-semibold capitalize'>Edit access password</h2> 
+                        <h2 className='text-white font-semibold capitalize'>Edit access password</h2>
                     </div>
                     <div className='text-white'>
                         <BsArrowRightShort size={24} />
                     </div>
                 </button>}
                 {ChanneLinfo?.hasAccess && <button
-                    onClick={DeleteAccessPassword} 
+                    onClick={DeleteAccessPassword}
                     className="flex flex-row justify-between items-center shadow p-2 rounded">
                     <div className='flex justify-center items-center p-3 rounded bg-secondary  text-white'>
                         <IoBagRemove size={32} />
                     </div>
                     <div>
-                        <h2 className='text-white font-semibold capitalize'>remove access password</h2> 
+                        <h2 className='text-white font-semibold capitalize'>remove access password</h2>
                     </div>
                     <div className='text-white'>
                         <BsArrowRightShort size={24} />

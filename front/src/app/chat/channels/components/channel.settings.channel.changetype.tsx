@@ -9,7 +9,7 @@ import { BsArrowRightShort, BsSaveFill } from "react-icons/bs";
 import { HiLockClosed, HiLockOpen } from "react-icons/hi";
 import ChanneLSettingsOptionItem from "./channel.settings.optionItem";
 import { IconBaseProps } from "react-icons";
-import React, { use, useCallback } from "react";
+import React, { use, useCallback, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useSearchParams } from "next/navigation";
 import getChannelWithId from "../actions/getChannelWithId";
@@ -18,6 +18,8 @@ import { setConstantValue } from "typescript";
 import Button from "../../components/Button";
 import ChanneLSettingsBody from "./channel.settings.body";
 import ChanneLSettingsTitle from "./channel.settings.title";
+import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
+import { toast } from "react-hot-toast";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -30,13 +32,14 @@ export default function ChanneLSettingsChanneLChangeType(
     { socket, OnBack, LogedMember, members, setUpdate }: ChanneLUserSettingsProps) {
     const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
     const [passwordPopup, setPasswordPopup] = React.useState<boolean>(false)
+    const channeLConfirmActionHook = ChanneLConfirmActionHook()
     const params = useSearchParams()
     const channeLLid = params.get('r')
+    const token: any = Cookies.get('token');
+    if (!token) return;
 
     React.useEffect(() => {
-        const token: any = Cookies.get('token');
         if (!channeLLid) return;
-        if (!token) return;
         (async () => {
             const ChanneLinfo = await getChannelWithId(channeLLid, token)
             if (ChanneLinfo && ChanneLinfo.statusCode !== 200) {
@@ -72,33 +75,47 @@ export default function ChanneLSettingsChanneLChangeType(
             return
         }
         // send data to server
-        socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+        // socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+        // change channel type :
+        const __message = `are you sure you whon to change channel type to ${data.roomtype}`;
+        __message && channeLConfirmActionHook.onOpen(
+            <button
+                onClick={() => {
+                    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+                }}
+                className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
+                save
+            </button>
+            , __message)
         //   reset data for password
         reset()
         if (data.roomtype === RoomTypeEnum.PROTECTED) {
             setPasswordPopup(false)
         }
     }
+    useEffect(() => {
 
-    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
-        const token: any = Cookies.get('token');
-        if (!channeLLid) return;
-        if (!token) return;
-        (async () => {
-            const ChanneLinfo = await getChannelWithId(channeLLid, token)
-            if (ChanneLinfo && ChanneLinfo.statusCode !== 200) {
-                setChanneLinfo(ChanneLinfo)
-            }
-        })();
-    })
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, (data) => {
+            data && toast.success(data.message)
+            channeLConfirmActionHook.onClose()
+
+        })
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+            if (!channeLLid) return;
+            (async () => {
+                const ChanneLinfo = await getChannelWithId(channeLLid, token)
+                if (ChanneLinfo) setChanneLinfo(ChanneLinfo);
+            })();
+        })
+    }, [socket])
 
     return (
         <ChanneLSettingsBody title={"Change Type"} OnBack={OnBack} >
             {LogedMember?.type === UserTypeEnum.OWNER ? <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full p-6">
-                <div className="flex flex-col gap-4 ">
+                <div className="flex flex-col gap-4 w-full ">
                     <ChanneLSettingsOptionItem
                         onClick={function (): void {
-
+                            setPasswordPopup(false)
                             channeLLid && ChanneLinfo && onSubmit({
                                 roomtype: RoomTypeEnum.PRIVATE,
                                 room: ChanneLinfo,
@@ -153,6 +170,7 @@ export default function ChanneLSettingsChanneLChangeType(
                     }
                     <ChanneLSettingsOptionItem
                         onClick={function (): void {
+                            setPasswordPopup(false)
                             channeLLid && ChanneLinfo && onSubmit({
                                 roomtype: RoomTypeEnum.PUBLIC,
                                 room: ChanneLinfo,

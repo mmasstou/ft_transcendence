@@ -577,6 +577,11 @@ export class ChatGateway implements OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: UpdateChanneLSendData,
   ) {
+    const ResponseEventData: responseEvent = {
+      status: responseEventStatusEnum.SUCCESS,
+      message: responseEventMessageEnum.SUCCESS,
+      data: null,
+    };
     const room = await this.roomservice.findOne({ id: data.room.id });
     try {
       console.log('Chat-> updateChanneL +> data :', data);
@@ -606,7 +611,7 @@ export class ChatGateway implements OnGatewayConnection {
           });
           console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
           client.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`,
             updateRoom,
           );
         }
@@ -624,10 +629,12 @@ export class ChatGateway implements OnGatewayConnection {
               ...dataRoom,
             },
           });
-          console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
+          ResponseEventData.data = updateRoom;
+          ResponseEventData.status = responseEventStatusEnum.SUCCESS;
+          ResponseEventData.message = responseEventMessageEnum.SUCCESS;
           client.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-            updateRoom,
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`,
+            ResponseEventData,
           );
         }
         // set access password :
@@ -644,7 +651,7 @@ export class ChatGateway implements OnGatewayConnection {
           });
           console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
           client.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_SET_ACCESS_PASSWORD}`,
             updateRoom,
           );
         }
@@ -662,21 +669,28 @@ export class ChatGateway implements OnGatewayConnection {
           });
           console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
           client.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD}`,
             updateRoom,
           );
         }
       }
     } catch (error) {
-      console.log('Chat-updateChanneL> error- +>', error);
-    }
-    const ResponseEventData: responseEvent = {
-      status: responseEventStatusEnum.SUCCESS,
-      message: responseEventMessageEnum.SUCCESS,
-      data: room,
-    };
+      console.log('Chat-updateChanneL> error- +>');
+      ResponseEventData.data = null;
+      ResponseEventData.status = responseEventStatusEnum.ERROR;
+      ResponseEventData.message = responseEventMessageEnum.ERROR;
 
-    client.emit(
+      this.server.emit(
+        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+        ResponseEventData,
+      );
+      return;
+    }
+    ResponseEventData.data = room;
+    ResponseEventData.status = responseEventStatusEnum.SUCCESS;
+    ResponseEventData.message = responseEventMessageEnum.SUCCESS;
+
+    this.server.emit(
       `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
       ResponseEventData,
     );
