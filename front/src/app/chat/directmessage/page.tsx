@@ -1,12 +1,14 @@
 'use client';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Dashboard from '@/app/Dashboard';
 import { HiChatBubbleLeftRight } from "react-icons/hi2";
 import { usePathname } from "next/navigation";
 import { FaUsers } from "react-icons/fa";
 import ChatNavbarLink from '../components/chat.navbar.link';
 import Button from '../components/Button';
-import { BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs';
+import { BsJournalPlus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse, BsFillPersonPlusFill, BsPersonAdd } from "react-icons/bs";
+import { IconType } from 'react-icons';
+import PrivateConversation from './components/privateConversation';
 
 
 const metadata = {
@@ -15,20 +17,31 @@ const metadata = {
 };
 export default function page() {
     const router = usePathname();
-	const [isOpen, setOpening] = useState(false);
+	const [isOpen, setOpening] = useState<boolean>(false);
+
+	useEffect(() => {}, [isOpen])
 
   return (
     <Dashboard>
-    <div className='h-full border-4 border-[#24323044]'>
-		<div className="channeLnavbarmenu col-span-2 flex justify-center sm:justify-around gap-4 w-full">
-				<div>
-					<Button
-						{isOpen ? icon={BsLayoutSidebarInset} : icon={BsReverseLayoutSidebarInsetReverse}}
+	<div className='border-4 border-[#24323044] h-full'>
+		<div className="channeLnavbar grid grid-flow-row-dense grid-cols-4 justify-between items-center text-white px-2 py-1">
+			<div>
+				{isOpen
+					? <Button
+						icon={BsReverseLayoutSidebarInsetReverse}
 						small
 						outline
-						onClick={() => setOpening(true)}
+						onClick={() => {setOpening(false)}}
 					/>
-				</div>
+					: <Button
+						icon={BsLayoutSidebarInset}
+						small
+						outline
+						onClick={() => {setOpening(true)}}
+					/>
+				}
+			</div>
+			<div className="channeLnavbarmenu col-span-2 flex justify-center  sm:justify-around gap-4 w-full ">
 				<ChatNavbarLink
 					to="/chat/directmessage"
 					label="direct Message"
@@ -41,7 +54,18 @@ export default function page() {
 					icon={FaUsers}
 					active={router.includes('channels')}
 				/>
+			</div>
+			<div className="flex justify-end items-center gap-2">
+	
+				<Button
+					icon={BsPersonAdd}
+					small
+					outline
+					onClick={() => {}}
+				/>
+			</div>
 		</div>
+		<PrivateConversation isOpen={isOpen}/>
 	</div>
     </Dashboard>
   )
