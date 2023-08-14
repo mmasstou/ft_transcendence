@@ -20,15 +20,9 @@ export default function ChanneLFindRoommodaL() {
     const searchInputRef = useRef<HTMLInputElement | null>(null);
     const UserId = Cookies.get("_id")
     const route = useRouter()
-    useEffect(() => {
-        (async () => {
-            const token: any = Cookies.get('token');
-            if (!token || !UserId) return
-            let response = await getPublicProtactedChannels(token)
-            if (!response) return
-            setrooms(response)
-        })();
-    }, [Update])
+
+    const token: any = Cookies.get('token');
+    if (!token || !UserId) return
 
     useEffect(() => {
         if (searchInputRef.current) {
@@ -57,6 +51,24 @@ export default function ChanneLFindRoommodaL() {
     // listen to socket event :
     useEffect(() => {
         socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            (data: {
+                message: string,
+                status: any,
+                data: RoomsType,
+            }) => {
+                if (data.data) {
+                    (async () => {
+                        let response = await getPublicProtactedChannels(token)
+                        if (!response) return
+                        setrooms(response)
+                    }
+                    )();
+                    return
+                }
+            }
+        );
+        socket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
             (data: {
                 message: string,
@@ -73,19 +85,9 @@ export default function ChanneLFindRoommodaL() {
                     onClose()
                 }
             });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, () => {
 
-            (async () => {
-                const token: any = Cookies.get('token');
-                if (!token || !UserId) return
-                let response = await getPublicProtactedChannels(token)
-                if (!response) return
-                setrooms(response)
-            })();
-            setUpdate(!Update)
-        })
     }, [socket])
-    
+
     const bodyContent = (
         <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[34rem]">
 

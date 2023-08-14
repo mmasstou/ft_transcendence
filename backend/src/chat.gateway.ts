@@ -94,11 +94,11 @@ export class ChatGateway implements OnGatewayConnection {
       member: any;
     },
   ) {
+    const __member = await this.memberService.findOne({
+      userId: data.member.userId,
+      roomId: data.member.roomsId,
+    });
     try {
-      const __member = await this.memberService.findOne({
-        userId: data.member.userId,
-        roomId: data.member.roomsId,
-      });
       if (data.updateType === updatememberEnum.SETADMIN) {
         const type: UserType =
           __member.type === UserType.ADMIN ? UserType.USER : UserType.ADMIN;
@@ -106,7 +106,7 @@ export class ChatGateway implements OnGatewayConnection {
           where: { id: data.member.id },
           data: { type: type },
         });
-        this.server.emit(
+        client.emit(
           `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
           member,
         );
@@ -118,8 +118,8 @@ export class ChatGateway implements OnGatewayConnection {
           where: { id: data.member.id },
           data: { isban: __isBan },
         });
-        // this.server.emit('updatememberResponseEvent', member);
-        this.server.emit(
+        // client.emit('updatememberResponseEvent', member);
+        client.emit(
           `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
           member,
         );
@@ -134,7 +134,7 @@ export class ChatGateway implements OnGatewayConnection {
             // mute_at: Date.now().toString(),
           },
         });
-        this.server.emit(
+        client.emit(
           `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
           member,
         );
@@ -146,7 +146,7 @@ export class ChatGateway implements OnGatewayConnection {
                 data: { ismute: false },
               });
             })();
-            this.server.emit(
+            client.emit(
               `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
               member,
             );
@@ -164,7 +164,7 @@ export class ChatGateway implements OnGatewayConnection {
             where: { id: data.member.id },
           }),
         ]);
-        this.server.emit(
+        client.emit(
           `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
           result,
         );
@@ -177,15 +177,25 @@ export class ChatGateway implements OnGatewayConnection {
           where: { id: data.member.id },
           data: { type: type },
         });
-        this.server.emit(
+        client.emit(
           `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
           member,
         );
       }
+
       // create room :
     } catch (error) {
       console.log('Chat-updatemember> error- +>', error);
     }
+    const ResponseEventData: responseEvent = {
+      status: responseEventStatusEnum.SUCCESS,
+      message: responseEventMessageEnum.SUCCESS,
+      data: __member,
+    };
+    this.server.emit(
+      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+      ResponseEventData,
+    );
   }
 
   @SubscribeMessage(`${process.env.SOCKET_EVENT_JOIN_MEMBER}`)
@@ -205,14 +215,6 @@ export class ChatGateway implements OnGatewayConnection {
       data: null,
     };
     const room = await this.roomservice.findOne({ id: data.roomid });
-    const senderinvit: any = await this.usersService.getUserInClientSocket(
-      client,
-    );
-    if (!senderinvit) return;
-    await this.sendNotification({
-      userId: data.userid,
-      senderId: senderinvit.id,
-    });
     try {
       // check if member is already in room database :
       const existMember = await this.memberService.findOne({
@@ -278,7 +280,6 @@ export class ChatGateway implements OnGatewayConnection {
         `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
         ResponseEventData,
       );
-      return;
     } catch (error) {
       console.log('Chat-> joinmember error- +>', error);
       // send response to client :
@@ -292,7 +293,10 @@ export class ChatGateway implements OnGatewayConnection {
     }
     // send event to all client  that member is join to room :
     // client.emit('sendNotification', { userId: data.userid, room: room });
-    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, null);
+    this.server.emit(
+      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+      ResponseEventData,
+    );
   }
   @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_CREATE}`)
   async createRoom(
@@ -329,28 +333,28 @@ export class ChatGateway implements OnGatewayConnection {
           `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
           null,
         );
-        return;
+      } else {
+        const newRoom = await this.roomservice.create({
+          name,
+          type,
+          friends,
+          channeLpassword,
+        });
+        if (!newRoom) throw new Error();
+        console.log('newRoom :', newRoom);
+        ResponseEventData.status = responseEventStatusEnum.SUCCESS;
+        ResponseEventData.message = responseEventMessageEnum.CHANNELCREATED;
+        ResponseEventData.data = newRoom;
+        // send response to the client that the name exist
+        client.emit(
+          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`,
+          ResponseEventData,
+        );
       }
-      const newRoom = await this.roomservice.create({
-        name,
-        type,
-        friends,
-        channeLpassword,
-      });
-      if (!newRoom) throw new Error();
-      console.log('newRoom :', newRoom);
-      ResponseEventData.status = responseEventStatusEnum.SUCCESS;
-      ResponseEventData.message = responseEventMessageEnum.CHANNELCREATED;
-      ResponseEventData.data = newRoom;
-      // send response to the client that the name exist
-      client.emit(
-        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`,
-        ResponseEventData,
-      );
       // send message that room is created :
       this.server.emit(
         `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-        newRoom,
+        ResponseEventData,
       );
     } catch (error) {
       ResponseEventData.status = responseEventStatusEnum.ERROR;
@@ -377,6 +381,7 @@ export class ChatGateway implements OnGatewayConnection {
       message: responseEventMessageEnum.DELETESUCCESS,
       data: null,
     };
+    console.log('SOCKET_EVENT_CHAT_DELETE :', data);
     try {
       // check if member is already in room database and is owner :
       const User = await this.usersService.findOne({ id: data.userId });
@@ -406,8 +411,11 @@ export class ChatGateway implements OnGatewayConnection {
         ResponseEventData,
       );
     }
+    this.server.emit(
+      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+      ResponseEventData,
+    );
     // send event to all client  that owner delete room :
-    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, null);
   }
 
   @SubscribeMessage('JoinRoom')
@@ -569,9 +577,9 @@ export class ChatGateway implements OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: UpdateChanneLSendData,
   ) {
+    const room = await this.roomservice.findOne({ id: data.room.id });
     try {
       console.log('Chat-> updateChanneL +> data :', data);
-      const room = await this.roomservice.findOne({ id: data.room.id });
       const LogedUser = await this.usersService.getUserInClientSocket(client);
       if (!LogedUser) return;
       const responseMemberData = await this.roomservice.isMemberInRoom(
@@ -621,7 +629,6 @@ export class ChatGateway implements OnGatewayConnection {
             `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
             updateRoom,
           );
-          this.server.emit('ChatUpdate', updateRoom);
         }
         // set access password :
         if (data.Updatetype === UpdateChanneLSendEnum.SETACCESSEPASSWORD) {
@@ -640,7 +647,6 @@ export class ChatGateway implements OnGatewayConnection {
             `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
             updateRoom,
           );
-          this.server.emit('ChatUpdate', updateRoom);
         }
         // remove access password :
         if (data.Updatetype === UpdateChanneLSendEnum.REMOVEACCESSEPASSWORD) {
@@ -659,12 +665,21 @@ export class ChatGateway implements OnGatewayConnection {
             `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
             updateRoom,
           );
-          this.server.emit('ChatUpdate', updateRoom);
         }
       }
     } catch (error) {
       console.log('Chat-updateChanneL> error- +>', error);
     }
+    const ResponseEventData: responseEvent = {
+      status: responseEventStatusEnum.SUCCESS,
+      message: responseEventMessageEnum.SUCCESS,
+      data: room,
+    };
+
+    client.emit(
+      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+      ResponseEventData,
+    );
   }
   @SubscribeMessage('sendNotification')
   async sendNotification(

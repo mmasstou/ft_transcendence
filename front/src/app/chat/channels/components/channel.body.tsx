@@ -2,7 +2,7 @@ import React, { use, useEffect } from "react";
 import LefttsideModaL from "../modaLs/LeftsideModal";
 import ChanneLSidebarItem from "./channel.sidebar.item";
 import { RoomsType, membersType, messagesType, userType } from "@/types/types";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { Socket } from "socket.io-client";
 import RightsideModaL from "../modaLs/RightsideModal";
@@ -14,6 +14,8 @@ import ChanneLsettingsHook from "../hooks/channel.settings";
 import LoginHook from "@/hooks/auth/login";
 import getChannels from "../actions/getChanneLs";
 import MyToast from "@/components/ui/Toast/MyToast";
+import sorteChanneLsWithName from "../actions/sorteChanneLsWithName";
+import MemberHasPermissionToAccess from "../actions/MemberHasPermissionToAccess";
 
 export default function ChanneLbody({ children, socket }: { children: React.ReactNode; socket: Socket | null }) {
     const [IsMounted, setIsMounted] = React.useState(false)
@@ -28,6 +30,14 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     const rightsidebar = RightsidebarHook()
     const loginHook = LoginHook()
     const [Notifications, setNotifications] = React.useState<any[]>([])
+    const token: any = Cookies.get('token');
+    const userId: any = Cookies.get('_id');
+    const router = useRouter()
+
+    if (!token || !userId)
+        return;
+
+
 
     socket?.on('notificationEvent', (data) => {
         console.log("notificationEvent data :", data)
@@ -36,70 +46,62 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
 
     useEffect(() => {
         (async () => {
-            const token: any = Cookies.get('token');
-            if (!token)
-                return;
             const resp: RoomsType[] | null = await getChannels(token)
-            if (resp) {
-
-                console.log("getChannels data :", resp)
-                setChannel(resp.sort((a, b) => {
-                    const nameA = a.name.toLowerCase();
-                    const nameB = b.name.toLowerCase();
-
-                    if (nameA < nameB) {
-                        return -1;
-                    }
-                    if (nameA > nameB) {
-                        return 1;
-                    }
-                    return 0;
-                }));
-            }
-            // console.log("resp :", resp)
+            if (!resp) return;
+            setChannel(sorteChanneLsWithName(resp));
         }
         )();
-        setUpdate(false)
-
-    }, [loginHook, update])
+    }, [loginHook])
 
 
     useEffect(() => {
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, () => {
-            // (async () => {
-            //     const token: any = Cookies.get('token');
-            //     if (!token)
-            //         return;
-            //     const resp = await getChannels(token)
-            //     if (resp) {
-
-            //         console.log("getChannels data :", resp)
-            //         setChannel(resp);
-            //     }
-            //     // console.log("resp :", resp)
-            // }
-            // )();
-            setUpdate(update ? false : true)
-        })
+        // global socket event response :
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            (data: {
+                message: string,
+                status: any,
+                data: RoomsType,
+            }) => {
+                if (data.data) {
+                    (async () => {
+                        const resp: RoomsType[] | null = await getChannels(token)
+                        if (resp) {
+                            setChannel(sorteChanneLsWithName(resp));
+                        }
+                        if (ChanneLsActiveID) {
+                            const hptaresponse = await MemberHasPermissionToAccess(token, ChanneLsActiveID, userId)
+                            if (!hptaresponse) router.push('/chat/channels')
+                        }
+                    }
+                    )();
+                    return
+                }
+            }
+        );
 
     }, [socket])
-    useEffect(() => {
 
-        if (params) {
-            setChanneLsActive(params.get('r'));
+    useEffect(() => {
+        if (ChanneLsActiveID) {
             (async () => {
-                const channeLLid = params.get('r')
-                const token: any = Cookies.get('token');
-                if (!channeLLid)
-                    return;
-                const channeLLMembers = await getChannelWithId(channeLLid, token)
+                const channeLLMembers = await getChannelWithId(ChanneLsActiveID, token)
                 if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                     setchanneLsmembers(channeLLMembers)
                 }
 
             })();
         }
-    }, [params, rightsidebar, channelsettingsHook])
+    }, [ChanneLsActiveID, rightsidebar, channelsettingsHook])
+
+
+    useEffect(() => {
+        const channeLid = params.get('r')
+        if (channeLid) {
+            setChanneLsActive(channeLid);
+        }
+    }, [params])
+
 
     useEffect(() => {
         setIsMounted(true)
@@ -109,23 +111,6 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
         return null
     return (
         <div className="channeLbody relative h-full flex ">
-            {
-                Notifications.map((notification: {
-                    message: string, User: userType,
-                    member: membersType,
-                    sendedUser: userType
-                }, index) => {
-                    return (
-                        // <Notification key={index} avatar={notification.sendedUser.avatar} name={notification.sendedUser.login} message={notification.message} />
-                        <MyToast
-                            key={index}
-                            isOpen={true}
-                            user={notification.sendedUser.login}
-                            message={notification.message} />
-                    )
-                }
-                )
-            }
             <LefttsideModaL>
                 {
                     ChanneLs && ChanneLs.map((room: RoomsType, key) => (

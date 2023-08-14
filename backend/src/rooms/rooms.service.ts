@@ -74,8 +74,8 @@ export class RoomsService {
   }
 
   async findOne(params: { id: string }): Promise<Rooms> {
+    const { id } = params;
     try {
-      const { id } = params;
       console.log('++findOne++>', id);
       const room = await this.prisma.rooms.findUnique({
         where: { id },
@@ -84,7 +84,7 @@ export class RoomsService {
       if (!room) throw new Error('');
       return room;
     } catch (error) {
-      console.log('Rooms-findOne> error- +>', error);
+      console.log('channeL with id %s not found', id);
       return null;
     }
   }
