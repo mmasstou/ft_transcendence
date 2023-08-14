@@ -318,6 +318,7 @@ class MyGateway implements OnGatewayConnection {
     if (UserMap.get(data.playerId).Status == 'InGame')
       return new Error('User already in game');
     else {
+      console.log('create bot table', _User)
       if (
         UserMap.get(data.playerId) &&
         UserMap.get(data.playerId).SocketId &&
@@ -392,41 +393,26 @@ class MyGateway implements OnGatewayConnection {
         else RandomListScore.add(obj);
         if (RandomListTime.length >= 2 || RandomListScore.length >= 2) {
           table_obj.tableId = uuidv4();
+          table_obj.GameType = 'random';
           if (RandomListTime.length >= 2) {
             table_obj.GameMode = 'time';
-            table_obj.GameType = 'random';
             table_obj.player1 = RandomListTime.getfirst.player;
             table_obj.player2 = RandomListTime.getfirst.player;
-            UserMap.get(table_obj.player1.UserId) &&
-              (UserMap.get(table_obj.player1.UserId).TableId =
-                table_obj.tableId);
-            UserMap.get(table_obj.player2.UserId) &&
-              (UserMap.get(table_obj.player2.UserId).TableId =
-                table_obj.tableId);
-            this.server
-              .to(UserMap.get(table_obj.player1.UserId).SocketId)
-              .emit('joinRoomGame', table_obj);
-            this.server
-              .to(UserMap.get(table_obj.player2.UserId).SocketId)
-              .emit('joinRoomGame', table_obj);
+            UserMap.get(table_obj.player1.UserId) && (UserMap.get(table_obj.player1.UserId).TableId = table_obj.tableId);
+            UserMap.get(table_obj.player2.UserId) && (UserMap.get(table_obj.player2.UserId).TableId = table_obj.tableId);
+            this.server.to(UserMap.get(table_obj.player1.UserId).SocketId).emit('joinRoomGame', table_obj);
+            this.server.to(UserMap.get(table_obj.player2.UserId).SocketId).emit('joinRoomGame', table_obj);
             TableMap.set(table_obj.tableId, table_obj);
             this.BallGateway.CreateRandomTable(data, table_obj);
             table_obj = new TableObj(currents);
-            return null;
           } else {
             table_obj.GameMode = 'score';
             table_obj.player1 = RandomListScore.getfirst.player;
             table_obj.player2 = RandomListScore.getfirst.player;
-            UserMap.get(data.player1_Id) &&
-              (UserMap.get(data.player1_Id).TableId = table_obj.tableId);
-            UserMap.get(data.player2_Id) &&
-              (UserMap.get(data.player2_Id).TableId = table_obj.tableId);
-            this.server
-              .to(UserMap.get(table_obj.player1.UserId).SocketId)
-              .emit('joinRoomGame', table_obj);
-            this.server
-              .to(UserMap.get(table_obj.player2.UserId).SocketId)
-              .emit('joinRoomGame', table_obj);
+            UserMap.get(table_obj.player1.UserId) && (UserMap.get(table_obj.player1.UserId).TableId = table_obj.tableId);
+            UserMap.get(table_obj.player2.UserId) && (UserMap.get(table_obj.player2.UserId).TableId = table_obj.tableId);
+            this.server.to(UserMap.get(table_obj.player1.UserId).SocketId).emit('joinRoomGame', table_obj);
+            this.server.to(UserMap.get(table_obj.player2.UserId).SocketId).emit('joinRoomGame', table_obj);
             TableMap.set(table_obj.tableId, table_obj);
             this.BallGateway.CreateRandomTable(data, table_obj);
             table_obj = new TableObj(currents);
