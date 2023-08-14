@@ -81,7 +81,6 @@ export type cursusType = {
   id: string;
     grade: string,
     level: Float32Array,
-    blackholed_at: string
 }
 export type messageSocket = {
   roomId: string;

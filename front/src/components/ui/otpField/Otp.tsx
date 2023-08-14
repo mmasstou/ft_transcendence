@@ -69,10 +69,12 @@ const Otp: React.FC<Props> = () => {
         }
       })
       .catch((err) => {
-        if (err.response && err.response.status === 401) {
-          toast.error(err.response.data.message);
-          return;
+        if (err.response.status === 401) {
+          toast.error('invalid otp code');
+        } else {
+          toast.error(err.message);
         }
+        console.clear();
         return;
       })
       .finally(() => {
