@@ -16,24 +16,21 @@ export class GameController {
     private GameGateway: MyGateway,
     private BallGateway: BallGateway,
   ) {}
-  // @Post('/FriendGame')
-  // async selectFriendGame(@Body() body: any) {
-  //     const promise = this.GameGateway.CreateFriendTable(body);
-  //     promise.then((tableId) => {
-  //         console.log("tableId: ", tableId);
-  //         this.BallGateway.CreateFriendTable(body, tableId);
-  //     });
-  //
 
   @Post('/FriendGame')
   async selectFriendGame(@Body() body: any) {
     try {
-      console.log('selectFriendGame(@Body() body: any) :', body);
-      const tableId = await this.GameGateway.CreateFriendTable(body);
-      console.log('this.GameGateway.CreateFriendTable(body); :', tableId);
-      this.BallGateway.CreateFriendTable(body, tableId);
+      const result = await this.GameGateway.CreateFriendTable(body);
+      if (result != undefined)
+        throw new HttpException(
+          { reason: result.message },
+          HttpStatus.CONFLICT,
+        );
     } catch (err) {
-      throw new HttpException({ reason: err }, HttpStatus.CONFLICT);
+      throw new HttpException(
+        { reason: err.response.reason },
+        HttpStatus.CONFLICT,
+      );
     }
   }
   /** {       ///////////////////////////////////////////////////////// body
@@ -54,36 +51,15 @@ export class GameController {
     } catch (err) {
       throw new HttpException(
         { reason: err.response.reason },
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.CONFLICT,
       );
     }
   }
 
-  // @Post('/BotGame')
-  // async selectBotGame(@Body() body: any) {
-  //     try {
-  //         console.log("body: ", body);
-  //         const res = await this.GameGateway.CreateBotTable(body);
-  //         this.BallGateway.CreateBotTable(body, res);
-  //     } catch (err) {
-  //         throw new HttpException({reason: err}, HttpStatus.CONFLICT);
-  //     }
-  // }
   /** {       ///////////////////////////////////////////////////////// body
-        "player_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
+        "playerId": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
         "mode": "time"
         } */
-
-  // @Post('/RandomGame')
-  // async selectRandomGame(@Body() body: any) {
-  //     const promise = this.GameGateway.CreateRandomTable(body);
-  //     promise.then((res) => {
-  //         this.BallGateway.CreateRandomTable(body, res);
-  //     }).catch((err) => {
-  //         console.log("+err: ", err)
-  //         return err;
-  //     });
-  // }
 
   @Post('/RandomGame')
   async selectRandomGame(@Body() body: any) {
@@ -95,7 +71,6 @@ export class GameController {
           HttpStatus.CONFLICT,
         );
       }
-      // await this.BallGateway.CreateRandomTable(body, res);
     } catch (err) {
       throw new HttpException(
         { reason: err.response.reason },
@@ -104,7 +79,7 @@ export class GameController {
     }
   }
   /** {       ///////////////////////////////////////////////////////// body
-        "player_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
+        "playerId": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
         "mode": "time"
         } */
 

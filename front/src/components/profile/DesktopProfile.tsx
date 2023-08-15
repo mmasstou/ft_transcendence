@@ -1,5 +1,5 @@
 'use client';
-import ImageUpload from '@/components/profile/ImageUpload';
+import ImageUpload from '@/components/profile/CoverUpload';
 import { Navbar } from '@/components/profile/Navbar';
 import { Statis } from '@/components/profile/UserStats';
 import axios from 'axios';

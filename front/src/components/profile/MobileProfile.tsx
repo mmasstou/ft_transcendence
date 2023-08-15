@@ -1,5 +1,5 @@
 'use client';
-import ImageUpload from '@/components/profile/ImageUpload';
+import ImageUpload from '@/components/profile/CoverUpload';
 import AvatarProfile from '@/components/profile/AvatarProfile';
 import { UserInfo } from '@/components/profile/UserInfo';
 import { UserStats } from '@/components/profile/UserStats';
