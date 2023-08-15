@@ -58,12 +58,6 @@ const _data = [
       },
     ],
     directMessage: [],
-    cursus_users: {
-      id: '222b3fde-1203-4da7-91ce-14fa29766470',
-      grade: 'Learner',
-      level: 8.89,
-      blackholed_at: '2023-10-15T09:58:00.000Z',
-    },
   },
   {
     id: 'd008897a-627f-466b-9152-bd7f36123740',
@@ -94,12 +88,6 @@ const _data = [
       },
     ],
     directMessage: [],
-    cursus_users: {
-      id: 'a33ab288-347f-4f66-9a05-13650c3bd699',
-      grade: 'Learner',
-      level: 8.93,
-      blackholed_at: '2023-09-11T08:00:00.000Z',
-    },
   },
 ];
 console.log(_data);
@@ -124,13 +112,6 @@ async function createUsers(users: any[]) {
             intraId: user.intraId,
             banner: user.banner,
             is_active: user.is_active,
-            cursus_users: {
-              create: {
-                grade: user.cursus_users.grade,
-                level: user.cursus_users.level,
-                blackholed_at: user.cursus_users.blackholed_at,
-              },
-            },
           },
         });
         console.log('Created user with id: ' + createdUser.login);

@@ -9,24 +9,21 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { UserService } from './users/user.service';
 import { Members, RoomType, Rooms, User, UserType } from '@prisma/client';
-import { error } from 'console';
-import { RoomsService } from './rooms/rooms.service';
-import { MessagesService } from './messages/messages.service';
-
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { MembersService } from './members/members.service';
-import { PrismaService } from './prisma.service';
-import { clientOnLigne } from './user.gateway';
-import { RoomsType, UserTypeEnum, membersType } from './users/user.type';
+import { JoinStatusEnum } from './types/room.joinStatus';
+import { UserService } from 'src/users/user.service';
+import { RoomsService } from './rooms.service';
+import { MessagesService } from 'src/messages/messages.service';
+import { MembersService } from 'src/members/members.service';
+import { PrismaService } from 'src/prisma.service';
+import { AppService } from 'src/app.service';
+import { UserTypeEnum } from 'src/users/user.type';
 import {
   UpdateChanneLSendData,
   UpdateChanneLSendEnum,
-} from './rooms/types/upatecahnnel';
-import { AppService } from './app.service';
-import { JoinStatusEnum } from './rooms/types/room.joinStatus';
-
+} from './types/upatecahnnel';
+import { clientOnLigne } from 'src/users/user.gateway';
 enum updatememberEnum {
   SETADMIN = 'SETADMIN',
   BANMEMBER = 'BANMEMBER',
@@ -64,15 +61,13 @@ export type responseEvent = {
   data: Rooms | Members | User | null;
 };
 @WebSocketGateway({ namespace: 'chat' })
-export class ChatGateway implements OnGatewayConnection {
+export class RoomGateway implements OnGatewayConnection {
   constructor(
-    private jwtService: JwtService,
     private readonly usersService: UserService,
     private roomservice: RoomsService,
     private messageservice: MessagesService,
     private memberService: MembersService,
     private prisma: PrismaService,
-    private readonly appservice: AppService,
   ) {}
   @WebSocketServer()
   server: Server;
@@ -707,7 +702,7 @@ export class ChatGateway implements OnGatewayConnection {
   }
   @SubscribeMessage('sendNotification')
   async sendNotification(
-    @MessageBody() data: { userId: string; senderId: string },
+    @MessageBody() data: { userId: string; senderId: string; mode: string },
   ) {
     try {
       console.log('Chat-> sendNotification +> data :', data);
@@ -730,6 +725,7 @@ export class ChatGateway implements OnGatewayConnection {
             socket.emit('notificationEvent', {
               message: `wants to play game with you`,
               sender: snderUser,
+              mode: data.mode,
             });
           });
         }

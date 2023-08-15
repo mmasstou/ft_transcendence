@@ -104,22 +104,6 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                 })();
             }
         );
-        socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`,
-            (data: any) => {
-                (async () => {
-                    console.log("NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK __userId:", __userId)
-                    console.log("NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK member:", data.member.userId)
-                    console.log("NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK result:", data.result)
-                    if (!channeLLid) return;
-                    if (data.member.userId === __userId) {
-                        const hptaresponse = await MemberHasPermissionToAccess(token, channeLLid, __userId)
-                        if (!hptaresponse) router.push('/chat/channels')
-                        setChanneLinfo(null)
-                    }
-                })();
-            }
-        );
 
     }, [socket])
 

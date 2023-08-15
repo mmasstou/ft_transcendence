@@ -5,7 +5,7 @@ import Login from '@/components/auth/modaLs/Login';
 import Cookies from 'js-cookie';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
 import ChanneLPasswordAccessModaL from './chat/channels/modaLs/channel.access.password.modaL';
 import { useEffect } from 'react';
@@ -17,6 +17,8 @@ import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
 import { membersType, userType } from '@/types/types';
 import MyToast from '@/components/ui/Toast/MyToast';
 import ChanneLConfirmActionModaL from './chat/channels/modaLs/channel.confirm.action';
+import { ro } from 'date-fns/locale';
+import StartGame from './chat/channels/actions/startgame';
 interface Props {
   children: React.ReactNode;
 }
@@ -26,18 +28,21 @@ const Dashboard = ({ children }: Props) => {
   const router = useRouter();
   const params = useSearchParams()
   const [Notifications, setNotifications] = React.useState<any>(null)
+  const userId = Cookies.get('_id')
+  const token: any = Cookies.get('token');
+  if (!token || !userId) return;
+
 
   socket?.on('notificationEvent', (data) => {
     console.log("notificationEvent data :", data)
     setNotifications(data)
-    setTimeout(() => {
+
+    return () => {
       setNotifications(null)
     }
-      , 1000)
 
   })
 
-  const token: any = Cookies.get('token');
   useEffect(() => {
     if (!token) {
       router.push('/');
@@ -63,6 +68,28 @@ const Dashboard = ({ children }: Props) => {
 
   }, [])
 
+  useEffect(() => {
+    socket?.on('GameResponse', (data: any) => {
+      if (data.sender.id === userId) {
+        (async () => {
+          if (!token) return;
+          const body = {       ///////////////////////////////////////////////////////// body
+              player2Id: data.sender.id,
+              player1Id: data.userId,
+              mode: data.mode
+          }
+          const g = await StartGame(body, token);
+          if (!g) return;
+          router.push(`/game/${data.mode}/friend`)
+        })();
+
+      }
+      if (data.userId === userId) {
+        router.push(`/game/${data.mode}/friend`)
+      }
+    })
+  }, [socket]);
+
   return (
     <>
       <Login />
@@ -80,7 +107,7 @@ const Dashboard = ({ children }: Props) => {
           const userId = Cookies.get('_id')
           if (!userId) return
           console.log("++++++++++++++++++++++++>:", userId)
-          socket?.emit('AcceptGame', { userId: userId })
+          socket?.emit('AcceptGame', { userId: userId, sender: Notifications.sender, mode: Notifications.mode })
         }} isOpen user={Notifications.sender.login} message={Notifications.message} />
       }
       <div className="dashboard bg-primary overflow-y-auto">

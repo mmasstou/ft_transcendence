@@ -67,7 +67,6 @@ export type userType = {
   updated_at: string;
   Rooms: RoomsType[];
   location: string;
-  cursus_users: cursusType[];
 };
 
 export type cursusType = {

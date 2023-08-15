@@ -206,12 +206,14 @@ export default function ChanneLUserSettings({ socket }: ChanneLUserSettingsProps
         </>
     )
     if (step === USERSETTINGSTEPS.PLAYGAME) {
-        bodyContent = <ChanneLsettingsPlayGame Onback={() => {setStep(USERSETTINGSTEPS.INDEX)}} onClick={function (): void {
+        bodyContent = <ChanneLsettingsPlayGame Onback={() => {setStep(USERSETTINGSTEPS.INDEX)}} 
+        onClick={function (mode : any): void {
 
             // send initaion to player 02
             socket?.emit('sendNotification', {
                 userId: PlayGameWith?.userId,
-                senderId: LogedMember?.userId
+                senderId: LogedMember?.userId,
+                mode : mode
             })
 
         }} player1Id={PlayGameWith?.userId} player2Id={LogedMember?.userId} />

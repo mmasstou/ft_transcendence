@@ -11,14 +11,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { USERSETTINGSTEPS, membersType, userType } from "@/types/types";
 interface props {
-    onClick: () => void;
+    onClick: (data : any) => void;
     Onback : () => void;
     player1Id: string | undefined;
     player2Id: string | undefined;
 }
 
 export default function ChanneLsettingsPlayGame(
-    { onClick, player1Id ,player2Id }: props
+    { onClick, player1Id ,player2Id, Onback }: props
 ) {
     const router = useRouter()
     return (
@@ -30,7 +30,7 @@ export default function ChanneLsettingsPlayGame(
                     outline
                     size={21}
                     labelsize={8}
-                    onClick={() => onabort}
+                    onClick={Onback}
                 />
             </div>
             <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
@@ -45,7 +45,9 @@ export default function ChanneLsettingsPlayGame(
                     </h2>
                     <div className="flex flex-col gap-3  w-full">
                         <button
-                            onClick={onClick}
+                            onClick={() => {
+                                onClick('time')
+                            }}
                             className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-[#FFCC00] hover:border">
                             <div className='flex justify-center items-center p-3 rounded bg-[#FFCC00] text-white'>
                                 <TfiTimer size={28} />
@@ -59,26 +61,27 @@ export default function ChanneLsettingsPlayGame(
                         </button>
                         <button
                             onClick={() => {
-                                const body = {       ///////////////////////////////////////////////////////// body
-                                    player2Id: player2Id,
-                                    player1Id: player1Id,
-                                    mode: "score"
-                                }
-                                // axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, body).then((result) => {
-                                //     router.push('/game/score/robot')
-                                // })
-                                // console.log("Ti÷me Mode");
-                                toast("Time Mode");
-                                (async () => {
-                                    console.log("${process.env.NEXT_PUBLIC_API_URL}/game/BotGame :", `${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`)
-                                    const token: any = Cookies.get('token');
-                                    if (!token) return;
-                                    const g = await StartGame(body, token);
-                                    console.log("++++++++++++++++++++++++++++++> game:", g)
-                                    if (!g) return;
-                                    toast.success("play ....")
-                                    router.push('/game/score/friend')
-                                })();
+                                onClick('score')
+                                // const body = {       ///////////////////////////////////////////////////////// body
+                                //     player2Id: player2Id,
+                                //     player1Id: player1Id,
+                                //     mode: "score"
+                                // }
+                                // // axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, body).then((result) => {
+                                // //     router.push('/game/score/robot')
+                                // // })
+                                // // console.log("Ti÷me Mode");
+                                // toast("Time Mode");
+                                // (async () => {
+                                //     console.log("${process.env.NEXT_PUBLIC_API_URL}/game/BotGame :", `${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`)
+                                //     const token: any = Cookies.get('token');
+                                //     if (!token) return;
+                                //     const g = await StartGame(body, token);
+                                //     console.log("++++++++++++++++++++++++++++++> game:", g)
+                                //     if (!g) return;
+                                //     toast.success("play ....")
+                                //     router.push('/game/score/friend')
+                                // })();
                             }}
                             className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-secondary hover:border">
                             <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>

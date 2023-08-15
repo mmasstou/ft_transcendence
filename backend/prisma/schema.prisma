@@ -45,7 +45,6 @@ model User {
   paddle_color                  String?                @default("#E0E0E0")
   ball_color                    String?                @default("#E0E0E0")
   location                      String?
-  cursus_users                  Cursus?                @relation(fields: [cursusId], references: [id])
   intraId                       Int?
   banner                        String?
   is_active                     Boolean                @default(false)
@@ -60,10 +59,10 @@ model User {
   Notification                  Notification[]
   ChanneLNotifications          ChanneLNotifications[]
   twoFactorAuthenticationSecret String?
-  twoFA                         Boolean         @default(false)
-  MyScore                       Match[]         @relation("Player1")
-  Other                         Match[]         @relation("Player2")
-  status                        String          @default("online") // need to be checked
+  twoFA                         Boolean                @default(false)
+  MyScore                       Match[]                @relation("Player1")
+  Other                         Match[]                @relation("Player2")
+  status                        String                 @default("online") // need to be checked
 }
 
 model Match {
@@ -94,14 +93,6 @@ model ChanneLNotifications {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   userId     String
-}
-
-model Cursus {
-  id    String @id @default(uuid())
-  grade String
-  level Float
-  // blackholed_at String
-  User  User[]
 }
 
 model Rooms {

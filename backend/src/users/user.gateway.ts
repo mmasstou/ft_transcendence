@@ -4,14 +4,18 @@ import {
   OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
-import { UserService } from './users/user.service';
+import { Server, Socket } from 'socket.io';
+import { UserService } from './user.service';
 
 export const clientOnLigne = new Map<string, Socket[]>();
 @WebSocketGateway({ namespace: 'User' })
 export class UserGateway implements OnGatewayConnection {
   constructor(private readonly usersService: UserService) {}
+
+  @WebSocketServer()
+  server: Server;
 
   async handleConnection(socket: Socket) {
     const User = await this.usersService.getUserInClientSocket(socket);
@@ -51,11 +55,19 @@ export class UserGateway implements OnGatewayConnection {
 
   @SubscribeMessage('AcceptGame')
   async handleAcceptGame(
-    @MessageBody() data: { userId: string },
+    @MessageBody() data: { userId: string; sender: any; mode: string },
     @ConnectedSocket() client: Socket,
   ) {
+    const Response = {
+      response: 'Accept',
+      sender: data.sender,
+      userId: data.userId,
+      mode: data.mode,
+    };
+    const User = await this.usersService.getUserInClientSocket(client);
+    // const sender = await this.usersService.getUserById(data.userId);
     console.log('User-> data :', data);
-    client.emit('AcceptGameResponse', { response: 'ok' });
+    this.server.emit('GameResponse', Response);
   }
 
   sendMessageToSocket(socket: Socket, message: any) {

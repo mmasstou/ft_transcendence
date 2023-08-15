@@ -29,12 +29,6 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
       where: { login: profile._json.login },
     });
     if (!_UserExist) {
-      const cursus_users = await this.prisma.cursus.create({
-        data: {
-          grade: profile._json.cursus_users[1].grade,
-          level: profile._json.cursus_users[1].level,
-        },
-      });
       const _User = await this.prisma.user.create({
         data: {
           login: profile._json.login,
@@ -45,11 +39,6 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
           kind: profile._json.kind,
           intraId: profile._json.id,
           location: profile._json.location,
-          cursus_users: {
-            connect: {
-              id: cursus_users.id,
-            },
-          },
         },
       });
       done(null, _User);
