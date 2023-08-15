@@ -30,6 +30,7 @@ export default function ConversationsTitlebar({ messageTo, OnSubmit, socket, cha
   socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
     setUpdate(true)
   })
+  
   React.useEffect(() => {
     if (!channeLId)
       channeLsettingsHook.onClose()

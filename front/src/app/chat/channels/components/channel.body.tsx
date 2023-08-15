@@ -69,9 +69,53 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
                         if (resp) {
                             setChannel(sorteChanneLsWithName(resp));
                         }
-                        if (ChanneLsActiveID) {
-                            const hptaresponse = await MemberHasPermissionToAccess(token, ChanneLsActiveID, userId)
-                            if (!hptaresponse) router.push('/chat/channels')
+                        if (!ChanneLsActiveID) return;
+                        const hptaresponse = await MemberHasPermissionToAccess(token, ChanneLsActiveID, userId)
+                        if (!hptaresponse) router.push('/chat/channels')
+                        const channeLLMembers = await getChannelWithId(ChanneLsActiveID, token)
+                        if (channeLLMembers){
+                             setchanneLsmembers(channeLLMembers)
+                             router.refresh();
+                            }
+                    }
+                    )();
+                    return
+                }
+            }
+        );
+        // listen to chat response update member event :
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            (data: {
+                message: string,
+                status: any,
+                data: RoomsType,
+            }) => {
+                if (data.data) {
+                    (async () => {
+                        if (!ChanneLsActiveID) return;
+                        const channeLLMembers = await getChannelWithId(ChanneLsActiveID, token)
+                        if (channeLLMembers) {
+                            setchanneLsmembers(channeLLMembers)
+                        }
+                    }
+                    )();
+                    return
+                }
+            }
+        );
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`,
+            (data: {
+                message: string,
+                status: any,
+                data: RoomsType,
+            }) => {
+                if (data.data) {
+                    (async () => {
+                        const resp: RoomsType[] | null = await getChannels(token)
+                        if (resp) {
+                            setChannel(sorteChanneLsWithName(resp));
                         }
                     }
                     )();
@@ -86,7 +130,7 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
         if (ChanneLsActiveID) {
             (async () => {
                 const channeLLMembers = await getChannelWithId(ChanneLsActiveID, token)
-                if (channeLLMembers && channeLLMembers.statusCode !== 200) {
+                if (channeLLMembers) {
                     setchanneLsmembers(channeLLMembers)
                 }
 

@@ -6,6 +6,7 @@ import { set } from "react-hook-form";
 import { FaChessQueen } from "react-icons/fa";
 import { UserAvatar } from "./channel.userAvater";
 import { useSearchParams } from "next/navigation";
+import { MdAdminPanelSettings } from "react-icons/md";
 
 
 
@@ -40,7 +41,10 @@ export default function ChanneLsmembersItem( {member} : IChannelMembersItemProps
                     LogedUserId === member.userId && <span className="text-xs text-[#FFFFFF]"> (You)</span>
                 }</h3>
                 </div>
-                {member.type === 'OWNER' && <FaChessQueen fill="#FFBF00" />}
+                {member.type === 'OWNER' 
+                ? <FaChessQueen fill="#FFBF00" />
+                : member.type === 'ADMIN' && <MdAdminPanelSettings fill="#FFBF00" />
+                }
             </div>
     </div>
 }

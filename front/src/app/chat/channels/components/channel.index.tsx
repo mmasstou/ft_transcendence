@@ -23,6 +23,8 @@ import RightsidebarHook from "../hooks/RightSidebarHook";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import { RiSearch2Fill, RiSearchLine } from "react-icons/ri";
 import ChanneLFindRoommodaLHook from "../hooks/channel.find.room.hook";
+import { RoomsType } from "@/types/types";
+import { toast } from "react-hot-toast";
 
 // env vars :
 interface ChannelIndexProps {
@@ -42,7 +44,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
     const params = useSearchParams()
 
     useEffect(() => { setIsMounted(true) }, [])
-
+   
     if (!IsMounted) return null
     return (
         <div className="--channeL relative h-full flex flex-col border-4 border-[#24323044] ">

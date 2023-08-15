@@ -94,108 +94,117 @@ export class ChatGateway implements OnGatewayConnection {
       member: any;
     },
   ) {
-    const __member = await this.memberService.findOne({
-      userId: data.member.userId,
-      roomId: data.member.roomsId,
-    });
     try {
-      if (data.updateType === updatememberEnum.SETADMIN) {
-        const type: UserType =
-          __member.type === UserType.ADMIN ? UserType.USER : UserType.ADMIN;
-        const member = await this.prisma.members.update({
-          where: { id: data.member.id },
-          data: { type: type },
-        });
-        client.emit(
-          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-          member,
-        );
-      }
-      // ban member :
-      if (data.updateType === updatememberEnum.BANMEMBER) {
-        const __isBan: boolean = __member.isban === true ? false : true;
-        const member = await this.prisma.members.update({
-          where: { id: data.member.id },
-          data: { isban: __isBan },
-        });
-        // client.emit('updatememberResponseEvent', member);
-        client.emit(
-          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-          member,
-        );
-      }
-      // mute member :
-      if (data.updateType === updatememberEnum.MUTEMEMBER) {
-        const __isMute: boolean = __member.ismute === true ? false : true;
-        const member = await this.prisma.members.update({
-          where: { id: data.member.id },
-          data: {
-            ismute: __isMute,
-            // mute_at: Date.now().toString(),
-          },
-        });
-        client.emit(
-          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-          member,
-        );
-        if (member.ismute) {
-          setTimeout(() => {
-            const member = (async () => {
-              return await this.prisma.members.update({
-                where: { id: data.member.id },
-                data: { ismute: false },
-              });
-            })();
-            client.emit(
-              `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-              member,
-            );
-          }, 10000);
-        }
-      }
-      // kick member :
-      if (data.updateType === updatememberEnum.KIKMEMBER) {
-        const result = await this.prisma.$transaction([
-          this.prisma.rooms.update({
-            where: { id: data.member.roomsId },
-            data: { members: { disconnect: { id: data.member.id } } },
-          }),
-          this.prisma.members.delete({
+      const __member = await this.memberService.findOne({
+        userId: data.member.userId,
+        roomId: data.member.roomsId,
+      });
+      try {
+        if (data.updateType === updatememberEnum.SETADMIN) {
+          const type: UserType =
+            __member.type === UserType.ADMIN ? UserType.USER : UserType.ADMIN;
+          const member = await this.prisma.members.update({
             where: { id: data.member.id },
-          }),
-        ]);
-        client.emit(
-          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-          result,
-        );
-      }
-      // set owner :
-      if (data.updateType === updatememberEnum.SETOWNER) {
-        const type: UserType =
-          __member.type === UserType.OWNER ? UserType.USER : UserType.OWNER;
-        const member = await this.prisma.members.update({
-          where: { id: data.member.id },
-          data: { type: type },
-        });
-        client.emit(
-          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-          member,
-        );
-      }
+            data: { type: type },
+          });
+          client.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            member,
+          );
+        }
+        // ban member :
+        if (data.updateType === updatememberEnum.BANMEMBER) {
+          const __isBan: boolean = __member.isban === true ? false : true;
+          const member = await this.prisma.members.update({
+            where: { id: data.member.id },
+            data: { isban: __isBan },
+          });
+          // client.emit('updatememberResponseEvent', member);
+          client.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            member,
+          );
+        }
+        // mute member :
+        if (data.updateType === updatememberEnum.MUTEMEMBER) {
+          const __isMute: boolean = __member.ismute === true ? false : true;
+          const member = await this.prisma.members.update({
+            where: { id: data.member.id },
+            data: {
+              ismute: __isMute,
+              // mute_at: Date.now().toString(),
+            },
+          });
+          client.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            member,
+          );
+          if (member.ismute) {
+            setTimeout(() => {
+              const member = (async () => {
+                return await this.prisma.members.update({
+                  where: { id: data.member.id },
+                  data: { ismute: false },
+                });
+              })();
+              client.emit(
+                `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+                member,
+              );
+            }, 10000);
+          }
+        }
+        // kick member :
+        if (data.updateType === updatememberEnum.KIKMEMBER) {
+          const result = await this.prisma.$transaction(async (prisma) => {
+            const room = await prisma.rooms.update({
+              where: { id: data.member.roomsId },
+              data: { members: { disconnect: { id: data.member.id } } },
+            });
+            await prisma.members.delete({
+              where: { id: data.member.id },
+            });
+            return room;
+          });
+          this.server.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`,
+            { result, member: data.member },
+          );
+          client.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            result,
+          );
+        }
+        // set owner :
+        if (data.updateType === updatememberEnum.SETOWNER) {
+          const type: UserType =
+            __member.type === UserType.OWNER ? UserType.USER : UserType.OWNER;
+          const member = await this.prisma.members.update({
+            where: { id: data.member.id },
+            data: { type: type },
+          });
+          client.emit(
+            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            member,
+          );
+        }
 
-      // create room :
+        // create room :
+      } catch (error) {
+        console.log('Chat-updatemember> error- +>', error);
+      }
+      const ResponseEventData: responseEvent = {
+        status: responseEventStatusEnum.SUCCESS,
+        message: responseEventMessageEnum.SUCCESS,
+        data: __member,
+      };
+      this.server.emit(
+        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+        ResponseEventData,
+      );
     } catch (error) {
-      console.log('Chat-updatemember> error- +>', error);
+      console.log('error f server ...');
     }
-    const ResponseEventData: responseEvent = {
-      status: responseEventStatusEnum.SUCCESS,
-      message: responseEventMessageEnum.SUCCESS,
-      data: __member,
-    };
-    this.server.emit(
-      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-      ResponseEventData,
-    );
   }
 
   @SubscribeMessage(`${process.env.SOCKET_EVENT_JOIN_MEMBER}`)
@@ -290,6 +299,7 @@ export class ChatGateway implements OnGatewayConnection {
         `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
         ResponseEventData,
       );
+      return;
     }
     // send event to all client  that member is join to room :
     // client.emit('sendNotification', { userId: data.userid, room: room });
