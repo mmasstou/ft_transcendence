@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-import { UpdateUserDto} from './dtos/UpdateUserDto';
+import { UpdateUserDto } from './dtos/UpdateUserDto';
 
 @Injectable()
 export class UserService {
@@ -32,6 +32,15 @@ export class UserService {
       where: { login: userLogin },
       data: {
         twoFA: false,
+      },
+    });
+  }
+
+  async setBanner(NewBanner: string, userLogin: string) {
+    return this.prisma.user.update({
+      where: { login: userLogin },
+      data: {
+        banner: NewBanner,
       },
     });
   }

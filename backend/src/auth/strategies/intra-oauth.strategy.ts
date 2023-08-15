@@ -33,7 +33,6 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
         data: {
           grade: profile._json.cursus_users[1].grade,
           level: profile._json.cursus_users[1].level,
-          blackholed_at: profile._json.cursus_users[1].blackholed_at,
         },
       });
       const _User = await this.prisma.user.create({
