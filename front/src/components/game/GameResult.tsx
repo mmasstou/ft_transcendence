@@ -22,13 +22,13 @@ const GameResult: FC<GameResultProps> = ({ result }) => {
       </h1>
       <div className="flex gap-3 xl:gap-4 text-sm 2xl:text-base">
         <button
-          onClick={() => router.push('/game')}
+          onClick={() => router.replace('/game')}
           className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-secondary rounded-xl font-bold text-secondary"
         >
           Play again
         </button>
         <button
-          onClick={() => router.push('/profile')}
+          onClick={() => router.replace('/profile')}
           className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-danger rounded-xl font-bold text-danger"
         >
           Quit
