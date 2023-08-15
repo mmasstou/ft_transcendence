@@ -1,49 +1,13 @@
-- check in the front with socket.id not the userId
+//TODO: ENV variables
+	- URL : fetch.
+	
+//TODO: wished behavior
+	- when i fetch users to list them i should filter the current user. => PrivateConversation : getUsers : filtredUsers.
+	- make the search life time (when i click to create new conversation it should displays all users also the new logged users).
 
-- add room id the the table_obj and send it to users to add it to his cookie and send it back in the socket when it create.
+//TODO: Apperance
+	- make responsive directe chat page (conversation list take full screen in mobile).
+	- create new conversation component popup.
 
-- check if the new socket it for the user that is exist in the table_obj base on userId and roomId (from the cookie of the user) and if yes update it in the table_obj.id
-
-- create array of table_obj for the random_match in time and in score.
-
-- add time to the user deconnect.
-
-- add timer for the game or check for score target.
-
-- !!!!!!!!!!!!!!!!!! add the check of image of avatar in the front
-
-
-
-
-
-
-
-list of gradient color :
-
-1 -  '#D16BA5' '#86A8E7' '#5FFBF1'
-
-2 -  
-
-
-
-
-
-        const img1 = new Image();
-        const img2 = new Image();
-        const background = new Image();
-        function checkImageLoaded() {
-            imageLoad++;
-            if (imageLoad == 3) {
-                setImages({
-                    img1:img1,
-                    img2:img2,
-                    background:background,
-                })
-            }
-        }
-        img1.onload = checkImageLoaded;
-        img2.onload = checkImageLoaded;
-        background.onload = checkImageLoaded;
-        img1.src = image1;
-        img2.src = image2;
-        background.src = backgroundSrc;
+//TODO: To implement
+	- create new Conversation after click to the user or open old one if exists.

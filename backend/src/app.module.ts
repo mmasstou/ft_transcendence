@@ -17,6 +17,7 @@ import { MessagesService } from './messages/messages.service';
 import { UserGateway } from './user.gateway';
 import { TwoFactorAuthenticationService } from './auth/2fa/twoFactorAuthentication.service';
 import { TwoFactorAuthenticationModule } from './auth/2fa/twoFactorAuthentication.module';
+import { ConversationsModule } from './directMessage/conversations/conversations.module';
 @Module({
   imports: [
     AuthModule,
@@ -27,6 +28,7 @@ import { TwoFactorAuthenticationModule } from './auth/2fa/twoFactorAuthenticatio
     MembersModule,
     GameModule,
     TwoFactorAuthenticationModule,
+    ConversationsModule,
   ],
   controllers: [AppController],
   providers: [

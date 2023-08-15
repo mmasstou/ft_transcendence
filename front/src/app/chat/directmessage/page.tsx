@@ -18,6 +18,7 @@ const metadata = {
 export default function page() {
     const router = usePathname();
 	const [isOpen, setOpening] = useState<boolean>(false);
+	const [createConversation, setConvCreation] = useState(false);
 
 	useEffect(() => {}, [isOpen])
 
@@ -61,11 +62,11 @@ export default function page() {
 					icon={BsPersonAdd}
 					small
 					outline
-					onClick={() => {}}
+					onClick={() => {setConvCreation(!createConversation)}}
 				/>
 			</div>
 		</div>
-		<PrivateConversation isOpen={isOpen}/>
+		<PrivateConversation isOpen={isOpen} createConversation={createConversation} setConvCreation={setConvCreation}/>
 	</div>
     </Dashboard>
   )
