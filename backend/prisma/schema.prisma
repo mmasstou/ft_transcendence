@@ -138,3 +138,11 @@ model Conversation {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+model Conversation {
+    id        String   @id @default(uuid())
+    content   String
+    users     User[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
