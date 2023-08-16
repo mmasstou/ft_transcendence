@@ -12,23 +12,24 @@ const TableMap: TableMap = new Map();
 const url = process.env.NEXT_PUBLIC_GAMESOCKET_URL_WS;
 const IPmachine = url + '/game';
 const IPmachineBall = url + '/ball';
-const AllTime = 75;
+const AllTime = 5;
 const targetScore = 5;
 
 /// game settings /// on % of the canvas
-var player_width = 6.25;
+let player_width = 6.25;
 
 function pongFunc(divRef: RefObject<HTMLDivElement>) {
-
-  const  canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isMounted, setIsMounted] = useState(false);
-  const DivCanvas = isMounted ? document.getElementById('CanvasGameDiv'): null;
-  const [Table_obj, setTable_obj] = useState<any>(null);
-  const [Status, setStatus] = useState(false);
-  const [socket, setSocket] = useState<any>(null);
-  const [ballSocket, setBallSocket] = useState<any>(null);
-  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-  const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null}>({
+  
+  let     isvertical;
+  const   canvasRef = useRef<HTMLCanvasElement>(null);
+  const   [isMounted, setIsMounted] = useState(false);
+  const   DivCanvas = isMounted ? document.getElementById('CanvasGameDiv'): null;
+  const   [Table_obj, setTable_obj] = useState<any>(null);
+  const   [Status, setStatus] = useState(false);
+  const   [socket, setSocket] = useState<any>(null);
+  const   [ballSocket, setBallSocket] = useState<any>(null);
+  const   [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const   [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null}>({
         img1: null,
         img2: null,
         pause: null,
@@ -67,16 +68,16 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     function MouseFunction(event: { clientX: number; clientY: number; }) {
       if (!Status)
       return;
-        var updatePlayer;
-        var max_variable = 100 - (100 / player_width);
+        let updatePlayer;
+        let max_variable = 100 - (100 / player_width);
         if (isMounted && canvas) {
           const rect = canvas.getBoundingClientRect();
           const x = event.clientX - rect.left;
           const y = event.clientY - rect.top;
           if (x >= 0 && y >= 0 && x <= rect.width && y <= rect.height) {
-            var position1 = Player1;
-            var position2 = Player2;
-            var is_vertical = canvas.height > canvas.width ? true : false;
+            let position1 = Player1;
+            let position2 = Player2;
+            let is_vertical = canvas.height > canvas.width ? true : false;
             if (is_vertical && isMounted && socket.auth.UserId == Table_obj.player1.UserId) {
                 updatePlayer = position1 >= 0 && position1 <= max_variable && (x / canvas.width) * 100 <= max_variable && (x / canvas.width) * 100 >= 0 ? Math.round((x / canvas.width) * 100) : position1;
                 if (updatePlayer != position1)
@@ -101,10 +102,36 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         }
       }
 
+    // function moveBot() {
+    //   if (BallObj.y > 8 && BallObj.y < 92) {
+    //     if (Table_obj.player2.position > BallObj.y - 8) {
+    //       // console.log();
+    //       socket.emit("setBot", {Player: Table_obj.player2.position - 1, tableId: Table_obj.tableId});
+    //       setPlayer2(Table_obj.player2.position - 1);
+    //     }
+    //     else {
+    //       socket.emit("setBot", {Player: Table_obj.player2.position + 1, tableId: Table_obj.tableId});
+    //       setPlayer2(Table_obj.player2.position + 1);
+    //     }
+    //   }
+    // }
+
+    // function handleTouchStart(e: TouchEvent) {
+    //   setStartPosition({x: e.touches[0].clientX, y: e.touches[0].clientY})
+    //   if (isReady && Status == false) {
+    //     socket.emit('setStatus', {status:true, tableId: Table_obj.tableId});
+    //   }
+    //   // console.log("touch start", e.touches[0].clientX, e.touches[0].clientY);
+    // }
+    // function handleTouchMove(e: TouchEvent) {
+    //   MouseFunction({clientX: e.touches[0].clientX, clientY: e.touches[0].clientY})
+    //   console.log("touch move", e.touches[0].clientX,e.touches[0].clientY);
+    // }
+
     function keyFunction(e: KeyboardEvent) {
-      var position1 = Player1;
-      var position2 = Player2;
-        var max_variable = 100 - (100 / player_width);
+      let position1 = Player1;
+      let position2 = Player2;
+        let max_variable = 100 - (100 / player_width);
         if ((e.key == 'ArrowLeft' || e.key == 'ArrowRight') && Status) {
             if (e.key == 'ArrowLeft'){
               if (socket.auth.UserId == Table_obj.player1.UserId && position1 >= 1) {
@@ -137,12 +164,12 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         }
 
     function handleResize() {
-      var height = 0;
-      var width = 0;
+      let height = 0;
+      let width = 0;
       if (divRef.current && divRef.current.offsetParent) {
           const dashboardRect = divRef.current.offsetParent.getBoundingClientRect();
           const headerHeight = divRef.current.offsetParent.querySelector('header')?.getBoundingClientRect().height ?? 0;
-          var sideBarwidth = document.getElementById('Sidebar')?.getBoundingClientRect().width ?? 0;
+          let sideBarwidth = document.getElementById('Sidebar')?.getBoundingClientRect().width ?? 0;
           if (sideBarwidth === dashboardRect.width)
               sideBarwidth = 0;
           height = (dashboardRect.height - headerHeight) * 0.9;
@@ -238,7 +265,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
   // transport close
   }, [])
     
-
     // useEffect for background
     useEffect(() => {
       if (LeaveGame) {
@@ -253,12 +279,16 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         window.addEventListener("resize", handleResize);
         window.addEventListener("mousemove", MouseFunction)
         window.addEventListener("keydown", StartPause)
+        // window.addEventListener('touchstart', handleTouchStart, false);
+        // window.addEventListener('touchmove', handleTouchMove, false);
         return () => {
           obj.backgroundCtx && obj.backgroundCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
           canvas?.parentNode && canvas.parentNode.contains(obj.backgroundLayer) && canvas.parentNode.removeChild(obj.backgroundLayer);
           window.removeEventListener("resize", handleResize);
           window.removeEventListener("mousemove", MouseFunction)
           window.removeEventListener("keydown", StartPause)
+          // window.removeEventListener('touchstart', handleTouchStart, false);
+          // window.removeEventListener('touchmove', handleTouchMove, false);
         }
       }
             
@@ -304,6 +334,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     useEffect(() => {
       if (isReady) {
           const obj = drawingBall(canvas, BallObj, socket, Table_obj, canvasSize);
+          // Table_obj.player2.UserId == 'Bot' && moveBot();
           Table_obj.player2.UserId == 'Bot' && BallObj.y > 8 && BallObj.y < 92 && socket.emit("setBot", {Player: BallObj.y - 8, tableId: Table_obj.tableId}) && setPlayer2(BallObj.y - 8);   /////////////// bot /////////////// need more calculation
           return () => {
             obj.ballCtx && obj.ballCtx.clearRect(0, 0,  canvasSize.width, canvasSize.height);
@@ -404,9 +435,9 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     }, [YouWin, YouLose, YouDraw])
 
     if (canvasSize.width < canvasSize.height)
-        var isvertical = true;
+        isvertical = true;
     else
-        var isvertical = false;
+        isvertical = false;
     return (
       !isReady ? <MatchMaking/> :
       LeaveGame && (YouWin || (!YouWin && !YouLose && !YouDraw))  ? <GameResult result="win" /> :

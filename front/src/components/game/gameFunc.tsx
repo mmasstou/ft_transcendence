@@ -112,7 +112,7 @@ function drawScore(
           ScoreCtx && (ScoreCtx.fillStyle = '#fff') && (ScoreCtx.font = str);
           ScoreCtx.beginPath();
           if (isMobile){
-              var rotation = Math.PI * 1.5;
+              let rotation = Math.PI * 1.5;
               ScoreCtx.translate(canvas.width/2, canvas.height/2);
               ScoreCtx.rotate(rotation);
               ScoreCtx.translate(-canvas.height/2, -canvas.width/2);
@@ -121,8 +121,8 @@ function drawScore(
               ScoreCtx && (ScoreCtx.fillStyle = first.color) && ScoreCtx.fillText(first.score, canvas.height * 0.75, canvas.width - canvas.width * 0.04);
               ScoreCtx && (ScoreCtx.fillStyle = second.color) && ScoreCtx.fillText(second.score, canvas.height / 4, canvas.width - canvas.width * 0.04);
               ScoreCtx && images.pause && !Status && ScoreCtx.drawImage(images.pause, canvas.height / 2 - radius, canvas.width - radius * 2, radius * 2, radius * 2);
-              ScoreCtx && (ScoreCtx.fillStyle = timeColor) && Status && Table_obj.GameMode == "time" && ScoreCtx.fillText(timer.toString(), canvas.height / 2 - radius, canvas.width - radius * 2);
-              ScoreCtx && (ScoreCtx.fillStyle = '#ffffff') && Status && Table_obj.GameMode == "score" && ScoreCtx.fillText("Score " + targetScore, canvas.height / 2 - radius * 1.2, canvas.width - radius / 1.5);
+              ScoreCtx && (ScoreCtx.fillStyle = timeColor) && Status && Table_obj.GameMode == "time" && ScoreCtx.fillText(timer.toString(), canvas.height / 2 - radius, canvas.width - canvas.width * 0.04);
+              ScoreCtx && (ScoreCtx.fillStyle = '#ffffff') && Status && Table_obj.GameMode == "score" && ScoreCtx.fillText("Score " + targetScore, canvas.height / 2 - radius * 1.2, canvas.width - canvas.width * 0.04);
               ScoreCtx.clip();
               first.img && ScoreCtx.drawImage(first.img, canvas.height - radius * 2, canvas.width - radius * 2, radius * 2, radius * 2);
               second.img && ScoreCtx.drawImage(second.img, 0, (canvas.width - radius * 2), radius * 2, radius * 2);
@@ -166,7 +166,7 @@ function Player1Draw(canvas: HTMLCanvasElement | null, socket: any, table_obj: t
     const playerLayer = document.createElement('canvas');
     const playerCtx = playerLayer.getContext('2d');
     if (canvas && playerCtx) {
-        var is_vertical = canvas.height > canvas.width ? true : false;
+        let is_vertical = canvas.height > canvas.width ? true : false;
         playerLayer.width = canvas.width;
         playerLayer.height = canvas.height;
         playerLayer.style.position = 'absolute';
@@ -188,7 +188,7 @@ function Player2Draw(canvas: HTMLCanvasElement | null, socket: any, table_obj: t
     const playerLayer = document.createElement('canvas');
     const playerCtx = playerLayer.getContext('2d');
     if (canvas && playerCtx) {
-        var is_vertical = canvas.height > canvas.width ? true : false;
+        let is_vertical = canvas.height > canvas.width ? true : false;
         playerLayer.width = canvas.width;
         playerLayer.height = canvas.height;
         playerLayer.style.position = 'absolute';
@@ -215,14 +215,14 @@ function drawingBall(
     const ballLayer = document.createElement('canvas');
     const ballCtx = ballLayer.getContext('2d');
     if (canvas) {
-        var ball_rad = (canvas.width + canvas.height) / 120;
-        var ball = {
+        let ball_rad = (canvas.width + canvas.height) / 120;
+        let ball = {
             x:BallObj.x,
             y:BallObj.y,
         }
         if (socket && socket.auth.UserId === Table_obj.player2.UserId)
             ball.x = 100 - ball.x;
-        var is_vertical = canvas.height > canvas.width ? true : false;
+        let is_vertical = canvas.height > canvas.width ? true : false;
         ballLayer.width = canvas.width;
         ballLayer.height = canvas.height;
         ballLayer.style.position = 'absolute';
@@ -231,6 +231,8 @@ function drawingBall(
         if (ballCtx) {
             ballCtx.beginPath();
             ballCtx.fillStyle = socket.auth.UserId === Table_obj.player1.UserId ? Table_obj.player1.GameSetting.ball : Table_obj.player2.GameSetting.ball;
+            if (ball.x < 3 || ball.x > 97)
+                ballCtx.fillStyle = "#ff0000";
             if (is_vertical)
             ballCtx.arc(((canvasSize.width) * ball.y) / 100, (canvasSize.height * ball.x) / 100, ball_rad, 0,Math.PI * 2);
             else
@@ -240,4 +242,5 @@ function drawingBall(
     }
     return {ballCtx, ballLayer}
 }
+
 export {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall}
