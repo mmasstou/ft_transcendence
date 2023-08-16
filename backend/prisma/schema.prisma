@@ -76,11 +76,11 @@ model Match {
 }
 
 model Cursus {
-    id            String @id @default(uuid())
-    grade         String
-    level         Float
-    blackholed_at String
-    User          User[]
+  id    String @id @default(uuid())
+  grade String
+  level Float
+  // blackholed_at String
+  User  User[]
 }
 
 model Rooms {

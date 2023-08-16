@@ -36,6 +36,15 @@ export class UserService {
     });
   }
 
+  async setBanner(NewBanner: string, userLogin: string) {
+    return this.prisma.user.update({
+      where: { login: userLogin },
+      data: {
+        banner: NewBanner,
+      },
+    });
+  }
+
   async findOne(params: { id: string }): Promise<any> {
     const { id } = params;
     // console.log('++findOne++>', login);

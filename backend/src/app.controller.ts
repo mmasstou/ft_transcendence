@@ -7,7 +7,6 @@ export class AppController {
 
   @Get()
   index() {
-    console.log('index page');
     return '<h2>Hello World!</h2>';
   }
 }

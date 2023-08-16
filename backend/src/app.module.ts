@@ -18,17 +18,20 @@ import { UserGateway } from './user.gateway';
 import { TwoFactorAuthenticationService } from './auth/2fa/twoFactorAuthentication.service';
 import { TwoFactorAuthenticationModule } from './auth/2fa/twoFactorAuthentication.module';
 import { ConversationsModule } from './directMessage/conversations/conversations.module';
+import { FileUploadModule } from './Uploads/file-upload.module';
+
 @Module({
   imports: [
     AuthModule,
     UserModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     RoomsModule,
     MessagesModule,
     MembersModule,
     GameModule,
     TwoFactorAuthenticationModule,
     ConversationsModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [
