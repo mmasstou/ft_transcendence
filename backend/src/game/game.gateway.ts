@@ -20,7 +20,6 @@ import {
 } from '../../tools/class';
 import { GameService } from './game.service';
 
-
 const UserMap: UserMap = new Map(); ////////// list of user connected to the game
 const TableMap: TableMap = new Map(); ////////// list of table obj created
 const RandomListTime = new UniqueSet(); ////////// list of random time obj created
@@ -65,8 +64,8 @@ function check_col(table: any) {
 
 function moveBall(server: Server, table: any) {
   if (
-    table.ball.x > 0 &&
-    table.ball.x < 100 &&
+    table.ball.x > 3 &&
+    table.ball.x < 97 &&
     table.ball.y > 0 &&
     table.ball.y < 100
   ) {
@@ -75,7 +74,7 @@ function moveBall(server: Server, table: any) {
   } else {
     table.ball.ball_speed.x = -table.ball.ball_speed.x;
     table.ball.ball_speed.y = -table.ball.ball_speed.y;
-    if (table.ball.x >= 100) {
+    if (table.ball.x >= 97) {
       table.player2.score += 1;
       table.ball.x = 50;
       table.intervaldelay = 30;
@@ -318,7 +317,6 @@ class MyGateway implements OnGatewayConnection {
     if (UserMap.get(data.playerId).Status == 'InGame')
       return new Error('User already in game');
     else {
-      console.log('create bot table', _User)
       if (
         UserMap.get(data.playerId) &&
         UserMap.get(data.playerId).SocketId &&
@@ -581,6 +579,7 @@ class MyGateway implements OnGatewayConnection {
       this.server.to(data.tableId).emit('setPlayer2', data.Player);
     }
   }
+  
 
   @SubscribeMessage('setBot') ///// done
   SetBot(client: any, data: any) {

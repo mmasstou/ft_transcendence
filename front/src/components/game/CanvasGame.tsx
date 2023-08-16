@@ -20,16 +20,16 @@ let player_width = 6.25;
 
 function pongFunc(divRef: RefObject<HTMLDivElement>) {
   
-  let isvertical;
-  const  canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isMounted, setIsMounted] = useState(false);
-  const DivCanvas = isMounted ? document.getElementById('CanvasGameDiv'): null;
-  const [Table_obj, setTable_obj] = useState<any>(null);
-  const [Status, setStatus] = useState(false);
-  const [socket, setSocket] = useState<any>(null);
-  const [ballSocket, setBallSocket] = useState<any>(null);
-  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-  const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null}>({
+  let     isvertical;
+  const   canvasRef = useRef<HTMLCanvasElement>(null);
+  const   [isMounted, setIsMounted] = useState(false);
+  const   DivCanvas = isMounted ? document.getElementById('CanvasGameDiv'): null;
+  const   [Table_obj, setTable_obj] = useState<any>(null);
+  const   [Status, setStatus] = useState(false);
+  const   [socket, setSocket] = useState<any>(null);
+  const   [ballSocket, setBallSocket] = useState<any>(null);
+  const   [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const   [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null}>({
         img1: null,
         img2: null,
         pause: null,
@@ -101,6 +101,24 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
           }
         }
       }
+
+    function moveBot() {
+      if (BallObj.y > 8 && BallObj.y < 92) {
+        // console.log("player: ", Table_obj.player2);
+        if (Table_obj.player2.position > BallObj.y - 8) {
+          // console.log();
+          socket.emit("setBot", {Player: Table_obj.player2.position - 1, tableId: Table_obj.tableId});
+          setPlayer2(Table_obj.player2.position - 1);
+        }
+        else {
+          socket.emit("setBot", {Player: Table_obj.player2.position + 1, tableId: Table_obj.tableId});
+          setPlayer2(Table_obj.player2.position + 1);
+        }
+          
+          // socket.emit("setBot", {Player: BallObj.y - 8, tableId: Table_obj.tableId});
+          // setPlayer2(BallObj.y - 8);
+      }
+    }
 
     function keyFunction(e: KeyboardEvent) {
       let position1 = Player1;
@@ -239,7 +257,6 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
   // transport close
   }, [])
     
-
     // useEffect for background
     useEffect(() => {
       if (LeaveGame) {
@@ -305,7 +322,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     useEffect(() => {
       if (isReady) {
           const obj = drawingBall(canvas, BallObj, socket, Table_obj, canvasSize);
-          Table_obj.player2.UserId == 'Bot' && BallObj.y > 8 && BallObj.y < 92 && socket.emit("setBot", {Player: BallObj.y - 8, tableId: Table_obj.tableId}) && setPlayer2(BallObj.y - 8);   /////////////// bot /////////////// need more calculation
+          Table_obj.player2.UserId == 'Bot' && moveBot();
           return () => {
             obj.ballCtx && obj.ballCtx.clearRect(0, 0,  canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ballLayer);

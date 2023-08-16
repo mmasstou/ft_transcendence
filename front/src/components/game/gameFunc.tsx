@@ -231,6 +231,8 @@ function drawingBall(
         if (ballCtx) {
             ballCtx.beginPath();
             ballCtx.fillStyle = socket.auth.UserId === Table_obj.player1.UserId ? Table_obj.player1.GameSetting.ball : Table_obj.player2.GameSetting.ball;
+            if (ball.x < 3 || ball.x > 97)
+                ballCtx.fillStyle = "#ff0000";
             if (is_vertical)
             ballCtx.arc(((canvasSize.width) * ball.y) / 100, (canvasSize.height * ball.x) / 100, ball_rad, 0,Math.PI * 2);
             else
@@ -240,4 +242,5 @@ function drawingBall(
     }
     return {ballCtx, ballLayer}
 }
+
 export {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall}
