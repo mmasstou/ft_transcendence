@@ -10,14 +10,19 @@ import Image from "next/image"
 import { toast } from "react-hot-toast"
 import { useRouter } from "next/navigation"
 import { env } from "process"
+import { RiSearchLine } from "react-icons/ri"
+import Loading from "../components/CanneLSettingsLoading"
+import React from "react"
+import { set } from "date-fns"
+import { DividerHorizontalIcon } from "@radix-ui/react-icons"
 
 export default function ChanneLFindRoommodaL() {
     const { IsOpen, onClose, onOpen, socket } = ChanneLFindRoommodaLHook()
-    const [rooms, setrooms] = useState<RoomsType[] | null>(null)
-    const [roomsFiltered, setroomsFiltered] = useState<RoomsType[] | null>(null)
     const [InputValue, setInputValue] = useState("")
-    const [Update, setUpdate] = useState<boolean>(false)
     const searchInputRef = useRef<HTMLInputElement | null>(null);
+    const [IsLoading, setIsLoading] = useState(false)
+    const [isInputFocused, setIsInputFocused] = useState(false);
+    const [ChanneLs, setChanneLs] = React.useState<RoomsType[] | null | undefined>(null)
     const UserId = Cookies.get("_id")
     const route = useRouter()
 
@@ -25,67 +30,79 @@ export default function ChanneLFindRoommodaL() {
     if (!token || !UserId) return
 
     useEffect(() => {
-        if (searchInputRef.current) {
-            searchInputRef.current.focus();
+        if (IsOpen) {
+            if (searchInputRef.current) {
+                searchInputRef.current.focus();
+            }
         }
-    }, [])
-    useEffect(() => {
-        if (!rooms) return
-        if (!InputValue) return setroomsFiltered(null)
-        setroomsFiltered(
-            rooms.filter((room: RoomsType) => {
-                return room.name.toLowerCase().includes(InputValue.toLowerCase())
-            }))
-    }, [InputValue, rooms])
+    }, [IsOpen])
 
-    const OnJion = (param: { room: RoomsType }) => {
-        // check if room is protacted :
-        const { room } = param
-        if (room.type === RoomTypeEnum.PROTECTED) return
-        // channel is public
-        socket?.emit(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
-            { userid: UserId, roomid: room.id })
-    }
+    // get data from backend :
+    React.useEffect(() => {
 
-    // listen to socket event :
-    useEffect(() => { }, [socket])
+        (async () => {
+            if (InputValue.length === 0) return;
+            const ChanneLs: RoomsType[] | null = await getPublicProtactedChannels(token)
+            if (!ChanneLs) return setChanneLs(null);
+            const ChanneLsFilter: RoomsType[] = ChanneLs.filter((channL) => channL.name.includes(InputValue))
+            setChanneLs(ChanneLsFilter.length === 0 ? null : ChanneLsFilter)
+        })();
+    }, [InputValue])
+
+    React.useEffect(() => {
+        if (ChanneLs) setIsLoading(false)
+    }, [ChanneLs])
+
+
+    React.useEffect(() => {
+        if (isInputFocused && InputValue.length === 0) {
+            setIsLoading(true)
+            return
+        }
+        if (!isInputFocused && InputValue.length === 0 && !ChanneLs) {
+            setIsLoading(false)
+            setChanneLs(null)
+            return
+        }
+        setIsLoading(false)
+    }, [isInputFocused, InputValue])
+
 
     const bodyContent = (
-        <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[34rem]">
-
-            <div className="body flex flex-col gap-4">
-
-                <div className="body flex flex-col gap-2 py-4">
+        <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col min-h-[40rem] h-full">
+            <div className="body flex flex-col gap-6">
+                <div className="body flex flex-row justify-center items-center gap-2 p-2 w-full rounded-[15px] bg-[#161F1E]">
+                    <RiSearchLine size={28} fill="#b6b6b6" />
                     <input
                         ref={searchInputRef}
-                        className="p-3 focus:outline-none rounded-[15px] bg-transparent border border-[#fdfdfd] text-[#ffffff] placeholder:text-white"
+                        onFocus={() => setIsInputFocused(true)}
+                        onBlur={() => setIsInputFocused(false)}
+                        className="py-2 w-full focus:outline-none  bg-transparent text-[#ffffff] placeholder:text-[#b6b6b6] text-[18px] font-thin"
                         onChange={(event) => { setInputValue(event.target.value); }}
                         placeholder="Type the name of channel"
                         type="search"
                         name=""
                         id="" />
                 </div>
-                <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-scroll justify-center items-center">
+                {IsLoading ? <Loading /> : <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-scroll justify-center items-center">
                     {
-                        roomsFiltered && roomsFiltered.length
-                            ? roomsFiltered.map((room: RoomsType, index: number) => {
+
+                        ChanneLs
+                            ? ChanneLs.map((room: RoomsType, index: number) => {
                                 return <ChannelFindRoomItem
                                     key={index}
                                     room={room}
                                     socket={socket}
                                     onClick={(param: { room: RoomsType }) => {
                                         const { room } = param
-                                        OnJion({ room })
                                     }} />
                             })
-                            : <Image src="/searching.svg" alt={"searching"} height={230} width={230} />
+                            : <h2>Not Fond</h2>
                     }
-                </div>
+                </div>}
             </div>
-
         </div>
     )
-    return <ChanneLModal IsOpen={IsOpen} title={"find channel"} children={bodyContent} onClose={onClose} />
+    return <ChanneLModal IsOpen={IsOpen} title={`Find channel`} children={bodyContent} onClose={onClose} />
 
 }

@@ -6,6 +6,15 @@
     background-color: #161F1E;
 }
 
+.loadingsettings {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
+    /* background-color: #161F1E; */
+}
+
 .spinner {
     border: 6px solid #fff;
     border-top: 6px solid #1EF0AE;
