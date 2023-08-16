@@ -1,7 +1,6 @@
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
-import { root } from 'postcss';
-import React, { useState } from 'react';
+import React from 'react';
 
 interface Props {
   isvertical: boolean;
@@ -15,7 +14,7 @@ function LeaveButton({ isvertical, isReady, isMobile }: Props) {
 
   const handleClick = async () => {
     router.push('/game');
-    const response = await fetch('http://127.0.0.1:80/api/game/leaveGame', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}api/game/leaveGame`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

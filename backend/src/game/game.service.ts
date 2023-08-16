@@ -13,6 +13,14 @@ export class GameService {
           where: { id },
         });
       }
+
+    async updateTotalMatches(params: { id: string; TotalWin: number, TotalLose: number, TotalDraw: number }): Promise<User> {
+        const { id, TotalWin, TotalLose, TotalDraw } = params;
+        return await this.prisma.user.update({
+          data : {TotalWin : TotalWin, TotalLose: TotalLose, TotalDraw: TotalDraw},
+          where: { id },
+        });
+      }
     
     async CreateScore(params: {Player1: string, Player2: string, score1: number, score2: number}): Promise<any> {
         const {Player1, Player2, score1, score2} = params;

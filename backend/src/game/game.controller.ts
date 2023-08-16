@@ -39,6 +39,7 @@ export class GameController {
 
   @Post('/BotGame')
   async selectBotGame(@Body() body: any) {
+    // console.log(body);
     try {
       const result = await this.GameGateway.CreateBotTable(body);
       if (result != undefined)
@@ -47,6 +48,7 @@ export class GameController {
           HttpStatus.CONFLICT,
         );
     } catch (err) {
+      // console.log(err);
       throw new HttpException(
         { reason: err.response.reason },
         HttpStatus.CONFLICT,
@@ -101,14 +103,20 @@ export class GameController {
         Other: true,
       },
     });
-
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    const matchList = user.MyScore.concat(user.Other);
+    const sortedmatchList = matchList.sort((item1, item2) => {
+      if (item1.created_at < item2.created_at) {
+        return -1;
+      }
+      if (item1.created_at > item2.created_at) {
+        return 1;
+      }
+      return 0;
+    });
 
-    return {
-      MyScore: user.MyScore,
-      Other: user.Other,
-    };
+    return matchList;
   }
 }

@@ -121,8 +121,8 @@ function drawScore(
               ScoreCtx && (ScoreCtx.fillStyle = first.color) && ScoreCtx.fillText(first.score, canvas.height * 0.75, canvas.width - canvas.width * 0.04);
               ScoreCtx && (ScoreCtx.fillStyle = second.color) && ScoreCtx.fillText(second.score, canvas.height / 4, canvas.width - canvas.width * 0.04);
               ScoreCtx && images.pause && !Status && ScoreCtx.drawImage(images.pause, canvas.height / 2 - radius, canvas.width - radius * 2, radius * 2, radius * 2);
-              ScoreCtx && (ScoreCtx.fillStyle = timeColor) && Status && Table_obj.GameMode == "time" && ScoreCtx.fillText(timer.toString(), canvas.height / 2 - radius, canvas.width - radius * 2);
-              ScoreCtx && (ScoreCtx.fillStyle = '#ffffff') && Status && Table_obj.GameMode == "score" && ScoreCtx.fillText("Score " + targetScore, canvas.height / 2 - radius * 1.2, canvas.width - radius / 1.5);
+              ScoreCtx && (ScoreCtx.fillStyle = timeColor) && Status && Table_obj.GameMode == "time" && ScoreCtx.fillText(timer.toString(), canvas.height / 2 - radius, canvas.width - canvas.width * 0.04);
+              ScoreCtx && (ScoreCtx.fillStyle = '#ffffff') && Status && Table_obj.GameMode == "score" && ScoreCtx.fillText("Score " + targetScore, canvas.height / 2 - radius * 1.2, canvas.width - canvas.width * 0.04);
               ScoreCtx.clip();
               first.img && ScoreCtx.drawImage(first.img, canvas.height - radius * 2, canvas.width - radius * 2, radius * 2, radius * 2);
               second.img && ScoreCtx.drawImage(second.img, 0, (canvas.width - radius * 2), radius * 2, radius * 2);
