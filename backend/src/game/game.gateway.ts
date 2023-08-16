@@ -64,8 +64,8 @@ function check_col(table: any) {
 
 function moveBall(server: Server, table: any) {
   if (
-    table.ball.x > 0 &&
-    table.ball.x < 100 &&
+    table.ball.x > 3 &&
+    table.ball.x < 97 &&
     table.ball.y > 0 &&
     table.ball.y < 100
   ) {
@@ -74,7 +74,7 @@ function moveBall(server: Server, table: any) {
   } else {
     table.ball.ball_speed.x = -table.ball.ball_speed.x;
     table.ball.ball_speed.y = -table.ball.ball_speed.y;
-    if (table.ball.x >= 100) {
+    if (table.ball.x >= 97) {
       table.player2.score += 1;
       table.ball.x = 50;
       table.intervaldelay = 30;
@@ -86,6 +86,42 @@ function moveBall(server: Server, table: any) {
       server.to(table.tableId + 'ball').emit('setScore1', table.player1.score);
     }
   }
+}
+
+async function SetUserMatchNumber(gameService: GameService, Win: string, Lose: string) {
+  if (Lose === 'Bot' || Win === 'Bot') return;
+  const user1 = UserMap.get(Win);
+  const user2 = UserMap.get(Lose);
+  await gameService.updateTotalMatches({
+    id: Win,
+    TotalWin: user1.User.TotalWin + 1,
+    TotalLose: user1.User.TotalLose,
+    TotalDraw: user1.User.TotalDraw,
+  });
+  await gameService.updateTotalMatches({
+    id: Lose,
+    TotalWin: user2.User.TotalWin,
+    TotalLose: user2.User.TotalLose + 1,
+    TotalDraw: user2.User.TotalDraw,
+  });
+}
+
+function setUserDraw(gameService: GameService, Win: string, Lose: string) {
+  if (Lose === 'Bot' || Win === 'Bot') return;
+  const user1 = UserMap.get(Win);
+  const user2 = UserMap.get(Lose);
+  gameService.updateTotalMatches({
+    id: Win,
+    TotalWin: user1.User.TotalWin,
+    TotalLose: user1.User.TotalLose,
+    TotalDraw: user1.User.TotalDraw + 1,
+  });
+  gameService.updateTotalMatches({
+    id: Lose,
+    TotalWin: user2.User.TotalWin,
+    TotalLose: user2.User.TotalLose,
+    TotalDraw: user2.User.TotalDraw + 1,
+  });
 }
 
 @WebSocketGateway({ namespace: 'ball' })
@@ -631,6 +667,27 @@ class MyGateway implements OnGatewayConnection {
         TableMap.get(data.tableId).player2.score
           ? 'no one'
           : winner;
+      if (winner != 'no one') {
+        TableMap.get(data.tableId).player1.score >
+        TableMap.get(data.tableId).player2.score
+          ? SetUserMatchNumber(
+              this.GameService,
+              TableMap.get(data.tableId).player1.UserId,
+              TableMap.get(data.tableId).player2.UserId,
+            )
+          : SetUserMatchNumber(
+              this.GameService,
+              TableMap.get(data.tableId).player2.UserId,
+              TableMap.get(data.tableId).player1.UserId,
+            );
+      }
+      else {
+        setUserDraw(
+          this.GameService,
+          TableMap.get(data.tableId).player1.UserId,
+          TableMap.get(data.tableId).player2.UserId,
+        )
+      }
       this.server.to(data.tableId).emit('GameOver', winner);
     }
   }

@@ -44,6 +44,12 @@ model User {
   bg_color                      String[]        @default(["#918CA9", "#211F2F"])
   paddle_color                  String?         @default("#E0E0E0")
   ball_color                    String?         @default("#E0E0E0")
+  MyScore                       Match[]         @relation("Player1")
+  Other                         Match[]         @relation("Player2")
+  status                        String          @default("online")
+  TotalWin                      Int             @default(0)
+  TotalLose                     Int             @default(0)
+  TotalDraw                     Int             @default(0)
   location                      String?
   cursus_users                  Cursus?         @relation(fields: [cursusId], references: [id])
   intraId                       Int?
@@ -59,13 +65,11 @@ model User {
   cursusId                      String?
   twoFactorAuthenticationSecret String?
   twoFA                         Boolean         @default(false)
-  MyScore                       Match[]         @relation("Player1")
-  Other                         Match[]         @relation("Player2")
-  status                        String          @default("online") // need to be checked
 }
 
 model Match {
   id           String @id @default(uuid())
+  created_at   DateTime @default(now())
   player1      User   @relation(name: "Player1", fields: [player1Id], references: [id])
   player1Id    String
   player1Score Int
