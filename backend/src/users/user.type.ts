@@ -50,6 +50,7 @@ export type RoomsType = {
   members: membersType[];
   messages: Message[];
   accesspassword: string;
+  slug: string;
 };
 
 export type userType = {

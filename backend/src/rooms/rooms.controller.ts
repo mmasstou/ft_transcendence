@@ -74,7 +74,6 @@ export class RoomsController {
     @Param('roomId') roomId: string,
     @Param('userId') userId: string,
   ) {
-    console.log(' async HasPermissionToAccess controller ');
     return await this.roomsService.HasPermissionToAccess({ roomId, userId });
   }
 
@@ -82,6 +81,12 @@ export class RoomsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.roomsService.findOne({ id });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('slug/:slug')
+  findOneBySLug(@Param('slug') slug: string) {
+    return this.roomsService.findOneBySLug({ slug });
   }
 
   @UseGuards(JwtAuthGuard)

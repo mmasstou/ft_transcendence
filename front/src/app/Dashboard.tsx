@@ -51,6 +51,8 @@ const Dashboard = ({ children }: Props) => {
       return;
     };
   }, [token]);
+
+
   useEffect(() => {
 
     if (!token) return
@@ -67,6 +69,34 @@ const Dashboard = ({ children }: Props) => {
     };
 
   }, [])
+
+  // React.useEffect(() => {
+  //   if (!token)
+  //     return;
+  //   const socket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
+  //     transports: ['websocket'],
+  //     auth: {
+  //       token: token,
+  //     },
+  //   });
+  //   // socket.on('jwt_expired', () => {
+  //   //   console.log("jwt_expired")
+  //   //   Cookies.remove('token')
+  //   //   Cookies.remove('_id')
+  //   // })
+  //   // Handle socket events here
+  //   socket.on('connect', () => {
+
+  //     setSocket(socket)
+  //     Cookies.set('socket', socket.id)
+  //   });
+
+  //   // Clean up the socket connection when the component unmounts
+  //   return () => {
+  //     socket.disconnect();
+  //     socket.close()
+  //   };
+  // }, []);
 
   useEffect(() => {
     socket?.on('GameResponse', (data: any) => {

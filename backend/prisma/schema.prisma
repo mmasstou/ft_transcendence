@@ -108,6 +108,7 @@ model Rooms {
   created_at           DateTime               @default(now())
   updated_at           DateTime               @updatedAt
   User                 User[]
+  slug                 String                 @unique @default(uuid())
   ChanneLNotifications ChanneLNotifications[]
 }
 

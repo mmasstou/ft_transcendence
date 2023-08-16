@@ -9,7 +9,7 @@ import ConversationsMessages from "./channel.conversations.messages";
 // hooks :
 import { Socket } from "socket.io-client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Message from "./channel.message";
 import LeftSidebarHook from "../hooks/LeftSidebarHook";
@@ -23,10 +23,13 @@ import getChannelWithId from "../actions/getChannelWithId";
 import { toast } from "react-hot-toast";
 import BanMember from "./channel.settings.banmember";
 import MemberHasPermissionToAccess from "../actions/MemberHasPermissionToAccess";
+import FindOneBySLug from "../actions/Channel/findOneBySlug";
 
 
 export default function Conversations({ socket }: { socket: Socket | null }) {
 
+    const query = useParams();
+    const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
     const [IsMounted, setIsMounted] = useState(false)
     const [messages, setMessages] = useState<any[]>([])
     const [channeLinfo, setChanneLinfo] = useState<any>(null)
@@ -44,20 +47,23 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     // console.log("Conversations socket :", socket?.id)
 
     useEffect(() => {
-        const token: any = channeLLid && Cookies.get('token');
-        channeLLid && (async () => {
-            const response = await getChanneLMessages(channeLLid, token)
+        const token: any = slug && Cookies.get('token');
+        slug && (async () => {
+            const _roomInfo : RoomsType = await FindOneBySLug(slug, token)
+            if (!_roomInfo){
+                return;
+            }
+            toast.success(`Welcome to ${_roomInfo.name}`)
+            setChanneLinfo(_roomInfo)
+            const response = await getChanneLMessages(_roomInfo.id, token)
             if (!response) return
-            console.log("= await getChanneLMessage :", response)
             setMessages(response.messages)
 
             // get channeLLid data :
-            const _roomInfo = await getChannelWithId(channeLLid, token)
-            setChanneLinfo(_roomInfo)
         })();
 
 
-    }, [channeLLid])
+    }, [slug])
 
     useEffect(() => {
         socket?.on('message', (message: any) => {
@@ -145,7 +151,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
         {channeLinfo
             ? <div className={`Conversations relative w-full h-full flex flex-col border-orange-300 sm:flex`}>
-                <ConversationsTitlebar LogedMember={LogedMember} socket={socket} channeLId={channeLLid} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
+                <ConversationsTitlebar LogedMember={LogedMember} socket={socket} channeLId={channeLinfo.id} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
                 {!LogedMember?.isban ?
                     <>
                         <ConversationsMessages socket={socket} Content={content} />

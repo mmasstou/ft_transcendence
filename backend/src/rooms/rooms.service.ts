@@ -89,6 +89,22 @@ export class RoomsService {
     }
   }
 
+  async findOneBySLug(params: { slug: string }) {
+    const { slug } = params;
+    try {
+      console.log('++findOneBySLug++>', slug);
+      const room = await this.prisma.rooms.findUnique({
+        where: { slug },
+        include: { members: true },
+      });
+      if (!room) throw new Error('');
+      return room;
+    } catch (error) {
+      console.log('channeL with slug %s not found', slug);
+      return new NotFoundException();
+    }
+  }
+
   async findOneByName(params: { name: string }): Promise<Rooms | null> {
     try {
       const { name } = params;

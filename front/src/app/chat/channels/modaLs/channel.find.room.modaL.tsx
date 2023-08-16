@@ -49,44 +49,7 @@ export default function ChanneLFindRoommodaL() {
     }
 
     // listen to socket event :
-    useEffect(() => {
-        socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-            (data: {
-                message: string,
-                status: any,
-                data: RoomsType,
-            }) => {
-                if (data.data) {
-                    (async () => {
-                        let response = await getPublicProtactedChannels(token)
-                        if (!response) return
-                        setrooms(response)
-                    }
-                    )();
-                    return
-                }
-            }
-        );
-        socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-            (data: {
-                message: string,
-                status: any,
-                data: RoomsType,
-            }) => {
-                console.log("RESPONSE_CHAT_MEMBER_UPDATE :", data)
-                if (!data.data) {
-                    toast.error(data.message)
-                }
-                if (data.data) {
-                    toast.success(data.message)
-                    route.push(`/chat/channels?r=${data.data.id}`)
-                    onClose()
-                }
-            });
-
-    }, [socket])
+    useEffect(() => { }, [socket])
 
     const bodyContent = (
         <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[34rem]">

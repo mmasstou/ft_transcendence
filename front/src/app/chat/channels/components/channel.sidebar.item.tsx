@@ -5,21 +5,26 @@ import { use, useCallback, useEffect, useState } from "react"
 import { Socket } from "socket.io-client"
 import LeftSidebarHook from "../hooks/LeftSidebarHook"
 import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
+import Link from "next/link"
+import { ro } from "date-fns/locale"
+import React from "react"
+import getChannelWithId from "../actions/getChannelWithId"
 
 interface ChanneLSidebarItemProps {
   room: RoomsType,
   active?: boolean,
   onClick?: () => void,
-  socket: Socket | null
   viewd?: number
 }
-const ChanneLSidebarItem = ({ room, active, onClick, socket, viewd }: ChanneLSidebarItemProps) => {
+const ChanneLSidebarItem = ({ room, active, onClick, viewd }: ChanneLSidebarItemProps) => {
   const [isMobile, setIsMobile] = useState(false);
   const [selectedchanneL, setSelectedchanneL] = useState<RoomsType | null>(null)
   const leftSidebar = LeftSidebarHook()
   const router = useRouter()
   const params = useSearchParams()
   const userId = Cookies.get('_id')
+  const token = Cookies.get('token')
+  if (!token || !userId) return;
 
   const channeLPasswordAccessHook = ChanneLPasswordAccessHook()
   let JoinData: any = room
@@ -27,75 +32,28 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket, viewd }: ChanneLSid
     JoinData.loginUser = userId
   }
 
-
   useEffect(() => {
-    const handleResize = () => {
+    window.addEventListener('resize', () => {
       const screenWidth = window.innerWidth;
       setIsMobile(screenWidth <= 767);
-    };
-
-    handleResize();
-
-    window.addEventListener('resize', handleResize);
+    });
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', () => {
+        const screenWidth = window.innerWidth;
+        setIsMobile(screenWidth <= 767);
+      });
     };
   }, []);
 
   useEffect(() => {
-    // if (selectedchanneL) {
-    //   if (selectedchanneL.hasAccess === true && selectedchanneL.id !== params.get('r')) {
-    //     console.log("selectedchanneL  :%s cliecked and hasAccessPassrod : ", selectedchanneL.name, selectedchanneL.hasAccess)
-    //     channeLPasswordAccessHook.onOpen(selectedchanneL, socket)
-    //   }
-    //   else if (selectedchanneL.hasAccess === false) {
-    //     console.log("selectedchanneL  :%s cliecked and hasAccessPassrod : ", selectedchanneL.name, selectedchanneL.hasAccess)
-    //     selectedchanneL && socket?.emit('accessToroom', selectedchanneL, (response: any) => { })
-    //     router.push(`/chat/channels?r=${selectedchanneL.id}`)
-    //   }
-    // }
-    if (selectedchanneL?.hasAccess) {
-      channeLPasswordAccessHook.onOpen(
-        selectedchanneL,
-        socket,
-        'accessToroom',
-        selectedchanneL,
-        "ACCESS"
-      )
-      return
-    }
-    if (!selectedchanneL) return
-    selectedchanneL && socket?.emit('accessToroom', selectedchanneL, (response: any) => { })
-
     if (isMobile) leftSidebar.onClose()
   }, [selectedchanneL])
 
 
-  useEffect(() => {
-    socket?.on('joinroomResponseEvent', (data) => {
-      console.log("joinroomResponseEvent :", data)
-      if (data) {
-        router.push(`/chat/channels?r=${data.id}`)
-        router.refresh()
-      }
-
-    })
-  }, [socket])
-
-  // useEffect(() => {
-  //   if (params) {
-  //     if (params.get('r') === room.id) {
-  //       room && socket?.emit('accessToroom', room, (response: any) => {
-  //         router.push(`/chat/channels?r=${params.get('r')}`)
-  //       })
-  //     }
-  //   }
-  // }, [params])
 
 
-
-  return <button
+  return <Link href={`/chat/channels/${room.slug}`}
     onClick={() => setSelectedchanneL(room)}
     className={`flex flex-row gap-3 justify-between px-1 items-center w-full  ${active ? ' text-secondary' : 'text-white'}`}>
     <div className="flex flex-row justify-start gap-3 items-center">
@@ -103,7 +61,7 @@ const ChanneLSidebarItem = ({ room, active, onClick, socket, viewd }: ChanneLSid
       <h2>{room.name} </h2>
     </div>
     <span className=" text-secondary">{room.type}</span>
-  </button>
+  </Link >
 }
 
 export default ChanneLSidebarItem
