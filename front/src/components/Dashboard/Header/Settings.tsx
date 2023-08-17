@@ -1,5 +1,5 @@
 'use client';
-import { use, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RiSettingsLine } from 'react-icons/ri';
 import axios from 'axios';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -75,6 +75,14 @@ const Settings: React.FC = () => {
   };
 
   const fileUpload = async (): Promise<void> => {
+    if (selectedFile) {
+      const fileSizeInMB = selectedFile?.size / (1024 * 1024);
+      if (fileSizeInMB > 5) {
+        toast.error('File size must be less than 2MB');
+        return;
+      }
+    }
+
     if (
       (selectedFile === null && user === '') ||
       (!validName && user.length > 0)
@@ -87,6 +95,7 @@ const Settings: React.FC = () => {
         if (selectedFile !== null) {
           formData.append('file', selectedFile);
         }
+        console.log('jwtToken', jwtToken);
         const postAvatar = await axios.post(
           `${process.env.NEXT_PUBLIC_BASE_URL}api/uploads/avatar`,
           formData,
@@ -114,6 +123,9 @@ const Settings: React.FC = () => {
           postAvatar,
           postLogin,
         ]);
+        if (avatarResponse.status === 200 && loginResponse.status === 200) {
+          toast.success('Informations saved!');
+        }
         console.log('avatarResponse', avatarResponse);
         console.log('loginResponse', loginResponse);
       } catch (error: any) {

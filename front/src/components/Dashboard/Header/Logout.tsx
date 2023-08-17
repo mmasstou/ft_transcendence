@@ -3,7 +3,6 @@ import * as Popover from '@radix-ui/react-popover';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import Cookies from 'js-cookie';
 import MyAvatar from '@/components/profile/MyAvatar';
-import { useRouter } from 'next/navigation';
 import router from 'next/router';
 
 export const Logout: React.FC = (props): JSX.Element => {
@@ -32,7 +31,7 @@ export const Logout: React.FC = (props): JSX.Element => {
     <Popover.Root>
       <Popover.Trigger asChild aria-controls="radix-:R1mcq:">
         <button aria-label="Update dimensions">
-          <div className="cursor-pointer w-[32px] h-[32px">
+          <div className="cursor-pointer w-[32px] h-[32px]">
             <MyAvatar />
           </div>
         </button>
