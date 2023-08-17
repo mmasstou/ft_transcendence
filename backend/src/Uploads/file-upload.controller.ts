@@ -46,6 +46,28 @@ export class FileUploadController {
     return result;
   }
 
+  @Post('/avatar')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() request: RequestWithUser,
+  ) {
+    const uploadDto = new ImageUploadDto();
+    uploadDto.mimeType = file.mimetype;
+    uploadDto.size = file.size;
+
+    if (!this.isValidMimeType(uploadDto.mimeType)) {
+      throw new BadRequestException('Invalid file type');
+    }
+
+    // Proceed with file upload and Cloudinary
+    const result = await this.cloudinaryService.uploadFile(file);
+    await this.userService.setAvatar(result.url, request.user.id);
+    return result;
+  }
+
   private isValidMimeType(mimeType: string): boolean {
     const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
     return allowedMimeTypes.includes(mimeType);

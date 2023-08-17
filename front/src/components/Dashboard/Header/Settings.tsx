@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { use, useEffect, useRef, useState } from 'react';
 import { RiSettingsLine } from 'react-icons/ri';
 import axios from 'axios';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -15,11 +15,12 @@ export * from '@radix-ui/react-dialog';
 
 function getUserData(): userType | null {
   const [user, setUser] = useState<userType | null>(null);
-  const jwtToken = Cookies.get('token');
   useEffect(() => {
+    const jwtToken = Cookies.get('token');
+    const userId = Cookies.get('_id');
     axios
       .get<userType | null>(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/auth/status`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/users/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
@@ -35,23 +36,31 @@ function getUserData(): userType | null {
       .catch((error) => {
         toast.error(error.message);
       });
-  }, [jwtToken]);
+  }, []);
   return user;
 }
 
 const Settings: React.FC = () => {
   // fetch user data
   const userData: userType | null = getUserData();
-  const jwtToken = Cookies.get('token');
 
+  const [jwtToken, setJwtToken] = useState<string | undefined>(
+    Cookies.get('token')
+  );
+  const [userId, setUserId] = useState<string | undefined>(Cookies.get('_id'));
   const [isOpen, setOpen] = useState<boolean>(false);
   const [selectedFile, setFile] = useState<File | null>(null);
-  const [imgProp, setImage] = useState<string | undefined>(userData?.avatar);
+  const [avatar, setAvatar] = useState<string | undefined>(userData?.avatar);
   const [user, setUser] = useState<string>(userData?.login || '');
   const [validName, setValidName] = useState<boolean>(false);
   const [twoFa, setTwoFA] = useState<boolean | undefined>(userData?.twoFA);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [openModal, setOpenModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    setJwtToken(Cookies.get('token'));
+    setUserId(Cookies.get('_id'));
+  }, []);
 
   const handleModal = (): void => {
     setOpen(!isOpen);
@@ -61,38 +70,55 @@ const Settings: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setFile(file);
-      setImage(URL.createObjectURL(file));
+      setAvatar(URL.createObjectURL(file));
     }
   };
 
   const fileUpload = async (): Promise<void> => {
     if (
-      (selectedFile === null && !twoFa && user === '') ||
+      (selectedFile === null && user === '') ||
       (!validName && user.length > 0)
     ) {
-      toast("Couldn't save informations!", {
-        style: { background: '#ff0e0e', color: '#FFFFFF' },
-      });
+      toast.error("Couldn't save informations!");
       return;
-    }
-    const formData = new FormData();
-    if (selectedFile) {
-      formData.append('avatar', selectedFile as Blob, selectedFile?.name);
-    }
-    formData.append('username', user);
-    formData.append('twoFa', String(twoFa));
-    try {
-      const response = await axios.post(
-        'http://localhost:8080/file-upload',
-        formData
-      );
-      toast(`Informations updated`, {
-        style: { background: '#81c784', color: '#FFFFFF' },
-      });
-    } catch (error) {
-      toast(`'Couldn\'t save informations! ${error}'`, {
-        style: { background: '#ff0e0e', color: '#FFFFFF' },
-      });
+    } else {
+      try {
+        const formData = new FormData();
+        if (selectedFile !== null) {
+          formData.append('file', selectedFile);
+        }
+        const postAvatar = await axios.post(
+          `${process.env.NEXT_PUBLIC_BASE_URL}api/uploads/avatar`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${jwtToken}`,
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+
+        const userData = { login: user };
+        const postLogin = await axios.patch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}api/users/${userId}`,
+          userData,
+          {
+            headers: {
+              Authorization: `Bearer ${jwtToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        const [avatarResponse, loginResponse] = await axios.all([
+          postAvatar,
+          postLogin,
+        ]);
+        console.log('avatarResponse', avatarResponse);
+        console.log('loginResponse', loginResponse);
+      } catch (error: any) {
+        toast.error(error.message);
+      }
     }
   };
 
@@ -128,7 +154,7 @@ const Settings: React.FC = () => {
   };
 
   useEffect(() => {
-    setImage(userData?.avatar);
+    setAvatar(userData?.avatar);
     setUser(userData?.login || '');
     setTwoFA(userData?.twoFA);
   }, [userData]);
@@ -173,7 +199,7 @@ const Settings: React.FC = () => {
             <div className=" p-4 m-4 flex flex-col justify-center items-center gap-6 md:gap-8 xl:gap-10">
               <div className="flex justify-between gap-6 md:gap-8 xl:gap-10 items-center">
                 <div className="h-[60px] w-[60px]">
-                  <AvatarUpload image={imgProp} />
+                  <AvatarUpload image={avatar} />
                 </div>
                 <input
                   style={{ display: 'none' }}
