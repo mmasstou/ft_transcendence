@@ -12,7 +12,7 @@ function getUserData(): userType | null {
     const userId = Cookies.get('_id');
     axios
       .get<userType | null>(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/users/${userId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
@@ -62,7 +62,7 @@ const ImageUpload = () => {
       body.append('file', image);
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}api/uploads/file`,
+          `${process.env.NEXT_PUBLIC_API_URL}/uploads/file`,
           body,
           {
             headers: {

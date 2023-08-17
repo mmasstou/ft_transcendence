@@ -20,7 +20,7 @@ function getUserData(): userType | null {
     const userId = Cookies.get('_id');
     axios
       .get<userType | null>(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/users/${userId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
@@ -78,7 +78,7 @@ const Settings: React.FC = () => {
     if (selectedFile) {
       const fileSizeInMB = selectedFile?.size / (1024 * 1024);
       if (fileSizeInMB > 5) {
-        toast.error('File size must be less than 2MB');
+        toast.error('File size must be less than 5MB');
         return;
       }
     }
@@ -95,9 +95,8 @@ const Settings: React.FC = () => {
         if (selectedFile !== null) {
           formData.append('file', selectedFile);
         }
-        console.log('jwtToken', jwtToken);
         const postAvatar = await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}api/uploads/avatar`,
+          `${process.env.NEXT_PUBLIC_API_URL}/uploads/avatar`,
           formData,
           {
             headers: {
@@ -109,7 +108,7 @@ const Settings: React.FC = () => {
 
         const userData = { login: user };
         const postLogin = await axios.patch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}api/users/${userId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
           userData,
           {
             headers: {
@@ -126,8 +125,6 @@ const Settings: React.FC = () => {
         if (avatarResponse.status === 200 && loginResponse.status === 200) {
           toast.success('Informations saved!');
         }
-        console.log('avatarResponse', avatarResponse);
-        console.log('loginResponse', loginResponse);
       } catch (error: any) {
         toast.error(error.message);
       }
@@ -148,7 +145,7 @@ const Settings: React.FC = () => {
     if (twoFa) {
       axios
         .post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}api/2fa/turn-off`,
+          `${process.env.NEXT_PUBLIC_API_URL}/2fa/turn-off`,
           {},
           { headers }
         )

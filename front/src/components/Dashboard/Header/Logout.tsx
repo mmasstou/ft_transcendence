@@ -9,7 +9,7 @@ export const Logout: React.FC = (props): JSX.Element => {
   const logoutHandle = () => {
     (async () => {
       const resp = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/auth/logout`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
         {
           method: 'GET',
           headers: {
