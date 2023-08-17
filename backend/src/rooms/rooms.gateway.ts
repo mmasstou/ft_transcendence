@@ -79,6 +79,17 @@ export class RoomGateway implements OnGatewayConnection {
     User &&
       console.log('Chat-> %s connected with socketId :', User.login, socket.id);
   }
+  // // disconnect
+  // @SubscribeMessage('disconnect')
+  // async handleDisconnect(socket: Socket) {
+  //   const User = await this.usersService.getUserInClientSocket(socket);
+  //   console.log(
+  //     'Chat-> %s Disconnected with socketId :',
+  //     User.login,
+  //     socket.id,
+  //   );
+  //   socket.disconnect();
+  // }
 
   @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_MEMBER_UPDATE}`)
   async updatemember(
@@ -560,16 +571,38 @@ export class RoomGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('sendMessage')
-  async handleEvent(@MessageBody() data: any) {
+  async handleEvent(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
     let messages: any;
     try {
+      const room = await this.roomservice.findOne({ id: data.roomsId });
+      const User = await this.usersService.getUserInClientSocket(client);
+      if (!User || !room) return;
+      console.log('sendMessage +room>', room);
+      console.log('sendMessage +User>', User);
+      // check if member is already in room database :
+      const _isMemberInRoom = await this.roomservice.isMemberInRoom(
+        room.id,
+        User.id,
+      );
+      console.log('sendMessage +_isMemberInRoom>', _isMemberInRoom);
+
+      // chack if user in room :
+      const isClientInRoom = client.rooms.has(data.roomId) || false;
+      if (!isClientInRoom && _isMemberInRoom) {
+        await client.join(data.id);
+      }
+      console.log('sendMessage +isClientInRoom>', isClientInRoom);
+
+      // console.log('Chat-> responseMemberData- +>', responseMemberData);
       console.log('sendMessage :', data);
       messages = await this.messageservice.create({
-        roomId: data.roomsId,
+        roomId: room.id,
         content: data.content,
-        userId: data.senderId,
+        userId: User.id,
       });
-      const room = await this.roomservice.findOne({ id: data.roomsId });
       console.log('to channeL :%s +>', room.name, messages);
       this.server.to(data.roomsId).emit('message', messages);
       // this.server.emit('message', messages);

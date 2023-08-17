@@ -120,7 +120,6 @@ const ChanneLCreateModaL = () => {
       });
     socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, (room: any) => {
       if (!room.data) {
-        console.log("room.message :", room.message)
         toast(room.message)
         return 
       }

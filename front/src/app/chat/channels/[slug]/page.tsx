@@ -4,7 +4,7 @@ import React from 'react'
 import Dashboard from '@/app/Dashboard';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { Socket } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import { toast } from 'react-hot-toast';
 import MemberHasPermissionToAccess from '../actions/MemberHasPermissionToAccess';
 import { RoomsType, membersType } from '@/types/types';
@@ -35,7 +35,15 @@ export default function page() {
     const userId = Cookies.get('_id');
     if (!token || !userId) return
 
+
     React.useEffect(() => {
+        setIsMounted(true);
+        const Clientsocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
+            auth: {
+                token, // Pass the token as an authentication parameter
+            },
+        });
+        setSocket(Clientsocket);
         (async () => {
             const channeL: RoomsType = await FindOneBySLug(slug, token);
             if (!channeL) {
@@ -43,20 +51,23 @@ export default function page() {
                 toast.error('channel not found');
                 return;
             }
+
+            Clientsocket.on('connect', () => {
+                Clientsocket.emit('accessToroom', channeL)
+            })
             setChanneLInfo(channeL);
-            setSocket(InitSocket(token, channeL))
             // get all members for this channel :
             const members = await getChannelMembersWithId(channeL.id, token)
             if (!members) return
             setChanneLsmembers(members)
         })();
-        setIsMounted(true);
 
-        // set a title for this page using next head 
         setTimeout(() => {
             setIsLoading(false);
-        }, 2000); // Replace with actual data fetching logic
+        }, 2000);
 
+
+        return () => { Clientsocket.disconnect() }
     }, [])
 
 
@@ -88,13 +99,13 @@ export default function page() {
     if (!IsMounted) return
     document.title = `chat : ${ChanneLInfo?.name}` || metadata.title;
     return <>
-    <Conversations socket={socket} />
-    <RightsideModaL>
-                {
-                    ChanneLsmembers && ChanneLsmembers.map((member: membersType, key: number) => (
-                        <ChanneLsmembersItem key={key} member={member} />
-                    ))
-                }
-            </RightsideModaL>
+        <Conversations socket={socket} />
+        <RightsideModaL>
+            {
+                ChanneLsmembers && ChanneLsmembers.map((member: membersType, key: number) => (
+                    <ChanneLsmembersItem key={key} member={member} />
+                ))
+            }
+        </RightsideModaL>
     </>
 }
