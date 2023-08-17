@@ -24,6 +24,9 @@ import { toast } from "react-hot-toast";
 import BanMember from "./channel.settings.banmember";
 import MemberHasPermissionToAccess from "../actions/MemberHasPermissionToAccess";
 import FindOneBySLug from "../actions/Channel/findOneBySlug";
+import { BsSendFill } from "react-icons/bs";
+import Button from "../../components/Button";
+import { IoSend } from "react-icons/io5";
 
 
 export default function Conversations({ socket }: { socket: Socket | null }) {
@@ -106,11 +109,16 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
 
     const OnSubmit = () => {
-        if (!message) {
+        const sendMesage = message.trim()
+        if (!sendMesage) {
             toast.error("no message to send")
+            setInputValue('')
             return
         }
-        if (!channeLinfo || !message) return
+        if (!channeLinfo || !sendMesage) {
+            setInputValue('')
+            return
+        }
         setInputValue('')
         // send message to server using socket :
         socket?.emit('sendMessage', {
@@ -125,9 +133,9 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
     if (!IsMounted) return null
 
-    return <div className="flex flex-col items-center border-2 w-full">
+    return <div className="flex flex-col items-center w-full">
         {channeLinfo
-            ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col border border-orange-300 sm:flex`}>
+            ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col sm:flex`}>
                 <ConversationsTitlebar
                     LogedMember={LogedMember}
                     socket={socket}
@@ -136,8 +144,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                     OnSubmit={function (event: React.FormEvent<HTMLInputElement>): void { }}
                 />
                 {!LogedMember?.isban ?
-                    <>
-                        <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll border-2 border-danger mb-2  flex flex-col gap-3" >
+                    <div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] py-4">
+                        <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll  mb-2  flex flex-col gap-3" >
                             {
                                 messages && messages.length ?
                                     messages.map((message, index) => (
@@ -151,29 +159,35 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                     : <div>no messages</div>
                             }
                         </div>
-                        <div className="w-full relative">
-                            <input
-                                className="ConversationsInput w-full h-[54px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
-                                onSubmit={(event: any) => {
-                                    setMessage(event.target.value);
+                        <div className="w-full relative px-6">
+                            <div
 
-                                    OnSubmit()
-                                    // onClickHandler(event)
-                                }
-                                }
-                                onKeyDown={(event) =>
-                                    event.key === "Enter" ? OnSubmit() : null
-                                }
-                                onChange={(event) => {
-                                    setInputValue(event.target.value);
-                                    setMessage(event.target.value);
-                                }}
-                                value={InputValue}
-                                placeholder={`Message to @'${channeLinfo.name}'`}
-                                type="search"
-                                name=""
-                                id="" />
-                        </div></>
+                                className="ConversationsInput w-full h-[54px] bg-[#24323044] text-[#ffffff]  text-[16px]  rounded-[12px] flex justify-center items-center"
+                            >
+                                <input
+                                    className="focus:outline-none placeholder:text-[#b6b6b6e3] placeholder:text-base placeholder:font-thin w-full py-1 px-4 bg-transparent"
+                                    onSubmit={(event: any) => {
+                                        setMessage(event.target.value);
+                                        OnSubmit()
+                                        // onClickHandler(event)
+                                    }
+                                    }
+                                    onKeyDown={(event) =>
+                                        event.key === "Enter" ? OnSubmit() : null
+                                    }
+                                    onChange={(event) => {
+                                        setInputValue(event.target.value);
+                                        setMessage(event.target.value);
+                                    }}
+                                    value={InputValue}
+                                    placeholder={`Message to @${channeLinfo.name}`}
+                                    type="search"
+                                    name=""
+                                    id="" />
+                                {InputValue.length !== 0 && <Button icon={IoSend} outline small onClick={OnSubmit} />}
+                            </div>
+                        </div>
+                    </div>
                     : <BanMember LogedMember={LogedMember} User={undefined} room={channeLinfo} />
                 }
             </div>

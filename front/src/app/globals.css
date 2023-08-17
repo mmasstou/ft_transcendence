@@ -100,3 +100,20 @@
   scrollbar-width: none; /* Firefox */
 }
 
+
+
+/* Hide the clear button for all input elements */
+input[type="text"]::-ms-clear,
+input[type="text"]::-ms-reveal {
+  display: none;
+}
+
+input[type="search"]::-webkit-search-clear-button {
+  display: none;
+}
+
+/* For certain browsers like Firefox, the clear button is styled using the pseudo-element */
+/* You can style it further or hide it */
+input[type="search"]::-moz-clear {
+  display: none;
+}
