@@ -33,4 +33,36 @@ export class GameService {
             }
         })
     }
+
+    async updateTotalMatch(params: { id: string; TotalMatch: number }): Promise<User> {
+        const { id, TotalMatch } = params;
+        return await this.prisma.user.update({
+          data : {TotalMatch: TotalMatch},
+          where: { id },
+        });
+      }
+    
+    async setcleanSheet(params: { id: string}): Promise<User> {
+        const { id } = params;
+        return await this.prisma.user.update({
+          data : {cleanSheet: true},
+          where: { id },
+        });
+      }
+    
+    async setMachine(params: { id: string}): Promise<User> {
+        const { id } = params;
+        return await this.prisma.user.update({
+          data : {Machine: true},
+          where: { id },
+        });
+      }
+    
+    async updateLevel(params: { id: string; level: number }): Promise<User> {
+        const { id, level } = params;
+        return await this.prisma.user.update({
+          data : {Level: level},
+          where: { id },
+        });
+      }
 }
