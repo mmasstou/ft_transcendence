@@ -580,31 +580,26 @@ export class RoomGateway implements OnGatewayConnection {
       const room = await this.roomservice.findOne({ id: data.roomsId });
       const User = await this.usersService.getUserInClientSocket(client);
       if (!User || !room) return;
-      console.log('sendMessage +room>', room);
-      console.log('sendMessage +User>', User);
       // check if member is already in room database :
       const _isMemberInRoom = await this.roomservice.isMemberInRoom(
         room.id,
         User.id,
       );
-      console.log('sendMessage +_isMemberInRoom>', _isMemberInRoom);
 
       // chack if user in room :
       const isClientInRoom = client.rooms.has(data.roomId) || false;
       if (!isClientInRoom && _isMemberInRoom) {
         await client.join(data.id);
       }
-      console.log('sendMessage +isClientInRoom>', isClientInRoom);
 
       // console.log('Chat-> responseMemberData- +>', responseMemberData);
-      console.log('sendMessage :', data);
       messages = await this.messageservice.create({
         roomId: room.id,
         content: data.content,
         userId: User.id,
       });
-      console.log('to channeL :%s +>', room.name, messages);
       this.server.to(data.roomsId).emit('message', messages);
+      console.log('+> %s sending message to %s', User.name, room.name);
       // this.server.emit('message', messages);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {

@@ -17,7 +17,7 @@ import ConversationsTitlebar from "./channel.conversations.titlebar";
 import getChanneLMessages from "../actions/getChanneLMessages";
 import Cookies from "js-cookie";
 import getMemberWithId from "../actions/getMemberWithId";
-import { RoomsType, membersType } from "@/types/types";
+import { RoomsType, membersType, messagesType } from "@/types/types";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import getChannelWithId from "../actions/getChannelWithId";
 import { toast } from "react-hot-toast";
@@ -35,7 +35,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
     const chatContainerRef = React.useRef<HTMLDivElement | null>(null);
     const [IsMounted, setIsMounted] = React.useState(false)
-    const [messages, setMessages] = React.useState<any[]>([])
+    const [messages, setMessages] = React.useState<messagesType[]>([])
     const [channeLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
     const [message, setMessage] = React.useState("")
     const [InputValue, setInputValue] = React.useState("")
@@ -97,9 +97,9 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         (async () => {
             const response = await getChanneLMessages(channeLinfo.id, token)
             if (!response) return
-            const messagat = response.messages
+            const messagat = response
             console.log("messagat :", messagat)
-            setMessages(response.messages)
+            setMessages(response)
             setTimeout(() => {
                 setLoadingMessages(false);
                 toast.remove(toastId)
@@ -111,31 +111,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     React.useEffect(() => {
         if (!channeLinfo) return;
         socket?.on('message', (message: any) => {
-
-            messages.length === 0
-                ? (async () => {
-                    const toastId = toast.loading('waiting to get OLd messages ...')
-                    const OLdMessages = await getChanneLMessages(channeLinfo.id, token)
-                    if (!OLdMessages) return
-                    const messagat = OLdMessages.messages
-                    console.log("messagat :", messagat)
-                    const List = [...messagat, message]
-                    setMessages(List)
-                    setTimeout(() => {
-                        setLoadingMessages(false);
-                        toast.remove(toastId)
-                        setSendingMessage(false)
-                    }, 500);
-                })()
-                : (() => {
-                    const List = [...messages, message]
-                    setMessages(List)
-                    setTimeout(() => {
-                        setLoadingMessages(false);
-                        setSendingMessage(false)
-                    }, 500);
-                })();
-
+            setMessages([...messages, message])
         })
     }, [InputValue, socket])
 
@@ -179,8 +155,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                     OnSubmit={function (event: React.FormEvent<HTMLInputElement>): void { }}
                 />
                 {!LogedMember?.isban ?
-                    <div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] py-4">
-                        <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll  mb-2  flex flex-col gap-3" >
+                    <div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5">
+                        <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll flex flex-col gap-3" >
                             {
                                 !LoadingMessages ? messages && messages.length ?
                                     messages.map((message, index) => (
@@ -188,7 +164,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                             key={index}
                                             message={message}
                                             isForOwner={message.senderId === Cookies.get('_id')}
-                                            userid={message.sender}
+                                            userid={message.senderId}
                                         />
                                     ))
                                     : <div>no messages</div>
@@ -197,42 +173,39 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                         </div>
                         <div className="w-full relative px-6">
 
-                            {SendingMessage && <div className="text-white text-[10px] capitalize">sending ....</div>}
-                <div
-
-                    className="ConversationsInput w-full h-[54px] bg-[#24323044] text-[#ffffff]  text-[16px]  rounded-[12px] flex justify-center items-center"
-                >
-                    <input
-                        ref={InputRef}
-                        className="focus:outline-none placeholder:text-[#b6b6b6e3] placeholder:text-base placeholder:font-thin w-full py-1 px-4 bg-transparent"
-                        onSubmit={(event: any) => {
-                            setMessage(event.target.value);
-                            OnSubmit()
-                            // onClickHandler(event)
-                        }
-                        }
-                        onKeyDown={(event) =>
-                            event.key === "Enter" ? OnSubmit() : null
-                        }
-                        onChange={(event) => {
-                            setInputValue(event.target.value);
-                            setMessage(event.target.value);
-                        }}
-                        value={InputValue}
-                        placeholder={`Message to @${channeLinfo.name}`}
-                        type="search"
-                        name=""
-                        id="" />
-                    {InputValue.length !== 0 && <Button icon={IoSend} outline small onClick={OnSubmit} />}
-                </div>
-            </div>
+                            {SendingMessage && <div className=" text-secondary text-[10px] capitalize absolute -top-4 left-4 bg-[#161F1E] ">sending ....</div>}
+                            <div className="ConversationsInput w-full h-[54px] bg-[#24323044] text-[#ffffff]  text-[16px]  rounded-[12px] flex justify-end items-center">
+                                <input
+                                    ref={InputRef}
+                                    className="focus:outline-none placeholder:text-[#b6b6b6e3] placeholder:text-base placeholder:font-thin w-full py-1 px-4 bg-transparent"
+                                    onSubmit={(event: any) => {
+                                        setMessage(event.target.value);
+                                        OnSubmit()
+                                        // onClickHandler(event)
+                                    }
+                                    }
+                                    onKeyDown={(event) =>
+                                        event.key === "Enter" ? OnSubmit() : null
+                                    }
+                                    onChange={(event) => {
+                                        setInputValue(event.target.value);
+                                        setMessage(event.target.value);
+                                    }}
+                                    value={InputValue}
+                                    placeholder={`Message to @${channeLinfo.name}`}
+                                    type="search"
+                                    name=""
+                                    id="" />
+                                {InputValue.length !== 0 && <Button icon={IoSend} outline small onClick={OnSubmit} />}
+                            </div>
+                        </div>
                     </div>
                     : <BanMember LogedMember={LogedMember} User={undefined} room={channeLinfo} />
-}
+                }
             </div >
             : <div className="flex flex-col justify-center items-center h-full w-full">
-    <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
-</div>
+                <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
+            </div>
         }
     </div >
 }

@@ -1,7 +1,7 @@
 
 const getChanneLMessages = async (channelId: string, token : string) => {
     try {
-        const channelMessages =  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/messages/${channelId}`, {
+        const channelMessages =  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/messages/channeL/${channelId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -29,13 +29,15 @@ const Message: FC<Imessage> = ({ message, userid, isForOwner }) => {
     const [IsMounted, setIsMounted] = useState(false)
     const userId = Cookies.get("_id");
     const token = Cookies.get("token");
-
     if (!userId || !token) return
 
 
     React.useEffect(() => {
         setIsMounted(true)
-    }, [])
+    }, []);
+    // let counter = 0;
+
+   
 
     useEffect(() => {
         (async function getsenderInfo(userid: string, token: string) {

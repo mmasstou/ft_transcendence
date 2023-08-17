@@ -76,7 +76,6 @@ export class RoomsService {
   async findOne(params: { id: string }): Promise<Rooms> {
     const { id } = params;
     try {
-      console.log('++findOne++>', id);
       const room = await this.prisma.rooms.findUnique({
         where: { id },
         include: { members: true },
@@ -108,7 +107,6 @@ export class RoomsService {
   async findOneByName(params: { name: string }): Promise<Rooms | null> {
     try {
       const { name } = params;
-      // console.log('++findOne++>', name);
       const room = await this.prisma.rooms.findUnique({
         where: { name },
       });
@@ -149,7 +147,6 @@ export class RoomsService {
   async findOwners(params: { channeLId: string }): Promise<User[]> {
     try {
       const { channeLId } = params;
-      // console.log('++findOne++>', name);
       const room = await this.prisma.rooms.findUnique({
         where: { id: channeLId },
         include: {

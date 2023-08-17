@@ -50,7 +50,6 @@ export class UserService {
 
   async findOne(params: { id: string }): Promise<any> {
     const { id } = params;
-    // console.log('++findOne++>', login);
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
