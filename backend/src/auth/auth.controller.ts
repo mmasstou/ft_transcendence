@@ -48,6 +48,9 @@ export class AuthController {
         httpOnly: false,
         sameSite: false,
       });
+      if (req.user.logedFirstTime) {
+        return res.redirect(`${process.env.AUTH_REDIRECT_LOGIN}`);
+      }
       if (req.user.twoFA) {
         return res.redirect(`${process.env.AUTH_REDIRECT_2FA}`);
       } else {

@@ -12,8 +12,8 @@ services:
   #   #   - backend
   #   #   - database
   #   volumes:
-  #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front:/frontend:rw
-  #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
+  #     - /Users/aouhadou/Desktop/ft_transcendence/front:/frontend:rw
+  #     - /Users/aouhadou/Desktop/ft_transcendence/front/public:/frontend/public:rw
   backend:
     build: backend/
     container_name: backend
@@ -27,8 +27,8 @@ services:
     depends_on:
       - database
     volumes:
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
+      - /Users/aouhadou/Desktop/ft_transcendence/backend/src:/app/src:rw
+      - /Users/aouhadou/Desktop/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
     image: postgres:13
     container_name: database
@@ -39,7 +39,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
+      - /Users/aouhadou/Desktop/ft_transcendence/databases/data:/var/lib/postgresql/data
   
 networks:
   APInetwork:
