@@ -196,42 +196,43 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                             }
                         </div>
                         <div className="w-full relative px-6">
-                            {SendingMessage && <span className="text-white text-[10px]">sending ....</span>}
-                            <div
 
-                                className="ConversationsInput w-full h-[54px] bg-[#24323044] text-[#ffffff]  text-[16px]  rounded-[12px] flex justify-center items-center"
-                            >
-                                <input
-                                    ref={InputRef}
-                                    className="focus:outline-none placeholder:text-[#b6b6b6e3] placeholder:text-base placeholder:font-thin w-full py-1 px-4 bg-transparent"
-                                    onSubmit={(event: any) => {
-                                        setMessage(event.target.value);
-                                        OnSubmit()
-                                        // onClickHandler(event)
-                                    }
-                                    }
-                                    onKeyDown={(event) =>
-                                        event.key === "Enter" ? OnSubmit() : null
-                                    }
-                                    onChange={(event) => {
-                                        setInputValue(event.target.value);
-                                        setMessage(event.target.value);
-                                    }}
-                                    value={InputValue}
-                                    placeholder={`Message to @${channeLinfo.name}`}
-                                    type="search"
-                                    name=""
-                                    id="" />
-                                {InputValue.length !== 0 && <Button icon={IoSend} outline small onClick={OnSubmit} />}
-                            </div>
-                        </div>
+                            {SendingMessage && <div className="text-white text-[10px] capitalize">sending ....</div>}
+                <div
+
+                    className="ConversationsInput w-full h-[54px] bg-[#24323044] text-[#ffffff]  text-[16px]  rounded-[12px] flex justify-center items-center"
+                >
+                    <input
+                        ref={InputRef}
+                        className="focus:outline-none placeholder:text-[#b6b6b6e3] placeholder:text-base placeholder:font-thin w-full py-1 px-4 bg-transparent"
+                        onSubmit={(event: any) => {
+                            setMessage(event.target.value);
+                            OnSubmit()
+                            // onClickHandler(event)
+                        }
+                        }
+                        onKeyDown={(event) =>
+                            event.key === "Enter" ? OnSubmit() : null
+                        }
+                        onChange={(event) => {
+                            setInputValue(event.target.value);
+                            setMessage(event.target.value);
+                        }}
+                        value={InputValue}
+                        placeholder={`Message to @${channeLinfo.name}`}
+                        type="search"
+                        name=""
+                        id="" />
+                    {InputValue.length !== 0 && <Button icon={IoSend} outline small onClick={OnSubmit} />}
+                </div>
+            </div>
                     </div>
                     : <BanMember LogedMember={LogedMember} User={undefined} room={channeLinfo} />
-                }
-            </div>
+}
+            </div >
             : <div className="flex flex-col justify-center items-center h-full w-full">
-                <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
-            </div>
+    <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
+</div>
         }
-    </div>
+    </div >
 }
