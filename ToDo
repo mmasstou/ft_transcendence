@@ -1,8 +1,8 @@
 //TODO: ENV variables
-	- URL : fetch.
+	- URL : fetch. |√|
 	
 //TODO: wished behavior
-	- when i fetch users to list them i should filter the current user. => PrivateConversation : getUsers : filtredUsers.
+	- when i fetch users to list them i should filter the current user. => PrivateConversation : getUsers : filtredUsers. |√|
 	- make the search life time (when i click to create new conversation it should displays all users also the new logged users).
 
 //TODO: Apperance

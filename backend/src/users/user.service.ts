@@ -50,6 +50,9 @@ export class UserService {
     // console.log('++findOne++>', login);
     const user = await this.prisma.user.findUnique({
       where: { id },
+      include: {
+        conversations: true,
+      },
     });
     if (!user) return null;
     return user;
