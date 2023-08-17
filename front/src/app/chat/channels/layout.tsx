@@ -130,7 +130,7 @@ export default function RootLayout({
                   outline
                   onClick={() => { channeLcreatemodaLHook.onOpen([], createRoomSocket) }}
                 />
-                {params && params.get('r') && <Button
+                {slug && <Button
                   icon={FiUsers}
                   small
                   outline

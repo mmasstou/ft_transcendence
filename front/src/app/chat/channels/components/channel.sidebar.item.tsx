@@ -32,24 +32,6 @@ const ChanneLSidebarItem = ({ room, active, onClick, viewd }: ChanneLSidebarItem
     JoinData.loginUser = userId
   }
 
-  useEffect(() => {
-    window.addEventListener('resize', () => {
-      const screenWidth = window.innerWidth;
-      setIsMobile(screenWidth <= 767);
-    });
-
-    return () => {
-      window.removeEventListener('resize', () => {
-        const screenWidth = window.innerWidth;
-        setIsMobile(screenWidth <= 767);
-      });
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isMobile) leftSidebar.onClose()
-  }, [selectedchanneL])
-
 
 
 

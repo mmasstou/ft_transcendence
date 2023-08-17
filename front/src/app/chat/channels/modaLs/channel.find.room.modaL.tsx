@@ -1,20 +1,15 @@
 'use client'
 import ChanneLFindRoommodaLHook from "../hooks/channel.find.room.hook"
 import { useEffect, useRef, useState } from "react"
-import { RoomTypeEnum, RoomsType } from "@/types/types"
+import { RoomsType } from "@/types/types"
 import Cookies from "js-cookie"
 import ChanneLModal from "./channel.modal"
 import ChannelFindRoomItem from "../components/channel.find.roomItem"
 import getPublicProtactedChannels from "../actions/getPublicProtactedChannels"
-import Image from "next/image"
-import { toast } from "react-hot-toast"
 import { useRouter } from "next/navigation"
-import { env } from "process"
 import { RiSearchLine } from "react-icons/ri"
 import Loading from "../components/CanneLSettingsLoading"
 import React from "react"
-import { set } from "date-fns"
-import { DividerHorizontalIcon } from "@radix-ui/react-icons"
 
 export default function ChanneLFindRoommodaL() {
     const { IsOpen, onClose, onOpen, socket } = ChanneLFindRoommodaLHook()
@@ -24,8 +19,6 @@ export default function ChanneLFindRoommodaL() {
     const [isInputFocused, setIsInputFocused] = useState(false);
     const [ChanneLs, setChanneLs] = React.useState<RoomsType[] | null | undefined>(null)
     const UserId = Cookies.get("_id")
-    const route = useRouter()
-
     const token: any = Cookies.get('token');
     if (!token || !UserId) return
 
@@ -39,7 +32,6 @@ export default function ChanneLFindRoommodaL() {
 
     // get data from backend :
     React.useEffect(() => {
-
         (async () => {
             if (InputValue.length === 0) return;
             const ChanneLs: RoomsType[] | null = await getPublicProtactedChannels(token)
@@ -71,13 +63,13 @@ export default function ChanneLFindRoommodaL() {
     const bodyContent = (
         <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col min-h-[40rem] h-full">
             <div className="body flex flex-col gap-6">
-                <div className="body flex flex-row justify-center items-center gap-2 p-2 w-full rounded-[15px] bg-[#161F1E]">
+                <div className="body flex flex-row justify-center items-center gap-2 p-2 w-full rounded-[4px] bg-[#161F1E]">
                     <RiSearchLine size={28} fill="#b6b6b6" />
                     <input
                         ref={searchInputRef}
                         onFocus={() => setIsInputFocused(true)}
                         onBlur={() => setIsInputFocused(false)}
-                        className="py-2 w-full focus:outline-none  bg-transparent text-[#ffffff] placeholder:text-[#b6b6b6] text-[18px] font-thin"
+                        className="py-1 w-full focus:outline-none  bg-transparent text-[#ffffff] placeholder:text-[#b6b6b6] placeholder:text-xs text-[16px] placeholder:font-thin"
                         onChange={(event) => { setInputValue(event.target.value); }}
                         placeholder="Type the name of channel"
                         type="search"
@@ -85,19 +77,17 @@ export default function ChanneLFindRoommodaL() {
                         id="" />
                 </div>
                 {IsLoading ? <Loading /> : <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-scroll justify-center items-center">
-                    {
-
-                        ChanneLs
-                            ? ChanneLs.map((room: RoomsType, index: number) => {
-                                return <ChannelFindRoomItem
-                                    key={index}
-                                    room={room}
-                                    socket={socket}
-                                    onClick={(param: { room: RoomsType }) => {
-                                        const { room } = param
-                                    }} />
-                            })
-                            : <h2>Not Fond</h2>
+                    {ChanneLs
+                        ? ChanneLs.map((room: RoomsType, index: number) => {
+                            return <ChannelFindRoomItem
+                                key={index}
+                                room={room}
+                                socket={socket}
+                                onClick={(param: { room: RoomsType }) => {
+                                    const { room } = param
+                                }} />
+                        })
+                        : <h2 className=" capitalize">not found</h2>
                     }
                 </div>}
             </div>

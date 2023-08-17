@@ -452,7 +452,7 @@ export class RoomGateway implements OnGatewayConnection {
   @SubscribeMessage('accessToroom')
   async AccesstoRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: any,
+    @MessageBody() data: Rooms,
   ) {
     try {
       // get room from database :
@@ -461,9 +461,10 @@ export class RoomGateway implements OnGatewayConnection {
       const LogedUser = await this.usersService.getUserInClientSocket(client);
       if (!LogedUser) return;
       console.log(
-        'Chat-> joinRoom +> user :%s has join to room :%s',
+        'Chat-> joinRoom +> user :%s has join to room :%s with socket %s',
         LogedUser.login,
         room.name,
+        client.id,
       );
       // check if member is already in room database :
       const _isMemberInRoom = await this.roomservice.isMemberInRoom(
@@ -562,12 +563,14 @@ export class RoomGateway implements OnGatewayConnection {
   async handleEvent(@MessageBody() data: any) {
     let messages: any;
     try {
+      console.log('sendMessage :', data);
       messages = await this.messageservice.create({
         roomId: data.roomsId,
         content: data.content,
         userId: data.senderId,
       });
-      // console.table(messages);
+      const room = await this.roomservice.findOne({ id: data.roomsId });
+      console.log('to channeL :%s +>', room.name, messages);
       this.server.to(data.roomsId).emit('message', messages);
       // this.server.emit('message', messages);
     } catch (error) {

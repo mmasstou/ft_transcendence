@@ -1,6 +1,6 @@
 "use client"
 // imports :
-import { FormEvent, use, useEffect, useRef, useState } from "react";
+import React from "react";
 
 // components :
 import ConversationsInput from "./channel.conversations.input";
@@ -30,68 +30,61 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
     const query = useParams();
     const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
-    const [IsMounted, setIsMounted] = useState(false)
-    const [messages, setMessages] = useState<any[]>([])
-    const [channeLinfo, setChanneLinfo] = useState<any>(null)
-    const [message, setMessage] = useState("")
-    const [InputValue, setInputValue] = useState("")
-    const [scrollmessage, setscrollmessage] = useState(false)
-    const [LogedMember, setLogedMember] = useState<membersType | null>(null)
+    const chatContainerRef = React.useRef<HTMLDivElement | null>(null);
+    const [IsMounted, setIsMounted] = React.useState(false)
+    const [messages, setMessages] = React.useState<any[]>([])
+    const [channeLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
+    const [message, setMessage] = React.useState("")
+    const [InputValue, setInputValue] = React.useState("")
+    const [scrollmessage, setscrollmessage] = React.useState(false)
+    const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
     const params = useSearchParams()
-    const channeLLid = params.get('r')
     const token = Cookies.get('token')
     const __userId = Cookies.get('_id')
     if (!token || !__userId) return
     const router = useRouter()
 
     // console.log("Conversations socket :", socket?.id)
+    // show this last message in the screan :
+    React.useEffect(() => {
+        setTimeout(() => {
+            if (chatContainerRef.current) {
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            }
+        }, 100);
+    }, [messages, socket, InputValue, message])
 
-    useEffect(() => {
+    React.useEffect(() => {
         const token: any = slug && Cookies.get('token');
         slug && (async () => {
-            const _roomInfo : RoomsType = await FindOneBySLug(slug, token)
-            if (!_roomInfo){
+            const _roomInfo: RoomsType = await FindOneBySLug(slug, token)
+            if (!_roomInfo) {
                 return;
             }
+            setIsMounted(true)
+            // scroll to the buttom of the page :
             toast.success(`Welcome to ${_roomInfo.name}`)
             setChanneLinfo(_roomInfo)
             const response = await getChanneLMessages(_roomInfo.id, token)
             if (!response) return
             setMessages(response.messages)
 
-            // get channeLLid data :
-        })();
-
-
-    }, [slug])
-
-    useEffect(() => {
-        socket?.on('message', (message: any) => {
-            setscrollmessage(!scrollmessage)
-            setMessages([...messages, message])
-        })
-        setscrollmessage(!scrollmessage)
-    }, [messages, InputValue])
-
-
-    useEffect(() => {
-        setIsMounted(true); // set isMounted to true
-        (async () => {
-            const token: any = Cookies.get('token');
-            const channeLLid = params.get('r')
-            if (!channeLLid)
-                return;
-
-            const channeLLMembers = __userId && await getMemberWithId(__userId, channeLLid, token)
+            const channeLLMembers = __userId && await getMemberWithId(__userId, _roomInfo.id, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                 setLogedMember(channeLLMembers)
             }
-        })();
 
+            // get channeLLid data :
+        })();
     }, [])
 
-    useEffect(() => {
-
+    React.useEffect(() => {
+        socket?.on('message', (message: any) => {
+            console.table("messages 1:", messages)
+            const List = [...messages, message]
+            console.table("message :", List)
+            setMessages(List)
+        })
         socket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
             (data: {
@@ -100,72 +93,76 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                 data: RoomsType,
             }) => {
                 (async () => {
-                    if (!channeLLid)
+                    if (!channeLinfo)
                         return;
-                    // toast.success(data.message)
-                    const channeLLMembers = __userId && await getMemberWithId(__userId, channeLLid, token)
+                    const channeLLMembers = __userId && await getMemberWithId(__userId, channeLinfo.id, token)
                     if (channeLLMembers) {
                         setLogedMember(channeLLMembers)
                     }
                 })();
             }
         );
+    }, [InputValue, socket])
 
-    }, [socket])
 
-    const content = (
-        <div className="flex flex-col gap-3">
-
-            {/* <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} /> */}
-            {
-                messages && messages.length ?
-                    messages.map((message, index) => (
-                        <Message
-                            key={index}
-                            message={message}
-                            isForOwner={message.senderId === Cookies.get('_id')}
-                            userid={message.sender}
-                        />
-                    ))
-                    : <div>no messages</div>
-            }
-        </div>
-    )
-
-    const OnSubmit = (event: FormEvent<HTMLInputElement>) => {
-        setInputValue("")
-
+    const OnSubmit = () => {
+        if (!message) {
+            toast.error("no message to send")
+            return
+        }
+        if (!channeLinfo || !message) return
+        setInputValue('')
         // send message to server using socket :
         socket?.emit('sendMessage', {
             content: message,
             senderId: Cookies.get('_id'),
-            roomsId: channeLLid
-        }, (response: any) => {
+            roomsId: channeLinfo.id
         })
+
     }
+
 
 
     if (!IsMounted) return null
 
-    return <>
-
+    return <div className="flex flex-col items-center border-2 w-full">
         {channeLinfo
-            ? <div className={`Conversations relative w-full h-full flex flex-col border-orange-300 sm:flex`}>
-                <ConversationsTitlebar LogedMember={LogedMember} socket={socket} channeLId={channeLinfo.id} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
+            ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col border border-orange-300 sm:flex`}>
+                <ConversationsTitlebar
+                    LogedMember={LogedMember}
+                    socket={socket}
+                    channeLId={channeLinfo.id}
+                    messageTo={channeLinfo.name}
+                    OnSubmit={function (event: React.FormEvent<HTMLInputElement>): void { }}
+                />
                 {!LogedMember?.isban ?
                     <>
-                        <ConversationsMessages socket={socket} Content={content} />
-                        <div className="w-full absolute bottom-4 left-0">
+                        <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll border-2 border-danger mb-2  flex flex-col gap-3" >
+                            {
+                                messages && messages.length ?
+                                    messages.map((message, index) => (
+                                        <Message
+                                            key={index}
+                                            message={message}
+                                            isForOwner={message.senderId === Cookies.get('_id')}
+                                            userid={message.sender}
+                                        />
+                                    ))
+                                    : <div>no messages</div>
+                            }
+                        </div>
+                        <div className="w-full relative">
                             <input
                                 className="ConversationsInput w-full h-[54px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
                                 onSubmit={(event: any) => {
                                     setMessage(event.target.value);
-                                    OnSubmit(event)
+
+                                    OnSubmit()
                                     // onClickHandler(event)
                                 }
                                 }
                                 onKeyDown={(event) =>
-                                    event.key === "Enter" ? OnSubmit(event) : null
+                                    event.key === "Enter" ? OnSubmit() : null
                                 }
                                 onChange={(event) => {
                                     setInputValue(event.target.value);
@@ -184,5 +181,5 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                 <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
             </div>
         }
-    </>
+    </div>
 }
