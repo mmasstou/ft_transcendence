@@ -28,31 +28,44 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     const _UserExist = await this.prisma.user.findUnique({
       where: { login: profile._json.login },
     });
+
     if (!_UserExist) {
-      const cursus_users = await this.prisma.cursus.create({
-        data: {
-          grade: profile._json.cursus_users[1].grade,
-          level: profile._json.cursus_users[1].level,
-        },
+      const _UserByEmail = await this.prisma.user.findUnique({
+        where: { email: profile._json.email },
       });
-      const _User = await this.prisma.user.create({
-        data: {
-          login: profile._json.login,
-          email: profile._json.email,
-          avatar: profile._json.image.link,
-          name: profile._json.usual_full_name,
-          banner: '',
-          kind: profile._json.kind,
-          intraId: profile._json.id,
-          location: profile._json.location,
-          cursus_users: {
-            connect: {
-              id: cursus_users.id,
+
+      if (!_UserByEmail) {
+        const cursus_users = await this.prisma.cursus.create({
+          data: {
+            grade: profile._json.cursus_users[1].grade,
+            level: profile._json.cursus_users[1].level,
+          },
+        });
+
+        const _User = await this.prisma.user.create({
+          data: {
+            login: profile._json.login,
+            email: profile._json.email,
+            avatar: profile._json.image.link,
+            name: profile._json.usual_full_name,
+            banner: '',
+            kind: profile._json.kind,
+            intraId: profile._json.id,
+            location: profile._json.location,
+            cursus_users: {
+              connect: {
+                id: cursus_users.id,
+              },
             },
           },
-        },
-      });
-      done(null, _User);
-    } else done(null, _UserExist);
+        });
+
+        done(null, _User);
+      } else {
+        done(null, _UserByEmail);
+      }
+    } else {
+      done(null, _UserExist);
+    }
   }
 }

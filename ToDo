@@ -47,3 +47,53 @@ list of gradient color :
         img1.src = image1;
         img2.src = image2;
         background.src = backgroundSrc;
+
+
+        if (selectedFile) {
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            try {
+              const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_BASE_URL}api/uploads/avatar`,
+                formData,
+                {
+                  headers: {
+                    Authorization: `Bearer ${jwtToken}`,
+                    'Content-Type': 'multipart/form-data',
+                  },
+                }
+              );
+              if (response.status === 200) {
+                toast.success('Avatar uploaded!');
+              }
+            } catch (error) {
+              toast(`your avatar not save due: ${error}`, {
+                style: { background: '#ff0e0e', color: '#FFFFFF' },
+              });
+            }
+          }
+          if (user !== userData?.login) {
+            const userId = Cookies.get('_id');
+            const userData = {
+              login: user,
+            };
+            try {
+              const response = await axios.patch(
+                `${process.env.NEXT_PUBLIC_BASE_URL}api/users/${userId}`,
+                userData,
+                {
+                  headers: {
+                    Authorization: `Bearer ${jwtToken}`,
+                    'Content-Type': 'application/json',
+                  },
+                }
+              );
+              if (response.status === 200) {
+                toast.success('Name changed!');
+              }
+            } catch (error) {
+              toast(`your name not save due: ${error}`, {
+                style: { background: '#ff0e0e', color: '#FFFFFF' },
+              });
+            }
+          }
