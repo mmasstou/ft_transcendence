@@ -5,7 +5,15 @@ import { PrismaService } from 'src/prisma.service';
 export class ConversationsService {
   constructor(private prismaService: PrismaService) {}
 
-  async findConversation() {
+  async findAllConv() {
     return await this.prismaService.conversation.findMany();
+  }
+
+  async findConversation(criteria) {
+    return await this.prismaService.conversation.findFirst(criteria);
+  }
+
+  async  createNewConversation(criteria) {
+    return this.prismaService.conversation.create(criteria);
   }
 }
