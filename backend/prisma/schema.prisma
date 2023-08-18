@@ -65,7 +65,7 @@ model User {
   cursusId                      String?
   twoFactorAuthenticationSecret String?
   twoFA                         Boolean         @default(false)
-  logedFirstTime                Boolean         @default(true)
+  logedFirstTime                Boolean         @default(false)
 }
 
 model Match {

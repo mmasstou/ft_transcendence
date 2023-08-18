@@ -37,8 +37,6 @@ const UserInput = ({ oldName, getUserInfo }: userInfo): JSX.Element => {
     setErrMsg('');
   }, [user]);
 
-  // getUserInfo(user, validName);
-
   return (
     <div className="text-white md:w-1/2">
       <p

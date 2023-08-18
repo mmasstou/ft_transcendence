@@ -23,7 +23,7 @@ const Header: React.FC = (): JSX.Element => {
       </div>
       <nav className="flex justify-center items-center">
         <ul className="flex items-center  gap-5 justify-center">
-          <Settings />
+          <Settings login={false} />
           <li>
             <Popover.Root>
               <Popover.Trigger asChild aria-controls="radix-:R1mcq:">
