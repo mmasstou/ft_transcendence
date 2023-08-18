@@ -7,11 +7,12 @@ import toast from 'react-hot-toast';
 
 function getUserData(): userType | null {
   const [user, setUser] = useState<userType | null>(null);
-  const jwtToken = Cookies.get('token');
   useEffect(() => {
+    const jwtToken = Cookies.get('token');
+    const userId = Cookies.get('_id');
     axios
       .get<userType | null>(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/auth/status`,
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
@@ -27,19 +28,25 @@ function getUserData(): userType | null {
       .catch((error) => {
         toast.error(error.message);
       });
-  }, [jwtToken]);
+  }, []);
   return user;
 }
 
 const ImageUpload = () => {
   const userData: userType | null = getUserData();
-  const jwtToken = Cookies.get('token');
+  const [jwtToken, setJwtToken] = useState<string | undefined>(
+    Cookies.get('token')
+  );
   const [image, setImage] = useState<File | undefined | string>(
     userData?.banner
   );
   const [createObjectURL, setCreateObjectURL] = useState<string | undefined>(
     userData?.banner
   );
+
+  useEffect(() => {
+    setJwtToken(Cookies.get('token'));
+  }, []);
 
   const uploadToClient = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -55,7 +62,7 @@ const ImageUpload = () => {
       body.append('file', image);
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}api/uploads/file`,
+          `${process.env.NEXT_PUBLIC_API_URL}/uploads/file`,
           body,
           {
             headers: {

@@ -88,7 +88,10 @@ function moveBall(server: Server, table: any) {
   }
 }
 
-async function SetUserMatchNumber(gameService: GameService, Win: string, Lose: string) {
+async function SetUserMatchNumber(gameService: GameService, Win: string, Lose: string, diff: number) {
+  if (Lose === 'Bot') {
+    await gameService.setMachine({id: Win})
+  }
   if (Lose === 'Bot' || Win === 'Bot') return;
   const user1 = UserMap.get(Win);
   const user2 = UserMap.get(Lose);
@@ -104,6 +107,23 @@ async function SetUserMatchNumber(gameService: GameService, Win: string, Lose: s
     TotalLose: user2.User.TotalLose + 1,
     TotalDraw: user2.User.TotalDraw,
   });
+  await gameService.updateTotalMatch({
+    id: Win,
+    TotalMatch: user1.User.TotalMatch + 1,
+  });
+  await gameService.updateTotalMatch({
+    id: Lose,
+    TotalMatch: user2.User.TotalMatch + 1,
+  });
+
+  await gameService.updateLevel({
+    id: Win,
+    level: user1.User.Level + (diff * 0.1),
+  })
+}
+
+async function setcleanSheet(gameService: GameService, user: string) {
+  await gameService.setcleanSheet({id: user})
 }
 
 function setUserDraw(gameService: GameService, Win: string, Lose: string) {
@@ -121,6 +141,14 @@ function setUserDraw(gameService: GameService, Win: string, Lose: string) {
     TotalWin: user2.User.TotalWin,
     TotalLose: user2.User.TotalLose,
     TotalDraw: user2.User.TotalDraw + 1,
+  });
+  gameService.updateTotalMatch({
+    id: Win,
+    TotalMatch: user1.User.TotalMatch + 1,
+  });
+  gameService.updateTotalMatch({
+    id: Lose,
+    TotalMatch: user2.User.TotalMatch + 1,
   });
 }
 
@@ -657,35 +685,36 @@ class MyGateway implements OnGatewayConnection {
   @SubscribeMessage('GameOver') ///// done
   GameOver(client: any, data: any) {
     if (TableMap.get(data.tableId)) {
+      const player1 = TableMap.get(data.tableId).player1.UserId;
+      const player2 = TableMap.get(data.tableId).player2.UserId;
+      const score1 = TableMap.get(data.tableId).player1.score;
+      const score2 = TableMap.get(data.tableId).player2.score;
+      score2 == 0 && player2 != 'Bot' && setcleanSheet(this.GameService, player1);
+      score1 == 0 && player2 != 'Bot' && setcleanSheet(this.GameService, player2);
       let winner =
-        TableMap.get(data.tableId).player1.score >
-        TableMap.get(data.tableId).player2.score
-          ? TableMap.get(data.tableId).player1.UserId
-          : TableMap.get(data.tableId).player2.UserId;
+        score1 > score2 ? player1  : player2;
       winner =
-        TableMap.get(data.tableId).player1.score ==
-        TableMap.get(data.tableId).player2.score
-          ? 'no one'
-          : winner;
+        score1 == score2  ? 'no one'  : winner;
       if (winner != 'no one') {
-        TableMap.get(data.tableId).player1.score >
-        TableMap.get(data.tableId).player2.score
+        score1 > score2
           ? SetUserMatchNumber(
               this.GameService,
-              TableMap.get(data.tableId).player1.UserId,
-              TableMap.get(data.tableId).player2.UserId,
+              player1,
+              player2,
+              score1 - score2,
             )
           : SetUserMatchNumber(
               this.GameService,
-              TableMap.get(data.tableId).player2.UserId,
-              TableMap.get(data.tableId).player1.UserId,
+              player2,
+              player1,
+              score2 - score1,
             );
       }
       else {
         setUserDraw(
           this.GameService,
-          TableMap.get(data.tableId).player1.UserId,
-          TableMap.get(data.tableId).player2.UserId,
+          player1,
+          player2,
         )
       }
       this.server.to(data.tableId).emit('GameOver', winner);

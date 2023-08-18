@@ -45,6 +45,15 @@ export class UserService {
     });
   }
 
+  async setAvatar(NewAvatar: string, id: string) {
+    return this.prisma.user.update({
+      where: { id: id },
+      data: {
+        avatar: NewAvatar,
+      },
+    });
+  }
+
   async findOne(params: { id: string }): Promise<any> {
     const { id } = params;
     // console.log('++findOne++>', login);
