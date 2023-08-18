@@ -149,14 +149,14 @@ const Settings: React.FC<Props> = ({ login }) => {
     setValidName(validName);
   };
 
-  const handleTwoFa = (): void => {
+  const handleTwoFa = async (): Promise<void> => {
     const headers = {
       Authorization: `Bearer ${jwtToken}`,
       'Content-Type': 'application/json',
     };
 
     if (twoFa) {
-      axios
+      await axios
         .post(
           `${process.env.NEXT_PUBLIC_API_URL}/2fa/turn-off`,
           {},

@@ -23,7 +23,6 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     accessToken: string,
     refreshToken: string,
     profile: any,
-    // done: VerifyCallback,
   ): Promise<any> {
     const _UserExist = await this.prisma.user.findUnique({
       where: { email: profile._json.email },
