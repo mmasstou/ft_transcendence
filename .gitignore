@@ -46,4 +46,4 @@ databases/data/
 
 
 */package-lock.json
-.env
+# .env

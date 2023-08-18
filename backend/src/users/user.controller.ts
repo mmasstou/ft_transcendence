@@ -24,14 +24,8 @@ export class UserController {
     return this.usersService.create(createUserDto);
   }
 
-<<<<<<< HEAD
   //   @UseGuards(IntraAuthGuard)
   @UseGuards(JwtAuthGuard)
-=======
-  // @UseGuards(JwtAuthGuard)
-  // @UseGuards(JwtAuthGuard)
-
->>>>>>> a29e31291935884e1bdfbcad241d826059df25a9
   @Get()
   findAll() {
     return this.usersService.findAll();

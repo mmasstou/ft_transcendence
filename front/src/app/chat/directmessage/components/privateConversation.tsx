@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import React, { useEffect, useState } from 'react'
 import Button from '../../components/Button';
 import { AiFillCloseCircle } from 'react-icons/ai';
-import ConversationList from './conversationList';
+import SearchList from './searchList';
 
 const token = Cookies.get('token');
 const currentId = Cookies.get('_id');
@@ -13,14 +13,6 @@ function PrivateConversation({ isOpen, createConversation, setConvCreation }: {i
 	const [convBody, setConvBody] = useState<string | null>(null);
 
 	async function getUsers() {
-		const currentUser = await(await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${currentId}`, {
-			method: 'GET',
-			headers: {
-			  'Content-Type': 'application/json',
-			  Authorization: `Bearer ${token}`,
-			},
-		  })).json();
-		  console.log(currentUser);
 		const res = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
 			method: 'GET',
 			headers: {
@@ -28,7 +20,7 @@ function PrivateConversation({ isOpen, createConversation, setConvCreation }: {i
 			  Authorization: `Bearer ${token}`,
 			},
 		  })).json();
-		const filtredUsers = res.filter((user) => user.login != currentUser.login)
+		const filtredUsers = res.filter((user) => user.id != currentId)
 		setUsers(filtredUsers);
 	}
 
@@ -48,7 +40,7 @@ function PrivateConversation({ isOpen, createConversation, setConvCreation }: {i
 					outline
 					onClick={() => setConvCreation(false)}
 					/>
-				<ConversationList users={users} setConvCreatoin={setConvCreation}/>
+				<SearchList users={users} setConvCreatoin={setConvCreation}/>
 			</div> : <></>}
 		</div>
 	</div>
