@@ -12,7 +12,7 @@ const TableMap: TableMap = new Map();
 const url = process.env.NEXT_PUBLIC_GAMESOCKET_URL_WS;
 const IPmachine = url + '/game';
 const IPmachineBall = url + '/ball';
-const AllTime = 5;
+const AllTime = 75;
 const targetScore = 5;
 
 /// game settings /// on % of the canvas
@@ -102,19 +102,19 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         }
       }
 
-    // function moveBot() {
-    //   if (BallObj.y > 8 && BallObj.y < 92) {
-    //     if (Table_obj.player2.position > BallObj.y - 8) {
-    //       // console.log();
-    //       socket.emit("setBot", {Player: Table_obj.player2.position - 1, tableId: Table_obj.tableId});
-    //       setPlayer2(Table_obj.player2.position - 1);
-    //     }
-    //     else {
-    //       socket.emit("setBot", {Player: Table_obj.player2.position + 1, tableId: Table_obj.tableId});
-    //       setPlayer2(Table_obj.player2.position + 1);
-    //     }
-    //   }
-    // }
+    function moveBot() {
+      if (BallObj.y > 8 && BallObj.y < 92 && BallObj.x < 50) {
+        const random =( Math.random() * 0.5) + 0.5;
+        if (Math.round(BallObj.y) > Math.round(Player2 + 8)) {
+          socket.emit("setBot", {Player: Player2 + 1, tableId: Table_obj.tableId});
+          setPlayer2(Player2 + random);
+        }
+        else if (Math.round(BallObj.y) < Math.round(Player2 + 8)) {
+          socket.emit("setBot", {Player: Player2 - 1, tableId: Table_obj.tableId});
+          setPlayer2(Player2 - random);
+        }
+      }
+    }
 
     // function handleTouchStart(e: TouchEvent) {
     //   setStartPosition({x: e.touches[0].clientX, y: e.touches[0].clientY})
@@ -334,8 +334,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     useEffect(() => {
       if (isReady) {
           const obj = drawingBall(canvas, BallObj, socket, Table_obj, canvasSize);
-          // Table_obj.player2.UserId == 'Bot' && moveBot();
-          Table_obj.player2.UserId == 'Bot' && BallObj.y > 8 && BallObj.y < 92 && socket.emit("setBot", {Player: BallObj.y - 8, tableId: Table_obj.tableId}) && setPlayer2(BallObj.y - 8);   /////////////// bot /////////////// need more calculation
+          Table_obj.player2.UserId == 'Bot' && moveBot();
           return () => {
             obj.ballCtx && obj.ballCtx.clearRect(0, 0,  canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ballLayer);
