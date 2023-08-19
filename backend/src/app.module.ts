@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -19,6 +19,7 @@ import { TwoFactorAuthenticationService } from './auth/2fa/twoFactorAuthenticati
 import { TwoFactorAuthenticationModule } from './auth/2fa/twoFactorAuthentication.module';
 import { ConversationsModule } from './directMessage/conversations/conversations.module';
 import { FileUploadModule } from './Uploads/file-upload.module';
+import * as cookieParser from 'cookie-parser';
 
 @Module({
   imports: [
@@ -47,4 +48,8 @@ import { FileUploadModule } from './Uploads/file-upload.module';
   ],
   exports: [UserService, PrismaService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(cookieParser()).forRoutes('*'); // Apply cookie-parser middleware to all routes
+  }
+}

@@ -3,9 +3,10 @@ import * as Popover from '@radix-ui/react-popover';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import Cookies from 'js-cookie';
 import MyAvatar from '@/components/profile/MyAvatar';
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export const Logout: React.FC = (props): JSX.Element => {
+  const router = useRouter();
   const logoutHandle = () => {
     (async () => {
       const resp = await fetch(

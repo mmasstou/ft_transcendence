@@ -1,9 +1,9 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { VerifyCallback, Strategy } from 'passport-42';
-import { User } from '@prisma/client';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { PrismaService } from 'src/prisma.service';
+import { _User } from 'src/chat.gateway';
 
 @Injectable()
 export class IntraStrategy extends PassportStrategy(Strategy, '42') {
@@ -23,49 +23,46 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     accessToken: string,
     refreshToken: string,
     profile: any,
-    done: VerifyCallback,
   ): Promise<any> {
     const _UserExist = await this.prisma.user.findUnique({
-      where: { login: profile._json.login },
+      where: { email: profile._json.email },
     });
 
     if (!_UserExist) {
-      const _UserByEmail = await this.prisma.user.findUnique({
-        where: { email: profile._json.email },
+      const cursus_users = await this.prisma.cursus.create({
+        data: {
+          grade: profile._json.cursus_users[1].grade,
+          level: profile._json.cursus_users[1].level,
+        },
       });
-
-      if (!_UserByEmail) {
-        const cursus_users = await this.prisma.cursus.create({
-          data: {
-            grade: profile._json.cursus_users[1].grade,
-            level: profile._json.cursus_users[1].level,
-          },
-        });
-
-        const _User = await this.prisma.user.create({
-          data: {
-            login: profile._json.login,
-            email: profile._json.email,
-            avatar: profile._json.image.link,
-            name: profile._json.usual_full_name,
-            banner: '',
-            kind: profile._json.kind,
-            intraId: profile._json.id,
-            location: profile._json.location,
-            cursus_users: {
-              connect: {
-                id: cursus_users.id,
-              },
+      const _User = await this.prisma.user.create({
+        data: {
+          login: profile._json.login,
+          email: profile._json.email,
+          avatar: profile._json.image.link,
+          name: profile._json.usual_full_name,
+          banner: '',
+          kind: profile._json.kind,
+          intraId: profile._json.id,
+          location: profile._json.location,
+          logedFirstTime: true,
+          cursus_users: {
+            connect: {
+              id: cursus_users.id,
             },
           },
-        });
-
-        done(null, _User);
-      } else {
-        done(null, _UserByEmail);
-      }
-    } else {
-      done(null, _UserExist);
+        },
+      });
+      return _User;
+    } else if (_UserExist.logedFirstTime == true) {
+      await this.prisma.user.update({
+        where: { email: profile._json.email },
+        data: {
+          logedFirstTime: false,
+        },
+      });
+      return _UserExist;
     }
+    return _UserExist;
   }
 }

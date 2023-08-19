@@ -70,6 +70,7 @@ model User {
   twoFactorAuthenticationSecret String?
   twoFA                         Boolean         @default(false)
   conversations                 Conversation[]
+  logedFirstTime                Boolean         @default(false)
 }
 
 model Match {
