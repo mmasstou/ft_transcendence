@@ -50,6 +50,10 @@ model User {
   TotalWin                      Int             @default(0)
   TotalLose                     Int             @default(0)
   TotalDraw                     Int             @default(0)
+  cleanSheet                    Boolean         @default(false)
+  Machine                       Boolean         @default(false)
+  TotalMatch                    Int             @default(0)
+  Level                         Float           @default(0.0)
   location                      String?
   cursus_users                  Cursus?         @relation(fields: [cursusId], references: [id])
   intraId                       Int?
