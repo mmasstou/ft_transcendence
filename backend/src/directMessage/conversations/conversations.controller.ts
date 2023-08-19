@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards, Req, Body, Post } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Req, Body, Post, Delete } from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
 
@@ -14,11 +14,11 @@ export class ConversationsController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':single')
-  findOne(@Body() reqBody: any) {
+  async findOne(@Body() reqBody: any) {
 
     //? body : { users: [id1, id2] }
 
-    const [fs, sc] = reqBody.users;
+    const [fs, sc] = reqBody.usersId;
     const criteria = {
       where: {
 				AND: [
@@ -27,7 +27,19 @@ export class ConversationsController {
 				]
 			} 
     };
-    return this.conversationService.findConversation(criteria);
+    
+    const response = await this.conversationService.findConversation(criteria);
+    if (response != null)
+      return response;
+
+    return this.conversationService.createNewConversation({
+      data: {
+        content: "... Created When Not Found!!",
+        users: {
+          connect: reqBody.usersId.map((id) => ({id}))
+        }
+      }
+    });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -39,11 +51,7 @@ export class ConversationsController {
     //?         users: [id1, id2] 
     //?        }
 
-
-    const [content, usersId] = reqBody;
-    
-    console.log(content);
-    console.log(usersId);
+    const {content, usersId} = reqBody;
 
     const criteria = {
       data: {
@@ -54,5 +62,11 @@ export class ConversationsController {
       }
     }
     return this.conversationService.createNewConversation(criteria)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.conversationService.deleteConversation(id);
   }
 }

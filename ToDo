@@ -17,5 +17,6 @@
 
 //TODO: To implement
 	- create new Conversation after click to the user or open old one if exists. 🖥
+	- list all user conversations 👁 (build the endPoint 🖥)
 	- close the search list after click a user 👁
 	- after fetching the conversatoin display the content in the Conversation body. 👁
