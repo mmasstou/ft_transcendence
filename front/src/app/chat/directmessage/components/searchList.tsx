@@ -4,9 +4,9 @@ import Cookies from 'js-cookie';
 
 const token = Cookies.get('token');
 
-function SearchList({ users, setConvCreation }) {
+function SearchList({ setConvCreation, users }) {
 
-	const [list, setList] = useState<any | null>([]);
+	const [list, setList] = useState([]);
 	const [searchedLogin, setLogin] = useState<string>('');
 	const inputRef = useRef(null);
 
@@ -45,7 +45,7 @@ function SearchList({ users, setConvCreation }) {
 				<li key={user.id} className='m-[2px] text-white border-2 flex justify-around items-center p-[5px] cursor-pointer' 
 				onClick={() => {
 					console.log(`Fetch Conversation Data of ${user.login} and Current User`);
-					// setConvCreation(false)
+					setConvCreation(false)
 				}}>
 					<Image src={user.avatar} alt='avatar' width={40} height={40} className='rounded-[50%]'/>
 					<p>{user.login}</p>

@@ -4,6 +4,7 @@ import Button from '../../components/Button';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import SearchList from './searchList';
 
+
 const token = Cookies.get('token');
 const currentId = Cookies.get('_id');
 
@@ -40,7 +41,7 @@ function PrivateConversation({ isOpen, createConversation, setConvCreation }: {i
 					outline
 					onClick={() => setConvCreation(false)}
 					/>
-				<SearchList users={users} setConvCreatoin={setConvCreation}/>
+				<SearchList setConvCreation={setConvCreation} users={users}/>
 			</div> : <></>}
 		</div>
 	</div>
