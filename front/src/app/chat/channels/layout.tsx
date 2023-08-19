@@ -54,6 +54,7 @@ export default function RootLayout({
   const query = useParams();
   const slug: string | undefined = query.slug ? typeof query.slug === 'string' ? query.slug : query.slug[0] : undefined
   React.useEffect(() => {
+    if(!pathname.includes('chat')) setIsLoading(true)
     setTimeout(() => {
       setIsLoading(false)
     }, 2000)
@@ -81,6 +82,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${changa.className}`} suppressHydrationWarning={true}>
         {isLoading ? < Loading /> : <Dashboard>
+        <div className=' absolute top-0 left-0 text-danger bg-white'>channeL route</div>
           <div className="--channeL relative h-full flex flex-col border-4 border-[#24323044] ">
             {/* nav bar */}
 

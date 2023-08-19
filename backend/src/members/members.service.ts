@@ -42,7 +42,12 @@ export class MembersService {
     // console.log('++findALLForRoom++>', roomId);
 
     return this.prisma.members.findMany({
-      where: { RoomId: { id: roomId } },
+      where: {
+        RoomId: { id: roomId },
+      },
+      orderBy: {
+        created_at: 'asc', // or 'desc' for descending order
+      },
     });
   }
 

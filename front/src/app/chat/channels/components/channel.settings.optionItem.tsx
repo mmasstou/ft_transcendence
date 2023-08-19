@@ -31,7 +31,7 @@ export default function ChanneLSettingsOptionItem(
         <Icon size={28} />
     </div>
     <div>
-        <h2 className='text-white'>{label}</h2>
+        <h2 className='text-white font-semibold'>{label}</h2>
     </div>
     <div className='text-white'>
         <BsArrowRightShort size={24} />

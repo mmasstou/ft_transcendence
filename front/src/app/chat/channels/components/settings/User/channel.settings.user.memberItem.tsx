@@ -1,5 +1,5 @@
-import Button from "../../components/Button";
-import { UserAvatar } from "./channel.userAvater";
+import Button from "../../../../components/Button";
+import { UserAvatar } from "../../channel.userAvater";
 
 
 // icons :
@@ -9,24 +9,25 @@ import { FaChessQueen, FaUserPlus, FaUserShield, FaVolumeMute } from "react-icon
 import { UserTypeEnum, membersType, updatememberEnum, updatememberType, userType } from "@/types/types";
 import React, { ReactNode } from "react";
 import Cookies from "js-cookie";
-import getUserWithId from "../actions/getUserWithId";
+import getUserWithId from "../../../actions/getUserWithId";
 import { GrUserAdmin } from "react-icons/gr";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { Socket } from "socket.io-client";
 import { useRouter, useSearchParams } from "next/navigation";
-import getMemberWithId from "../actions/getMemberWithId";
-import ChanneLsettingsHook from "../hooks/channel.settings";
+import getMemberWithId from "../../../actions/getMemberWithId";
+import ChanneLsettingsHook from "../../../hooks/channel.settings";
 import Image from "next/image";
-import ChannelSettingsUserMemberItemOption from "./channel.settings.user.memberItem.option";
-import MuteTime from "./channel.settings.user.mutetime";
-import ChanneLSettingsUserMemberItemActions from "./channel.settings.user.memberItem.actions";
+import ChannelSettingsUserMemberItemOption from "../../channel.settings.user.memberItem.option";
+import MuteTime from "../../channel.settings.user.mutetime";
+import ChanneLSettingsUserMemberItemActions from "../../channel.settings.user.memberItem.actions";
 import { VscPersonAdd } from "react-icons/vsc";
+import { AiOutlineUserAdd } from "react-icons/ai";
 
 
 interface IChannelSettingsUserMemberItemProps {
     member: membersType;
     socket: Socket | null;
-    OnClick: (data: any) => void;
+    OnClick: (data: { updateType?: updatememberEnum, member: membersType }) => void;
     UserJoin?: boolean
     UserOwne?: boolean
     UserBan?: boolean
@@ -99,20 +100,29 @@ export default function ChannelSettingsUserMemberItem(
     // CanEdit && console.log("CanEdit :", CanEdit)
     return <div className="flex flex-col w-full">
         <div
-            className="flex flex-col justify-between items-center gap-4 shadow p-1 md:p-4 w-full rounded">
+            className="flex flex-col justify-between items-center gap-4  p-1 md:p-4 w-full rounded-[12px] bg-[#24323044]">
             <div className="flex flex-row justify-between items-center w-full ">
                 <div className='flex justify-center items-center text-white gap-2'>
-                    <div className={`image  min-w-[24px] hidden sm:block rounded overflow-hidden`}>
-                        <Image src={UserInfo ? UserInfo?.avatar : '/avatar.jpg'} alt="avatar" width={24} height={24} />
+                    {/* <div className={`image  min-w-[24px] hidden sm:block rounded overflow-hidden`}>
+                        <Image src={UserInfo ? UserInfo?.avatar : '/avatar.png'} alt="avatar" width={24} height={24} />
+                    </div> */}
+                    <div className=" hidden sm:flex">
+                        <UserAvatar User={UserInfo ? UserInfo : undefined} size={42} image={UserInfo ? UserInfo?.avatar : '/avatar.png'} />
+
                     </div>
-                    <h2 className={`text-white  ${member.type === 'OWNER' && 'md:text-white text-[#FFBF00]'} font-semibold capitalize`}>
-                        {UserInfo?.login}
-                        {member.userId === __userId && <small className="text-[6px] px-1">[you]</small>}
-                    </h2>
-                    {/* <MdAdminPanelSettings size={16} fill="#1EF0AE" /> */}
-                    {member.type === 'OWNER' && <>
-                        <FaChessQueen className=" hidden md:flex" size={16} fill="#FFBF00" />
-                    </>}
+                    <div>
+                        <div>
+                            <h2 className={`text-white  ${member.type === 'OWNER' && 'md:text-white text-[#FFBF00]'} font-semibold capitalize`}>
+                                {UserInfo?.name}
+                                {member.userId === __userId && <small className="text-[6px] px-1">[you]</small>}
+                            </h2>
+                            {/* <MdAdminPanelSettings size={16} fill="#1EF0AE" /> */}
+                            {member.type === 'OWNER' && <>
+                                <FaChessQueen className=" hidden md:flex" size={16} fill="#FFBF00" />
+                            </>}
+                        </div>
+                        <span className="text-[#b6b6b6e3] text-xs font-thin">{UserInfo?.login}</span>
+                    </div>
                 </div>
                 <div className="flex flex-row gap-3 justify-center items-center">
                     {!UserJoin && !UserOwne && !UserBan && <>
@@ -131,9 +141,8 @@ export default function ChannelSettingsUserMemberItem(
                         /></>
                     }
                     {UserJoin && <ChannelSettingsUserMemberItemOption
-                        icon={VscPersonAdd}
+                        icon={AiOutlineUserAdd}
                         size={24}
-                        background
                         Onclick={() => { OnClick({ member }) }}
                     />}
                     {UserBan && <ChannelSettingsUserMemberItemOption

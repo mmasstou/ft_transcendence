@@ -6,36 +6,37 @@ import { CgEditFlipH } from 'react-icons/cg';
 import { TbEdit, TbPassword } from 'react-icons/tb';
 import { VscGroupByRefType } from "react-icons/vsc";
 import { Channel } from 'diagnostics_channel';
-import ChanneLSettingsEditModaL from '../modaLs/channel.settings.edit.modal';
+import ChanneLSettingsEditModaL from '../../../modaLs/channel.settings.edit.modal';
 import Input from '@/components/Input';
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, set } from 'react-hook-form';
-import Button from '../../components/Button';
+import Button from '../../../../components/Button';
 import { IoBagRemove, IoChevronBackOutline, IoInformation, IoLogOut } from 'react-icons/io5';
 import { GoEyeClosed } from 'react-icons/go';
 import { HiLockClosed, HiLockOpen } from 'react-icons/hi';
 import { TfiTimer } from 'react-icons/tfi';
 import { FaChessQueen, FaUserTimes } from 'react-icons/fa';
-import { useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
-import getChannelMembersWithId from '../actions/getChannelmembers';
+import getChannelMembersWithId from '../../../actions/getChannelmembers';
 import { RoomTypeEnum, RoomsType, UpdateChanneLSendData, UpdateChanneLSendEnum, UserTypeEnum, membersType } from '@/types/types';
-import getMemberWithId from '../actions/getMemberWithId';
+import getMemberWithId from '../../../actions/getMemberWithId';
 import { Socket } from 'socket.io-client';
 import Image from 'next/image';
-import ChanneLSettingsChanneLBanedMember from './channel.settings.channel.banedmember';
-import ChanneLsettingsChanneLsetOwner from './channel.settings.channel.setOwner';
-import ChanneLSettingsChanneLAccessPassword from './channel.settings.channel.accesspassword';
-import ChanneLaccessDeniedModaL from '../modaLs/channel.access.denied.modaL';
-import ChanneLSettingsChanneLChangeType from './channel.settings.channel.changetype';
-import getChannelWithId from '../actions/getChannelWithId';
-import ChanneLSettingsOptionItem from './channel.settings.optionItem';
+import ChanneLSettingsChanneLBanedMember from '../../channel.settings.channel.banedmember';
+import ChanneLsettingsChanneLsetOwner from '../../channel.settings.channel.setOwner';
+import ChanneLSettingsChanneLAccessPassword from '../../channel.settings.channel.accesspassword';
+import ChanneLaccessDeniedModaL from '../../../modaLs/channel.access.denied.modaL';
+import ChanneLSettingsChanneLChangeType from '../../channel.settings.channel.changetype';
+import getChannelWithId from '../../../actions/getChannelWithId';
+import ChanneLSettingsOptionItem from '../../channel.settings.optionItem';
 import { AiOutlineDelete } from 'react-icons/ai';
-import ChanneLSettingsChanneLDeleteChannel from './channel.settings.channel.deletechannel';
-import PermissionDenied from './channel.settings.permissiondenied';
-import ChanneLSettingsChanneLChangePassword from './channel.settings.channel.changepassword';
-import ChanneLConfirmActionHook from '../hooks/channel.confirm.action';
+import ChanneLSettingsChanneLDeleteChannel from '../../channel.settings.channel.deletechannel';
+import PermissionDenied from '../../channel.settings.permissiondenied';
+import ChanneLSettingsChanneLChangePassword from '../../channel.settings.channel.changepassword';
+import ChanneLConfirmActionHook from '../../../hooks/channel.confirm.action';
 import { PiPasswordBold } from 'react-icons/pi';
 import toast from 'react-hot-toast';
+import FindOneBySLug from '../../../actions/Channel/findOneBySlug';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
@@ -63,17 +64,17 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
     const channeLConfirmActionHook = ChanneLConfirmActionHook()
     const params = useSearchParams()
-    const channeLLid = params.get('r')
     const __userId = Cookies.get('_id')
+    const query = useParams();
+    const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
 
     React.useEffect(() => {
 
         (async () => {
-            const channeLLid = params.get('r')
             const token: any = Cookies.get('token');
-            if (!channeLLid)
+            if (!ChanneLinfo)
                 return;
-            const channeLLMembers = await getChannelMembersWithId(channeLLid, token)
+            const channeLLMembers = await getChannelMembersWithId(ChanneLinfo.id, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
 
                 // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== __userId)
@@ -87,11 +88,11 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         (async () => {
             const token: any = Cookies.get('token');
             // get loged member :
-            const channeLLid = params.get('r')
-            if (!channeLLid)
+            if (!ChanneLinfo)
                 return;
-            const channeLLMembers = __userId && await getMemberWithId(__userId, channeLLid, token)
-            if (channeLLMembers && channeLLMembers.statusCode !== 200) {
+            const channeLLMembers: membersType = __userId && await getMemberWithId(__userId, ChanneLinfo.id, token)
+            if (channeLLMembers) {
+                toast(channeLLMembers.type)
                 setLogedMember(channeLLMembers)
                 console.log("+++++++++channeLLMembers :", channeLLMembers);
             }
@@ -128,11 +129,10 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     React.useEffect(() => {
         // get channel info :
         const token: any = Cookies.get('token');
-        if (!channeLLid) return;
         if (!token) return;
         (async () => {
-            const ChanneLinfo = await getChannelWithId(channeLLid, token)
-            if (ChanneLinfo && ChanneLinfo.statusCode !== 200) {
+            const ChanneLinfo = await FindOneBySLug(slug, token)
+            if (ChanneLinfo) {
                 setChanneLinfo(ChanneLinfo)
             }
         })();
@@ -148,11 +148,11 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         })
         // change type :
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, (data) => {
-            
+
         })
         // set access password :
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_SET_ACCESS_PASSWORD}`, (data) => {
-            
+
         })
         // remove access password :
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD}`, (data) => {
@@ -164,8 +164,8 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             toast("NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE")
         })
 
-         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
-            
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+
         })
     }, [socket])
 
@@ -227,108 +227,49 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
                     <ChanneLSettingsOptionItem
                         onClick={function (): void { OnEditPassword(); }}
                         icon={GoEyeClosed}
-                        label={"Change password"} />
+                        label={"Change password"}
+                    />
                 }
-                <button
-                    onClick={() => {
-
-                        OnChangeChannel()
-                    }}
-                    className="flex flex-row justify-between items-center shadow p-2 rounded">
-                    <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                        <CgEditFlipH size={32} />
-                    </div>
-                    <div>
-                        <h2 className='text-white font-semibold capitalize'>Change Type</h2>
-                    </div>
-                    <div className='text-white'>
-                        <BsArrowRightShort size={24} />
-                    </div>
-                </button>
-
-                <button
-                    onClick={() => {
-
-                        OnBanedMembers()
-                    }}
-                    className="flex flex-row justify-between items-center shadow p-2 rounded">
-                    <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                        <FaUserTimes size={32} />
-                    </div>
-                    <div>
-                        <h2 className='text-white font-semibold capitalize'>Baned members</h2>
-                    </div>
-                    <div className='text-white'>
-                        <BsArrowRightShort size={24} />
-                    </div>
-                </button>
-
-                <button
-                    onClick={() => {
-
-                        OnSetOwner()
-                    }}
-                    className="flex flex-row justify-between items-center shadow p-2 rounded">
-                    <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                        <FaChessQueen size={32} />
-                    </div>
-                    <div>
-                        <h2 className='text-white font-semibold capitalize'>set owner</h2>
-                    </div>
-                    <div className='text-white'>
-                        <BsArrowRightShort size={24} />
-                    </div>
-                </button>
-                {/* set access password */}
-                {!ChanneLinfo?.hasAccess && <button
-                    onClick={() => {
-
-                        OnAccessPassword()
-                    }}
-                    className="flex flex-row justify-between items-center shadow p-2 rounded">
-                    <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>
-                        <TbPassword size={32} />
-                    </div>
-                    <div>
-                        <h2 className='text-white font-semibold capitalize'>set access password</h2>
-                    </div>
-                    <div className='text-white'>
-                        <BsArrowRightShort size={24} />
-                    </div>
-                </button>}
-                {ChanneLinfo?.hasAccess && <button
-                    onClick={OnEditAccessPassword}
-                    className="flex flex-row justify-between items-center shadow p-2 rounded">
-                    <div className='flex justify-center items-center p-3 rounded bg-secondary  text-white'>
-                        <PiPasswordBold size={32} />
-                    </div>
-                    <div>
-                        <h2 className='text-white font-semibold capitalize'>Edit access password</h2>
-                    </div>
-                    <div className='text-white'>
-                        <BsArrowRightShort size={24} />
-                    </div>
-                </button>}
-                {ChanneLinfo?.hasAccess && <button
-                    onClick={DeleteAccessPassword}
-                    className="flex flex-row justify-between items-center shadow p-2 rounded">
-                    <div className='flex justify-center items-center p-3 rounded bg-secondary  text-white'>
-                        <IoBagRemove size={32} />
-                    </div>
-                    <div>
-                        <h2 className='text-white font-semibold capitalize'>remove access password</h2>
-                    </div>
-                    <div className='text-white'>
-                        <BsArrowRightShort size={24} />
-                    </div>
-                </button>}
+                <ChanneLSettingsOptionItem
+                    onClick={OnChangeChannel}
+                    icon={CgEditFlipH}
+                    label={"Change Type"}
+                />
+                <ChanneLSettingsOptionItem
+                    onClick={OnBanedMembers}
+                    icon={FaUserTimes}
+                    label={"Baned members"}
+                />
+                <ChanneLSettingsOptionItem
+                    onClick={OnSetOwner}
+                    icon={FaChessQueen}
+                    label={"set owner"}
+                />
+                {!ChanneLinfo?.hasAccess &&
+                    <ChanneLSettingsOptionItem
+                        onClick={OnAccessPassword}
+                        icon={TbPassword}
+                        label={"set access password"}
+                    />}
+                {ChanneLinfo?.hasAccess &&
+                    <ChanneLSettingsOptionItem
+                        onClick={OnEditAccessPassword}
+                        icon={PiPasswordBold}
+                        label={"set access password"}
+                    />}
+                {ChanneLinfo?.hasAccess &&
+                    <ChanneLSettingsOptionItem
+                        onClick={DeleteAccessPassword}
+                        icon={IoBagRemove}
+                        label={"remove access password"}
+                    />}
             </div>
         </div>
     )
 
-    if (LogedMember?.type !== UserTypeEnum.OWNER && LogedMember?.type !== UserTypeEnum.ADMIN) {
-        _body = (<PermissionDenied />)
-    }
+    // if (LogedMember?.type !== UserTypeEnum.OWNER && LogedMember?.type !== UserTypeEnum.ADMIN) {
+    //     _body = (<PermissionDenied />)
+    // }
 
     if (step === SETTINGSTEPS.BANEDMEMBERS) {
         _body = members ? <ChanneLSettingsChanneLBanedMember
@@ -380,40 +321,11 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             LogedMember={LogedMember}
             members={members}
         />
-        // (
-        //     <div className="flex flex-col justify-between min-h-[34rem]">
-        //         <div>
-        //             <Button
-        //                 icon={IoChevronBackOutline}
-        //                 label={"Back"}
-        //                 outline
-        //                 onClick={OnBack}
-        //             />
 
-        //             <div className='flex flex-col gap-5 p-4'>
-        //                 <Input id="ChanneLpassword" lable="password" type="password" register={register} errors={errors} onChange={() => { }} />
-        //                 <Input id="newChanneLpassword" lable="new password" type="password" register={register} errors={errors} onChange={() => { }} />
-        //                 <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={() => { }} />
-        //             </div>
-        //         </div>
-        //         <div className='flex flex-row justify-between items-center
-        //        '>
-
-        //             <Button
-        //                 label={"Save Changes"}
-        //                 outline
-        //                 onClick={() => { () => { } }}
-        //             />
-        //         </div>
-        //     </div>
-        // )
     }
     if (step === SETTINGSTEPS.DELETECHANNEL) {
         _body = <ChanneLSettingsChanneLDeleteChannel room={ChanneLinfo} OnBack={OnBack} socket={socket} />
     }
-    // if (step === SETTINGSTEPS.CHANGECHANNEL) {
-    //     _body = ()
-    // }
     return <ChanneLSettingsEditModaL >
         {_body}
     </ChanneLSettingsEditModaL>

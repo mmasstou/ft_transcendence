@@ -73,23 +73,10 @@ export class RoomGateway implements OnGatewayConnection {
   server: Server;
 
   async handleConnection(socket: Socket) {
-    // const status = await this.appservice.handleSocketConnection(socket);
-    // if (!status) socket.disconnect();
     const User = await this.usersService.getUserInClientSocket(socket);
     User &&
       console.log('Chat-> %s connected with socketId :', User.login, socket.id);
   }
-  // // disconnect
-  // @SubscribeMessage('disconnect')
-  // async handleDisconnect(socket: Socket) {
-  //   const User = await this.usersService.getUserInClientSocket(socket);
-  //   console.log(
-  //     'Chat-> %s Disconnected with socketId :',
-  //     User.login,
-  //     socket.id,
-  //   );
-  //   socket.disconnect();
-  // }
 
   @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_MEMBER_UPDATE}`)
   async updatemember(
@@ -287,11 +274,11 @@ export class RoomGateway implements OnGatewayConnection {
       );
       ResponseEventData.status = responseEventStatusEnum.SUCCESS;
       ResponseEventData.message = responseEventMessageEnum.WELLCOME;
-      ResponseEventData.data = roomJoined;
+      ResponseEventData.data = member;
       // send response to client :
       // client.emit('sendNotification', { userId: data.userid, room: room });
 
-      client.emit(
+      this.server.emit(
         `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
         ResponseEventData,
       );
@@ -307,12 +294,6 @@ export class RoomGateway implements OnGatewayConnection {
       );
       return;
     }
-    // send event to all client  that member is join to room :
-    // client.emit('sendNotification', { userId: data.userid, room: room });
-    this.server.emit(
-      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-      ResponseEventData,
-    );
   }
   @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_CREATE}`)
   async createRoom(
@@ -598,7 +579,9 @@ export class RoomGateway implements OnGatewayConnection {
         content: data.content,
         userId: User.id,
       });
-      this.server.to(data.roomsId).emit('message', messages);
+      console.log('Chat-> sendMessage +> messages :', messages);
+      // send message to all client in the room :
+      this.server.to(room.id).emit('newmessage', messages);
       console.log('+> %s sending message to %s', User.name, room.name);
       // this.server.emit('message', messages);
     } catch (error) {

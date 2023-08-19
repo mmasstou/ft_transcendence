@@ -49,6 +49,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const InputRef = React.useRef<HTMLInputElement | null>(null);
     const [LoadingMessages, setLoadingMessages] = React.useState<boolean>(false)
     const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
+    const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
     // show this last message in the screan :
     React.useEffect(() => {
@@ -67,6 +68,15 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         }, 100); // sleep .1s ; waiting search input to mounted in focus on it
     }, [slug])
 
+    // React.useEffect(() => {
+    //     if (!channeLinfo) return;
+    //     (async () => {
+    //         const response = await getChanneLMessages(channeLinfo.id, token)
+    //         if (!response) return
+    //         if (response.length === messages.length) return
+    //         setMessages(response)
+    //     })();
+    // }, [IsInputFocused])
 
     React.useEffect(() => {
         const token: any = slug && Cookies.get('token');
@@ -86,16 +96,10 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                 setLogedMember(channeLLMembers)
             }
-        })();
-    }, [])
 
-    // geting channeL old messages :
-    React.useEffect(() => {
-        if (!channeLinfo) return;
-        setLoadingMessages(true);
-        const toastId = toast.loading('waiting to get OLd messages ...');
-        (async () => {
-            const response = await getChanneLMessages(channeLinfo.id, token)
+            // get messages :
+            const toastId = toast.loading('waiting to get OLd messages ...');
+            const response = await getChanneLMessages(_roomInfo.id, token)
             if (!response) return
             const messagat = response
             console.log("messagat :", messagat)
@@ -105,15 +109,43 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                 toast.remove(toastId)
             }, 500);
         })();
-    }, [channeLinfo])
+    }, [])
+
+    // // geting channeL old messages :
+    // React.useEffect(() => {
+    //     if (!channeLinfo) return;
+    //     setLoadingMessages(true);
+    //     const toastId = toast.loading('waiting to get OLd messages ...');
+    //     (async () => {
+    //         const response = await getChanneLMessages(channeLinfo.id, token)
+    //         if (!response) return
+    //         const messagat = response
+    //         console.log("messagat :", messagat)
+    //         setMessages(response)
+    //         setTimeout(() => {
+    //             setLoadingMessages(false);
+    //             toast.remove(toastId)
+    //         }, 500);
+    //     })();
+    // }, [channeLinfo])
 
     // listen to message event and send the incomming message to client
     React.useEffect(() => {
         if (!channeLinfo) return;
-        socket?.on('message', (message: any) => {
-            setMessages([...messages, message])
+        socket?.on('newmessage', (newMessage: any) => {
+            toast(`listening to message event in ${newMessage.content}`)
+            const messagat = [...messages, newMessage]
+            setMessages(messagat)
+            setSendingMessage(false);
+            setInputValue('')
+            // setMessages([...messages, message])
+            setTimeout(() => {
+                if (InputRef.current) {
+                    InputRef.current.focus();
+                }
+            }, 10); // sleep .1s ; waiting search input to mounted in focus on it
         })
-    }, [InputValue, socket])
+    }, [socket])
 
 
     const OnSubmit = () => {
@@ -128,7 +160,6 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             toast.error("no channeLinfo")
             return
         }
-        setInputValue('')
         // send message to server using socket :
         // toast(`sended :${message} to socket ${socket?.id}`)
         socket?.emit('sendMessage', {
@@ -177,6 +208,9 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                             <div className="ConversationsInput w-full h-[54px] bg-[#24323044] text-[#ffffff]  text-[16px]  rounded-[12px] flex justify-end items-center">
                                 <input
                                     ref={InputRef}
+                                    onFocus={() => setIsInputFocused(true)}
+                                    onBlur={() => setIsInputFocused(false)}
+                                    disabled={SendingMessage}
                                     className="focus:outline-none placeholder:text-[#b6b6b6e3] placeholder:text-base placeholder:font-thin w-full py-1 px-4 bg-transparent"
                                     onSubmit={(event: any) => {
                                         setMessage(event.target.value);
@@ -196,7 +230,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                     type="search"
                                     name=""
                                     id="" />
-                                {InputValue.length !== 0 && <Button icon={IoSend} outline small onClick={OnSubmit} />}
+                                {InputValue.length !== 0 && <Button icon={IoSend} disabled={SendingMessage} outline small onClick={OnSubmit} />}
                             </div>
                         </div>
                     </div>

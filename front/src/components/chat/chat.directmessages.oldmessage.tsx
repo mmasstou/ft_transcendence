@@ -13,14 +13,14 @@ const OldMessages = [
         name: "user 01",
         lastmessgae: "Administration when is the next tournament , i like eveything ! ",
         time: "34m",
-        image: "/avatar.jpg",
+        image: "/avatar.png",
         active: true
     },
     {
         name: "aboulhaj",
         lastmessgae: "Administration when is the next tournament , i like eveything ! ",
         time: "34m",
-        image: "/avatar.jpg",
+        image: "/avatar.png",
         active: false
     }
 ]
@@ -71,7 +71,7 @@ const DirectOLdMessages = () => {
     `}>
         <div className="w-full">
             {OLdrooms.length && OLdrooms.map((item : RoomsType, index) =>(
-                <DirectOLdMessagesItem key={index} OnClick={handleClick} isActive={currentQuery === item.id} image={"/avatar.jpg"} data={item}  />
+                <DirectOLdMessagesItem key={index} OnClick={handleClick} isActive={currentQuery === item.id} image={"/avatar.png"} data={item}  />
             ))}
             
         </div>

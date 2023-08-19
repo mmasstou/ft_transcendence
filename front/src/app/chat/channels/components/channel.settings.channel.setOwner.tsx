@@ -2,7 +2,7 @@ import { Socket } from "socket.io-client";
 import Button from "../../components/Button";
 import { IoChevronBackOutline } from "react-icons/io5";
 import { UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
-import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
+import ChannelSettingsUserMemberItem from "./settings/User/channel.settings.user.memberItem";
 import Image from "next/image";
 import ChanneLSettingsBody from "./channel.settings.body";
 import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";

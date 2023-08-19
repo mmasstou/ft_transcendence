@@ -5,7 +5,7 @@ import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHan
 import React, { MouseEvent, useEffect, useState } from "react"
 import { RoomsType, membersType, userType } from "@/types/types"
 import Cookies from "js-cookie"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 
 
 import ChanneLModal from "./channel.modal"
@@ -24,103 +24,54 @@ import { GrUserSettings } from "react-icons/gr"
 import { RiChatSettingsLine } from "react-icons/ri"
 import { FaUsersCog } from "react-icons/fa"
 import Image from "next/image"
-import ChanneLUserSettings from "../components/channel.settings.User"
 import { TbInfoSquareRoundedFilled, TbUserPlus } from "react-icons/tb"
 import getChannelWithId from "../actions/getChannelWithId"
-import ChanneLChatSettings from "../components/channel.settings.channel"
-import ChanneLSettingsInfo from "../components/channel.settings.info"
+import ChanneLChatSettings from "../components/settings/ChanneL/channel.settings.channel"
+import ChanneLSettingsInfo from "../components/settings/channel.settings.info"
+import FindOneBySLug from "../actions/Channel/findOneBySlug"
+import ChanneLUserSettings from "../components/settings/User/channel.settings.user"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',
 }
 const ChanneLSettingsModaL = () => {
-    const [Ismounted, setIsmounted] = useState<boolean>(false)
+    const query = useParams();
+    const slug: string = typeof query.slug === 'string' ? query.slug : '';
+    const [IsMounted, setMounted] = useState<boolean>(false)
     const { IsOpen, onClose, onOpen, selectedchanneL, socket } = ChanneLsettingsHook()
-    const [selectedUser, setselectedUser] = useState<userType | null>(null)
-    const [memberselected, setmemberselected] = useState<membersType | null>(null)
-    const [roomquery, setroomquery] = useState<string | null>(null)
-    const [userCookieId, setuserCookieId] = useState<string | undefined>(undefined)
-    const [roomInfo, setroomInfo] = useState<RoomsType | null>(null)
-    const [tokenCookie, settokenCookie] = useState<string | undefined>(undefined)
-    const params = useSearchParams()
-    const roomId = params.get('r')
+    const [ChanneLInfo, setChanneLInfo] = useState<RoomsType | null>(null)
+    const [UserInfo, setUserInfo] = useState<userType | null>(null)
+    const [MemberInfo, setMemberInfo] = useState<membersType | null>(null)
+
+    const token: any = Cookies.get('token');
+    const UserId: any = Cookies.get('_id');
+    if (!token || !UserId)
+        return;
 
     useEffect(() => {
-        let roomquery: string | null = null
-        const token: any = Cookies.get('token');
-        setuserCookieId(Cookies.get('_id'))
-        settokenCookie(token)
-
-        if (params) {
-            roomquery = params.get('r')
-            setroomquery(roomquery)
-        }
-        if (!token || !roomquery)
-            return;
-        setIsmounted(true)
-    }, [])
-
-    React.useEffect(() => {
         (async () => {
-            const token: any = Cookies.get('token');
-            if (!token)
-                return;
-            const response = roomId && await getChannelWithId(roomId, token)
-            setroomInfo(response)
+            const channeLinfo = await FindOneBySLug(slug, token)
+            if (!channeLinfo) return
+            const userInfo = await getUserWithId(UserId, token)
+            const memberInfo = await getMemberWithId(UserId, channeLinfo.id, token)
+            setUserInfo(userInfo)
+            setMemberInfo(memberInfo)
+            setChanneLInfo(channeLinfo)
         })();
-    }, [roomId])
+        setMounted(true)
+    }, [slug])
 
-    React.useEffect(() => {
-        (async () => {
-            const token: any = Cookies.get('token');
-            if (!tokenCookie || !userCookieId)
-                return;
-            const response = await getUserWithId(userCookieId, tokenCookie)
-            const _member = roomquery && await getMemberWithId(userCookieId, roomquery, tokenCookie)
-            setselectedUser(response)
-            setmemberselected(_member)
-        })();
-    }, [tokenCookie, userCookieId])
-
-    type formValues = {
-        channel_name: string,
-        friends: userType[],
-        ChanneLpassword: string,
-        channeLtype: string
-    }
-
-    const {
-        control,
-        register,
-        handleSubmit,
-        setValue,
-        watch,
-        reset,
-        formState: { errors },
-    } = useForm<FieldValues>({
+    const { setValue, watch, reset, } = useForm<FieldValues>({
         defaultValues: {
-            channel_name: '',
-            friends: [],
-            ChanneLpassword: "",
             channeLtype: "ChatInfo"
         },
     });
 
-    const friends = watch('friends')
-    const _channel_name = watch('channel_name')
-    const _channeLpassword = watch('ChanneLpassword')
     const _channeLtype = watch('channeLtype')
 
 
     const setcustomvalue = (key: any, value: any) => {
         setValue(key, value, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
-    }
-
-
-
-    const onSubmit: SubmitHandler<FieldValues> = async (UserId: any) => {
-        // create private room : createroom
-
     }
 
     const bodyContent = (
@@ -154,19 +105,24 @@ const ChanneLSettingsModaL = () => {
             <div className={`body flex flex-col gap-4 h-full w-full min-h-[38rem]`}>
                 {
                     _channeLtype === "UserSettings"
-                        ? <ChanneLUserSettings socket={socket} />
+                        ? <ChanneLUserSettings
+                            socket={socket}
+                            room={ChanneLInfo}
+                            User={UserInfo}
+                            member={MemberInfo}
+                        />
                         : _channeLtype === "ChatSettings"
                             ? <ChanneLChatSettings socket={socket} />
-                            : roomInfo && <ChanneLSettingsInfo
+                            : ChanneLInfo && <ChanneLSettingsInfo
                                 socket={socket}
-                                room={roomInfo}
-                                User={selectedUser}
-                                member={memberselected}
+                                room={ChanneLInfo}
+                                User={UserInfo}
+                                member={MemberInfo}
                             />}
             </div>
         </div>
     )
-    return <ChanneLModal IsOpen={IsOpen} title={` ${roomInfo?.name} settings`} children={bodyContent} onClose={() => {
+    return <ChanneLModal IsOpen={IsOpen} title={` ${ChanneLInfo?.name} settings`} children={bodyContent} onClose={() => {
         onClose()
         reset()
     }} />

@@ -56,14 +56,14 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
                       Notifications
                     </h1>
                     <Notification
-                      avatar="/avatar.jpg"
+                      avatar="/avatar.png"
                       name="mehdi"
                       message="send a friend request."
                       isFriend
                       isOnline
                     />
                     <Notification
-                      avatar="/avatar.jpg"
+                      avatar="/avatar.png"
                       name="mehdi"
                       message="send a friend request."
                       isFriend
@@ -71,7 +71,7 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
                     <Notification
                       isFriend
                       directMessage
-                      avatar="/avatar.jpg"
+                      avatar="/avatar.png"
                       name="mehdi"
                       message="send a friend request."
                     />

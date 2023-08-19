@@ -84,8 +84,8 @@ export type userType = {
   location: string;
   twoFactorAuthenticationSecret: string;
   twoFA: boolean;
+  status: string;
 };
-
 
 export type cursusType = {
   id: string;
@@ -122,7 +122,7 @@ export enum updatememberEnum {
   PLAYGAME = 'PLAYGAME',
   SETOWNER = 'SETOWNER',
   ACCESSPASSWORD = 'ACCESSPASSWORD',
-  ADDMEMBER = "ADDMEMBER"
+  ADDMEMBER = 'ADDMEMBER',
 }
 
 export enum UpdateChanneLSendEnum {

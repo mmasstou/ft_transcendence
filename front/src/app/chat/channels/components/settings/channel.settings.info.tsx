@@ -1,34 +1,35 @@
 import { RiRadioButtonLine } from "react-icons/ri";
-import ChanneLSidebarItem from "./channel.sidebar.item";
+import ChanneLSidebarItem from "../channel.sidebar.item";
 import { PiGameControllerFill } from "react-icons/pi";
 import { IoLogOut } from "react-icons/io5";
 import { AiFillDelete, AiOutlineUsergroupAdd } from "react-icons/ai";
 import { MdNotificationsActive } from "react-icons/md";
-import Button from "../../components/Button";
+import Button from "../../../components/Button";
 import { MouseEvent, use } from "react";
 import { ImUserCheck } from "react-icons/im";
 import { CgClose } from "react-icons/cg";
 import { Avatar } from "@radix-ui/react-avatar";
-import { UserAvatar } from "./channel.userAvater";
+import { UserAvatar } from "../channel.userAvater";
 import { FaChessQueen } from "react-icons/fa";
 import React from "react";
 import { RoomsType, UserTypeEnum, membersType, userType } from "@/types/types";
 import { Socket } from "socket.io-client";
 import Cookies from "js-cookie";
-import { useRouter, useSearchParams } from "next/navigation";
-import getChanneLOwners from "../actions/getChannelOwner";
-import getUserWithId from "../actions/getUserWithId";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import getChanneLOwners from "../../actions/getChannelOwner";
+import getUserWithId from "../../actions/getUserWithId";
 import { space } from "postcss/lib/list";
-import getChannelMembersWithId from "../actions/getChannelmembers";
-import getChanneLNotifications from "../actions/getChanneLNotifications";
-import ChanneLSettingsInfonotifications from "./channel.settings.info.notifications";
-import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
-import ChanneLConfirmActionBtn from "./channel.confirm.action.Btn";
+import getChannelMembersWithId from "../../actions/getChannelmembers";
+import getChanneLNotifications from "../../actions/getChanneLNotifications";
+import ChanneLSettingsInfonotifications from "../channel.settings.info.notifications";
+import ChanneLConfirmActionHook from "../../hooks/channel.confirm.action";
+import ChanneLConfirmActionBtn from "../channel.confirm.action.Btn";
 import { toast } from "react-hot-toast";
-import ChanneLsettingsHook from "../hooks/channel.settings";
-import ChanneLSettingsBody from "./channel.settings.body";
-import PermissionDenied from "./channel.settings.permissiondenied";
-import getMemberWithId from "../actions/getMemberWithId";
+import ChanneLsettingsHook from "../../hooks/channel.settings";
+import ChanneLSettingsBody from "../channel.settings.body";
+import PermissionDenied from "../channel.settings.permissiondenied";
+import getMemberWithId from "../../actions/getMemberWithId";
+import FindOneBySLug from "../../actions/Channel/findOneBySlug";
 
 interface Props {
     room: RoomsType;
@@ -40,6 +41,8 @@ export default function ChanneLSettingsInfo(
     { room, socket, User, member }: Props
 ) {
 
+    const query = useParams();
+    const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
     const [Isloading, setLoading] = React.useState<boolean>(true)
     const [ownersList, setownersList] = React.useState<userType[] | null>(null)
     const [aLLMembersList, setaLLMembersList] = React.useState<membersType[] | null>(null)
@@ -59,21 +62,21 @@ export default function ChanneLSettingsInfo(
 
     React.useEffect(() => {
 
-        const ChanneLId: string | null = params ? params.get('r') : null
-        if (!ChanneLId) return
         (async () => {
+            const channeLInfo = await FindOneBySLug(slug, token)
+            if (!channeLInfo) return;
             // get channel owners
-            const OwnersList = await getChanneLOwners(ChanneLId, token)
+            const OwnersList = await getChanneLOwners(channeLInfo.id, token)
             if (!OwnersList) return
             setownersList(OwnersList)
 
             // get Logged Member :
-            const member = await getMemberWithId(userId, ChanneLId, token)
+            const member = await getMemberWithId(userId, channeLInfo.id, token)
             member && setLogedMember(member)
 
 
             // get channel members
-            const aLLMembersList = await getChannelMembersWithId(ChanneLId, token)
+            const aLLMembersList = await getChannelMembersWithId(channeLInfo.id, token)
             if (!aLLMembersList) return
             setaLLMembersList(aLLMembersList)
             const ListUser: userType[] = []
@@ -90,9 +93,11 @@ export default function ChanneLSettingsInfo(
             for (let index = 0; index < ListUser.length; index++) {
                 const _user = ListUser[index];
                 // check if status is online :
-                _onLineMembers++;
+                if (_user.status === 'online')
+                    _onLineMembers++;
                 // check if status is onGame
-                _onGameMembers++;
+                if (_user.status === 'ongame')
+                    _onGameMembers++;
 
             }
             setonGameMembers(_onGameMembers)
@@ -100,7 +105,7 @@ export default function ChanneLSettingsInfo(
 
 
         })();
-    }, [])
+    }, [slug])
 
     React.useEffect(() => {
         (async () => {
@@ -211,9 +216,13 @@ export default function ChanneLSettingsInfo(
     }, [socket])
 
     React.useEffect(() => setLoading(false))
+
+
     if (Isloading) return
     console.log("ownerUserList :", ownerUserList)
     console.log("ownersList :", ownersList)
+
+
     return <div className="flex flex-col justify-between min-h-[39rem]">
         {!LogedMember?.isban ?
             <>
