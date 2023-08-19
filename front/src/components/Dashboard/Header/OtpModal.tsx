@@ -94,9 +94,15 @@ const Otp: React.FC<Props> = ({ setOpenModal, setTwoFA }) => {
       })
       .catch((err) => {
         setOtp(new Array(6).fill(''));
-        toast.error(
-          `${err.response.data.message} 🤔 Please try again or generate new Qr code`
-        );
+        if (err.response && err.response.status === 401) {
+          toast.error(
+            `Wrong otp code 🤔 Please try again or generate new Qr code`
+          );
+        } else {
+          toast.error(
+            `${err.response.data.message} 🤔 Please try again or generate new Qr code`
+          );
+        }
         console.clear();
         return;
       });
