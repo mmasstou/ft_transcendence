@@ -52,6 +52,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     const [YouWin, setYouWin] = useState(false);
     const [YouLose, setYouLose] = useState(false);
     const [YouDraw, setYouDraw] = useState(false);
+    const [StartPosition, setStartPosition] = useState({x: 0, y: 0});
 
     function handleRemoveCanvas() {
       DivCanvas?.parentNode?.contains(DivCanvas) && DivCanvas?.parentNode?.removeChild(DivCanvas);
@@ -116,17 +117,15 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       }
     }
 
-    // function handleTouchStart(e: TouchEvent) {
-    //   setStartPosition({x: e.touches[0].clientX, y: e.touches[0].clientY})
-    //   if (isReady && Status == false) {
-    //     socket.emit('setStatus', {status:true, tableId: Table_obj.tableId});
-    //   }
-    //   // console.log("touch start", e.touches[0].clientX, e.touches[0].clientY);
-    // }
-    // function handleTouchMove(e: TouchEvent) {
-    //   MouseFunction({clientX: e.touches[0].clientX, clientY: e.touches[0].clientY})
-    //   console.log("touch move", e.touches[0].clientX,e.touches[0].clientY);
-    // }
+    function handleTouchStart(e: TouchEvent) {
+      setStartPosition({x: e.touches[0].clientX, y: e.touches[0].clientY})
+      if (isReady && Status == false) {
+        socket.emit('setStatus', {status:true, tableId: Table_obj.tableId});
+      }
+    }
+    function handleTouchMove(e: TouchEvent) {
+      MouseFunction({clientX: e.touches[0].clientX, clientY: e.touches[0].clientY})
+    }
 
     function keyFunction(e: KeyboardEvent) {
       let position1 = Player1;
@@ -279,16 +278,16 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
         window.addEventListener("resize", handleResize);
         window.addEventListener("mousemove", MouseFunction)
         window.addEventListener("keydown", StartPause)
-        // window.addEventListener('touchstart', handleTouchStart, false);
-        // window.addEventListener('touchmove', handleTouchMove, false);
+        window.addEventListener('touchstart', handleTouchStart, false);
+        window.addEventListener('touchmove', handleTouchMove, false);
         return () => {
           obj.backgroundCtx && obj.backgroundCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
           canvas?.parentNode && canvas.parentNode.contains(obj.backgroundLayer) && canvas.parentNode.removeChild(obj.backgroundLayer);
           window.removeEventListener("resize", handleResize);
           window.removeEventListener("mousemove", MouseFunction)
           window.removeEventListener("keydown", StartPause)
-          // window.removeEventListener('touchstart', handleTouchStart, false);
-          // window.removeEventListener('touchmove', handleTouchMove, false);
+          window.removeEventListener('touchstart', handleTouchStart, false);
+          window.removeEventListener('touchmove', handleTouchMove, false);
         }
       }
             
