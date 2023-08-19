@@ -18,15 +18,18 @@ export class TwoFactorAuthenticationService {
     twoFactorAuthenticationCode: string,
     user: Prisma.UserUncheckedCreateInput,
   ) {
-    if (user.twoFactorAuthenticationSecret) {
-      twoFactorAuthenticationCode == '000000';
-    }
     const _user = await this.usersService.findOneLogin({ login: user.login });
     if (!_user || !twoFactorAuthenticationCode) return false;
-    return authenticator.verify({
-      token: twoFactorAuthenticationCode,
-      secret: _user.twoFactorAuthenticationSecret,
-    });
+
+    try {
+      const isCodeValid = authenticator.verify({
+        token: twoFactorAuthenticationCode,
+        secret: _user.twoFactorAuthenticationSecret,
+      });
+      return isCodeValid;
+    } catch (err) {
+      return false;
+    }
   }
 
   public async generateTwoFactorAuthenticationSecret(
