@@ -33,7 +33,7 @@ function SearchList({ setConvCreation, users }) {
 
 	useEffect(() => {
 		if (inputRef.current)
-		inputRef.current.focus()
+			inputRef.current.focus()
 		formatList();
 	}, [searchedLogin]);
 

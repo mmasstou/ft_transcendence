@@ -12,3 +12,10 @@
 	- close the search list after click a user 👁
 	- after fetching the conversatoin display the content in the Conversation body. 👁
 	- Friend list component (Modal) 👁🖥
+
+    - Frontend :
+            + Restructure the code refactoring required.
+            + Design the idea first
+            + Create search modal
+            + Responsive
+            + Conversation and Friend lists

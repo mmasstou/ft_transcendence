@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { FaUsers } from "react-icons/fa";
 import ChatNavbarLink from '../components/chat.navbar.link';
 import Button from '../components/Button';
-import { BsJournalPlus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse, BsFillPersonPlusFill, BsPersonAdd } from "react-icons/bs";
+import { BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse, BsPersonAdd, BsFillPeopleFill, BsPeople } from "react-icons/bs";
 import { IconType } from 'react-icons';
 import PrivateConversation from './components/privateConversation';
 
@@ -19,8 +19,9 @@ export default function page() {
     const router = usePathname();
 	const [isOpen, setOpening] = useState<boolean>(false);
 	const [createConversation, setConvCreation] = useState(false);
+	const [openFriendList, setFriendList] = useState(false);
 
-	useEffect(() => {}, [isOpen])
+	useEffect(() => {}, [isOpen, openFriendList])
 
   return (
     <Dashboard>
@@ -57,16 +58,29 @@ export default function page() {
 				/>
 			</div>
 			<div className="flex justify-end items-center gap-2">
-	
 				<Button
 					icon={BsPersonAdd}
 					small
 					outline
 					onClick={() => {setConvCreation(!createConversation)}}
 				/>
+				{openFriendList ? 
+					<Button 
+						icon={BsPeople}
+						small
+						outline
+						onClick={() => setFriendList(!openFriendList)}
+					/> 
+					: <Button 
+						icon={BsFillPeopleFill}
+						small
+						outline
+						onClick={() => setFriendList(!openFriendList)}
+					/>
+				}
 			</div>
 		</div>
-		<PrivateConversation isOpen={isOpen} createConversation={createConversation} setConvCreation={setConvCreation}/>
+		<PrivateConversation isOpen={isOpen} openFriendList={openFriendList} createConversation={createConversation} setFriendList={setFriendList} setConvCreation={setConvCreation}/>
 	</div>
     </Dashboard>
   )
