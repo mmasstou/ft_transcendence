@@ -7,12 +7,14 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import * as Switch from '@radix-ui/react-switch';
 import toast from 'react-hot-toast';
 import AvatarUpload from './AvatarUpload';
-import UserInput from './UserInput';
 import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import OtpModal from './OtpModal';
 import { useRouter } from 'next/navigation';
 export * from '@radix-ui/react-dialog';
+import { FaTimes, FaInfoCircle, FaCheck } from 'react-icons/fa';
+
+const USER_REGEX = /^[A-z][A-z0-9-_]{5,7}$/;
 
 function getUserData(): userType | null {
   const [user, setUser] = useState<userType | null>(null);
@@ -46,7 +48,6 @@ interface Props {
 }
 
 const Settings: React.FC<Props> = ({ login }) => {
-  // fetch user data
   const userData: userType | null = getUserData();
   const router = useRouter();
 
@@ -62,6 +63,28 @@ const Settings: React.FC<Props> = ({ login }) => {
   const [twoFa, setTwoFA] = useState<boolean | undefined>(userData?.twoFA);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [openModal, setOpenModal] = useState<boolean>(false);
+  // user input
+  const userRef = useRef<HTMLInputElement>(null);
+  const errRef = useRef<HTMLParagraphElement>(null);
+  const [userFocus, setUserFocus] = useState<boolean>(false);
+  const [errMsg, setErrMsg] = useState<string>('');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    if (userRef.current != null) {
+      userRef.current.focus();
+    }
+  }, []);
+
+  useEffect(() => {
+    const result = USER_REGEX.test(user);
+    setValidName(result);
+  }, [user]);
+
+  useEffect(() => {
+    setErrMsg('');
+  }, [user]);
+  // end user input
 
   useEffect(() => {
     setJwtToken(Cookies.get('token'));
@@ -75,25 +98,25 @@ const Settings: React.FC<Props> = ({ login }) => {
   const fileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      const fileSizeInMB = file?.size / (1024 * 1024);
+      if (fileSizeInMB > 5) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
       setFile(file);
       setAvatar(URL.createObjectURL(file));
     }
   };
 
   const fileUpload = async (): Promise<void> => {
-    if (selectedFile) {
-      const fileSizeInMB = selectedFile?.size / (1024 * 1024);
-      if (fileSizeInMB > 5) {
-        toast.error('File size must be less than 5MB');
-        return;
+    if (user === '' || (!validName && user.length > 0)) {
+      if (!login) {
+        toast.error("Couldn't save informations!");
       }
-    }
-
-    if (
-      (selectedFile === null && user === '') ||
-      (!validName && user.length > 0)
-    ) {
-      toast.error("Couldn't save informations!");
+      if (login) {
+        router.push('/profile');
+        toast.success('Account created successfully!');
+      }
       return;
     } else {
       try {
@@ -140,13 +163,10 @@ const Settings: React.FC<Props> = ({ login }) => {
         }
       } catch (error: any) {
         toast.error(error.message);
+        console.clear();
       }
     }
-  };
-
-  const getUserInfo = (user: string, validName: boolean): void => {
-    setUser(user);
-    setValidName(validName);
+    router.push('/profile');
   };
 
   const handleTwoFa = async (): Promise<void> => {
@@ -184,8 +204,6 @@ const Settings: React.FC<Props> = ({ login }) => {
   useEffect(() => {
     setTwoFA(twoFa);
   }, [twoFa]);
-
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -244,7 +262,67 @@ const Settings: React.FC<Props> = ({ login }) => {
                   </button>
                 </div>
                 {!openModal && (
-                  <UserInput getUserInfo={getUserInfo} oldName={user} />
+                  // start user input
+                  <div className="text-white md:w-1/2">
+                    <p
+                      ref={errRef}
+                      className={
+                        errMsg
+                          ? 'bg-pink-300 text-red-700 font-bold p-1 mb-1'
+                          : 'hidden'
+                      }
+                      aria-live="assertive"
+                    >
+                      {errMsg}
+                    </p>
+                    <form className="flex flex-col justify-evenly  grow-1 pb-1">
+                      <label htmlFor="username">
+                        <span
+                          className={
+                            validName ? 'text-secondary ml-1' : 'hidden'
+                          }
+                        >
+                          <FaCheck />
+                        </span>
+                        <span
+                          className={
+                            validName || !user ? 'hidden' : 'text-red-500 ml-1'
+                          }
+                        >
+                          <FaTimes />
+                        </span>
+                      </label>
+                      <div className="flex flex-col justify-between gap-2 items-center">
+                        <input
+                          value={user}
+                          placeholder="USERNAME"
+                          className="bg-transparent border rounded-md px-2 outline-none w-full py-1"
+                          type="text"
+                          id="username"
+                          ref={userRef}
+                          autoComplete="off"
+                          onChange={(e) => setUser(e.target.value)}
+                          aria-invalid={validName ? 'false' : 'true'}
+                          aria-describedby="uidnote"
+                          onFocus={() => setUserFocus(true)}
+                          onBlur={() => setUserFocus(false)}
+                        />
+                        <p
+                          id="uidnote"
+                          className={
+                            userFocus && user && !validName
+                              ? 'mr-1 text-[1em] font-light bg-black/50 px-3 py-2 rounded-md'
+                              : 'hidden'
+                          }
+                        >
+                          <FaInfoCircle />
+                          6-8 characters. <br />
+                          Only Letters, Numbers, Undersocores, Hyphen allwed.
+                        </p>
+                      </div>
+                    </form>
+                  </div>
+                  // end user input
                 )}
 
                 <form>
@@ -352,10 +430,71 @@ const Settings: React.FC<Props> = ({ login }) => {
                     </button>
                   </div>
                   {!openModal && (
-                    <UserInput
-                      getUserInfo={getUserInfo}
-                      oldName={userData?.login}
-                    />
+                    // start user input
+                    <div className="text-white md:w-1/2">
+                      <p
+                        ref={errRef}
+                        className={
+                          errMsg
+                            ? 'bg-pink-300 text-red-700 font-bold p-1 mb-1'
+                            : 'hidden'
+                        }
+                        aria-live="assertive"
+                      >
+                        {errMsg}
+                      </p>
+                      <form className="flex flex-col justify-evenly  grow-1 pb-1">
+                        <label htmlFor="username">
+                          <span
+                            className={
+                              validName ? 'text-secondary ml-1' : 'hidden'
+                            }
+                          >
+                            <FaCheck />
+                          </span>
+                          <span
+                            className={
+                              validName || !user
+                                ? 'hidden'
+                                : 'text-red-500 ml-1'
+                            }
+                          >
+                            <FaTimes />
+                          </span>
+                        </label>
+                        <div className="flex flex-col justify-between gap-2 items-center">
+                          <input
+                            value={user}
+                            placeholder="USERNAME"
+                            className="bg-transparent border rounded-md px-2 outline-none w-full py-1"
+                            type="text"
+                            id="username"
+                            ref={userRef}
+                            autoComplete="off"
+                            onChange={(e) => setUser(e.target.value)}
+                            aria-invalid={validName ? 'false' : 'true'}
+                            aria-describedby="uidnote"
+                            onFocus={() => setUserFocus(true)}
+                            onBlur={() => setUserFocus(false)}
+                          />
+                          <p
+                            id="uidnote"
+                            className={
+                              userFocus && user && !validName
+                                ? 'mr-1 text-[1em] font-light bg-black/50 px-3 py-2 rounded-md'
+                                : 'hidden'
+                            }
+                          >
+                            <FaInfoCircle />
+                            6-8 characters. <br />
+                            Only Letters, Numbers, Undersocores, Hyphen allwed.
+                            If you use invalid username a default one will be
+                            set.
+                          </p>
+                        </div>
+                      </form>
+                    </div>
+                    // end user input
                   )}
 
                   <form>
@@ -400,15 +539,21 @@ const Settings: React.FC<Props> = ({ login }) => {
                       )}
                     </div>
                   </form>
-                  <Dialog.Close asChild>
-                    <button
-                      className="bg-transparent text-secondary border border-secondary 
+                  <button
+                    className="bg-transparent text-secondary border border-secondary 
                             px-[8px] w-1/2 h-[40px] font-normal rounded-lg text-[1em] sm:text-[1.25em] hover:bg-secondary hover:text-white"
-                      onClick={fileUpload}
-                    >
-                      CONFIRM
-                    </button>
-                  </Dialog.Close>
+                    onClick={fileUpload}
+                  >
+                    CONFIRM
+                  </button>
+                  <button
+                    onClick={() => {
+                      router.push('/profile');
+                    }}
+                    className="text-[#D9D9D9] border-b-[2px]"
+                  >
+                    I will do it later
+                  </button>
                 </div>
               </Dialog.Content>
             </Dialog.Portal>

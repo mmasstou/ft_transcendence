@@ -16,7 +16,6 @@ const Header: React.FC = (): JSX.Element => {
           src={logo}
           height={32}
           width={79}
-          style={{ width: '15vw', height: '15vh' }}
           alt="Picture of the author"
           priority
         />

@@ -64,7 +64,7 @@ const _data = [
     is_active: true,
   },
   {
-    login: 'mmasstou',
+    login: 'mmasstou1212121',
     email: 'mmasstou@student.1337.ma',
     password: 'mmasstou012345_',
     name: 'Mohamed Masstour',
