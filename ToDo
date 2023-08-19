@@ -3,16 +3,12 @@
 	🖥 : Backend.
 	📩 : socket.
 
-
-//TODO: ENV variables
-	
-//TODO: wished behavior
-	- make the search life time (when i click to create new conversation it should displays all users also the new logged users). 📩
-
 //TODO: Apperance
 	- make responsive directe chat page (conversation list take full screen in mobile). 👁
-	- create new conversation component popup. 👁
+	- create new conversation component modal. 👁
 
 //TODO: To implement
+	- make the search life time (when i click to create new conversation it should displays all users also the new logged users). 📩
 	- close the search list after click a user 👁
 	- after fetching the conversatoin display the content in the Conversation body. 👁
+	- Friend list component (Modal) 👁🖥
