@@ -16,4 +16,12 @@ export class ConversationsService {
   async  createNewConversation(criteria) {
     return this.prismaService.conversation.create(criteria);
   }
+
+  async deleteConversation(id: string) {
+    return this.prismaService.conversation.delete({
+      where: {
+        id,
+      }
+    })
+  }
 }
