@@ -9,7 +9,7 @@ import MatchMaking from "./MatchMaking";
 import { useRouter } from "next/navigation";
 
 const TableMap: TableMap = new Map();
-const url = process.env.NEXT_PUBLIC_GAMESOCKET_URL_WS;
+const url = process.env.NEXT_PUBLIC_SOCKET_URL;
 const IPmachine = url + '/game';
 const IPmachineBall = url + '/ball';
 const AllTime = 75;
@@ -78,7 +78,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>, router: any) {
           || (!is_vertical && x >= (canvasSize.width * (2 / 3) - radius * 2.5) && x <= (canvasSize.width * (2 / 3)) && y >= (canvasSize.height) && y <= (canvasSize.height + (radius * 3)))
             ) {
               router.push('/game');
-              const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}api/game/leaveGame`, {
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/game/leaveGame`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
