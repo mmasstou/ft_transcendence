@@ -175,24 +175,21 @@ export default function ChanneLSettingsInfo(
             })
         socket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_DELETE}`,
-            (data: {
-                message: string,
-                status: any,
-                data: RoomsType,
-            }) => {
-                if (data.data) {
+            (data: { Ok: boolean }) => {
+                
+                if (data.Ok) {
 
-                    // toast.success(data.message)
+                    toast.success('delete successfully')
                     channeLConfirmActionHook.onClose()
                     channeLsettingsHook.onClose()
                     route.push(`/chat/channels`)
                     route.refresh();
-
                     return
                 }
-                // console.log("+++++++++++++++++++++++++++++++++data :", data)
-                // toast.error("can't delete this channel")
-                channeLConfirmActionHook.onClose()
+                else {
+                    toast.error("can't delete this channel")
+                    channeLConfirmActionHook.onClose()
+                }
             }
         );
         socket?.on(

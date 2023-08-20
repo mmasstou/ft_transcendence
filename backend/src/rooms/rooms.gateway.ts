@@ -395,23 +395,22 @@ export class RoomGateway implements OnGatewayConnection {
         roomId: room.id,
       });
       // chck if no User or room or member or this member is not Owner
-      if (!User || !room || !member || member.type !== UserTypeEnum.OWNER)
+      console.log('SOCKET_EVENT_RESPONSE_CHAT_DELETE +member+>', member);
+      if (!member || member.type !== UserTypeEnum.OWNER)
         throw new NotFoundException();
       // delete room :
       const deleteRoom = await this.roomservice.remove(room.id);
       ResponseEventData.data = deleteRoom;
-      client.emit(
-        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_DELETE}`,
-        ResponseEventData,
-      );
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_DELETE}`, {
+        Ok: true,
+      });
     } catch (error) {
       ResponseEventData.data = null;
       ResponseEventData.status = responseEventStatusEnum.ERROR;
-      ResponseEventData.message = responseEventMessageEnum.CANTDELETE;
-      client.emit(
-        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_DELETE}`,
-        ResponseEventData,
-      );
+      ResponseEventData.message = responseEventMessageEnum.ERROR;
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_DELETE}`, {
+        Ok: false,
+      });
     }
     this.server.emit(
       `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,

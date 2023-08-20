@@ -104,11 +104,11 @@ export default function page() {
     React.useEffect(() => {
         if (!IsMounted) return
         socket?.on('accessToroomResponse', (resp: { channeL: RoomsType, LogedUser: userType }) => {
-            if(resp === null){
+            if (resp === null) {
                 toast.error(`dont have permission to access this channel`);
                 router.push('/chat/channels/');
-            }else toast.success(`${resp.LogedUser.login} connected to chat ${resp.channeL.name}`)
-             
+            } else toast.success(`${resp.LogedUser.login} connected to chat ${resp.channeL.name}`)
+
         });
 
         // check for channels :
@@ -116,12 +116,23 @@ export default function page() {
         socket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
             (data: any) => {
-                toast('NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE');
                 (async () => {
+                    if(!slug) return ;
+                    const channeL: RoomsType = await FindOneBySLug(slug, token);
+                    if(!channeL) return;
+                    // check if the channel is deleted :
+                    await MemberHasPermissionToAccess(token, channeL.id, userId).then((res) => {
+                        if (!res) {
+                            router.push('/chat/channels/');
+                            toast.error('this channel is deleted by owner');
+                            return;
+                        }
+                    })
+                    // update channels :
                     const ChanneLs = await getChannels(token)
                     if (!ChanneLs) return
                     setChannel(ChanneLs)
-                })
+                })();
             })
     }, [socket])
 

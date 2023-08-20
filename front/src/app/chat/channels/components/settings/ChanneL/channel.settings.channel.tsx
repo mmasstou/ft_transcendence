@@ -157,11 +157,9 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         // remove access password :
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD}`, (data) => {
             if (!data) return
-            console.log("NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE :", data)
             channeLConfirmActionHook.onClose()
             setChanneLinfo(data);
             OnBack()
-            toast("NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE")
         })
 
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
