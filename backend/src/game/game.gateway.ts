@@ -587,7 +587,6 @@ class MyGateway implements OnGatewayConnection {
   async disconneting(client: any, data: any) {
     const UsId = client.handshake.auth.UserId;
     const TableId = UserMap.get(UsId) && UserMap.get(UsId).TableId;
-    console.log('disconnecting', data);
     if (data[0] == 'transport close') {
       console.log('the client id: ', UsId, ' reload the game page');
       if (
