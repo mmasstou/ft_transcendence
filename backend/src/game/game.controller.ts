@@ -39,7 +39,6 @@ export class GameController {
 
   @Post('/BotGame')
   async selectBotGame(@Body() body: any) {
-    // console.log(body);
     try {
       const result = await this.GameGateway.CreateBotTable(body);
       if (result != undefined)
