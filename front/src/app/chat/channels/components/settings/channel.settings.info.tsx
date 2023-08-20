@@ -23,7 +23,7 @@ import getChannelMembersWithId from "../../actions/getChannelmembers";
 import getChanneLNotifications from "../../actions/getChanneLNotifications";
 import ChanneLSettingsInfonotifications from "../channel.settings.info.notifications";
 import ChanneLConfirmActionHook from "../../hooks/channel.confirm.action";
-import ChanneLConfirmActionBtn from "../channel.confirm.action.Btn";
+import ChanneLConfirmActionBtn from "./channel.confirm.action.Btn";
 import { toast } from "react-hot-toast";
 import ChanneLsettingsHook from "../../hooks/channel.settings";
 import ChanneLSettingsBody from "../channel.settings.body";
@@ -48,6 +48,7 @@ export default function ChanneLSettingsInfo(
     const [aLLMembersList, setaLLMembersList] = React.useState<membersType[] | null>(null)
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
     const [ownerUserList, setownerUserList] = React.useState<userType[]>([])
+    const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
     const [ChanneLNotifications, setChanneLNotifications] = React.useState<any>(null)
     const [updaterequestNotification, setupdaterequestNotification] = React.useState<boolean>(false)
     const [onLineMembers, setonLineMembers] = React.useState<number>(0)
@@ -65,6 +66,7 @@ export default function ChanneLSettingsInfo(
         (async () => {
             const channeLInfo = await FindOneBySLug(slug, token)
             if (!channeLInfo) return;
+            setChanneLinfo(channeLInfo)
             // get channel owners
             const OwnersList = await getChanneLOwners(channeLInfo.id, token)
             if (!OwnersList) return
@@ -105,7 +107,7 @@ export default function ChanneLSettingsInfo(
 
 
         })();
-    }, [slug])
+    }, [])
 
     React.useEffect(() => {
         (async () => {
@@ -122,8 +124,6 @@ export default function ChanneLSettingsInfo(
     }, [updaterequestNotification])
 
     React.useEffect(() => {
-        const ChanneLId: string | null = params ? params.get('r') : null
-        if(!ChanneLId) return;
         socket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
             (data: {
@@ -132,18 +132,20 @@ export default function ChanneLSettingsInfo(
                 data: RoomsType,
             }) => {
                 (async () => {
+                    if (!ChanneLinfo) return
+
                     // get channel owners
-                    const OwnersList = await getChanneLOwners(ChanneLId, token)
+                    const OwnersList = await getChanneLOwners(ChanneLinfo.id, token)
                     if (!OwnersList) return
                     setownersList(OwnersList)
 
                     // get Logged Member :
-                    const member = await getMemberWithId(userId, ChanneLId, token)
+                    const member = await getMemberWithId(userId, ChanneLinfo.id, token)
                     member && setLogedMember(member)
 
 
                     // get channel members
-                    const aLLMembersList = await getChannelMembersWithId(ChanneLId, token)
+                    const aLLMembersList = await getChannelMembersWithId(ChanneLinfo.id, token)
                     if (!aLLMembersList) return
                     setaLLMembersList(aLLMembersList)
                     const ListUser: userType[] = []
@@ -195,21 +197,13 @@ export default function ChanneLSettingsInfo(
         );
         socket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`,
-            (data: {
-                message: string,
-                status: any,
-                data: RoomsType,
-            }) => {
-                if (data.data) {
-
-                    // toast.success(data.message)
-                    channeLConfirmActionHook.onClose()
-                    channeLsettingsHook.onClose()
-                    route.push(`/chat/channels`)
-                    route.refresh();
-                    return
-                }
+            (data: any) => {
+                toast('NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE')
+                // toast.success(data.message)
                 channeLConfirmActionHook.onClose()
+                channeLsettingsHook.onClose()
+                route.push(`/chat/channels`)
+                route.refresh();
             }
         );
         route.refresh();

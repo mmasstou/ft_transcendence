@@ -599,4 +599,55 @@ export class RoomsService {
       return null;
     }
   }
+
+  // sockets functions :
+  async LeaveChanneL(params: {
+    userId: string;
+    roomId: string;
+  }): Promise<Rooms> {
+    try {
+      const { userId, roomId } = params;
+      const room = await this.prisma.rooms.findUnique({
+        where: { id: roomId },
+        include: { members: true },
+      });
+      const User = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (!room || !User) {
+        if (!room)
+          throw new NotFoundException(`Room with ID ${roomId} not found`);
+        if (!User)
+          throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+
+      const member = await this.membersservice.findOne({
+        userId: User.id,
+        roomId: room.id,
+      });
+      if (!member) throw new Error();
+      const result = await this.prisma.$transaction(async (prisma) => {
+        const room = await prisma.rooms.update({
+          where: { id: roomId },
+          data: {
+            members: { disconnect: { id: userId } },
+          },
+        });
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            Rooms: { disconnect: { id: roomId } },
+          },
+        });
+        await prisma.members.delete({
+          where: { id: member.id },
+        });
+        return room;
+      });
+      return result;
+    } catch (error) {
+      console.log('Chat - error -> LeaveChanneL');
+      return null;
+    }
+  }
 }

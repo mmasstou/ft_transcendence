@@ -31,19 +31,43 @@ import InitSocket from './actions/InitSocket';
 
 export default function page() {
   const [IsMounted, setIsMounted] = React.useState(false)
+  const [ChanneLs, setChannel] = React.useState<RoomsType[] | null>(null)
+  const query = useParams();
+  const slug: string | undefined = query.slug ? typeof query.slug === 'string' ? query.slug : query.slug[0] : undefined
   const leftSidebarHook = LeftSidebarHook();
   const rightsidebarHook = RightsidebarHook()
   const UserId: any = Cookies.get('_id');
   const token = Cookies.get('token');
   if (!UserId || !token) return;
 
-  React.useEffect(() => { setIsMounted(true); }, [])
+  React.useEffect(() => { 
+    (async () => {
+      const ChanneLs = await getChannels(token)
+      if (!ChanneLs) return
+      setChannel(ChanneLs)
+      // setIsLoading(false)
+    })();
+    setIsMounted(true); 
+  
+  }, [])
 
   if (!IsMounted)
     return null
-  return (<div className={`${(leftSidebarHook.IsOpen || rightsidebarHook.IsOpen) && 'hidden md:flex'} w-full`}>
-    <div className="flex flex-col justify-center items-center h-full w-full">
-      <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
-    </div>
-  </div>)
+  return (
+    <>
+      <LefttsideModaL>
+        {
+          ChanneLs && ChanneLs.map((room: RoomsType, key) => (
+            <ChanneLSidebarItem key={key} room={room} viewd={8} active={room.slug === slug} />
+          ))
+        }
+      </LefttsideModaL>
+      <div className={`${(leftSidebarHook.IsOpen || rightsidebarHook.IsOpen) && 'hidden md:flex'} w-full`}>
+        <div className="flex flex-col justify-center items-center h-full w-full">
+          <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
+        </div>
+      </div>
+    </>
+
+  )
 }

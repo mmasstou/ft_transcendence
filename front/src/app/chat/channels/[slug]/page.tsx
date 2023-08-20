@@ -17,6 +17,9 @@ import RightsideModaL from '../modaLs/RightsideModal';
 import ChanneLsmembersItem from '../components/channel.membersItem';
 import getChannelMembersWithId from '../actions/getChannelmembers';
 import getUserWithId from '../actions/getUserWithId';
+import LefttsideModaL from '../modaLs/LeftsideModal';
+import getChannels from '../actions/getChanneLs';
+import ChanneLSidebarItem from '../components/channel.sidebar.item';
 const metadata = {
     title: 'Transcendence',
     description: 'ft_transcendence',
@@ -28,6 +31,7 @@ export default function page() {
     const query = useParams();
     const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
     const [ChanneLInfo, setChanneLInfo] = React.useState<RoomsType | null>(null);
+    const [ChanneLs, setChannel] = React.useState<RoomsType[] | null>(null)
     const [LoggedUser, setLoggedUser] = React.useState<userType | null>(null);
     const [ChanneLsmembers, setChanneLsmembers] = React.useState<membersType[] | null>(null);
     const [socket, setSocket] = React.useState<Socket | null>(null);
@@ -46,6 +50,9 @@ export default function page() {
         });
         setSocket(Clientsocket);
         (async () => {
+            const ChanneLs = await getChannels(token)
+            if (!ChanneLs) return
+            setChannel(ChanneLs)
             const channeL: RoomsType = await FindOneBySLug(slug, token);
             if (!channeL) {
                 router.push('/chat/channels/');
@@ -96,17 +103,39 @@ export default function page() {
 
     React.useEffect(() => {
         if (!IsMounted) return
-        socket?.on('accessToroomResponse', (resp :{channeL: RoomsType , LogedUser : userType}) => {
-            resp !== null
-                ? toast.success(`${resp.LogedUser.login} connected to chat ${resp.channeL.name}`)
-                : toast.error(`dont have permission to access this channel`);
+        socket?.on('accessToroomResponse', (resp: { channeL: RoomsType, LogedUser: userType }) => {
+            if(resp === null){
+                toast.error(`dont have permission to access this channel`);
+                router.push('/chat/channels/');
+            }else toast.success(`${resp.LogedUser.login} connected to chat ${resp.channeL.name}`)
+             
         });
-    }, [socket, IsMounted])
 
-    
+        // check for channels :
+        // leave the channeLs :
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            (data: any) => {
+                toast('NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE');
+                (async () => {
+                    const ChanneLs = await getChannels(token)
+                    if (!ChanneLs) return
+                    setChannel(ChanneLs)
+                })
+            })
+    }, [socket])
+
+
     if (!IsMounted) return
     document.title = `chat : ${ChanneLInfo?.name}` || metadata.title;
     return <>
+        <LefttsideModaL>
+            {
+                ChanneLs && ChanneLs.map((room: RoomsType, key) => (
+                    <ChanneLSidebarItem key={key} room={room} viewd={8} active={room.slug === slug} />
+                ))
+            }
+        </LefttsideModaL>
         <Conversations socket={socket} />
         <RightsideModaL>
             {

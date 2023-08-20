@@ -38,7 +38,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [IsMounted, setIsMounted] = React.useState(false)
-  const [ChanneLs, setChannel] = React.useState<RoomsType[] | null>(null)
   const [createRoomSocket, setcreateRoomSocket] = React.useState<Socket | null>(null)
   const params = useSearchParams()
   const pathname = usePathname()
@@ -60,21 +59,6 @@ export default function RootLayout({
     }, 2000)
     setIsMounted(true)
   }, [])
-
-
-
-  React.useEffect(() => {
-    if(!IsMounted) return;
-    (async () => {
-      const ChanneLs = await getChannels(token)
-      if (!ChanneLs) return
-      setChannel(ChanneLs)
-      // setIsLoading(false)
-    })();
-
-  }, [IsMounted]);
-
-
 
   if (!IsMounted) return
 
@@ -141,15 +125,7 @@ export default function RootLayout({
 
               </div>
             </div>
-
             <div className="channeLbody relative h-full flex ">
-              <LefttsideModaL>
-                {
-                  ChanneLs && ChanneLs.map((room: RoomsType, key) => (
-                    <ChanneLSidebarItem key={key} room={room} viewd={8} active={room.slug === slug} />
-                  ))
-                }
-              </LefttsideModaL>
               {children}
             </div>
 

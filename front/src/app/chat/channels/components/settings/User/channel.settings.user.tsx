@@ -17,7 +17,7 @@ import { IoChevronBackOutline } from "react-icons/io5";
 import { BsArrowRightShort } from "react-icons/bs";
 import { MdOutlineScoreboard } from "react-icons/md";
 import { TfiTimer } from "react-icons/tfi";
-import ChanneLConfirmActionBtn from "../../channel.confirm.action.Btn";
+import ChanneLConfirmActionBtn from "../channel.confirm.action.Btn";
 import ChanneLConfirmActionHook from "../../../hooks/channel.confirm.action";
 import getmessage from "../../../actions/member.action.message";
 import axios from "axios";

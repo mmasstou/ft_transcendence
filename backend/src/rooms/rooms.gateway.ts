@@ -37,6 +37,10 @@ export enum responseEventStatusEnum {
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR',
 }
+
+export enum responseEventTypeEnum {
+  LEAVEROOM = 'LEAVEROOM',
+}
 export enum responseEventMessageEnum {
   ERROR = 'error',
   SUCCESS = 'success',
@@ -57,7 +61,8 @@ export enum responseEventMessageEnum {
 }
 export type responseEvent = {
   status: responseEventStatusEnum;
-  message: responseEventMessageEnum;
+  message?: responseEventMessageEnum;
+  type?: responseEventTypeEnum;
   data: Rooms | Members | User | null;
 };
 @WebSocketGateway({ namespace: 'chat' })
@@ -482,7 +487,7 @@ export class RoomGateway implements OnGatewayConnection {
   ) {
     const ResponseEventData: responseEvent = {
       status: responseEventStatusEnum.SUCCESS,
-      message: responseEventMessageEnum.SUCCESS,
+      type: responseEventTypeEnum.LEAVEROOM,
       data: null,
     };
     try {
@@ -491,58 +496,29 @@ export class RoomGateway implements OnGatewayConnection {
       // get room data :
       const room = await this.roomservice.findOne({ id: data.roomId });
       // get member data :
-      const member = await this.memberService.findOne({
+      const LeavedChanneL = await this.roomservice.LeaveChanneL({
         userId: LogedUser.id,
         roomId: room.id,
       });
 
-      if (!LogedUser || !room || !member) throw new Error();
-      // disconnect the member from the room :
-      ResponseEventData.data = await this.prisma.$transaction(
-        async (prisma) => {
-          // disconnect member from room :
-          const channel = await this.prisma.rooms.update({
-            where: { id: room.id },
-            data: {
-              members: {
-                disconnect: {
-                  id: member.id,
-                },
-              },
-            },
-            include: {
-              members: true,
-            },
-          });
-          // disconnect room from User :
-          await prisma.user.update({
-            where: { id: LogedUser.id },
-            data: {
-              Rooms: {
-                disconnect: {
-                  id: channel.id,
-                },
-              },
-            },
-            include: { Rooms: true },
-          });
-          // console.log('SOCKET_EVENT_CHAT_MEMBER_LEAVE :', _User);
-          return channel;
-        },
-      );
+      if (!LeavedChanneL) throw new Error();
+      // send response to client :
       ResponseEventData.status = responseEventStatusEnum.SUCCESS;
-      ResponseEventData.message = responseEventMessageEnum.ERROR;
-      // client.leave(data.roomId);
+      ResponseEventData.data = LeavedChanneL;
+      // leave room socket :
+      client.leave(data.roomId);
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`, {
+        Ok: 'Oki',
+      });
     } catch (error) {
       ResponseEventData.data = null;
       ResponseEventData.status = responseEventStatusEnum.ERROR;
       ResponseEventData.message = responseEventMessageEnum.ERROR;
     }
-    client.emit(
-      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`,
+    this.server.emit(
+      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
       ResponseEventData,
     );
-    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, null);
   }
 
   @SubscribeMessage('sendMessage')
