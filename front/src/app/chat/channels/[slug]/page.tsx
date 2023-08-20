@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 import { Socket, io } from 'socket.io-client';
 import { toast } from 'react-hot-toast';
 import MemberHasPermissionToAccess from '../actions/MemberHasPermissionToAccess';
-import { RoomsType, membersType } from '@/types/types';
+import { RoomsType, membersType, userType } from '@/types/types';
 import ChanneLIndex from '../components/channel.index';
 import FindOneBySLug from '../actions/Channel/findOneBySlug';
 import InitSocket from '../actions/InitSocket';
@@ -16,6 +16,7 @@ import Conversations from '../components/channel.conversations';
 import RightsideModaL from '../modaLs/RightsideModal';
 import ChanneLsmembersItem from '../components/channel.membersItem';
 import getChannelMembersWithId from '../actions/getChannelmembers';
+import getUserWithId from '../actions/getUserWithId';
 const metadata = {
     title: 'Transcendence',
     description: 'ft_transcendence',
@@ -27,6 +28,7 @@ export default function page() {
     const query = useParams();
     const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
     const [ChanneLInfo, setChanneLInfo] = React.useState<RoomsType | null>(null);
+    const [LoggedUser, setLoggedUser] = React.useState<userType | null>(null);
     const [ChanneLsmembers, setChanneLsmembers] = React.useState<membersType[] | null>(null);
     const [socket, setSocket] = React.useState<Socket | null>(null);
     const [IsMounted, setIsMounted] = React.useState(false);
@@ -37,7 +39,6 @@ export default function page() {
 
 
     React.useEffect(() => {
-        setIsMounted(true);
         const Clientsocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
             auth: {
                 token, // Pass the token as an authentication parameter
@@ -51,10 +52,9 @@ export default function page() {
                 toast.error('channel not found');
                 return;
             }
-
-            Clientsocket.on('connect', () => {
-                Clientsocket.emit('accessToroom', channeL)
-            })
+            const User: userType | null = await getUserWithId(userId, token);
+            if (!User) return
+            setLoggedUser(User)
             setChanneLInfo(channeL);
             // get all members for this channel :
             const members = await getChannelMembersWithId(channeL.id, token)
@@ -65,7 +65,7 @@ export default function page() {
         setTimeout(() => {
             setIsLoading(false);
         }, 2000);
-
+        setIsMounted(true);
 
         return () => { Clientsocket.disconnect() }
     }, [])
@@ -94,8 +94,16 @@ export default function page() {
 
     }, [slug])
 
+    React.useEffect(() => {
+        if (!IsMounted) return
+        socket?.on('accessToroomResponse', (resp :{channeL: RoomsType , LogedUser : userType}) => {
+            resp !== null
+                ? toast.success(`${resp.LogedUser.login} connected to chat ${resp.channeL.name}`)
+                : toast.error(`dont have permission to access this channel`);
+        });
+    }, [socket, IsMounted])
 
-
+    
     if (!IsMounted) return
     document.title = `chat : ${ChanneLInfo?.name}` || metadata.title;
     return <>

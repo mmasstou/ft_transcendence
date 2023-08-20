@@ -68,19 +68,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         }, 100); // sleep .1s ; waiting search input to mounted in focus on it
     }, [slug])
 
-    // React.useEffect(() => {
-    //     if (!channeLinfo) return;
-    //     (async () => {
-    //         const response = await getChanneLMessages(channeLinfo.id, token)
-    //         if (!response) return
-    //         if (response.length === messages.length) return
-    //         setMessages(response)
-    //     })();
-    // }, [IsInputFocused])
-
     React.useEffect(() => {
-        const token: any = slug && Cookies.get('token');
-
         slug && (async () => {
             const _roomInfo: RoomsType = await FindOneBySLug(slug, token)
             if (!_roomInfo) {
@@ -90,7 +78,6 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             socket?.emit('accessToroom', _roomInfo)
             setIsMounted(true)
             // scroll to the buttom of the page :
-            // toast.success(`Welcome to ${_roomInfo.name}`)
             setChanneLinfo(_roomInfo)
             const channeLLMembers = __userId && await getMemberWithId(__userId, _roomInfo.id, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
@@ -101,52 +88,30 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             const toastId = toast.loading('waiting to get OLd messages ...');
             const response = await getChanneLMessages(_roomInfo.id, token)
             if (!response) return
-            const messagat = response
-            console.log("messagat :", messagat)
             setMessages(response)
             setTimeout(() => {
                 setLoadingMessages(false);
+                FocusedOnSendMessageInput()
                 toast.remove(toastId)
             }, 500);
         })();
     }, [])
 
-    // // geting channeL old messages :
-    // React.useEffect(() => {
-    //     if (!channeLinfo) return;
-    //     setLoadingMessages(true);
-    //     const toastId = toast.loading('waiting to get OLd messages ...');
-    //     (async () => {
-    //         const response = await getChanneLMessages(channeLinfo.id, token)
-    //         if (!response) return
-    //         const messagat = response
-    //         console.log("messagat :", messagat)
-    //         setMessages(response)
-    //         setTimeout(() => {
-    //             setLoadingMessages(false);
-    //             toast.remove(toastId)
-    //         }, 500);
-    //     })();
-    // }, [channeLinfo])
-
-    // listen to message event and send the incomming message to client
+    // // listen to message event and send the incomming message to client
     React.useEffect(() => {
         if (!channeLinfo) return;
         socket?.on('newmessage', (newMessage: any) => {
-            toast(`listening to message event in ${newMessage.content}`)
-            const messagat = [...messages, newMessage]
-            setMessages(messagat)
+            (async () => {
+                const response = await getChanneLMessages(channeLinfo.id, token)
+                if (!response) return
+                setMessages(response)
+            })();
+            FocusedOnSendMessageInput()
             setSendingMessage(false);
             setInputValue('')
-            // setMessages([...messages, message])
-            setTimeout(() => {
-                if (InputRef.current) {
-                    InputRef.current.focus();
-                }
-            }, 10); // sleep .1s ; waiting search input to mounted in focus on it
+            
         })
-    }, [socket])
-
+    }, [message, socket, InputValue])
 
     const OnSubmit = () => {
         const sendMesage = message.trim()
@@ -161,7 +126,6 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             return
         }
         // send message to server using socket :
-        // toast(`sended :${message} to socket ${socket?.id}`)
         socket?.emit('sendMessage', {
             content: message,
             senderId: Cookies.get('_id'),
@@ -170,8 +134,13 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         setSendingMessage(true)
 
     }
-
-
+    const FocusedOnSendMessageInput = () =>{
+        setTimeout(() => {
+            if (InputRef.current) {
+                InputRef.current.focus();
+            }
+        }, 100); // sleep .1s ; waiting search input to mounted in focus on it
+    }
 
     if (!IsMounted) return null
 

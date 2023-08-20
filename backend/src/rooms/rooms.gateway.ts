@@ -465,18 +465,12 @@ export class RoomGateway implements OnGatewayConnection {
       );
       // console.log('Chat-> responseMemberData- +>', responseMemberData);
       if (_isMemberInRoom !== null) {
-        await client.join(data.id);
+        await client.join(room.id);
         // send response to client :
-        client.emit('joinroomResponseEvent', room);
-      } else
-        client.emit('joinroomResponseEvent', {
-          error: 'you are not member or not in the socket channel yet',
-        });
+        client.emit('accessToroomResponse', { channeL: room, LogedUser });
+      } else throw new Error();
     } catch (error) {
-      console.log('Chat-joinRoom> error- +>', error);
-      client.emit('joinroomResponseEvent', {
-        error: 'somthing worreng in the server',
-      });
+      client.emit('accessToroomResponse', null);
     }
   }
 
@@ -556,7 +550,6 @@ export class RoomGateway implements OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    let messages: any;
     try {
       const room = await this.roomservice.findOne({ id: data.roomsId });
       const User = await this.usersService.getUserInClientSocket(client);
@@ -574,7 +567,7 @@ export class RoomGateway implements OnGatewayConnection {
       }
 
       // console.log('Chat-> responseMemberData- +>', responseMemberData);
-      messages = await this.messageservice.create({
+      const messages = await this.messageservice.create({
         roomId: room.id,
         content: data.content,
         userId: User.id,
@@ -585,7 +578,7 @@ export class RoomGateway implements OnGatewayConnection {
       console.log('+> %s sending message to %s', User.name, room.name);
       // this.server.emit('message', messages);
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
+      if (error) {
         console.log('Chat-sendMessage> error- +>', error);
       }
     }
