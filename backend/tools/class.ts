@@ -20,7 +20,7 @@ type Random_Obj = {
     GameMode: string
   }
 
-type UserMap = Map<string, {User: User, SocketId?: string, BallSocketId?: string, Status: string, TableId?: string}>;
+type UserMap = Map<string, {User: User, SocketId?: string, BallSocketId?: string, Status: string, TableId?: string, timeOut?: any}>;
 
 type TableMap = Map<string, table_obj>;
 

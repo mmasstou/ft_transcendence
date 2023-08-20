@@ -555,11 +555,16 @@ class MyGateway implements OnGatewayConnection {
         SocketId: socket.id,
         Status: 'online',
       });
-    else UserMap.get(_User.id).SocketId = socket.id;
+    else {
+      UserMap.get(_User.id).SocketId = socket.id;
+      clearTimeout(UserMap.get(_User.id).timeOut);
+      UserMap.get(_User.id).timeOut = null;
+    }
     if (socket.handshake.auth.tableId) {
       socket.emit('joinRoomGame', TableMap.get(socket.handshake.auth.tableId));
     }
   }
+
 
   @SubscribeMessage('joinToRoomGame')
   JoinToRoomGame(client: any, data: any) {
@@ -582,6 +587,7 @@ class MyGateway implements OnGatewayConnection {
   async disconneting(client: any, data: any) {
     const UsId = client.handshake.auth.UserId;
     const TableId = UserMap.get(UsId) && UserMap.get(UsId).TableId;
+    console.log('disconnecting', data);
     if (data[0] == 'transport close') {
       console.log('the client id: ', UsId, ' reload the game page');
       if (
@@ -591,6 +597,23 @@ class MyGateway implements OnGatewayConnection {
       ) {
         TableMap.get(TableId).Status = false;
         this.server.to(TableId).emit('setStatus', false);
+        UserMap.get(UsId).timeOut = setTimeout(async () => {
+          console.log('the client id: ', UsId, ' logout from the game page');
+          await this.GameService.updateStatus({ id: UsId, status: 'online' });
+          if (UserMap.get(UsId)) {
+            this.server.to(TableId).emit('leaveGame');
+            if (
+              UserMap.get(UsId).TableId &&
+              TableMap.get(UserMap.get(UsId).TableId)
+            ) {
+              clearInterval(TableMap.get(UserMap.get(UsId).TableId).current);
+              TableMap.delete(UserMap.get(UsId).TableId);
+            }
+            RandomListScore.deleteElement(UsId);
+            RandomListTime.deleteElement(UsId);
+            UserMap.delete(UsId);
+          }
+        },10000);
       }
     } else {
       console.log('the client id: ', UsId, ' logout from the game page');
