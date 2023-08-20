@@ -26,9 +26,9 @@ export class AuthService {
     });
 
     if (!userExists) {
+      console.log('************** user not exists **************');
       return await this.registerUser(user);
     }
-
     return this.generateJwt({
       login: userExists.login,
       email: userExists.email,
@@ -36,6 +36,7 @@ export class AuthService {
       name: userExists.name,
       banner: userExists.banner,
       intraId: userExists.intraId,
+      logedFirstTime: userExists.logedFirstTime,
     });
   }
   async registerUser(user: Prisma.UserUncheckedCreateInput) {
@@ -48,6 +49,7 @@ export class AuthService {
           name: user.name,
           banner: user.banner,
           intraId: user.intraId,
+          logedFirstTime: user.logedFirstTime,
         },
       });
       return await this.generateJwt({
@@ -57,6 +59,7 @@ export class AuthService {
         name: newUser.name,
         banner: newUser.banner,
         intraId: newUser.intraId,
+        logedFirstTime: newUser.logedFirstTime,
       });
     } catch (error) {
       console.log(error);

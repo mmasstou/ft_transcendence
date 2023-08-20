@@ -22,10 +22,10 @@ const MyAvatar = () => {
   return (
     <Avatar.Root
       className={`${style.flexCenter} flex-inline align-middle overflow-hidden select-none
-            rounded-full `}
+            rounded-full w-full h-full`}
     >
       <Avatar.Image
-        className="w-[100%] h-[100%] object-cover rounded-[inherit] border-secondary"
+        className="w-full h-full object-cover border-secondary rounded-full"
         src={LogedUser?.avatar}
         sizes="100%"
         alt="User Avatar"

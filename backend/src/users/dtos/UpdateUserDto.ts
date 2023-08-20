@@ -5,4 +5,5 @@ export class UpdateUserDto {
   last_name?: string;
   kind?: string;
   image?: string;
+  logedFirstTime: boolean;
 }

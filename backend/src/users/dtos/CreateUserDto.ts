@@ -5,4 +5,5 @@ export class CreateUserDto {
   last_name: string;
   kind: string;
   image: string;
+  logedFirstTime: boolean;
 }

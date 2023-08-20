@@ -52,16 +52,12 @@ const Otp: React.FC<Props> = () => {
       twoFactorAuthenticationCode: otpSend,
     };
     axios
-      .post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/2fa/authenticate`,
-        userData,
-        {
-          headers: {
-            Authorization: `Bearer ${yourJwtToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/2fa/authenticate`, userData, {
+        headers: {
+          Authorization: `Bearer ${yourJwtToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
       .then((response) => {
         if (response.status === 200) {
           router.push('/profile');

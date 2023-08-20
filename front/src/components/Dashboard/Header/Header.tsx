@@ -16,14 +16,13 @@ const Header: React.FC = (): JSX.Element => {
           src={logo}
           height={32}
           width={79}
-          style={{ width: '15vw', height: '15vh' }}
           alt="Picture of the author"
           priority
         />
       </div>
       <nav className="flex justify-center items-center">
         <ul className="flex items-center  gap-5 justify-center">
-          <Settings />
+          <Settings login={false} />
           <li>
             <Popover.Root>
               <Popover.Trigger asChild aria-controls="radix-:R1mcq:">
