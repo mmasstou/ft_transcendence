@@ -218,10 +218,12 @@ export class RoomsService {
       // console.log('++create+userId+>', userId);
       return await this.prisma.$transaction(async (prisma) => {
         // console.log('++data : ', _data);
+        const slug = this.createSlug(_data.name);
         const room = await prisma.rooms.create({
           data: {
             name: _data.name,
             type: _data.type,
+            slug,
             password: _data.channeLpassword,
             members: {
               create: _data.friends.map((friend: any) => ({
@@ -649,5 +651,15 @@ export class RoomsService {
       console.log('Chat - error -> LeaveChanneL');
       return null;
     }
+  }
+
+  createSlug(name: string) {
+    return name
+      .toLowerCase() // Convert to lowercase
+      .replace(/\s+/g, '-') // Replace spaces with dashes
+      .replace(/[^\w\-]+/g, '') // Remove non-word characters except dashes
+      .replace(/\-\-+/g, '-') // Replace consecutive dashes with a single dash
+      .replace(/^\-+/, '') // Remove leading dashes
+      .replace(/\-+$/, ''); // Remove trailing dashes
   }
 }

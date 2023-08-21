@@ -21,7 +21,7 @@ import ChanneLSidebarItem from './components/channel.sidebar.item';
 import Image from 'next/image';
 import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { Socket } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import FindOneBySLug from './actions/Channel/findOneBySlug';
 import getChannels from './actions/getChanneLs';
 import { set } from 'date-fns';
@@ -53,11 +53,19 @@ export default function RootLayout({
   const query = useParams();
   const slug: string | undefined = query.slug ? typeof query.slug === 'string' ? query.slug : query.slug[0] : undefined
   React.useEffect(() => {
-    if(!pathname.includes('chat')) setIsLoading(true)
+    if (!pathname.includes('chat')) setIsLoading(true)
     setTimeout(() => {
       setIsLoading(false)
     }, 2000)
+
+    const Clientsocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
+      auth: {
+        token, // Pass the token as an authentication parameter
+      },
+    });
+    setcreateRoomSocket(Clientsocket)
     setIsMounted(true)
+    return () => { Clientsocket.disconnect() }
   }, [])
 
   if (!IsMounted) return
@@ -66,7 +74,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${changa.className}`} suppressHydrationWarning={true}>
         {isLoading ? < Loading /> : <Dashboard>
-        <div className=' absolute top-0 left-0 text-danger bg-white'>channeL route</div>
+          <div className=' absolute top-0 left-0 text-danger bg-white'>channeL route</div>
           <div className="--channeL relative h-full flex flex-col border-4 border-[#24323044] ">
             {/* nav bar */}
 

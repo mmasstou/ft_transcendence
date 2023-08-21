@@ -42,7 +42,7 @@ export default function ChanneLSettingsInfo(
 ) {
 
     const query = useParams();
-    const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
+    const slug: string | undefined = typeof query.slug === 'string' ? query.slug : undefined;
     const [Isloading, setLoading] = React.useState<boolean>(true)
     const [ownersList, setownersList] = React.useState<userType[] | null>(null)
     const [aLLMembersList, setaLLMembersList] = React.useState<membersType[] | null>(null)
@@ -64,6 +64,7 @@ export default function ChanneLSettingsInfo(
     React.useEffect(() => {
 
         (async () => {
+            if (slug === undefined) return;
             const channeLInfo = await FindOneBySLug(slug, token)
             if (!channeLInfo) return;
             setChanneLinfo(channeLInfo)
@@ -176,9 +177,8 @@ export default function ChanneLSettingsInfo(
         socket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_DELETE}`,
             (data: { Ok: boolean }) => {
-                
-                if (data.Ok) {
 
+                if (data.Ok) {
                     toast.success('delete successfully')
                     channeLConfirmActionHook.onClose()
                     channeLsettingsHook.onClose()
@@ -195,7 +195,6 @@ export default function ChanneLSettingsInfo(
         socket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`,
             (data: any) => {
-                toast('NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE')
                 // toast.success(data.message)
                 channeLConfirmActionHook.onClose()
                 channeLsettingsHook.onClose()

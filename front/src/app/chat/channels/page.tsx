@@ -3,7 +3,7 @@
 import React from 'react'
 import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { Socket } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import Image from 'next/image';
 // components :
 import Dashboard from '@/app/Dashboard';
@@ -28,10 +28,13 @@ import { AiOutlineUsergroupAdd } from 'react-icons/ai';
 // types :
 import { RoomsType } from '@/types/types';
 import InitSocket from './actions/InitSocket';
+import FindOneBySLug from './actions/Channel/findOneBySlug';
+import { toast } from 'react-hot-toast';
 
 export default function page() {
   const [IsMounted, setIsMounted] = React.useState(false)
   const [ChanneLs, setChannel] = React.useState<RoomsType[] | null>(null)
+  const [socket, setSocket] = React.useState<Socket | null>(null)
   const query = useParams();
   const slug: string | undefined = query.slug ? typeof query.slug === 'string' ? query.slug : query.slug[0] : undefined
   const leftSidebarHook = LeftSidebarHook();
@@ -40,16 +43,41 @@ export default function page() {
   const token = Cookies.get('token');
   if (!UserId || !token) return;
 
-  React.useEffect(() => { 
+  React.useEffect(() => {
     (async () => {
       const ChanneLs = await getChannels(token)
       if (!ChanneLs) return
       setChannel(ChanneLs)
       // setIsLoading(false)
     })();
-    setIsMounted(true); 
-  
+    const Clientsocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
+      auth: {
+        token, // Pass the token as an authentication parameter
+      },
+    });
+    setSocket(Clientsocket)
+    setIsMounted(true)
+    return () => { Clientsocket.disconnect() }
   }, [])
+
+  React.useEffect(() => {
+    if (!IsMounted) return
+
+
+    // check for channels :
+    // leave the channeLs :
+    socket?.on(
+      `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+      (data: any) => {
+        (async () => {
+          // update channels :
+          const ChanneLs = await getChannels(token)
+          if (!ChanneLs) return
+          setChannel(ChanneLs)
+        })();
+      })
+  }, [socket])
+
 
   if (!IsMounted)
     return null

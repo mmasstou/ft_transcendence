@@ -20,6 +20,8 @@ import getUserWithId from '../actions/getUserWithId';
 import LefttsideModaL from '../modaLs/LeftsideModal';
 import getChannels from '../actions/getChanneLs';
 import ChanneLSidebarItem from '../components/channel.sidebar.item';
+import ChanneLConfirmActionHook from '../hooks/channel.confirm.action';
+import ChanneLsettingsHook from '../hooks/channel.settings';
 const metadata = {
     title: 'Transcendence',
     description: 'ft_transcendence',
@@ -37,6 +39,9 @@ export default function page() {
     const [socket, setSocket] = React.useState<Socket | null>(null);
     const [IsMounted, setIsMounted] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(true);
+    // hooks :
+    const confirmAction = ChanneLConfirmActionHook()
+    const settings = ChanneLsettingsHook()
     const token = Cookies.get('token');
     const userId = Cookies.get('_id');
     if (!token || !userId) return
@@ -117,14 +122,16 @@ export default function page() {
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
             (data: any) => {
                 (async () => {
-                    if(!slug) return ;
+                    if (!slug) return;
                     const channeL: RoomsType = await FindOneBySLug(slug, token);
-                    if(!channeL) return;
+                    if (!channeL) return;
                     // check if the channel is deleted :
                     await MemberHasPermissionToAccess(token, channeL.id, userId).then((res) => {
                         if (!res) {
                             router.push('/chat/channels/');
                             toast.error('this channel is deleted by owner');
+                            confirmAction.onClose()
+                            settings.onClose()
                             return;
                         }
                     })

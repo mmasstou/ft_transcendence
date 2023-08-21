@@ -42,7 +42,13 @@ export default function ChanneLConfirmActionBtn(
             channeLConfirmActionHook.onOpen(
                 <button
                     onClick={() => {
-                        ExecuteAction ? socket?.emit(event, data) : toast.error('you can\'t leave this channel with out set a Owner because you are the only owner')
+                        if (ExecuteAction) {
+                            socket?.emit(event, data)
+                        } else {
+                            toast.error('you can\'t leave this channel with out set a Owner because you are the only owner')
+                            channeLConfirmActionHook.onClose()
+                        }
+                        // ExecuteAction ? socket?.emit(event, data) : toast.error('you can\'t leave this channel with out set a Owner because you are the only owner')
                     }}
                     className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold capitalize px-7 py-3 rounded-[12px]  w-full">
                     confirm

@@ -1,7 +1,7 @@
 import { RoomTypeEnum, RoomsType } from "@/types/types"
 import { on } from "events";
 import { use, useEffect, useRef, useState } from "react";
-import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook";
+import ChanneLPasswordAccessHook from "../../../hooks/Channel.Access.Password.hook";
 import { Socket } from "socket.io-client";
 import { useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
@@ -11,7 +11,8 @@ interface ChannelFindRoomItemProps {
     onClick: (data: { room: RoomsType }) => void
     socket: Socket | null
 }
-export default function ChannelFindRoomItem({ room, onClick, socket }: ChannelFindRoomItemProps) {
+export default function
+    ChannelFindRoomItem({ room, onClick, socket }: ChannelFindRoomItemProps) {
     const [InputValue, setInputValue] = useState("")
     const [joinBtn, setJoinBtn] = useState(false)
     const [passwordInput, setPasswordInput] = useState(false)
@@ -49,6 +50,11 @@ export default function ChannelFindRoomItem({ room, onClick, socket }: ChannelFi
                             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
                             { userid: UserId, roomid: room.id },
                             "JOIN")
+                    } else {
+                        socket?.emit(
+                            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
+                            { userid: UserId, roomid: room.id }
+                        )
                     }
                     onClick({ room })
                 }}

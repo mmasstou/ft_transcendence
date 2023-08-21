@@ -88,7 +88,7 @@ const ChanneLCreateModaL = () => {
     });
   };
 
-  const onSubmit: SubmitHandler<FieldValues> = async (UserId: any) => {
+  const onSubmit: SubmitHandler<FieldValues> = async (Data: any) => {
     // create private room : createroom
     setcustomvalue(_channel_name, "")
     reset();
@@ -102,18 +102,17 @@ const ChanneLCreateModaL = () => {
     let _friends: any[] = []
 
     // get friends data :
-    for (let i = 0; i < UserId.friends.length; i++) {
-      const __friends = await getUserWithId(UserId.friends[i].value, token);
+    for (let i = 0; i < Data.friends.length; i++) {
+      const __friends = await getUserWithId(Data.friends[i].value, token);
       __friends.role = "USER"
       _friends.push(__friends)
     }
     _friends.push(LoginUser)
-
     socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_CREATE}`, {
-      name: UserId.channel_name,
+      name: Data.channel_name,
       friends: _friends,
-      type: UserId.channeLtype,
-      channeLpassword: UserId.ChanneLpassword
+      type: Data.channeLtype,
+      channeLpassword: Data.ChanneLpassword
     },
       (response: any) => {
         console.log('join response : ', response)
@@ -121,9 +120,9 @@ const ChanneLCreateModaL = () => {
     socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, (room: any) => {
       if (!room.data) {
         toast(room.message)
-        return 
+        return
       }
-      route.push(`/chat/channels?r=${room.data.id}`)
+      route.push(`/chat/channels/${room.data.slug}`)
       onClose()
     })
   }
@@ -202,6 +201,7 @@ const ChanneLCreateModaL = () => {
       </div>
     </div>
   );
+  console.log("const ChanneLCreateModaL = ():", socket?.id)
   return (
     <ChanneLModal
       IsOpen={IsOpen}

@@ -283,22 +283,25 @@ export class RoomGateway implements OnGatewayConnection {
       // send response to client :
       // client.emit('sendNotification', { userId: data.userid, room: room });
 
-      this.server.emit(
-        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-        ResponseEventData,
-      );
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+        Ok: true,
+        room: room,
+      });
     } catch (error) {
       console.log('Chat-> joinmember error- +>', error);
       // send response to client :
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+        Ok: false,
+      });
+
       ResponseEventData.status = responseEventStatusEnum.ERROR;
       ResponseEventData.message = responseEventMessageEnum.CANTJOIN;
       ResponseEventData.data = null;
-      client.emit(
-        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-        ResponseEventData,
-      );
-      return;
     }
+    this.server.emit(
+      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+      ResponseEventData,
+    );
   }
   @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_CREATE}`)
   async createRoom(
@@ -317,6 +320,7 @@ export class RoomGateway implements OnGatewayConnection {
       data: null,
     };
     try {
+      console.log('SOCKET_EVENT_CHAT_CREATE :', data);
       const { name, type, friends, channeLpassword } = data;
       const LogedUser = await this.usersService.getUserInClientSocket(client);
       if (!LogedUser) throw new Error();
@@ -383,7 +387,6 @@ export class RoomGateway implements OnGatewayConnection {
       message: responseEventMessageEnum.DELETESUCCESS,
       data: null,
     };
-    console.log('SOCKET_EVENT_CHAT_DELETE :', data);
     try {
       // check if member is already in room database and is owner :
       const User = await this.usersService.findOne({ id: data.userId });
@@ -395,7 +398,6 @@ export class RoomGateway implements OnGatewayConnection {
         roomId: room.id,
       });
       // chck if no User or room or member or this member is not Owner
-      console.log('SOCKET_EVENT_RESPONSE_CHAT_DELETE +member+>', member);
       if (!member || member.type !== UserTypeEnum.OWNER)
         throw new NotFoundException();
       // delete room :
