@@ -74,6 +74,11 @@ export type userType = {
   cursus_users: cursusType[];
   twoFactorAuthenticationSecret: string;
   twoFA: boolean;
+  TotalWin: number;
+  TotalLose: number;
+  TotalMatch: number;
+  TotalDraw: number;
+  Level: number;
 };
 
 
