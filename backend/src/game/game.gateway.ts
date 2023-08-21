@@ -97,30 +97,30 @@ async function SetUserMatchNumber(
   if (Lose === 'Bot') {
     await gameService.setMachine({ id: Win });
   }
-  if (Lose === 'Bot' || Win === 'Bot') return;
-  const user1 = UserMap.get(Win);
-  const user2 = UserMap.get(Lose);
-  await gameService.updateTotalMatches({
+  const user1 = Win != 'Bot' ? UserMap.get(Win) : null;
+  const user2 = Lose != 'Bot' ? UserMap.get(Lose) : null;
+  user1 && await gameService.updateTotalMatches({
     id: Win,
     TotalWin: user1.User.TotalWin + 1,
     TotalLose: user1.User.TotalLose,
     TotalDraw: user1.User.TotalDraw,
   });
-  await gameService.updateTotalMatches({
+  user2 && await gameService.updateTotalMatches({
     id: Lose,
     TotalWin: user2.User.TotalWin,
     TotalLose: user2.User.TotalLose + 1,
     TotalDraw: user2.User.TotalDraw,
   });
-  await gameService.updateTotalMatch({
+  user1 && await gameService.updateTotalMatch({
     id: Win,
     TotalMatch: user1.User.TotalMatch + 1,
   });
-  await gameService.updateTotalMatch({
+  user2 && await gameService.updateTotalMatch({
     id: Lose,
     TotalMatch: user2.User.TotalMatch + 1,
   });
-
+  
+  if (Lose === 'Bot' || Win === 'Bot') return;
   await gameService.updateLevel({
     id: Win,
     level: user1.User.Level + diff * 0.1,
@@ -513,17 +513,40 @@ class MyGateway implements OnGatewayConnection {
   }
 
   async LeaveGame(data: any) {
+    const leavedUser = data.UserId;
     const table = TableMap.get(data.TableId);
     if (table) {
       await this.GameService.updateStatus({
         id: table.player1.UserId,
         status: 'online',
       });
-      if (table.player2.UserId !== 'Bot')
+      if (table.player2.UserId !== 'Bot') {
         await this.GameService.updateStatus({
           id: table.player2.UserId,
           status: 'online',
         });
+        if (table.player2.UserId === leavedUser) {
+          SetUserMatchNumber(
+            this.GameService,
+            table.player1.UserId,
+            table.player2.UserId,
+            1,
+          )
+        } else {
+          SetUserMatchNumber(
+            this.GameService,
+            table.player2.UserId,
+            table.player1.UserId,
+            1,
+          )
+        }
+        await this.GameService.CreateScore({
+          Player1: table.player1.UserId,
+          Player2: table.player2.UserId,
+          score1: table.player2.UserId === leavedUser ? 1 : 0,
+          score2: table.player2.UserId === leavedUser ? 0 : 1,
+        });
+      }
       TableMap.get(data.TableId) && (TableMap.get(data.TableId).Status = false);
       this.server.to(table.tableId).emit('setStatus', false);
       UserMap.get(data.UserId) &&
@@ -615,7 +638,7 @@ class MyGateway implements OnGatewayConnection {
         },10000);
       }
     } else {
-      console.log('--> Client', UserMap.get(UsId).User.login, 'logout from the game page');
+      console.log('--> Client', UsId, 'logout from the game page');
       await this.GameService.updateStatus({ id: UsId, status: 'online' });
       if (UserMap.get(UsId)) {
         this.server.to(TableId).emit('leaveGame');
