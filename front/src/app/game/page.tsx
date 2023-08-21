@@ -1,15 +1,31 @@
 'use client';
-import Image from 'next/image';
-import Dashboard from '../Dashboard';
-import Link from 'next/link';
 import * as Dialog from '@radix-ui/react-dialog';
-import GameThemes from '../../../lib/GameThemes';
-import { toast } from 'react-hot-toast';
-import Cookies from 'js-cookie';
 import axios from 'axios';
+import Cookies from 'js-cookie';
+import Image from 'next/image';
+import Link from 'next/link';
+import { toast } from 'react-hot-toast';
+import GameThemes from '../../../lib/GameThemes';
+import Dashboard from '../Dashboard';
 
 const page = () => {
   let selectedTheme = GameThemes[0];
+
+  const saveTheme = async () => {
+    const body = {
+      id: Cookies.get('_id'),
+      theme: selectedTheme,
+    };
+    toast.promise(
+      axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/UpdateTheme`, body),
+      {
+        loading: 'Saving...',
+        success: 'Theme saved',
+        error: 'Error while saving',
+      }
+    );
+  };
+
   return (
     <Dashboard>
       <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide text-white">
@@ -61,26 +77,24 @@ const page = () => {
                             key={index}
                             className={`w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-md ring-2 ring-transparent focus:ring-secondary transition-all`}
                             style={gradientStyle}
-                            onClick={() => {selectedTheme = GameThemes[index]}}
+                            onClick={() => {
+                              selectedTheme = theme;
+                            }}
                           />
                         );
                       })}
                     </div>
                     <div className="flex gap-4">
-                    <Dialog.Close asChild>
-                        <button className=" px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-secondary rounded-xl font-bold text-secondary focus:outline-none" onClick={() => {
-                          const body = {
-                            id: Cookies.get('_id'),
-                            theme: selectedTheme
-                          };
-                          axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/UpdateTheme`, body)
-                          .catch((err) => {
-                            toast.error(err.response.data.reason);
-                          });
-                        }}>
+                      <Dialog.Close asChild>
+                        <button
+                          className=" px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-secondary rounded-xl font-bold text-secondary focus:outline-none"
+                          onClick={() => {
+                            saveTheme();
+                          }}
+                        >
                           Save
                         </button>
-                        </Dialog.Close>
+                      </Dialog.Close>
                       <Dialog.Close asChild>
                         <button className=" px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-red-500 rounded-xl font-bold text-red-500 focus:outline-none">
                           Cancel
@@ -92,13 +106,13 @@ const page = () => {
               </Dialog.Root>
               <Link
                 href={'/game/time'}
-                className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-yellow-500 rounded-xl font-bold text-yellow-500"
+                className="px-2 py-1 xl:px-6 xl:py-2 border xl:border-2 border-yellow-500 rounded-xl font-bold text-yellow-500 focus:outline-none"
               >
                 Time Mode
               </Link>
               <Link
                 href={'/game/score'}
-                className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-secondary rounded-xl font-bold text-secondary focus:outline-none"
+                className="px-2 py-1 xl:px-6 xl:py-2 border xl:border-2  border-secondary rounded-xl font-bold text-secondary focus:outline-none"
               >
                 Score Mode
               </Link>
