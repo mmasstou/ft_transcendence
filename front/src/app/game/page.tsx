@@ -1,13 +1,15 @@
 'use client';
 import Image from 'next/image';
 import Dashboard from '../Dashboard';
-import CanvasGame from '@/components/game/CanvasGame';
 import Link from 'next/link';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Cross2Icon } from '@radix-ui/react-icons';
 import GameThemes from '../../../lib/GameThemes';
+import { toast } from 'react-hot-toast';
+import Cookies from 'js-cookie';
+import axios from 'axios';
 
 const page = () => {
+  let selectedTheme = GameThemes[0];
   return (
     <Dashboard>
       <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide text-white">
@@ -52,21 +54,33 @@ const page = () => {
                     <div className="grid grid-cols-3 gap-4 md:gap-6 2xl:gap-10 xl:text-lg">
                       {GameThemes.map((theme, index) => {
                         const gradientStyle = {
-                          backgroundImage: `linear-gradient(to right, ${theme.left}, ${theme.right})`,
+                          backgroundImage: `linear-gradient(to right, ${theme.background[0]}, ${theme.background[1]})`,
                         };
                         return (
                           <button
                             key={index}
                             className={`w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-md ring-2 ring-transparent focus:ring-secondary transition-all`}
                             style={gradientStyle}
+                            onClick={() => {selectedTheme = GameThemes[index]}}
                           />
                         );
                       })}
                     </div>
                     <div className="flex gap-4">
-                      <button className=" px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-secondary rounded-xl font-bold text-secondary focus:outline-none">
-                        Save
-                      </button>
+                    <Dialog.Close asChild>
+                        <button className=" px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-secondary rounded-xl font-bold text-secondary focus:outline-none" onClick={() => {
+                          const body = {
+                            id: Cookies.get('_id'),
+                            theme: selectedTheme
+                          };
+                          axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/UpdateTheme`, body)
+                          .catch((err) => {
+                            toast.error(err.response.data.reason);
+                          });
+                        }}>
+                          Save
+                        </button>
+                        </Dialog.Close>
                       <Dialog.Close asChild>
                         <button className=" px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-red-500 rounded-xl font-bold text-red-500 focus:outline-none">
                           Cancel
