@@ -25,7 +25,7 @@ function draw_line(
   socket: any)
   {
     const color = socket.auth.UserId === table_obj.player1.UserId ? table_obj.player1.GameSetting.ball : table_obj.player2.GameSetting.ball;
-      backgroundCtx.strokeStyle = "#ffffff";
+      backgroundCtx.strokeStyle = socket.auth.UserId === table_obj.player1.UserId ? table_obj.player1.GameSetting.ball : table_obj.player2.GameSetting.ball;
       backgroundCtx.beginPath();
       let x = 0;
       if (is_vertical) {
@@ -47,24 +47,6 @@ function draw_line(
           }
       }
 }
-
-function draw_exit_button(
-  backgroundCtx: CanvasRenderingContext2D,
-  canvas: HTMLCanvasElement,
-  canvasSize: {width:number, height: number},
-  is_vertical: any,
-  table_obj: table_obj,
-  socket: any,
-  images: {img1: HTMLImageElement | null;
-  img2: HTMLImageElement | null;
-  pause: HTMLImageElement | null;
-  exit: HTMLImageElement | null;}) {
-    if (canvas && backgroundCtx) {
-        // is_vertical && images.img1 && backgroundCtx.drawImage(images.img1, 0, 0, canvasSize.width / 20, canvasSize.width / 20);
-        // !is_vertical && !table_obj.Status && images.exit && backgroundCtx.drawImage(images.exit, (canvasSize.width / 2) - canvasSize.width / 30, 0, canvasSize.width / 15, canvasSize.height / 15);
-    }
-}
-
 
 function drawBackground(
   table_obj: table_obj,
@@ -88,7 +70,6 @@ function drawBackground(
       const color = socket.auth.UserId === table_obj.player1.UserId ? table_obj.player1.GameSetting.table : table_obj.player2.GameSetting.table;
       const gradient = backgroundCtx.createLinearGradient(0, 0, canvasSize.width, canvasSize.height);
       gradient.addColorStop(0.05, color[0]);
-    //   gradient.addColorStop(0.5, color[1]);
       gradient.addColorStop(0.85, color[1]);
       backgroundCtx.fillStyle = gradient;
       if (is_vertical)
@@ -97,7 +78,6 @@ function drawBackground(
           backgroundCtx.fillRect(0, 0, canvasSize.width, canvasSize.height);
 
       draw_line(backgroundCtx, canvas, canvasSize, is_vertical, table_obj, socket);
-      draw_exit_button(backgroundCtx, canvas, canvasSize, is_vertical, table_obj, socket, images);
   }
   return { backgroundCtx, backgroundLayer }
 }

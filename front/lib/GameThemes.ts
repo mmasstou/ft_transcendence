@@ -1,33 +1,39 @@
 const GameThemes = [
     {
         name: 'Theme 1',
-        left: '#56CCF2',
-        right: '#2F80ED',
+        background: ['#56CCF2', '#2F80ED'],
+        paddle: '#000000',
+        ball: '#ffffff',
     },
     {
         name: 'Theme 2',
-        left: '#B6F1E4',
-        right: '#00AEA9',
+        background: ['#B6F1E4', '#00AEA9'],
+        paddle: '#000000',
+        ball: '#ffffff',
     },
     {
         name: 'Theme 3',
-        left: '#89F7FE',
-        right: '#4895FF',
+        background: ['#89F7FE', '#4895FF'],
+        paddle: '#000000',
+        ball: '#ffffff',
     },
     {
         name: 'Theme 4',
-        left: '#779DBE',
-        right: '#123E64',
+        background: ['#779DBE', '#123E64'],
+        paddle: '#000000',
+        ball: '#ffffff',
     },
     {
         name: 'Theme 5',
-        left: '#D397FA',
-        right: '#6642DB',
+        background: ['#D397FA', '#6642DB'],
+        paddle: '#000000',
+        ball: '#ffffff',
     },
     {
         name: 'Theme 6',
-        left: '#918CA9',
-        right: '#211F2F',
+        background: ['#918CA9', '#211F2F'],
+        paddle: '#ffffff',
+        ball: '#000000',
     }
 ]
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
@@ -65,4 +65,15 @@ export class GameService {
           where: { id },
         });
       }
+    
+    async updateTheme(params: {id: string; theme: {background: string[], paddle: string, ball: string}}){
+        const {id, theme} = params;
+        if (await this.prisma.user.findUnique({where: {id}}) == null){
+            throw new NotFoundException('User not found');
+        }
+          return await this.prisma.user.update({
+              data: {bg_color: theme.background, paddle_color: theme.paddle, ball_color: theme.ball},
+              where: {id},
+          });
+    }
 }
