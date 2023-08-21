@@ -18,7 +18,6 @@ const Achpage = () => {
     axios
       .get(`http://localhost:80/api/users/${id}`)
       .then((res) => {
-        console.log(res.data);
         setUser(res.data);
       })
       .catch((err) => console.log(err));
