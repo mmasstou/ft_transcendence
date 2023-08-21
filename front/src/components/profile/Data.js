@@ -1,6 +1,6 @@
 export const UserData = [
     {
-        id: 1,
+        id: 0,
         day: 1,
         lose: -3,
     },

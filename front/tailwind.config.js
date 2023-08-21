@@ -14,8 +14,7 @@ module.exports = {
                     'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
             },
             fontFamily: {
-                // lato : 'var(--font-lato)',
-                changa : 'var(--font-changa)',
+               changa : 'var(--font-changa)',
             },
             colors: {
                 primary: '#161F1E',

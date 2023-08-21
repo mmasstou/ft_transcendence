@@ -1,6 +1,11 @@
-// edit profile fron : refactor and remove old settings
-// validat input and image before posting
-// add skip button
+// should i check if user already in use
+// check in sign up in if username taken or not
+// if taken than update username with unique one
+// update user info in profile
+// complete match history
+// make graph dynamic
+// list user friends
+// make public profile
 
 
 
