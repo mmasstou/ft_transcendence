@@ -1,5 +1,5 @@
 import { UserTypeEnum, updatememberEnum } from "@/types/types";
-import ChannelSettingsUserMemberItemOption from "./channel.settings.user.memberItem.option";
+import ChannelSettingsUserMemberItemOption from "../../channel.settings.user.memberItem.option";
 // icons :
 import { MdAdminPanelSettings } from "react-icons/md";
 import { TbDeviceGamepad2, TbUserX } from "react-icons/tb";
@@ -22,7 +22,6 @@ export default function ChanneLSettingsUserMemberItemActions(
             size={24}
             disabled={member.type === UserTypeEnum.OWNER}
             IsActivate={member.type === UserTypeEnum.ADMIN}
-            background
             Onclick={() => {
                 OnClick({ updateType: updatememberEnum.SETADMIN, member: member })
             }}
@@ -31,7 +30,6 @@ export default function ChanneLSettingsUserMemberItemActions(
             icon={TbUserX}
             size={24}
             disabled={member.type === UserTypeEnum.OWNER}
-            background
             Onclick={() => {
                 OnClick({ updateType: updatememberEnum.KIKMEMBER, member: member })
             }}
@@ -41,7 +39,6 @@ export default function ChanneLSettingsUserMemberItemActions(
             size={24}
             disabled={member.type === UserTypeEnum.OWNER}
             IsActivate={member.isban}
-            background
             Onclick={() => {
 
                 OnClick({ updateType: updatememberEnum.BANMEMBER, member: member })
@@ -52,7 +49,6 @@ export default function ChanneLSettingsUserMemberItemActions(
             size={24}
             disabled={member.type === UserTypeEnum.OWNER}
             IsActivate={member.ismute}
-            background
             Onclick={() => {
                 OnClick({ updateType: updatememberEnum.MUTEMEMBER, member: member })
             }}

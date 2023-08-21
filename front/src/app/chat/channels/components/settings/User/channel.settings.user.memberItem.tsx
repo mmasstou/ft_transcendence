@@ -19,7 +19,7 @@ import ChanneLsettingsHook from "../../../hooks/channel.settings";
 import Image from "next/image";
 import ChannelSettingsUserMemberItemOption from "../../channel.settings.user.memberItem.option";
 import MuteTime from "../../channel.settings.user.mutetime";
-import ChanneLSettingsUserMemberItemActions from "../../channel.settings.user.memberItem.actions";
+import ChanneLSettingsUserMemberItemActions from "./channel.settings.user.memberItem.actions";
 import { VscPersonAdd } from "react-icons/vsc";
 import { AiOutlineUserAdd } from "react-icons/ai";
 
@@ -38,12 +38,14 @@ export default function ChannelSettingsUserMemberItem(
     const [UserInfo, setUserInfo] = React.useState<userType | null>(null)
     const router = useRouter()
     const params = useSearchParams()
-    const __userId = Cookies.get('_id')
+    const UserId = Cookies.get('_id')
+
     const channeLsettingsHook = ChanneLsettingsHook()
     const [CanEdit, setCanEdit] = React.useState<boolean>(false)
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
     const [Join_At, setJoin_At] = React.useState<string>("")
 
+    if (!UserId) return;
     React.useEffect(() => {
         setIsMounted(true)
     }, [])
@@ -58,7 +60,7 @@ export default function ChannelSettingsUserMemberItem(
             if (!channeLLid)
                 return;
 
-            const channeLLMembers = __userId && await getMemberWithId(__userId, channeLLid, token)
+            const channeLLMembers = UserId && await getMemberWithId(UserId, channeLLid, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                 setLogedMember(channeLLMembers)
             }
@@ -100,7 +102,7 @@ export default function ChannelSettingsUserMemberItem(
     // CanEdit && console.log("CanEdit :", CanEdit)
     return <div className="flex flex-col w-full">
         <div
-            className="flex flex-col justify-between items-center gap-4  p-1 md:p-4 w-full rounded-[12px] bg-[#24323044]">
+            className="flex flex-col justify-between items-center gap-4  p-3 md:p-4 w-full rounded-[4px] ">
             <div className="flex flex-row justify-between items-center w-full ">
                 <div className='flex justify-center items-center text-white gap-2'>
                     {/* <div className={`image  min-w-[24px] hidden sm:block rounded overflow-hidden`}>
@@ -114,31 +116,39 @@ export default function ChannelSettingsUserMemberItem(
                         <div>
                             <h2 className={`text-white  ${member.type === 'OWNER' && 'md:text-white text-[#FFBF00]'} font-semibold capitalize`}>
                                 {UserInfo?.name}
-                                {member.userId === __userId && <small className="text-[6px] px-1">[you]</small>}
+                                
                             </h2>
                             {/* <MdAdminPanelSettings size={16} fill="#1EF0AE" /> */}
-                            {member.type === 'OWNER' && <>
-                                <FaChessQueen className=" hidden md:flex" size={16} fill="#FFBF00" />
-                            </>}
+
                         </div>
-                        <span className="text-[#b6b6b6e3] text-xs font-thin">{UserInfo?.login}</span>
+                        <div className="flex justify-start items-center gap-2">
+                            <span className="text-[#b6b6b6e3] text-xs font-thin">{UserInfo?.login}{member.userId === UserId && <small className="text-[6px] px-1">[you]</small>}</span>
+                            <>
+                                {member.type === UserTypeEnum.OWNER && <FaChessQueen size={14} fill="#FFBF00" />}
+                                {member.type === UserTypeEnum.ADMIN && <MdAdminPanelSettings size={14} fill="#FFBF00" />}
+                            </>
+                        </div>
                     </div>
                 </div>
                 <div className="flex flex-row gap-3 justify-center items-center">
                     {!UserJoin && !UserOwne && !UserBan && <>
 
-                        <ChanneLSettingsUserMemberItemActions
-                            hasPermissions={LogedMember?.type !== UserTypeEnum.USER}
+                        {<ChanneLSettingsUserMemberItemActions
+                            hasPermissions={
+                                LogedMember?.type !== UserTypeEnum.USER
+                                && member.type !== UserTypeEnum.OWNER
+                                && member.userId !== UserId
+                            }
                             member={member}
-                            OnClick={(data) => OnClick(data)} type={""} />
-                        <ChannelSettingsUserMemberItemOption
+                            OnClick={(data) => OnClick(data)} type={""} />}
+                        {member.userId !== UserId && <ChannelSettingsUserMemberItemOption
                             icon={TbDeviceGamepad2}
                             size={24}
                             background
                             Onclick={() => {
                                 OnClick({ updateType: updatememberEnum.PLAYGAME, member: member })
                             }}
-                        /></>
+                        />}</>
                     }
                     {UserJoin && <ChannelSettingsUserMemberItemOption
                         icon={AiOutlineUserAdd}

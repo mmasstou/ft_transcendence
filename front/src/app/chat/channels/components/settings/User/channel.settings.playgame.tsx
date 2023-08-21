@@ -1,6 +1,6 @@
-import Button from "../../components/Button";
+import Button from "../../../../components/Button";
 import Image from "next/image"
-import StartGame from "../actions/startgame";
+import StartGame from "../../../actions/startgame";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { IoChevronBackOutline } from "react-icons/io5";

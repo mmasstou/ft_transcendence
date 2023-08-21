@@ -4,7 +4,6 @@ import { RoomsType, USERSETTINGSTEPS, UserTypeEnum, membersType, updatememberEnu
 import ChanneLsettingsHook from "../../../hooks/channel.settings";
 import Cookies from "js-cookie";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import getChannelMembersWithId from "../../../actions/getChannelmembers";
 import { Socket } from "socket.io-client";
 import getUserWithId from "../../../actions/getUserWithId";
 import getMemberWithId from "../../../actions/getMemberWithId";
@@ -23,12 +22,13 @@ import getmessage from "../../../actions/member.action.message";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import StartGame from "../../../actions/startgame";
-import ChanneLsettingsPlayGame from "../../channel.settings.playgame";
+import ChanneLsettingsPlayGame from "./channel.settings.playgame";
 import { steps } from "framer-motion";
 import ChanneLSettingsEditModaL from "../../../modaLs/channel.settings.edit.modal";
 import getLable from "../../../actions/getLable";
 import { tr } from "date-fns/esm/locale";
 import { set } from "date-fns";
+import FilterMembers_IsBan_NotLoggedUser from "../../../actions/filterMembers_IsBan_NotLoggedUser";
 
 interface ChanneLUserSettingsProps {
     room: RoomsType | null;
@@ -52,35 +52,18 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
     const [update, setUpdate] = React.useState<boolean>(false)
     const channeLsettingsHook = ChanneLsettingsHook()
     const params = useSearchParams()
-    const __userId = Cookies.get('_id')
+    const UserId = Cookies.get('_id')
     const router = useRouter()
     const token: any = Cookies.get('token');
+    if (!token || !UserId || !room) return;
 
-    const updatemembers = (itemId: string, updateMemberData: membersType) => {
-        console.log("members :", members)
-        console.log("updateMemberData :", updateMemberData)
-        console.log("itemId :", itemId)
-        members && toast(members?.length.toString())
-        let found: boolean = false;
-        const updatedItems = members && members.map(item => {
-            if (item.id === itemId) {
-                found = true;
-                return { ...updateMemberData }
-            }
-            else return item
-        }
-        );
-        if (updatedItems && !found) setMembers([...members, updateMemberData]);
-        else setMembers(updatedItems);
-        updatedItems && toast(updatedItems?.length.toString())
 
-    };
 
     React.useEffect(() => {
         setIsMounted(true);
         (async () => {
-            const _members = room && await getChannelMembersWithId(room?.id, token)
-            if (_members) setMembers(_members)
+            const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
+            if (channeLLMembers) setMembers(channeLLMembers)
         })();
         member && setLogedMember(member)
     }, [])
@@ -88,20 +71,15 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
     // check for rooms socket events :
     React.useEffect(() => {
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-            (response: {
-                status: any, message: any, data: any
-            }) => {
+            (response: { OK : boolean}) => {
                 channeLConfirmActionHook.onClose()
-                if (response.status === "SUCCESS") {
-                    // updatemembers(response.data.id, response.data)
-                    // toast(response.data.id)
-                    setMembers([...members, response.data])
-                    // (async () => {
-                    //     const _members = room && await getChannelMembersWithId(room?.id, token)
-                    //     if (_members) setMembers(_members)
-                    // })();
+                if (response.OK) {
+                    (async () => {
+                        const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
+                        if (channeLLMembers) setMembers(channeLLMembers)
+                    })();
                 }
-                if (response.status === "ERROR") { }
+                if (!response.OK) { }
 
 
             })
@@ -138,13 +116,13 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
         (async () => {
             if (!room)
                 return;
-            const channeLLMembers = await getChannelMembersWithId(room.id, token)
-            if (channeLLMembers) {
-                // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== __userId)
-                // filter if member is ban or member userId === loged userId
-                const filterdmembers = channeLLMembers.filter((member: membersType) => member.isban !== true)
-                setMembers(filterdmembers.filter((member: membersType) => member.userId !== __userId))
-            }
+            const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
+            if (channeLLMembers) setMembers(channeLLMembers)
+            // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== UserId)
+            // filter if member is ban or member userId === loged userId
+            // const filterdmembers = channeLLMembers.filter((member: membersType) => member.isban !== true)
+            // setMembers(filterdmembers.filter((member: membersType) => member.userId !== UserId))
+            // }
 
         })();
         setUpdate(false);
@@ -155,15 +133,12 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
             const channeLLid = params.get('r')
             if (!channeLLid)
                 return;
-            const channeLLMembers = __userId && await getMemberWithId(__userId, channeLLid, token)
+            const channeLLMembers = UserId && await getMemberWithId(UserId, channeLLid, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                 setLogedMember(channeLLMembers)
             }
         })();
     }, [update])
-
-
-
 
     const handlOnclick = (data: { updateType?: updatememberEnum, member: membersType }) => {
         console.log("ana hanananananan")
@@ -190,12 +165,27 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
             </button>
             , __message
         )
-
-
     }
 
+    const updatemembers = (itemId: string, updateMemberData: membersType) => {
+        console.log("members :", members)
+        console.log("updateMemberData :", updateMemberData)
+        console.log("itemId :", itemId)
+        members && toast(members?.length.toString())
+        let found: boolean = false;
+        const updatedItems = members && members.map(item => {
+            if (item.id === itemId) {
+                found = true;
+                return { ...updateMemberData }
+            }
+            else return item
+        }
+        );
+        if (updatedItems && !found) setMembers([...members, updateMemberData]);
+        else setMembers(updatedItems);
+        updatedItems && toast(updatedItems?.length.toString())
 
-
+    };
 
     if (!IsMounted)
         return <div className="Members flex p-4">
@@ -218,10 +208,6 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
                     }}
                 />
             </div>}
-
-
-
-
             <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full gap-4">
                 {members && members.map((member: membersType, index) => (
                     <ChannelSettingsUserMemberItem
@@ -231,7 +217,6 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
                         UserJoin={false}
                         UserOwne={false}
                         OnClick={handlOnclick} />
-
                 ))
                 }
             </div>
@@ -241,7 +226,6 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
     if (step === USERSETTINGSTEPS.PLAYGAME) {
         bodyContent = <ChanneLsettingsPlayGame Onback={() => { setStep(USERSETTINGSTEPS.INDEX) }}
             onClick={function (mode: any): void {
-
                 // send initaion to player 02
                 socket?.emit('sendNotification', {
                     userId: PlayGameWith?.userId,
