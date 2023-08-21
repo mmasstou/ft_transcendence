@@ -45,7 +45,7 @@ const page = ({ params }: { params: { mode: string } }) => {
             </p>
             <div className="flex gap-10 my-4 w-full justify-center">
               <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-yellow-500 rounded-xl font-bold text-yellow-500" onClick={() => {
-                axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}api/game/BotGame`, body).then((res) => {
+                axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, body).then((res) => {
                   router.push(`/game/${params.mode}/robot`)
                 })
                 .catch((err) => {
@@ -56,7 +56,7 @@ const page = ({ params }: { params: { mode: string } }) => {
                 Robot
               </button>
               <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2 border-secondary rounded-xl font-bold text-secondary" onClick={() => {
-                axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}api/game/RandomGame`, body).then((res) => {
+                axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/RandomGame`, body).then((res) => {
                   router.push(`/game/${params.mode}/random`)
                 })
                 .catch((err) => {

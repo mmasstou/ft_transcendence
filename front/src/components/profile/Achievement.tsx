@@ -6,6 +6,7 @@ type AchievementProps = {
   icon: string;
   title: string;
   description: string;
+  accomplished?: boolean;
 } & (
   | {
       hasProgression: true;
@@ -23,17 +24,18 @@ const Achievement: FC<AchievementProps> = ({
   progression,
   title,
   hasProgression,
+  accomplished,
 }) => {
   return (
     <div
-      className={`flex bg-[#3E504D] w-full rounded-md p-3 lg:p-4 items-center justify-between ${
-        progression === 100 && 'opacity-40'
+      className={`flex bg-[#3E504D] w-full rounded-md p-3 lg:p-4 items-center justify-between opacity-${
+        progression === 100 || accomplished ? '100' : '50'
       }`}
     >
       <div className="flex items-center justify-center gap-3 lg:gap-5">
-        <div className="h-12 w-12 lg:h-14 lg:w-14 2xl:h-16 2xl:w-16 flex items-center justify-center rounded-full border">
+        <div className="h-12 w-12 lg:h-14 lg:w-14 2xl:h-16 2xl:w-16 flex items-center justify-center rounded-full border xl:border-2">
           <img
-            src={`./${icon}.svg`}
+            src={`/${icon}.svg`}
             alt=""
             className="w-8 h-8 lg:w-10 lg:h-10"
           />
@@ -50,7 +52,7 @@ const Achievement: FC<AchievementProps> = ({
       )}
       <BsCheckLg
         className={`h-9 w-9 lg:w-12 lg:h-12 ${
-          progression === 100 && 'fill-secondary'
+          (progression === 100 || accomplished) && 'fill-secondary'
         }`}
       />
     </div>

@@ -36,7 +36,7 @@ const Login = () => {
 
     useEffect(() => {
 
-        const socket: Socket = io(`${process.env.NEXT_PUBLIC_USERSOCKET_URL_WS}`, {
+        const socket: Socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/User`, {
             auth: {
                 token: `${token}`,
                 id: `${Cookies.get("_id")}`
