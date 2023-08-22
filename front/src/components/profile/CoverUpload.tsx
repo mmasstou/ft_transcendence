@@ -32,7 +32,7 @@ function getUserData(): userType | null {
   return user;
 }
 
-const ImageUpload = () => {
+const CoverUpload = () => {
   const userData: userType | null = getUserData();
   const [jwtToken, setJwtToken] = useState<string | undefined>(
     Cookies.get('token')
@@ -43,6 +43,8 @@ const ImageUpload = () => {
   const [createObjectURL, setCreateObjectURL] = useState<string | undefined>(
     userData?.banner
   );
+
+  const [isHovering, setIsHovering] = useState<boolean>(false);
 
   useEffect(() => {
     setJwtToken(Cookies.get('token'));
@@ -99,24 +101,40 @@ const ImageUpload = () => {
   const uploadInputRef = React.createRef<HTMLInputElement>();
 
   return (
-    <section className="rounded-md">
+    <section className="rounded-[20px]">
       <div
         className="relative flex flex-col justify-center items-center h-[333px]  w-full cursor-pointer 
-          hover:opacity-70 hover:border-2 hover:border-dashed hover:rounded-lg transition banner"
+          transition banner"
         onClick={handleUploadToServer}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
       >
+        {isHovering && (
+          <div className="absolute bg-[#161F1E] bg-opacity-80 w-full h-full rounded-[20px] top-0 left-0 transition">
+            <span
+              className="h-full w-full text-[#D9D9D9] text-[1em] font-normal 
+            flex justify-center mt-10 text-center "
+            >
+              Clicke to update your cover photo!
+              <br />
+              Image size should be less than 5MB.
+              <br />
+              Prefrred dimensions is 330x1200.
+            </span>
+          </div>
+        )}
         {createObjectURL ? (
           <img
             src={createObjectURL}
             alt="Uploaded File"
-            className="w-full h-full rounded-lg border-transparent"
+            className="w-full h-full rounded-[20px] border-transparent"
           />
         ) : (
           userData?.banner && (
             <img
               src={userData?.banner}
               alt="Uploaded File"
-              className="w-full h-full rounded-lg border-transparent"
+              className="w-full h-full rounded-[20px] border-transparent"
             />
           )
         )}
@@ -132,4 +150,4 @@ const ImageUpload = () => {
   );
 };
 
-export default ImageUpload;
+export default CoverUpload;

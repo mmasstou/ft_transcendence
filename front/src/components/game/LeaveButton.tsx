@@ -14,7 +14,7 @@ function LeaveButton({ isvertical, isReady, isMobile }: Props) {
 
   const handleClick = async () => {
     router.push('/game');
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}api/game/leaveGame`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/game/leaveGame`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

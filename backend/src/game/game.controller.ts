@@ -10,12 +10,14 @@ import {
 } from '@nestjs/common';
 import { MyGateway } from './game.gateway';
 import { PrismaService } from 'src/prisma.service';
+import { GameService } from './game.service';
 
 @Controller('game')
 export class GameController {
   constructor(
     private GameGateway: MyGateway,
     private prisma: PrismaService,
+    private GameService: GameService,
   ) {}
 
   @Post('/FriendGame')
@@ -39,7 +41,6 @@ export class GameController {
 
   @Post('/BotGame')
   async selectBotGame(@Body() body: any) {
-    // console.log(body);
     try {
       const result = await this.GameGateway.CreateBotTable(body);
       if (result != undefined)
@@ -118,5 +119,19 @@ export class GameController {
     });
 
     return matchList;
+  }
+
+
+  @Post('/UpdateTheme')
+  async updateTheme(@Body() body: any) {
+    try {
+      await this.GameService.updateTheme(body);
+    } 
+    catch (err) {
+      throw new HttpException(
+        { reason: 'User not found'},
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 }

@@ -1,61 +1,86 @@
-import React, { useState } from 'react'
-import MyAvatar from './MyAvatar'
-import { RiRadioButtonLine } from 'react-icons/ri'
-import { IoLogoGameControllerB } from 'react-icons/io';
+import React, { FC } from 'react';
+import { TiUserAdd } from 'react-icons/ti';
+import { BiJoystick } from 'react-icons/bi';
+import { UserCardProps } from '@/types/UserCardTypes';
 
-interface btnProps {
-    status: string;
-    style: string;
-    cursor: string;
+const UserCard: FC<UserCardProps> = ({
+  username,
+  addRequest,
+  online,
+  inGame,
+}) => {
+  return (
+    <div className=" bg-container rounded-xl my-3 p-2 xl:p-3 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <div className="h-10 w-10 xl:w-14 xl:h-14 bg-black rounded-full"></div>
+        <h3 className="xl:text-lg">{username}</h3>
+      </div>
+      <div className="flex items-center text-xs xl:text-sm gap-2">
+        {addRequest ? (
+          <button className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors">
+            <TiUserAdd
+              className="mr-1 fill-sky-500 group-hover:fill-container"
+              size={16}
+            />
+            Add Friend
+          </button>
+        ) : (
+          online && (
+            <button className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors">
+              {addRequest ? (
+                <TiUserAdd
+                  className="mr-1 fill-sky-500 group-hover:fill-container"
+                  size={16}
+                />
+              ) : (
+                online && (
+                  <BiJoystick
+                    className="mr-1 fill-sky-500 group-hover:fill-container"
+                    size={16}
+                  />
+                )
+              )}
+              Invite
+            </button>
+          )
+        )}
+        {!addRequest && (
+          <div
+            className={`border flex gap-1 items-center p-1 px-2 xl:px-3 rounded-xl ${
+              inGame
+                ? 'border-orange-500'
+                : online
+                ? 'border-green-500'
+                : 'border-yellow-500'
+            }`}
+          >
+            <div
+              className={`w-2 h-2 rounded-full ${
+                inGame
+                  ? 'bg-orange-500'
+                  : online
+                  ? 'bg-green-500'
+                  : 'bg-yellow-500'
+              }`}
+            ></div>
+            <span
+              className={`
+            ${
+              inGame
+                ? 'text-orange-500'
+                : online
+                ? 'text-green-500'
+                : 'text-yellow-500'
+            }
+          `}
+            >
+              {inGame ? 'In Game' : online && !inGame ? 'Online' : 'Offline'}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
-const Button: React.FC<btnProps> = (props) => {
-  return (
-    <button className={`bg-transparen text-[10px] md:text-[16px] w-[70px] sm:w-[80px] px-2 border 
-            ${props.style} rounded-full ${props.cursor} flex justify-between items-center gap-1`}>
-        {(props.status === 'ONLINE') && <RiRadioButtonLine />}
-        {(props.status === 'IN GAME' || props.status === 'INVITE') && <IoLogoGameControllerB />}
-        {(props.status === 'OFFLINE') && <RiRadioButtonLine />}
-
-        {props.status}
-    </button>
-  )
-}
-
-
-
-const FriendCard : React.FC= () => {
-    let status: string = 'IN GAME';
-  return (
-    <div className='bg-[#3E504D] hover:opacity-40 w-full h-[47px] flex mx-2 my-2 justify-between rounded-md 
-             cursor-pointer ' >
-        <div className='flex overflow-hidden items-center'>
-            <div className='w-[37px] h-[37px] mx-2'>
-                <MyAvatar/>
-            </div>
-            <span className='text-[14px] font-thin' >azouhadou</span>
-        </div>
-        <div className='flex px-1 py-4 items-center justify-center gap-1'>
-            {(status === 'ONLINE') && 
-                <Button status='INVITE' style='text-[#6CCCFE] border-[#6CCCFE]' cursor='cursor-pointer'/>
-            }
-            {(status === 'ONLINE') && 
-                <Button status={status} style='text-secondary border-secondary' cursor='cursor-not-allowed' />
-            }
-
-            {(status === 'IN GAME') && 
-                <Button status={status} style='text-[#ED6C03] border-[#ED6C03]' cursor='cursor-not-allowed' />
-            }
-
-            {(status === 'OFFLINE') && 
-                <Button status={status} style='text-[#FFCC00] border-[#FFCC00]' cursor='cursor-not-allowed' />
-            }
-
-            
-
-        </div>
-    </div>
-  )
-}
-
-export default FriendCard
+export default UserCard;
