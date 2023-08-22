@@ -2,34 +2,32 @@ import MyAvatar from './MyAvatar';
 
 const HistoriqueCard = () => {
   return (
-    <div className="bg-[#3E504D]  w-full flex justify-between py-3 lg:py-4 rounded-md">
-      <div className="flex flex-col overflow-hidden items-center justify-center lg:mx-8">
-        <div className="w-[28px] h-[28px] lg:h-[45px] lg:w-[45px] xl:h-[60px] xl:w-[60px] mx-2">
+    <div className="bg-[#3E504D]  w-full flex justify-between items-center py-2 px-3 lg:py-3 lg:px-4 rounded-md">
+      <div className="flex flex-col overflow-hidden items-center justify-center">
+        <div className="h-10 w-10 md:h-12 md:w-12 xl:h-16 xl:w-16">
           <MyAvatar />
         </div>
-        <span className="text-[0.625em] lg:text-[1em] font-semibold text-white mx-2 lg:mx-4">
+        <span className="text-sm xl:text-lg font-semibold text-white">
           azouhadou
         </span>
       </div>
 
-      <div className="flex items-center cursor-default">
+      <div className="flex items-center cursor-default text-sm xl:text-xl tracking-widest">
         <div
-          className={`bg-transparent text-secondary flex justify-center items-center gap-2 border rounded-full border-secondary 
-                            text-[1em] md:text-[1em] lg:text-[1.5em] xl:text-[1.5em] 2xl:text-[1.5em]
-                            px-2 md:px-10 md:py-2 lg:px-10 lg:py-2 xl:px-10 xl:py-2 2xl:px-10 2xl:py-2
+          className={`p-2 lg:p-3 bg-transparent text-secondary flex justify-center gap-1 xl:gap-2 items-center border rounded-2xl border-secondary 
                 `}
         >
           <span className="font-semibold">7</span>{' '}
-          <span className="font-semibold">VS</span>{' '}
+          <span className="font-semibold">vs</span>{' '}
           <span className="font-semibold">4</span>
         </div>
       </div>
 
-      <div className="flex flex-col overflow-hidden items-center justify-center lg:mx-8">
-        <div className="w-[28px] h-[28px] lg:h-[45px] lg:w-[45px] xl:h-[60px] xl:w-[60px] mx-2">
+      <div className="flex flex-col items-center justify-center">
+        <div className="h-10 w-10 md:h-12 md:w-12 xl:h-16 xl:w-16">
           <MyAvatar />
         </div>
-        <span className="text-[0.625em] lg:text-[1em] font-semibold text-white mx-2 lg:mx-4">
+        <span className="text-sm xl:text-lg font-semibold text-white">
           azouhadou
         </span>
       </div>
