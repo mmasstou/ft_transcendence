@@ -1,6 +1,6 @@
 import { IoChevronBackOutline } from "react-icons/io5";
-import Button from "../../components/Button";
-import PermissionDenied from "./channel.settings.permissiondenied";
+import Button from "../../../components/Button";
+import PermissionDenied from "../channel.settings.permissiondenied";
 
 interface channeLSettingsBodyProps {
     children: React.ReactNode;

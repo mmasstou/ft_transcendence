@@ -6,7 +6,7 @@ import { CgEditFlipH } from 'react-icons/cg';
 import { TbEdit, TbPassword } from 'react-icons/tb';
 import { VscGroupByRefType } from "react-icons/vsc";
 import { Channel } from 'diagnostics_channel';
-import ChanneLSettingsEditModaL from '../../../modaLs/channel.settings.edit.modal';
+import SettingsProvider from '../../../modaLs/channel.settings.provider';
 import Input from '@/components/Input';
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, set } from 'react-hook-form';
 import Button from '../../../../components/Button';
@@ -65,41 +65,28 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     const channeLConfirmActionHook = ChanneLConfirmActionHook()
     const params = useSearchParams()
     const __userId = Cookies.get('_id')
+    const token: any = Cookies.get('token');
+    if (!token || !__userId) return <ChanneLaccessDeniedModaL />
     const query = useParams();
     const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
 
     React.useEffect(() => {
 
         (async () => {
-            const token: any = Cookies.get('token');
+            const ChanneLinfo = await FindOneBySLug(slug, token)
             if (!ChanneLinfo)
                 return;
+            setChanneLinfo(ChanneLinfo)
             const channeLLMembers = await getChannelMembersWithId(ChanneLinfo.id, token)
-            if (channeLLMembers && channeLLMembers.statusCode !== 200) {
-
-                // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== __userId)
-                // filter if member is ban or member userId === loged userId
-                setMembers(channeLLMembers.filter((member: membersType) => member.userId !== __userId))
-            }
+            if (!channeLLMembers) return;
+            setMembers(channeLLMembers.filter((member: membersType) => member.userId !== __userId))
+            const channeLLMember: membersType = __userId && await getMemberWithId(__userId, ChanneLinfo.id, token)
+            if (!channeLLMember) return;
+            toast(channeLLMember.type)
+            setLogedMember(channeLLMember)
 
         })();
-        setUpdate(false);
-
-        (async () => {
-            const token: any = Cookies.get('token');
-            // get loged member :
-            if (!ChanneLinfo)
-                return;
-            const channeLLMembers: membersType = __userId && await getMemberWithId(__userId, ChanneLinfo.id, token)
-            if (channeLLMembers) {
-                toast(channeLLMembers.type)
-                setLogedMember(channeLLMembers)
-                console.log("+++++++++channeLLMembers :", channeLLMembers);
-            }
-        })();
-
-
-    }, [update])
+    }, [])
 
     const DeleteAccessPassword = async () => {
         if (!ChanneLinfo) return;
@@ -265,9 +252,9 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         </div>
     )
 
-    // if (LogedMember?.type !== UserTypeEnum.OWNER && LogedMember?.type !== UserTypeEnum.ADMIN) {
-    //     _body = (<PermissionDenied />)
-    // }
+    if (LogedMember?.type !== UserTypeEnum.OWNER) {
+        _body = (<PermissionDenied />)
+    }
 
     if (step === SETTINGSTEPS.BANEDMEMBERS) {
         _body = members ? <ChanneLSettingsChanneLBanedMember
@@ -324,7 +311,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     if (step === SETTINGSTEPS.DELETECHANNEL) {
         _body = <ChanneLSettingsChanneLDeleteChannel room={ChanneLinfo} OnBack={OnBack} socket={socket} />
     }
-    return <ChanneLSettingsEditModaL >
+    return <SettingsProvider >
         {_body}
-    </ChanneLSettingsEditModaL>
+    </SettingsProvider>
 }

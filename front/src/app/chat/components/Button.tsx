@@ -1,7 +1,9 @@
 'use client';
-
+import { Tooltip } from 'react-tooltip'
 import { IconType } from "react-icons";
-
+// import { randomUUID } from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'react-hot-toast';
 interface ButtonProps {
     label?: string;
     onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -16,6 +18,7 @@ interface ButtonProps {
     labelsize?: number;
     responsive?: boolean;
     type?: boolean;
+    showLabeL?: boolean
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -31,14 +34,18 @@ const Button: React.FC<ButtonProps> = ({
     type,
     size,
     IsBan,
-    responsive
+    responsive,
+    showLabeL
 }) => {
     const _labelsise: string | undefined = labelsize ? 'text-' + labelsize.toString() : undefined
+    const _id = uuidv4();
     return (
         <button
             type={type ? 'submit' : 'button'}
             disabled={disabled}
             onClick={onClick}
+            data-tooltip-id={_id}
+            data-tooltip-content={label}
             className={`
         relative
         flex
@@ -62,8 +69,11 @@ const Button: React.FC<ButtonProps> = ({
       `}
         >
             {Icon && (<Icon size={size ? size : 24} />)}
-            <span className={` ${responsive ? 'hidden sm:flex' : ''}  ${_labelsise && _labelsise} `}>  {label && label}</span>
+            {showLabeL && <span className={` ${responsive ? 'hidden sm:flex' : ''}  ${_labelsise && _labelsise} `}>  {label && label}</span>}
+            {label && responsive&&<Tooltip id={_id} place="bottom" />}
+
         </button>
+
     );
 }
 

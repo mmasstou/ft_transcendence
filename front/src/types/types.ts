@@ -145,4 +145,5 @@ export enum USERSETTINGSTEPS {
   INDEX = 0,
   PLAYGAME = 1,
   MEMBERJOIN = 2,
+  FINDMEMBER = 3,
 }

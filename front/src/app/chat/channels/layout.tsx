@@ -1,6 +1,7 @@
 'use client';
 import Dashboard from '@/app/Dashboard';
 import '@/app/globals.css';
+import 'react-tooltip/dist/react-tooltip.css'
 import { Changa, Lato } from 'next/font/google';
 import React from 'react';
 import LeftSidebarHook from './hooks/LeftSidebarHook';

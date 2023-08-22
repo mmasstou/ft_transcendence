@@ -4,7 +4,7 @@ import Button from "../../components/Button";
 import { UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types";
 import ChannelSettingsUserMemberItem from "./settings/User/channel.settings.user.memberItem";
 import Image from "next/image";
-import ChanneLSettingsBody from "./channel.settings.body";
+import ChanneLSettingsBody from "./settings/channel.settings.body";
 import React, { useEffect } from "react";
 import getUserWithId from "../actions/getUserWithId";
 import Cookies from "js-cookie";

@@ -8,7 +8,7 @@ import ChannelFindRoomItem from "../components/settings/ChanneL/channel.find.roo
 import getPublicProtactedChannels from "../actions/getPublicProtactedChannels"
 import { useRouter } from "next/navigation"
 import { RiSearchLine } from "react-icons/ri"
-import Loading from "../components/CanneLSettingsLoading"
+import Loading from "../components/settings/CanneLSettingsLoading"
 import React from "react"
 import Button from "../../components/Button"
 import { toast } from "react-hot-toast"
@@ -29,10 +29,24 @@ export default function ChanneLFindRoommodaL() {
 
     useEffect(() => {
         if (IsOpen) {
-            if (searchInputRef.current) {
-                searchInputRef.current.focus();
-            }
-            setsearchInput('')
+
+            setsearchInput('');
+            setIsLoading(true);
+            (async () => {
+                const ChanneLs: RoomsType[] | null = await getPublicProtactedChannels(token)
+                if (!ChanneLs) return setChanneLs(null);
+                // const ChanneLsFilter: RoomsType[] = ChanneLs.filter((channL) => channL.name.includes(searchInput))
+                setChanneLs(ChanneLs)
+            })();
+
+            setTimeout(() => {
+                setIsLoading(false)
+               setTimeout(() => {
+                searchInputRef.current?.focus()
+               }
+                , 100)
+            }, 2000)
+
         }
 
     }, [IsOpen])
@@ -54,32 +68,24 @@ export default function ChanneLFindRoommodaL() {
     // get data from backend :
     React.useEffect(() => {
         (async () => {
-            if (searchInput.length === 0) return;
+            // if (searchInput.length === 0) return;
             const ChanneLs: RoomsType[] | null = await getPublicProtactedChannels(token)
             if (!ChanneLs) return setChanneLs(null);
-            const ChanneLsFilter: RoomsType[] = ChanneLs.filter((channL) => channL.name.includes(searchInput))
+            const ChanneLsFilter: RoomsType[] = ChanneLs.filter((channL) => channL.name.toLowerCase().includes(searchInput.toLowerCase()))
             setChanneLs(ChanneLsFilter.length === 0 ? null : ChanneLsFilter)
         })();
     }, [searchInput])
 
-    React.useEffect(() => {
-        if (ChanneLs) setIsLoading(false)
-    }, [ChanneLs])
 
-
-    React.useEffect(() => {
-        if (isInputFocused && searchInput.length === 0) {
-            // setIsLoading(true)
-            setChanneLs(null)
-            return
-        }
-        if (!isInputFocused && searchInput.length === 0 && !ChanneLs) {
-            // setIsLoading(false)
-            setChanneLs(null)
-            return
-        }
-        // setIsLoading(false)
-    }, [isInputFocused, searchInput])
+    // React.useEffect(() => {
+    //     if (isInputFocused && searchInput.length === 0) {
+    //         setIsLoading(true)
+    //     }
+    //     if (!isInputFocused && searchInput.length === 0) {
+    //         setIsLoading(false)
+    //     }
+    //     // setIsLoading(false)
+    // }, [isInputFocused, searchInput])
 
 
     const bodyContent = (
@@ -125,17 +131,21 @@ export default function ChanneLFindRoommodaL() {
                     </div>
                 </div>
                 {IsLoading ? <Loading /> : <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-scroll justify-center items-center">
-                    {ChanneLs
-                        ? ChanneLs.map((room: RoomsType, index: number) => {
-                            return <ChannelFindRoomItem
-                                key={index}
-                                room={room}
-                                socket={socket}
-                                onClick={(param: { room: RoomsType }) => {
-                                    const { room } = param
-                                }} />
-                        })
-                        : <h2 className=" capitalize">not found</h2>
+                {searchInput && <h3 className=" capitalize w-full text-start font-semibold text-white">channeL match  : {searchInput} </h3>}
+                    {ChanneLs && ChanneLs.length !== 0
+                        ? <div className="flex flex-col justify-start items-center w-full gap-4">
+                           
+                            {ChanneLs.map((room: RoomsType, index: number) => {
+                                return <ChannelFindRoomItem
+                                    key={index}
+                                    room={room}
+                                    socket={socket}
+                                    onClick={(param: { room: RoomsType }) => {
+                                        const { room } = param
+                                    }} />
+                            })}
+                        </div>
+                        : <h2 className=" capitalize">Not channel to Join</h2>
                     }
                 </div>}
             </div>

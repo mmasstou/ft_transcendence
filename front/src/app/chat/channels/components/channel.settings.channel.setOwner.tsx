@@ -4,7 +4,7 @@ import { IoChevronBackOutline } from "react-icons/io5";
 import { UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
 import ChannelSettingsUserMemberItem from "./settings/User/channel.settings.user.memberItem";
 import Image from "next/image";
-import ChanneLSettingsBody from "./channel.settings.body";
+import ChanneLSettingsBody from "./settings/channel.settings.body";
 import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
 import getmessage from "../actions/member.action.message";
 import { useEffect } from "react";

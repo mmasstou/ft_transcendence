@@ -20,6 +20,7 @@ export default function ChanneLSettingsUserMemberItemActions(
         {<ChannelSettingsUserMemberItemOption
             icon={MdAdminPanelSettings}
             size={24}
+            label="set as Admin"
             disabled={member.type === UserTypeEnum.OWNER}
             IsActivate={member.type === UserTypeEnum.ADMIN}
             Onclick={() => {
@@ -28,6 +29,7 @@ export default function ChanneLSettingsUserMemberItemActions(
         />}
         {<ChannelSettingsUserMemberItemOption
             icon={TbUserX}
+            label={`set as Admin`}
             size={24}
             disabled={member.type === UserTypeEnum.OWNER}
             Onclick={() => {
@@ -37,6 +39,7 @@ export default function ChanneLSettingsUserMemberItemActions(
         {<ChannelSettingsUserMemberItemOption
             icon={SlBan}
             size={24}
+            label="ban member"
             disabled={member.type === UserTypeEnum.OWNER}
             IsActivate={member.isban}
             Onclick={() => {
@@ -47,6 +50,7 @@ export default function ChanneLSettingsUserMemberItemActions(
         {<ChannelSettingsUserMemberItemOption
             icon={FaVolumeMute}
             size={24}
+            label="mute member"
             disabled={member.type === UserTypeEnum.OWNER}
             IsActivate={member.ismute}
             Onclick={() => {

@@ -16,9 +16,9 @@ import LeftSidebarHook from "../../../hooks/LeftSidebarHook";
 import ChanneLsettingsHook from "../../../hooks/channel.settings";
 import getChannelWithId from "../../../actions/getChannelWithId";
 import { RiSearchLine } from "react-icons/ri";
-import ChanneLSettingsBody from "../../channel.settings.body";
+import ChanneLSettingsBody from "../channel.settings.body";
 import { toast } from "react-hot-toast";
-import Loading from "../../CanneLSettingsLoading";
+import Loading from "../CanneLSettingsLoading";
 import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
 import getMemberWithId from "../../../actions/getMemberWithId";
 
@@ -117,7 +117,7 @@ export default function ChanneLSettingsMemberJoinModaL(
 
     if (!IsMounted) return null
     return <ChanneLSettingsBody
-        title={`Add Friends`}
+        title={`Add membes to ${ChanneLInfo?.name}`}
         OnBack={OnBack}
         HasPermission={false} >
         <div className="hjhjhjhj flex flex-col min-h-[24rem] w-full gap-4">
@@ -136,7 +136,7 @@ export default function ChanneLSettingsMemberJoinModaL(
                             className="focus:outline-none placeholder:text-[#b6b6b6e3] placeholder:text-base placeholder:font-thin w-full py-1 px-4 bg-transparent"
                             onChange={(event) => { setInputValue(event.target.value) }}
                             value={searchInput}
-                            placeholder={`Fiend friend`}
+                            placeholder={`Find friend`}
                             type="search"
                             name=""
                             id="" />

@@ -24,11 +24,14 @@ import { toast } from "react-hot-toast";
 import StartGame from "../../../actions/startgame";
 import ChanneLsettingsPlayGame from "./channel.settings.playgame";
 import { steps } from "framer-motion";
-import ChanneLSettingsEditModaL from "../../../modaLs/channel.settings.edit.modal";
+import SettingsProvider from "../../../modaLs/channel.settings.provider";
 import getLable from "../../../actions/getLable";
 import { tr } from "date-fns/esm/locale";
 import { set } from "date-fns";
 import FilterMembers_IsBan_NotLoggedUser from "../../../actions/filterMembers_IsBan_NotLoggedUser";
+import { BiSolidFileFind } from "react-icons/bi";
+import ChanneLSettingsMemberFindModaL from "./channel.settings.user.findmember";
+import Loading from "../CanneLSettingsLoading";
 
 interface ChanneLUserSettingsProps {
     room: RoomsType | null;
@@ -77,6 +80,9 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
                     (async () => {
                         const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
                         if (channeLLMembers) setMembers(channeLLMembers)
+                        const channeLLMember = await getMemberWithId(UserId, room.id, token)
+                        if (!channeLLMember) return;
+                        setLogedMember(channeLLMember)
                     })();
                 }
                 if (!response.OK) { }
@@ -85,7 +91,11 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
             })
 
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
-
+            (async () => {
+                const channeLLMembers = await getMemberWithId(UserId, room.id, token)
+                if (!channeLLMembers) return;
+                setLogedMember(channeLLMembers)
+            })();
         })
 
         socket?.on('GameNotificationResponse', (data) => {
@@ -113,34 +123,30 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
 
     }, [socket])
 
-    React.useEffect(() => {
+    // React.useEffect(() => {
 
-        (async () => {
-            if (!room)
-                return;
-            const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
-            if (channeLLMembers) setMembers(channeLLMembers)
-            // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== UserId)
-            // filter if member is ban or member userId === loged userId
-            // const filterdmembers = channeLLMembers.filter((member: membersType) => member.isban !== true)
-            // setMembers(filterdmembers.filter((member: membersType) => member.userId !== UserId))
-            // }
+    //     (async () => {
+    //         if (!room)
+    //             return;
+    //         const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
+    //         if (channeLLMembers) setMembers(channeLLMembers)
+    //         // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== UserId)
+    //         // filter if member is ban or member userId === loged userId
+    //         // const filterdmembers = channeLLMembers.filter((member: membersType) => member.isban !== true)
+    //         // setMembers(filterdmembers.filter((member: membersType) => member.userId !== UserId))
+    //         // }
 
-        })();
-        setUpdate(false);
+    //     })();
+    //     setUpdate(false);
 
-        (async () => {
-            const token: any = Cookies.get('token');
-            // get loged member :
-            const channeLLid = params.get('r')
-            if (!channeLLid)
-                return;
-            const channeLLMembers = UserId && await getMemberWithId(UserId, channeLLid, token)
-            if (channeLLMembers && channeLLMembers.statusCode !== 200) {
-                setLogedMember(channeLLMembers)
-            }
-        })();
-    }, [update])
+    //     (async () => {
+
+    //         const channeLLMembers = UserId && await getMemberWithId(UserId, room.id, token)
+    //         if (channeLLMembers && channeLLMembers.statusCode !== 200) {
+    //             setLogedMember(channeLLMembers)
+    //         }
+    //     })();
+    // }, [])
 
     const handlOnclick = (data: { updateType?: updatememberEnum, member: membersType }) => {
         console.log("ana hanananananan")
@@ -190,26 +196,41 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
     };
 
     if (!IsMounted)
-        return <div className="Members flex p-4">
+        return (<div className="Members flex p-4">
             <div className="flex flex-row items-center p-1 gap-1">
                 <h3 className="text-base font-light text-[#FFFFFF]">Loading...</h3>
             </div>
-        </div>
+        </div>)
 
     let bodyContent = (
         <>
-            {LogedMember?.type !== UserTypeEnum.USER && <div className="flex flex-row justify-start items-center gap-2">
+            <div className="flex flex-row justify-end items-center gap-2">
+                {LogedMember?.type !== UserTypeEnum.USER &&
+                    <Button
+                        icon={TbUserPlus}
+                        label={"Add member"}
+                        outline
+                        responsive
+                        size={24}
+                        labelsize={8}
+                        onClick={() => {
+                            setStep(USERSETTINGSTEPS.MEMBERJOIN)
+                        }}
+                    />
+                }
                 <Button
-                    icon={TbUserPlus}
-                    label={"Add member"}
+                    icon={BiSolidFileFind}
+                    label={"Find member"}
+
+                    responsive
                     outline
-                    size={21}
+                    size={24}
                     labelsize={8}
                     onClick={() => {
-                        setStep(USERSETTINGSTEPS.MEMBERJOIN)
+                        setStep(USERSETTINGSTEPS.FINDMEMBER)
                     }}
                 />
-            </div>}
+            </div>
             <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full gap-4">
                 {members && members.map((member: membersType, index) => (
                     <ChannelSettingsUserMemberItem
@@ -242,8 +263,13 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
             setStep(USERSETTINGSTEPS.INDEX)
         }} />
     }
+    if (step === USERSETTINGSTEPS.FINDMEMBER) {
+        bodyContent = <ChanneLSettingsMemberFindModaL OnClick={() => { setStep(USERSETTINGSTEPS.INDEX) }} socket={socket} OnBack={() => {
+            setStep(USERSETTINGSTEPS.INDEX)
+        }} />
+    }
 
-    return <ChanneLSettingsEditModaL >
+    return <SettingsProvider >
         {bodyContent}
-    </ChanneLSettingsEditModaL>
+    </SettingsProvider>
 }

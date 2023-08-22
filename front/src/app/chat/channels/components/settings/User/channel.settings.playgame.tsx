@@ -14,8 +14,8 @@ import React from "react";
 import { Socket } from "socket.io-client";
 import getUserWithId from "../../../actions/getUserWithId";
 import { set } from "date-fns";
-import ChanneLSettingsBody from "../../channel.settings.body";
-import Loading from "../../CanneLSettingsLoading";
+import ChanneLSettingsBody from "../channel.settings.body";
+import Loading from "../CanneLSettingsLoading";
 interface props {
     onClick: (data: any) => void;
     Onback: () => void;
@@ -24,7 +24,6 @@ interface props {
     socket: Socket | null
 }
 /*
-
 {
   Response: false,
   User: {
@@ -37,8 +36,6 @@ interface props {
   },
   mode: 'time'
 }
-
-
 **/
 export default function ChanneLsettingsPlayGame(
     { onClick, player1Id, player2Id, Onback, socket }: props
@@ -47,6 +44,7 @@ export default function ChanneLsettingsPlayGame(
     const [LoadingGame, setLoadingGame] = React.useState<boolean>(false)
     const [PLayer01, setPLayer01] = React.useState<userType | null>(null)
     const [PLayer02, setPLayer02] = React.useState<userType | null>(null)
+    const [gamemode, setgamemode] = React.useState<string>('')
     const UserId = Cookies.get('_id')
     const token: any = Cookies.get('token');
     if (!UserId || !token) return;
@@ -69,10 +67,7 @@ export default function ChanneLsettingsPlayGame(
             Response: boolean
             mode: string
         }) => {
-
-
             setLoadingGame(false)
-
         })
 
     }, [socket]);
@@ -83,7 +78,7 @@ export default function ChanneLsettingsPlayGame(
         HasPermission={false}
     >
         {LoadingGame ? <div>
-            <Loading message={` Waiting for ${PLayer01?.login}  to accept the invitation ...`} />
+            <Loading mode={gamemode} message={` Waiting for ${PLayer01?.login}  to accept the invitation ...`} />
         </div> : <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
             <div className="flex flex-col h-full w-full justify-start gap-4 items-center min-h-[34rem] ">
                 <div className="flex flex-col justify-center items-center gap-3">
@@ -91,19 +86,25 @@ export default function ChanneLsettingsPlayGame(
                     {/* <h2 className=" capitalize font-extrabold text-white">permission denied</h2> */}
                 </div>
                 <h2>
-                    P1 :{player1Id} <br />
-                    p2 : {player2Id}
+                    P1 :{player1Id} - {PLayer02?.login} <br />
+                    p2 : {player2Id} - {PLayer01?.login}
                 </h2>
                 <div className="flex flex-col gap-3  w-full">
                     <button
                         onClick={() => {
-                            onClick('time')
-                            setLoadingGame(true);
-                            (async () => {
-                                setTimeout(() => {
-                                    setLoadingGame(false)
-                                }, 8000);
-                            })();
+                            if (PLayer01?.status === 'online') {
+                                onClick('time')
+                                setLoadingGame(true);
+                                setgamemode('time');
+                                (async () => {
+                                    setTimeout(() => {
+                                        setLoadingGame(false)
+                                    }, 8100);
+                                })();
+                            }
+                            else {
+                                toast(`${PLayer01?.login} is On Game`)
+                            }
                         }}
                         className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-[#FFCC00] hover:border">
                         <div className='flex justify-center items-center p-3 rounded bg-[#FFCC00] text-white'>
@@ -118,33 +119,20 @@ export default function ChanneLsettingsPlayGame(
                     </button>
                     <button
                         onClick={() => {
-                            onClick('score')
-                            setLoadingGame(true);
-                            (async () => {
-                                setTimeout(() => {
-                                    setLoadingGame(false)
-                                }, 8000);
-                            })();
-                            // const body = {       ///////////////////////////////////////////////////////// body
-                            //     player2Id: player2Id,
-                            //     player1Id: player1Id,
-                            //     mode: "score"
-                            // }
-                            // // axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, body).then((result) => {
-                            // //     router.push('/game/score/robot')
-                            // // })
-                            // // console.log("Ti÷me Mode");
-                            // toast("Time Mode");
-                            // (async () => {
-                            //     console.log("${process.env.NEXT_PUBLIC_API_URL}/game/BotGame :", `${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`)
-                            //     const token: any = Cookies.get('token');
-                            //     if (!token) return;
-                            //     const g = await StartGame(body, token);
-                            //     console.log("++++++++++++++++++++++++++++++> game:", g)
-                            //     if (!g) return;
-                            //     toast.success("play ....")
-                            //     router.push('/game/score/friend')
-                            // })();
+                            if (PLayer01?.status === 'online') {
+
+                                onClick('score')
+                                setLoadingGame(true);
+                                setgamemode('score');
+                                (async () => {
+                                    setTimeout(() => {
+                                        setLoadingGame(false)
+                                    }, 8000);
+                                })();
+                            }
+                            else {
+                                toast(`${PLayer01?.login} is On Game`)
+                            }
                         }}
                         className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-secondary hover:border">
                         <div className='flex justify-center items-center p-3 rounded bg-secondary text-white'>

@@ -16,7 +16,7 @@ import getChannelWithId from "../actions/getChannelWithId";
 import ChanneLSettingsAlert from "./channel.settings.alerts";
 import { setConstantValue } from "typescript";
 import Button from "../../components/Button";
-import ChanneLSettingsBody from "./channel.settings.body";
+import ChanneLSettingsBody from "./settings/channel.settings.body";
 import ChanneLSettingsTitle from "./channel.settings.title";
 import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
 import { toast } from "react-hot-toast";

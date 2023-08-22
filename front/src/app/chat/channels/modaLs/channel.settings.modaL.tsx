@@ -82,6 +82,7 @@ const ChanneLSettingsModaL = () => {
                     label={"ChanneL Info"}
                     outline
                     responsive
+                    showLabeL
                     IsActive={_channeLtype === "ChatInfo"}
                     onClick={() => { setcustomvalue("channeLtype", "ChatInfo") }}
                 /><Button
@@ -89,6 +90,7 @@ const ChanneLSettingsModaL = () => {
                     label={"User Settings"}
                     outline
                     responsive
+                    showLabeL
                     IsActive={_channeLtype === "UserSettings"}
                     onClick={() => { setcustomvalue("channeLtype", "UserSettings") }}
                 />
@@ -96,6 +98,7 @@ const ChanneLSettingsModaL = () => {
                     icon={RiChatSettingsLine}
                     label={"ChanneL Settings"}
                     outline
+                    showLabeL
                     responsive
                     IsActive={_channeLtype === "ChatSettings"}
                     onClick={() => { setcustomvalue("channeLtype", "ChatSettings") }}

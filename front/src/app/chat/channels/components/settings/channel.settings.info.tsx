@@ -26,7 +26,7 @@ import ChanneLConfirmActionHook from "../../hooks/channel.confirm.action";
 import ChanneLConfirmActionBtn from "./channel.confirm.action.Btn";
 import { toast } from "react-hot-toast";
 import ChanneLsettingsHook from "../../hooks/channel.settings";
-import ChanneLSettingsBody from "../channel.settings.body";
+import ChanneLSettingsBody from "./channel.settings.body";
 import PermissionDenied from "../channel.settings.permissiondenied";
 import getMemberWithId from "../../actions/getMemberWithId";
 import FindOneBySLug from "../../actions/Channel/findOneBySlug";

@@ -116,7 +116,7 @@ export default function ChannelSettingsUserMemberItem(
                         <div>
                             <h2 className={`text-white  ${member.type === 'OWNER' && 'md:text-white text-[#FFBF00]'} font-semibold capitalize`}>
                                 {UserInfo?.name}
-                                
+
                             </h2>
                             {/* <MdAdminPanelSettings size={16} fill="#1EF0AE" /> */}
 
@@ -131,33 +131,40 @@ export default function ChannelSettingsUserMemberItem(
                     </div>
                 </div>
                 <div className="flex flex-row gap-3 justify-center items-center">
-                    {!UserJoin && !UserOwne && !UserBan && <>
+                    {!UserJoin && !UserOwne && !UserBan
+                        && <>
 
-                        {<ChanneLSettingsUserMemberItemActions
-                            hasPermissions={
-                                LogedMember?.type !== UserTypeEnum.USER
-                                && member.type !== UserTypeEnum.OWNER
-                                && member.userId !== UserId
-                            }
-                            member={member}
-                            OnClick={(data) => OnClick(data)} type={""} />}
-                        {member.userId !== UserId && <ChannelSettingsUserMemberItemOption
-                            icon={TbDeviceGamepad2}
-                            size={24}
-                            background
-                            Onclick={() => {
-                                OnClick({ updateType: updatememberEnum.PLAYGAME, member: member })
-                            }}
-                        />}</>
+                            {<ChanneLSettingsUserMemberItemActions
+                                hasPermissions={
+                                    LogedMember?.type !== UserTypeEnum.USER
+                                    && member.type !== UserTypeEnum.OWNER
+                                    && member.userId !== UserId
+                                }
+                                member={member}
+                                OnClick={(data) => OnClick(data)} type={""}
+                            />}
+                            {member.userId !== UserId
+                                && <ChannelSettingsUserMemberItemOption
+                                    icon={TbDeviceGamepad2}
+                                    size={24}
+                                    label="play game"
+                                    background
+                                    Onclick={() => {
+                                        OnClick({ updateType: updatememberEnum.PLAYGAME, member: member })
+                                    }}
+                                />}
+                        </>
                     }
                     {UserJoin && <ChannelSettingsUserMemberItemOption
                         icon={AiOutlineUserAdd}
+                        label={`add member`}
                         size={24}
                         Onclick={() => { OnClick({ member }) }}
                     />}
                     {UserBan && <ChannelSettingsUserMemberItemOption
                         icon={SlBan}
                         size={24}
+                        label="ban member"
                         disabled={member.type === UserTypeEnum.OWNER}
                         IsActivate={member.isban}
                         background
@@ -169,6 +176,7 @@ export default function ChannelSettingsUserMemberItem(
                     {UserOwne && <ChannelSettingsUserMemberItemOption
                         icon={FaChessQueen}
                         size={24}
+                        label="set as Owner"
                         background
                         Onclick={() => {
                             OnClick({ updateType: updatememberEnum.SETOWNER, member: member })
