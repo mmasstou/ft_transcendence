@@ -23,7 +23,7 @@ const Statistics = () => {
 
   return (
     <div
-      className="bg-[#243230] flex rounded-md justify-center h-[300px] md:h-[400px] xl:h-[700px] p-2 xl:p-3
+      className="bg-[#243230] flex rounded-md justify-start md:justify-center h-[300px] md:h-[400px] xl:h-[700px] p-2 xl:p-3
           text-white"
     >
       {/* <Bar data={userData} className="sm:flex-1" /> */}
