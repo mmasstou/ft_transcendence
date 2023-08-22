@@ -56,18 +56,16 @@ export default function ChanneLSettingsMemberJoinModaL(
                 token, // Pass the token as an authentication parameter
             },
         });
+        toast('NEXT_PUBLIC_USERSOCKET_URL_WS addmember')
         setUsersocket(_socket);
-        (async () => {
-
-        })();
         (async () => {
             const ChanneL = await FindOneBySLug(slug, token);
             if (!ChanneL) return;
             setChanneLInfo(ChanneL)
         })();
-        setTimeout(() => {
-            setLoading(false);
-        }, 200);
+        // setTimeout(() => {
+        //     setLoading(false);
+        // }, 200);
 
 
         return () => { _socket.disconnect() }

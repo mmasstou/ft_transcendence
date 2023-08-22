@@ -76,10 +76,27 @@ export class UserGateway implements OnGatewayConnection {
     this.server.emit('GameResponse', Response);
   }
 
-  sendMessageToSocket(socket: Socket, message: any) {
-    // send notificationEvent to user
-    socket.emit('notificationEvent', message);
+  @SubscribeMessage('DenyGame')
+  async handleDenyGame(
+    @MessageBody() data: { userId: string; sender: any; mode: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const Response = {
+      response: 'Deny',
+      sender: data.sender,
+      userId: data.userId,
+      mode: data.mode,
+    };
+    const User = await this.usersService.getUserInClientSocket(client);
+    // const sender = await this.usersService.getUserById(data.userId);
+    console.log('User-> data :', data);
+    this.server.emit('GameResponse', Response);
   }
+
+  // sendMessageToSocket(socket: Socket, message: any) {
+  //   // send GameNotificationResponse to user
+  //   socket.emit('GameNotificationResponse', message);
+  // }
 
   @SubscribeMessage('FriendToAddToChanneL')
   async FriendToAddToChanneL(

@@ -71,7 +71,7 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
     // check for rooms socket events :
     React.useEffect(() => {
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-            (response: { OK : boolean}) => {
+            (response: { OK: boolean }) => {
                 channeLConfirmActionHook.onClose()
                 if (response.OK) {
                     (async () => {
@@ -88,7 +88,7 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
 
         })
 
-        socket?.on('notificationEvent', (data) => {
+        socket?.on('GameNotificationResponse', (data) => {
             (async () => {
                 const body = {       ///////////////////////////////////////////////////////// body
                     player1Id: PlayGameWith?.userId,
@@ -109,6 +109,8 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
                 router.push('/game/time/friend')
             })();
         })
+
+
     }, [socket])
 
     React.useEffect(() => {
@@ -224,10 +226,10 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
         </>
     )
     if (step === USERSETTINGSTEPS.PLAYGAME) {
-        bodyContent = <ChanneLsettingsPlayGame Onback={() => { setStep(USERSETTINGSTEPS.INDEX) }}
+        bodyContent = <ChanneLsettingsPlayGame socket={socket} Onback={() => { setStep(USERSETTINGSTEPS.INDEX) }}
             onClick={function (mode: any): void {
                 // send initaion to player 02
-                socket?.emit('sendNotification', {
+                socket?.emit('sendGameNotification', {
                     userId: PlayGameWith?.userId,
                     senderId: LogedMember?.userId,
                     mode: mode

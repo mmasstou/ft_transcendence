@@ -18,7 +18,7 @@ import { MessagesService } from 'src/messages/messages.service';
 import { MembersService } from 'src/members/members.service';
 import { PrismaService } from 'src/prisma.service';
 import { AppService } from 'src/app.service';
-import { UserTypeEnum } from 'src/users/user.type';
+import { UserTypeEnum, userType } from 'src/users/user.type';
 import {
   UpdateChanneLSendData,
   UpdateChanneLSendEnum,
@@ -243,7 +243,6 @@ export class RoomGateway implements OnGatewayConnection {
         ResponseEventData.message = responseEventMessageEnum.WELLCOMEBACK;
         ResponseEventData.data = roomJoined;
         // send response to client :
-        // client.emit('sendNotification', { userId: data.userid, room: room });
 
         this.server.emit(
           `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
@@ -266,7 +265,6 @@ export class RoomGateway implements OnGatewayConnection {
       ResponseEventData.message = responseEventMessageEnum.WELLCOME;
       ResponseEventData.data = member;
       // send response to client :
-      // client.emit('sendNotification', { userId: data.userid, room: room });
 
       client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
         Ok: true,
@@ -673,12 +671,11 @@ export class RoomGateway implements OnGatewayConnection {
       ResponseEventData,
     );
   }
-  @SubscribeMessage('sendNotification')
-  async sendNotification(
+  @SubscribeMessage('sendGameNotification')
+  async sendGameNotification(
     @MessageBody() data: { userId: string; senderId: string; mode: string },
   ) {
     try {
-      console.log('Chat-> sendNotification +> data :', data);
       const snderUser: User | null = await this.usersService.findOne({
         id: data.senderId,
       });
@@ -687,16 +684,14 @@ export class RoomGateway implements OnGatewayConnection {
       const UserTOSendTo: User | null = await this.usersService.findOne({
         id: data.userId,
       });
-      console.log('Chat-> sendNotification +> sendedUser :', UserTOSendTo);
 
       if (UserTOSendTo) {
         const ListSocket = clientOnLigne.get(UserTOSendTo.id);
-        console.log('Chat-> sendNotification +> ListSocket :', ListSocket);
 
         if (ListSocket) {
           ListSocket.forEach((socket) => {
-            socket.emit('notificationEvent', {
-              message: `wants to play game with you`,
+            socket.emit('GameNotificationResponse', {
+              message: `wants to play ${data.mode} mode game with you`,
               sender: snderUser,
               mode: data.mode,
             });
@@ -704,10 +699,35 @@ export class RoomGateway implements OnGatewayConnection {
         }
       }
     } catch (error) {
-      console.log('Chat-sendNotification> error- +>', error);
+      console.log('Chat-sendGameNotification> error- +>', error);
     }
   }
 
+  @SubscribeMessage('GameResponseToChat')
+  async GameResponseToChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    Resp: { response: string; sendTo: userType; mode: string },
+  ) {
+    console.log('Response : ', Resp);
+    const User = await this.usersService.getUserInClientSocket(client);
+    const sendToUser = await this.usersService.findOne({
+      id: Resp.sendTo.id,
+    });
+    if (!User || !sendToUser) return;
+    console.log('Chat-> GameResponseToChat +> Response :', {
+      Response: Resp.response === 'Accept' ? true : false,
+      User: User,
+      sender: sendToUser,
+      mode: Resp.mode,
+    });
+    this.server.emit('GameResponseToChatToUser', {
+      Response: Resp.response === 'Accept' ? true : false,
+      User: User,
+      sender: sendToUser,
+      mode: Resp.mode,
+    });
+  }
   // @SubscribeMessage('askToPlayGameWith')
   // async askToPlayGameWith(@MessageBody() data: {}) {}
 }

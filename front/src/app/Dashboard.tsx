@@ -19,29 +19,34 @@ import MyToast from '@/components/ui/Toast/MyToast';
 import ChanneLConfirmActionModaL from './chat/channels/modaLs/channel.confirm.action';
 import { ro } from 'date-fns/locale';
 import StartGame from './chat/channels/actions/startgame';
+import ChanneLsettingsHook from './chat/channels/hooks/channel.settings';
 interface Props {
   children: React.ReactNode;
 }
 
 const Dashboard = ({ children }: Props) => {
   const [socket, setSocket] = React.useState<Socket | null>(null);
+  const [chatSocket, setchatSocket] = React.useState<Socket | null>(null);
   const router = useRouter();
   const params = useSearchParams()
   const [Notifications, setNotifications] = React.useState<any>(null)
+  const channeLsettingsHook = ChanneLsettingsHook()
   const userId = Cookies.get('_id')
   const token: any = Cookies.get('token');
   if (!token || !userId) return;
 
 
-  socket?.on('notificationEvent', (data) => {
-    console.log("notificationEvent data :", data)
-    setNotifications(data)
+  React.useEffect(() => {
+    socket?.on('GameNotificationResponse', (data) => {
+      console.log("GameNotificationResponse data :", data)
+      setNotifications(data)
 
-    return () => {
-      setNotifications(null)
-    }
+      return () => {
+        setNotifications(null)
+      }
 
-  })
+    })
+  }, [socket]);
 
   useEffect(() => {
     if (!token) {
@@ -55,17 +60,26 @@ const Dashboard = ({ children }: Props) => {
 
   useEffect(() => {
 
-    if (!token) return
     const socket: Socket = io(`${process.env.NEXT_PUBLIC_USERSOCKET_URL_WS}`, {
       auth: {
         token: `${token}`,
         id: `${Cookies.get("_id")}`
       }
     });
+    toast('NEXT_PUBLIC_USERSOCKET_URL_WS dashboard')
+
+    const chatSocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
+      transports: ['websocket'],
+      auth: {
+        token: token,
+      },
+    });
     setSocket(socket);
+    setchatSocket(chatSocket)
     socket && socket.on("connected", (data) => { })
     return () => {
       socket && socket.disconnect();
+      chatSocket && chatSocket.disconnect()
     };
 
   }, [])
@@ -73,7 +87,7 @@ const Dashboard = ({ children }: Props) => {
   // React.useEffect(() => {
   //   if (!token)
   //     return;
-  //   const socket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
+  //   const chatSocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
   //     transports: ['websocket'],
   //     auth: {
   //       token: token,
@@ -97,25 +111,37 @@ const Dashboard = ({ children }: Props) => {
   //     socket.close()
   //   };
   // }, []);
-
   useEffect(() => {
     socket?.on('GameResponse', (data: any) => {
-      if (data.sender.id === userId) {
-        (async () => {
-          if (!token) return;
-          const body = {       ///////////////////////////////////////////////////////// body
+      if (data.response === 'Accept') {
+
+        if (data.sender.id === userId) {
+          (async () => {
+            if (!token) return;
+            const body = {       ///////////////////////////////////////////////////////// body
               player2Id: data.sender.id,
               player1Id: data.userId,
               mode: data.mode
-          }
-          const g = await StartGame(body, token);
-          if (!g) return;
-          router.push(`/game/${data.mode}/friend`)
-        })();
+            }
+            const g = await StartGame(body, token);
+            if (!g) return;
+            channeLsettingsHook.onClose()
+            router.push(`/game/${data.mode}/friend`)
+          })();
 
+        }
+        if (data.userId === userId) {
+          channeLsettingsHook.onClose()
+          router.push(`/game/${data.mode}/friend`)
+        }
       }
-      if (data.userId === userId) {
-        router.push(`/game/${data.mode}/friend`)
+      if (data.response === 'Deny') {
+        if (data.userId === userId) {
+          toast('You denied your friend invitation', { icon: '🤗' })
+        }
+        if (data.sender.id === userId) {
+          toast('Your friend denied your invitation', { icon: '🤗' })
+        }
       }
     })
   }, [socket]);
@@ -132,17 +158,27 @@ const Dashboard = ({ children }: Props) => {
       <ChanneLaccessDeniedModaL />
       <ChanneLPasswordAccessModaL />
       {
-        Notifications && <MyToast OnAccept={() => {
-          if (!params) return;
-          const userId = Cookies.get('_id')
-          if (!userId) return
-          console.log("++++++++++++++++++++++++>:", userId)
-          socket?.emit('AcceptGame', { userId: userId, sender: Notifications.sender, mode: Notifications.mode })
-        }} isOpen user={Notifications.sender.login} message={Notifications.message} />
+        Notifications && <MyToast
+          OnAccept={() => {
+            if (!params) return;
+            console.log("++++++++++++++++++++++++>:", userId)
+            socket?.emit('AcceptGame', { userId: userId, sender: Notifications.sender, mode: Notifications.mode })
+            chatSocket?.emit('GameResponseToChat', { response: 'Accept', sendTo: Notifications.sender, mode: Notifications.mode })
+            setNotifications(null)
+          }}
+          OnDeny={() => {
+            socket?.emit('DenyGame', { userId: userId, sender: Notifications.sender, mode: Notifications.mode })
+            chatSocket?.emit('GameResponseToChat', { response: 'Deny', sendTo: Notifications.sender, mode: Notifications.mode })
+            setNotifications(null)
+          }}
+          isOpen
+          user={Notifications.sender.login}
+          message={Notifications.message}
+        />
       }
       <div className="dashboard bg-primary overflow-y-auto">
         <header className="bg-transparent flex items-center justify-between px-5 ">
-          <Header socket={socket} />
+          <Header socket={null} />
         </header>
 
         <main className="">{children}</main>

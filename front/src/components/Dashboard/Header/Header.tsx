@@ -15,8 +15,8 @@ import MyToast from '@/components/ui/Toast/MyToast';
 const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
   const [Notifications, setNotifications] = React.useState<any[] | null>(null)
 
-  // socket?.on('notificationEvent', (data) => {
-  //   console.log("notificationEvent data :", data)
+  // socket?.on('GameNotificationResponse', (data) => {
+  //   console.log("GameNotificationResponse data :", data)
   //   Notifications !== null
   //   ? setNotifications([...Notifications, data])
   //   : setNotifications([data])
