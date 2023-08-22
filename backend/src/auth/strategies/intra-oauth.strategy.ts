@@ -1,5 +1,5 @@
 import { PassportStrategy } from '@nestjs/passport';
-import { VerifyCallback, Strategy } from 'passport-42';
+import { Strategy } from 'passport-42';
 import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { PrismaService } from 'src/prisma.service';
@@ -29,6 +29,8 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     });
 
     if (!_UserExist) {
+      // check if there is a user with login = profile._json.login
+      // if yes, update the user login
       const cursus_users = await this.prisma.cursus.create({
         data: {
           grade: profile._json.cursus_users[1].grade,

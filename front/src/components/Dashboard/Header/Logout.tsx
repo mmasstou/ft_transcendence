@@ -1,3 +1,4 @@
+'use client';
 import { RiLogoutBoxFill } from 'react-icons/ri';
 import * as Popover from '@radix-ui/react-popover';
 import Cookies from 'js-cookie';
