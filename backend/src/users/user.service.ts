@@ -116,4 +116,11 @@ export class UserService {
     });
     return user;
   }
+
+  isLoginValid(login: string): boolean {
+    if (login.length < 6) return false;
+    if (login.length > 8) return false;
+    if (!login.match(/^[A-z][A-z0-9-_]{5,7}$/)) return false;
+    return true;
+  }
 }

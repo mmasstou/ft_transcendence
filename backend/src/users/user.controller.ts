@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/CreateUserDto';
@@ -46,8 +47,21 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: UpdateUserDto) {
-    return this.usersService.update({ id, data });
+  async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
+    // check if the data contains only login field
+    if (
+      Object.keys(data).length !== 1 ||
+      !data.login ||
+      this.usersService.isLoginValid(data.login) === false
+    ) {
+      throw new BadRequestException('Invalid data');
+    }
+    // check if login user already exist
+    const user = await this.usersService.findOneLogin({ login: data.login });
+    if (user) {
+      throw new BadRequestException('Login already exist');
+    }
+    return await this.usersService.update({ id, data });
   }
 
   @UseGuards(JwtAuthGuard)

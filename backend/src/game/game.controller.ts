@@ -30,7 +30,10 @@ export class GameController {
           HttpStatus.CONFLICT,
         );
     } catch (err) {
-      throw new HttpException({ reason: err.response.reason }, HttpStatus.CONFLICT);
+      throw new HttpException(
+        { reason: err.response.reason },
+        HttpStatus.CONFLICT,
+      );
     }
   }
   /** {       ///////////////////////////////////////////////////////// body
@@ -109,10 +112,10 @@ export class GameController {
     }
     const matchList = user.MyScore.concat(user.Other);
     const sortedmatchList = matchList.sort((item1, item2) => {
-      if (item1.created_at < item2.created_at) {
+      if (item1.created_at > item2.created_at) {
         return -1;
       }
-      if (item1.created_at > item2.created_at) {
+      if (item1.created_at < item2.created_at) {
         return 1;
       }
       return 0;
@@ -121,15 +124,13 @@ export class GameController {
     return matchList;
   }
 
-
   @Post('/UpdateTheme')
   async updateTheme(@Body() body: any) {
     try {
       await this.GameService.updateTheme(body);
-    } 
-    catch (err) {
+    } catch (err) {
       throw new HttpException(
-        { reason: 'User not found'},
+        { reason: 'User not found' },
         HttpStatus.NOT_FOUND,
       );
     }
