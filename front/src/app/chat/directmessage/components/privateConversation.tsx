@@ -5,6 +5,7 @@ import { AiFillCloseCircle } from 'react-icons/ai';
 import SearchList from './searchList';
 import ConversationList from './conversationList';
 import FriendList from './friendList';
+import SearchModal from './searchModal';
 
 
 const token = Cookies.get('token');
@@ -14,6 +15,7 @@ function PrivateConversation({ isOpen, openFriendList, createConversation, setFr
 
 	const [users, setUsers] = useState([]);
 	const [convBody, setConvBody] = useState<string | null>(null);
+	const [open, setOpen] = useState(false);
 
 	async function getUsers() {
 		const res = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
@@ -33,11 +35,15 @@ function PrivateConversation({ isOpen, openFriendList, createConversation, setFr
 
   return (
 	<div className='flex h-full w-full'>
-		{isOpen ? <div className=' bg-[#243230] h-full w-[15%] min-w-[200px] max-w-[350px] relative'>
+		{isOpen ? <div className=' bg-[#243230] h-full w-[20%] min-w-[200px] max-w-[350px] relative'>
 			<ConversationList />
 		</div> : <></>}
 		<div className='flex justify-center min-w-2/3 w-full border-[1px] border-[#243230]'>
-			<div className=''>Conversation Body</div>
+			<div className=''>
+				<p>Conversation Body</p>
+				<button onClick={() => {setOpen(true);}} className='text-white bg-[#243230] p-[10px]'>Show</button>
+				<SearchModal open={open}  onClose={() => setOpen(false)} users={users}/>
+			</div>
 			{createConversation ?
 			<div className='bg-[#243230] h-[250px] w-[250px] flex flex-col justify-center gap-1 z-10'>
 				<Button
@@ -48,7 +54,7 @@ function PrivateConversation({ isOpen, openFriendList, createConversation, setFr
 				<SearchList setConvCreation={setConvCreation} users={users}/>
 			</div> : <></>}
 		</div>
-		{openFriendList ? <div className=' bg-[#243230] h-full w-[15%] min-w-[200px] max-w-[350px] '>
+		{openFriendList ? <div className=' bg-[#243230] h-full w-[20%] min-w-[200px] max-w-[350px] '>
 			<FriendList />
 		</div> : <></> }
 	</div>
