@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import { RiSettingsLine } from 'react-icons/ri';
 import axios from 'axios';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -15,6 +15,30 @@ export * from '@radix-ui/react-dialog';
 import { FaTimes, FaInfoCircle, FaCheck } from 'react-icons/fa';
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{5,7}$/;
+
+function getAllUsers(): userType[] | null {
+  const jwtToken = Cookies.get('token');
+  const [users, setUsers] = useState<userType[] | null>(null);
+
+  useEffect(() => {
+    axios
+      .get<userType[] | null>(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          setUsers(response.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }, []);
+  return users;
+}
 
 function getUserData(): userType | null {
   const [user, setUser] = useState<userType | null>(null);
@@ -49,6 +73,11 @@ interface Props {
 
 const Settings: React.FC<Props> = ({ login }) => {
   const userData: userType | null = getUserData();
+  const users: userType[] | null = getAllUsers();
+  useEffect(() => {
+    console.log(users);
+  }, [users]);
+
   const router = useRouter();
 
   const [jwtToken, setJwtToken] = useState<string | undefined>(
@@ -69,6 +98,7 @@ const Settings: React.FC<Props> = ({ login }) => {
   const [userFocus, setUserFocus] = useState<boolean>(false);
   const [errMsg, setErrMsg] = useState<string>('');
   const [isMounted, setIsMounted] = useState(false);
+  const [alreadyInUse, setAlreadyInUse] = useState<boolean>(false);
 
   useEffect(() => {
     if (userRef.current != null) {
@@ -77,7 +107,12 @@ const Settings: React.FC<Props> = ({ login }) => {
   }, []);
 
   useEffect(() => {
-    const result = USER_REGEX.test(user);
+    let result = USER_REGEX.test(user);
+    const login = users?.find((u) => u.login === user);
+    if (login && user !== userData?.login) {
+      setAlreadyInUse(true);
+      result = false;
+    }
     setValidName(result);
   }, [user]);
 
@@ -307,18 +342,32 @@ const Settings: React.FC<Props> = ({ login }) => {
                           onFocus={() => setUserFocus(true)}
                           onBlur={() => setUserFocus(false)}
                         />
-                        <p
-                          id="uidnote"
-                          className={
-                            userFocus && user && !validName
-                              ? 'mr-1 text-[1em] font-light bg-black/50 px-3 py-2 rounded-md'
-                              : 'hidden'
-                          }
-                        >
-                          <FaInfoCircle />
-                          6-8 characters. <br />
-                          Only Letters, Numbers, Undersocores, Hyphen allwed.
-                        </p>
+                        {!alreadyInUse ? (
+                          <p
+                            id="uidnote"
+                            className={
+                              userFocus && user && !validName
+                                ? 'mr-1 text-[1em] font-light bg-black/50 px-3 py-2 rounded-md'
+                                : 'hidden'
+                            }
+                          >
+                            <FaInfoCircle />
+                            6-8 characters. <br />
+                            Only Letters, Numbers, Undersocores, Hyphen allwed.
+                          </p>
+                        ) : (
+                          <p
+                            id="uidnote"
+                            className={
+                              userFocus && user && !validName
+                                ? 'mr-1 text-[1em] font-light bg-black/50 px-3 py-2 rounded-md text-red-500'
+                                : 'hidden'
+                            }
+                          >
+                            <FaInfoCircle />
+                            Username already in use!.
+                          </p>
+                        )}
                       </div>
                     </form>
                   </div>
