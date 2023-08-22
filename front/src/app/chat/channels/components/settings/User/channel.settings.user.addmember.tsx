@@ -63,9 +63,9 @@ export default function ChanneLSettingsMemberJoinModaL(
             if (!ChanneL) return;
             setChanneLInfo(ChanneL)
         })();
-        // setTimeout(() => {
-        //     setLoading(false);
-        // }, 200);
+        setTimeout(() => {
+            setLoading(false);
+        }, 200);
 
 
         return () => { _socket.disconnect() }
