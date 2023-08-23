@@ -1,14 +1,15 @@
 import { IoChevronBackOutline } from "react-icons/io5";
 import { Socket } from "socket.io-client";
-import Button from "../../components/Button";
+import Button from "../../../../components/Button";
 import { UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types";
-import ChannelSettingsUserMemberItem from "./settings/User/channel.settings.user.memberItem";
+import ChannelSettingsUserMemberItem from "../User/channel.settings.user.memberItem";
 import Image from "next/image";
-import ChanneLSettingsBody from "./settings/channel.settings.body";
+import ChanneLSettingsBody from "../channel.settings.body";
 import React, { useEffect } from "react";
-import getUserWithId from "../actions/getUserWithId";
+import getUserWithId from "../../../actions/getUserWithId";
 import Cookies from "js-cookie";
-import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
+import ChanneLConfirmActionHook from "../../../hooks/channel.confirm.action";
+import ChanneLsettingsProvider from "./channel.settings.chnnel.provider";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -60,27 +61,22 @@ export default function ChanneLSettingsChanneLBanedMember(
     socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
         setUpdate(true)
     })
-    return (
-        <ChanneLSettingsBody
-            title={`Baned Members Memeber :${User?.login}`}
-            OnBack={OnBack}
-            HasPermission={LogedMember?.type !== UserTypeEnum.OWNER && LogedMember?.type !== UserTypeEnum.ADMIN}>
-            <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
-                {members && members.map((member, index) => (
-                    <ChannelSettingsUserMemberItem
-                        key={index}
-                        member={member}
-                        socket={socket}
-                        UserJoin={false}
-                        UserOwne={false}
-                        UserBan
-                        OnClick={(data) => {
-                            console.log("ChanneLSettingsChanneLBanedMember :", data)
-                            handlOnclick({ updateType: updatememberEnum.BANMEMBER, member: member })
-                        }} />
-                ))
-                }
-            </div>
-        </ChanneLSettingsBody>
-    )
+    return <ChanneLsettingsProvider socket={socket} label={`Baned Members :${User?.login}`} OnBack={OnBack}>
+        <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
+            {members && members.map((member, index) => (
+                <ChannelSettingsUserMemberItem
+                    key={index}
+                    member={member}
+                    socket={socket}
+                    UserJoin={false}
+                    UserOwne={false}
+                    UserBan
+                    OnClick={(data) => {
+                        console.log("ChanneLSettingsChanneLBanedMember :", data)
+                        handlOnclick({ updateType: updatememberEnum.BANMEMBER, member: member })
+                    }} />
+            ))
+            }
+        </div>
+    </ChanneLsettingsProvider>
 }

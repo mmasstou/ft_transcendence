@@ -9,7 +9,7 @@ interface ChanneLSettingsOptionItemProps {
     color ?: string
     IsActive ?: boolean,
 }
-export default function ChanneLSettingsOptionItem(
+export default function ChanneLSettingsItem(
     {
         onClick,
         icon : Icon,

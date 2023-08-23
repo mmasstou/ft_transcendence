@@ -176,7 +176,8 @@ export default function ChannelSettingsUserMemberItem(
                     {UserOwne && <ChannelSettingsUserMemberItemOption
                         icon={FaChessQueen}
                         size={24}
-                        label="set as Owner"
+                        IsActivate={member.type === UserTypeEnum.OWNER}
+                        label={`${member.type === UserTypeEnum.OWNER ? 'remove as Owner':'set as Owner' }`}
                         background
                         Onclick={() => {
                             OnClick({ updateType: updatememberEnum.SETOWNER, member: member })

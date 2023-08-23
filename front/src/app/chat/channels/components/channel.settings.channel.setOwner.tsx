@@ -1,13 +1,21 @@
 import { Socket } from "socket.io-client";
 import Button from "../../components/Button";
 import { IoChevronBackOutline } from "react-icons/io5";
-import { UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
+import { RoomsType, UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
 import ChannelSettingsUserMemberItem from "./settings/User/channel.settings.user.memberItem";
 import Image from "next/image";
 import ChanneLSettingsBody from "./settings/channel.settings.body";
 import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
 import getmessage from "../actions/member.action.message";
 import { useEffect } from "react";
+import ChanneLsettingsProvider from "./settings/ChanneL/channel.settings.chnnel.provider";
+import React from "react";
+import { useParams } from "next/navigation";
+import Cookies from "js-cookie";
+import FindOneBySLug from "../actions/Channel/findOneBySlug";
+import getMemberWithId from "../actions/getMemberWithId";
+import { toast } from "react-hot-toast";
+import getChannelMembersWithId from "../actions/getChannelmembers";
 interface ChanneLsettingsChanneLsetOwnerProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -16,21 +24,32 @@ interface ChanneLsettingsChanneLsetOwnerProps {
     setUpdate: (data: boolean) => void
 }
 
+const UserId: string | undefined = Cookies.get('_id')
+const token: string | undefined = Cookies.get('token')
 export default function ChanneLsettingsChanneLsetOwner(
     { socket, OnBack, LogedMember, members, setUpdate }: ChanneLsettingsChanneLsetOwnerProps) {
+    const [IsMounted, setMounted] = React.useState<boolean>(false)
+    const [LoggedMember, setLoggedMember] = React.useState<membersType | null>(null)
+    const [Members, setMembers] = React.useState<membersType[] | null>([])
+    const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
     const channeLConfirmActionHook = ChanneLConfirmActionHook()
+    const query = useParams();
+    const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
 
-    useEffect(() => {
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
-            // const channeLLMembers = __userId && await getMemberWithId(__userId, channeLLid, token)
-            // if (channeLLMembers && channeLLMembers.statusCode !== 200) {
-            //     setLogedMember(channeLLMembers)
-            // }
-            channeLConfirmActionHook.onClose()
-        })
-    }, [socket])
+    const UpdateData = async () => {
+        if (!UserId || !slug || !token) return;
+        const channeL: RoomsType | null = await FindOneBySLug(slug, token)
+        if (!channeL) return;
+        setChanneLinfo(channeL);
+        const member: membersType | null = await getMemberWithId(UserId, channeL.id, token)
+        if (!member) return;
+        setLoggedMember(member);
+        const members: membersType[] | null = await getChannelMembersWithId(channeL.id, token);
+        if (!members) return;
+        setMembers(members?.filter((member) => member.userId !== UserId && !member.isban));
+    }
+
     const handlOnclick = (data: any) => {
-
         const __message = 'are ypu sure you whon to set this member  as Owner';
         __message && channeLConfirmActionHook.onOpen(
             <button
@@ -47,38 +66,46 @@ export default function ChanneLsettingsChanneLsetOwner(
 
     }
 
-    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+    React.useEffect(() => {
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+            if (!data) return
+            UpdateData();
+            channeLConfirmActionHook.onClose()
+        });
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+            if (!data) return
+            UpdateData();
+        });
+    }, [socket])
 
-        setUpdate(true)
-    })
-    return (
-        <ChanneLSettingsBody 
-        title={"set Owner"} 
-        HasPermission={LogedMember?.type !== UserTypeEnum.OWNER}
-        OnBack={OnBack}>
-            
-            <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
-                {(LogedMember?.isban === false && (LogedMember?.type === "OWNER")) ?
-                    members && members.map((member, index) => (
-                        <ChannelSettingsUserMemberItem
-                            key={index}
-                            member={member}
-                            socket={socket}
-                            UserJoin={false}
-                            UserOwne
-                            OnClick={(data) => {
-                                handlOnclick({ updateType: updatememberEnum.SETOWNER, member: member })
-                            }} />
 
-                    ))
-                    : <div className="flex h-full w-full justify-center items-center min-h-[34rem] ">
-                        <div className="flex flex-col justify-center items-center gap-3">
-                            <Image src="/access_denied.svg" width={200} height={200} alt={""} />
-                            <h2 className=" capitalize font-extrabold text-white">permission denied</h2>
-                        </div>
-                    </div>
-                }
-            </div>
-        </ChanneLSettingsBody>
-    )
+    React.useEffect(() => {
+        if (!UserId || !slug || !token) return;
+        (async () => {
+            const channeL: RoomsType | null = await FindOneBySLug(slug, token)
+            if (!channeL) return;
+            setChanneLinfo(channeL);
+        })();
+        if (!members) return
+        setMembers(members?.filter((member) => !member.isban))
+        setLoggedMember(LogedMember)
+
+    }, [])
+
+    return <ChanneLsettingsProvider socket={socket} label={`set Owner`} OnBack={OnBack}>
+        <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
+            {Members && Members.map((member, index) => (
+                <ChannelSettingsUserMemberItem
+                    key={index}
+                    member={member}
+                    socket={socket}
+                    UserJoin={false}
+                    UserOwne
+                    OnClick={(data) => {
+                        handlOnclick({ updateType: updatememberEnum.SETOWNER, member: member })
+                    }} />))
+            }
+        </div>
+    </ChanneLsettingsProvider>
+
 }

@@ -22,13 +22,13 @@ import { RoomTypeEnum, RoomsType, UpdateChanneLSendData, UpdateChanneLSendEnum, 
 import getMemberWithId from '../../../actions/getMemberWithId';
 import { Socket } from 'socket.io-client';
 import Image from 'next/image';
-import ChanneLSettingsChanneLBanedMember from '../../channel.settings.channel.banedmember';
+import ChanneLSettingsChanneLBanedMember from './channel.settings.channel.banedmember';
 import ChanneLsettingsChanneLsetOwner from '../../channel.settings.channel.setOwner';
 import ChanneLSettingsChanneLAccessPassword from '../../channel.settings.channel.accesspassword';
 import ChanneLaccessDeniedModaL from '../../../modaLs/channel.access.denied.modaL';
 import ChanneLSettingsChanneLChangeType from '../../channel.settings.channel.changetype';
 import getChannelWithId from '../../../actions/getChannelWithId';
-import ChanneLSettingsOptionItem from '../../channel.settings.optionItem';
+import ChanneLSettingsOptionItem from './channel.settings.channel.Item';
 import { AiOutlineDelete } from 'react-icons/ai';
 import ChanneLSettingsChanneLDeleteChannel from '../../channel.settings.channel.deletechannel';
 import PermissionDenied from '../../channel.settings.permissiondenied';
@@ -37,6 +37,7 @@ import ChanneLConfirmActionHook from '../../../hooks/channel.confirm.action';
 import { PiPasswordBold } from 'react-icons/pi';
 import toast from 'react-hot-toast';
 import FindOneBySLug from '../../../actions/Channel/findOneBySlug';
+import ChanneLsettingsIndex from './channel.settings.channel.Index';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
@@ -205,63 +206,68 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
 
 
 
-    let _body = (
-        <div className="flex h-full flex-col justify-between items-start min-h-[34rem] ">
-            <div className="flex flex-col gap-2 w-full">
-                {ChanneLinfo && ChanneLinfo.type == RoomTypeEnum.PROTECTED &&
-                    <ChanneLSettingsOptionItem
-                        onClick={function (): void { OnEditPassword(); }}
-                        icon={GoEyeClosed}
-                        label={"Change password"}
-                    />
-                }
-                <ChanneLSettingsOptionItem
-                    onClick={OnChangeChannel}
-                    icon={CgEditFlipH}
-                    label={"Change Type"}
-                />
-                <ChanneLSettingsOptionItem
-                    onClick={OnBanedMembers}
-                    icon={FaUserTimes}
-                    label={"Baned members"}
-                />
-                <ChanneLSettingsOptionItem
-                    onClick={OnSetOwner}
-                    icon={FaChessQueen}
-                    label={"set owner"}
-                />
-                {!ChanneLinfo?.hasAccess &&
-                    <ChanneLSettingsOptionItem
-                        onClick={OnAccessPassword}
-                        icon={TbPassword}
-                        label={"set access password"}
-                    />}
-                {ChanneLinfo?.hasAccess &&
-                    <ChanneLSettingsOptionItem
-                        onClick={OnEditAccessPassword}
-                        icon={PiPasswordBold}
-                        label={"set access password"}
-                    />}
-                {ChanneLinfo?.hasAccess &&
-                    <ChanneLSettingsOptionItem
-                        onClick={DeleteAccessPassword}
-                        icon={IoBagRemove}
-                        label={"remove access password"}
-                    />}
-            </div>
-        </div>
-    )
+    // let _body = (
+    //     <div className="flex h-full flex-col justify-between items-start min-h-[34rem] ">
+    //         <div className="flex flex-col gap-2 w-full">
+    //             {ChanneLinfo && ChanneLinfo.type == RoomTypeEnum.PROTECTED &&
+    //                 <ChanneLSettingsOptionItem
+    //                     onClick={function (): void { OnEditPassword(); }}
+    //                     icon={GoEyeClosed}
+    //                     label={"Change password"}
+    //                 />
+    //             }
+    //             <ChanneLSettingsOptionItem
+    //                 onClick={OnChangeChannel}
+    //                 icon={CgEditFlipH}
+    //                 label={"Change Type"}
+    //             />
+    //             <ChanneLSettingsOptionItem
+    //                 onClick={OnBanedMembers}
+    //                 icon={FaUserTimes}
+    //                 label={"Baned members"}
+    //             />
+    //             <ChanneLSettingsOptionItem
+    //                 onClick={OnSetOwner}
+    //                 icon={FaChessQueen}
+    //                 label={"set owner"}
+    //             />
+    //             {!ChanneLinfo?.hasAccess &&
+    //                 <ChanneLSettingsOptionItem
+    //                     onClick={OnAccessPassword}
+    //                     icon={TbPassword}
+    //                     label={"set access password"}
+    //                 />}
+    //             {ChanneLinfo?.hasAccess &&
+    //                 <ChanneLSettingsOptionItem
+    //                     onClick={OnEditAccessPassword}
+    //                     icon={PiPasswordBold}
+    //                     label={"set access password"}
+    //                 />}
+    //             {ChanneLinfo?.hasAccess &&
+    //                 <ChanneLSettingsOptionItem
+    //                     onClick={DeleteAccessPassword}
+    //                     icon={IoBagRemove}
+    //                     label={"remove access password"}
+    //                 />}
+    //         </div>
+    //     </div>
+    // )
+    let _body = <ChanneLsettingsIndex socket={socket} onClick={(data: {to : SETTINGSTEPS}) => {
+        setStep(data.to)
+    }} />
 
-    if (LogedMember?.type !== UserTypeEnum.OWNER) {
-        _body = (<PermissionDenied />)
-    }
+    // if (LogedMember?.type !== UserTypeEnum.OWNER) {
+    //     _body = (<PermissionDenied />)
+    // }
 
     if (step === SETTINGSTEPS.BANEDMEMBERS) {
-        _body = members ? <ChanneLSettingsChanneLBanedMember
-            setUpdate={setUpdate}
-            socket={socket}
-            OnBack={OnBack} LogedMember={LogedMember} members={members.filter((member: membersType) => member.isban === true)}
-        /> : (<div></div>)
+        _body = members
+            ? <ChanneLSettingsChanneLBanedMember
+                setUpdate={setUpdate}
+                socket={socket}
+                OnBack={OnBack} LogedMember={LogedMember} members={members.filter((member: membersType) => member.isban === true)}
+            />
+            : (<div> no member is baned </div>)
     }
     if (step === SETTINGSTEPS.SETOWNER) {
         _body = members ? <ChanneLsettingsChanneLsetOwner

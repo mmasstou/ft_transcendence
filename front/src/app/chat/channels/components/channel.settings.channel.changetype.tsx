@@ -7,7 +7,7 @@ import Input from "@/components/Input";
 import { GoEyeClosed } from "react-icons/go";
 import { BsArrowRightShort, BsSaveFill } from "react-icons/bs";
 import { HiLockClosed, HiLockOpen } from "react-icons/hi";
-import ChanneLSettingsOptionItem from "./channel.settings.optionItem";
+import ChanneLSettingsOptionItem from "./settings/ChanneL/channel.settings.channel.Item";
 import { IconBaseProps } from "react-icons";
 import React, { use, useCallback, useEffect } from "react";
 import Cookies from "js-cookie";
