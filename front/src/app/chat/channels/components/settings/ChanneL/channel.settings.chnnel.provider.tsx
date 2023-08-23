@@ -10,6 +10,8 @@ import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
 import { useParams } from "next/navigation";
 import PermissionDenied from "../../channel.settings.permissiondenied";
 import { toast } from "react-hot-toast";
+import { tr } from "date-fns/locale";
+import Loading from "../CanneLSettingsLoading";
 
 interface props {
     children: React.ReactNode;
@@ -24,6 +26,7 @@ export default function ChanneLsettingsProvider(props: props) {
     const [IsMounted, setMounted] = React.useState<boolean>(false)
     const [LoggedMember, setLoggedMember] = React.useState<membersType | null>(null)
     const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
+    const [IsLoading, setLoading] = React.useState<boolean>(true)
     const query = useParams();
     const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
 
@@ -35,11 +38,15 @@ export default function ChanneLsettingsProvider(props: props) {
         const member: membersType | null = await getMemberWithId(UserId, channeL.id, token)
         if (!member) return;
         setLoggedMember(member);
+        setTimeout(() => {
+            setLoading(false)
+        }, 400);
     }
     React.useEffect(() => {
 
-        UpdateData();
         setMounted(true)
+        UpdateData();
+       
     }, [])
 
     React.useEffect(() => {
@@ -54,6 +61,7 @@ export default function ChanneLsettingsProvider(props: props) {
     }, [props.socket])
 
     if (!IsMounted) return;
+    if(IsLoading) return <Loading />
     return <div className="flex flex-col justify-between">
         {LoggedMember?.type === UserTypeEnum.OWNER
             ? <div className="flex flex-col justify-start">

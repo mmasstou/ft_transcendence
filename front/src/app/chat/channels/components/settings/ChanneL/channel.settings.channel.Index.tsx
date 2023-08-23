@@ -1,4 +1,4 @@
-import { RoomTypeEnum, RoomsType } from "@/types/types";
+import { RoomTypeEnum, RoomsType, membersType } from "@/types/types";
 import ChanneLsettingsProvider from "./channel.settings.chnnel.provider";
 import React from "react";
 import { SETTINGSTEPS } from "./channel.settings.channel";
@@ -10,6 +10,8 @@ import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
 import ChanneLSettingsItem from "./channel.settings.channel.Item";
 import { FaChessQueen, FaUserTimes } from "react-icons/fa";
 import { Socket } from "socket.io-client";
+import getMemberWithId from "../../../actions/getMemberWithId";
+import getChannelMembersWithId from "../../../actions/getChannelmembers";
 
 interface props {
     onClick: (data: { to: SETTINGSTEPS }) => void;
@@ -17,19 +19,39 @@ interface props {
 }
 export default function ChanneLsettingsIndex(props: props) {
     const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
-    const __userId = Cookies.get('_id')
+    const [Members, setMembers] = React.useState<membersType[] | null>(null)
+    const UserId = Cookies.get('_id')
     const token: any = Cookies.get('token');
-    if (!token || !__userId) return <ChanneLaccessDeniedModaL />
+    if (!token || !UserId) return <ChanneLaccessDeniedModaL />
     const query = useParams();
     const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
+
+    const UpdateData = async () => {
+        if (!UserId || !slug || !token) return;
+        const channeL: RoomsType = await FindOneBySLug(slug, token)
+        if (!channeL) return;
+        setChanneLinfo(channeL);
+        const member: membersType[] | null = await getChannelMembersWithId(channeL.id, token)
+        if (!member) return;
+        setMembers(member.filter((member) => member.isban));
+    }
+
     React.useEffect(() => {
         if (!slug) return;
-        (async () => {
-            const channeL: RoomsType = await FindOneBySLug(slug, token)
-            if (!channeL) return;
-            setChanneLinfo(channeL);
-        })();
+        UpdateData();
     }, [])
+
+    React.useEffect(() => {
+        props.socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+            if (!data) return
+            UpdateData();
+        });
+        props.socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+            if (!data) return
+            UpdateData();
+        });
+    }, [props.socket])
+
     return <ChanneLsettingsProvider socket={props.socket}  >
         <div className="flex h-full flex-col justify-between items-start min-h-[34rem] w-full">
             <div className="flex flex-col gap-2 w-full">
@@ -42,13 +64,13 @@ export default function ChanneLsettingsIndex(props: props) {
                         label={"Change password"}
                     />
                 }
-                <ChanneLSettingsItem
+                {Members && Members?.length > 0 && <ChanneLSettingsItem
                     onClick={() => {
                         props.onClick({ to: SETTINGSTEPS.BANEDMEMBERS })
                     }}
                     icon={FaUserTimes}
                     label={"Baned members"}
-                />
+                />}
                 <ChanneLSettingsItem
                     onClick={() => {
                         props.onClick({ to: SETTINGSTEPS.SETOWNER })
