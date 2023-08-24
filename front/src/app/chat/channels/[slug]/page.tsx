@@ -54,6 +54,10 @@ export default function page() {
             },
         });
         setSocket(Clientsocket);
+        return () => { Clientsocket.disconnect() }
+    }, [])
+
+    React.useEffect(() => {
         (async () => {
             const ChanneLs = await getChannels(token)
             if (!ChanneLs) return
@@ -64,7 +68,6 @@ export default function page() {
                 toast.error('channel not found');
                 return;
             }
-            socket?.emit('accessToroom', channeL);
             const User: userType | null = await getUserWithId(userId, token);
             if (!User) return
             setLoggedUser(User)
@@ -73,14 +76,9 @@ export default function page() {
             const members = await getChannelMembersWithId(channeL.id, token)
             if (!members) return
             setChanneLsmembers(members)
-        })();
-
-        setTimeout(() => {
             setIsLoading(false);
-        }, 2000);
+        })();
         setIsMounted(true);
-
-        return () => { Clientsocket.disconnect() }
     }, [])
 
 
@@ -108,12 +106,16 @@ export default function page() {
     }, [slug])
 
     React.useEffect(() => {
+        if (!IsMounted || !ChanneLInfo) return;
+        socket?.emit('accessToroom', ChanneLInfo);
+    }, [ChanneLInfo])
+    React.useEffect(() => {
         if (!IsMounted) return
         socket?.on('accessToroomResponse', (resp: { channeL: RoomsType, LogedUser: userType }) => {
             if (resp === null) {
                 toast.error(`dont have permission to access this channel`);
                 router.push('/chat/channels/');
-            } else toast.success(`${resp.LogedUser.login} connected to chat ${resp.channeL.name}`)
+            } else toast.success(`${resp.LogedUser.login} connected with ${socket.id} to chat ${resp.channeL.name}`)
 
         });
 
@@ -130,7 +132,6 @@ export default function page() {
                     await MemberHasPermissionToAccess(token, channeL.id, userId).then((res) => {
                         if (!res) {
                             router.push('/chat/channels/');
-                            toast.error('this channel is deleted by owner');
                             confirmAction.onClose()
                             settings.onClose()
                             return;

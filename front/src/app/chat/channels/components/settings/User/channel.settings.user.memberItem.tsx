@@ -5,7 +5,7 @@ import { UserAvatar } from "../../channel.userAvater";
 // icons :
 import { TbDeviceGamepad2, TbUserX } from "react-icons/tb";
 import { SlBan, SlOptionsVertical } from "react-icons/sl";
-import { FaChessQueen, FaUserPlus, FaUserShield, FaVolumeMute } from "react-icons/fa";
+import { FaChessQueen, FaUserPlus, FaUserShield, FaVolumeMute, FaVolumeUp, FaBan} from "react-icons/fa";
 import { UserTypeEnum, membersType, updatememberEnum, updatememberType, userType } from "@/types/types";
 import React, { ReactNode } from "react";
 import Cookies from "js-cookie";
@@ -128,6 +128,8 @@ export default function ChannelSettingsUserMemberItem(
                             <>
                                 {member.type === UserTypeEnum.OWNER && <FaChessQueen size={14} fill="#FFBF00" />}
                                 {member.type === UserTypeEnum.ADMIN && <MdAdminPanelSettings size={14} fill="#FFBF00" />}
+                                {member.ismute && <FaVolumeMute size={14} fill="#FFCC00" />} 
+                                {member.isban && <FaBan size={14} fill="#ED6C03" />} 
                             </>
                         </div>
                     </div>
@@ -192,15 +194,15 @@ export default function ChannelSettingsUserMemberItem(
                             label={`Leave`}
                             background
                             Onclick={() => {
-                                OnClick({ updateType: updatememberEnum.SETOWNER, member: member })
+                                OnClick({ updateType: updatememberEnum.LEAVECHANNEL, member: member })
                             }} />
-                           {member.type === UserTypeEnum.OWNER && <ChannelSettingsUserMemberItemOption
+                        {member.type === UserTypeEnum.OWNER && <ChannelSettingsUserMemberItemOption
                             icon={AiFillDelete}
                             size={21}
                             label={'Delete'}
                             background
                             Onclick={() => {
-                                OnClick({ updateType: updatememberEnum.SETOWNER, member: member })
+                                OnClick({ updateType: updatememberEnum.DELETECHANNEL, member: member })
                             }} />}
                     </>}
 

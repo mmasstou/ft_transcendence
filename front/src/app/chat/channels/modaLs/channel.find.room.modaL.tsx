@@ -27,66 +27,33 @@ export default function ChanneLFindRoommodaL() {
     const token: any = Cookies.get('token');
     if (!token || !UserId) return
 
-    useEffect(() => {
-        if (IsOpen) {
-
-            setsearchInput('');
-            setIsLoading(true);
-            (async () => {
-                const ChanneLs: RoomsType[] | null = await getPublicProtactedChannels(token)
-                if (!ChanneLs) return setChanneLs(null);
-                // const ChanneLsFilter: RoomsType[] = ChanneLs.filter((channL) => channL.name.includes(searchInput))
-                setChanneLs(ChanneLs)
-            })();
-
-            setTimeout(() => {
-                setIsLoading(false)
-               setTimeout(() => {
-                searchInputRef.current?.focus()
-               }
-                , 100)
-            }, 2000)
-
-        }
-
-    }, [IsOpen])
-
-    React.useEffect(() => {
-        socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`,
-            (data: {
-                Ok: boolean,
-                room: RoomsType
-            }) => {
-                if (!data.Ok) return toast.error("you can't join this channel")
-                router.push(`/chat/channels/${data.room.slug}`)
-                onClose()
-            }
-        )
-    }, [socket])
-
-    // get data from backend :
-    React.useEffect(() => {
+    const UpdateData = () => {
         (async () => {
-            // if (searchInput.length === 0) return;
             const ChanneLs: RoomsType[] | null = await getPublicProtactedChannels(token)
             if (!ChanneLs) return setChanneLs(null);
             const ChanneLsFilter: RoomsType[] = ChanneLs.filter((channL) => channL.name.toLowerCase().includes(searchInput.toLowerCase()))
             setChanneLs(ChanneLsFilter.length === 0 ? null : ChanneLsFilter)
         })();
-    }, [searchInput])
+    }
+    React.useEffect(() => {
+        if (IsOpen) {
+            setsearchInput('');
+            setIsLoading(true);
+            UpdateData();
+            setTimeout(() => { setIsLoading(false) }, 1000)
+            setTimeout(() => { searchInputRef.current?.focus() }, 1100)
+        }
+    }, [IsOpen])
 
+    React.useEffect(() => {
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            (data: { Ok: boolean, room: RoomsType }) => { UpdateData(); }
+        )
+    }, [socket])
 
-    // React.useEffect(() => {
-    //     if (isInputFocused && searchInput.length === 0) {
-    //         setIsLoading(true)
-    //     }
-    //     if (!isInputFocused && searchInput.length === 0) {
-    //         setIsLoading(false)
-    //     }
-    //     // setIsLoading(false)
-    // }, [isInputFocused, searchInput])
-
+    // get data from backend :
+    React.useEffect(() => { UpdateData(); }, [searchInput])
 
     const bodyContent = (
         <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col min-h-[40rem] h-full">
@@ -131,10 +98,10 @@ export default function ChanneLFindRoommodaL() {
                     </div>
                 </div>
                 {IsLoading ? <Loading /> : <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-scroll justify-center items-center">
-                {searchInput && <h3 className=" capitalize w-full text-start font-semibold text-white">channeL match  : {searchInput} </h3>}
+                    {searchInput && <h3 className=" capitalize w-full text-start font-semibold text-white">channeL match  : {searchInput} </h3>}
                     {ChanneLs && ChanneLs.length !== 0
                         ? <div className="flex flex-col justify-start items-center w-full gap-4">
-                           
+
                             {ChanneLs.map((room: RoomsType, index: number) => {
                                 return <ChannelFindRoomItem
                                     key={index}

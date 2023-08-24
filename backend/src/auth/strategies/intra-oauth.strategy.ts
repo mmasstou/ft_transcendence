@@ -25,9 +25,15 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    const _UserExist = await this.prisma.user.findUnique({
-      where: { login: profile._json.login },
-    });
+    let _UserExist: User | null = null;
+    try {
+      _UserExist = await this.prisma.user.findUnique({
+        where: { login: profile._json.login },
+      });
+    } catch (error) {
+      console.log(error.message);
+      _UserExist = null;
+    }
     if (!_UserExist) {
       const _User = await this.prisma.user.create({
         data: {

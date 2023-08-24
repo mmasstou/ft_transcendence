@@ -59,7 +59,7 @@ export type userType = {
   email: string;
   password: string | null;
   name: string;
-  kind: null;
+  kind: string | null;
   avatar: string | '';
   intraId: number;
   banner: string | '';

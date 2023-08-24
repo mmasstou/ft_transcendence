@@ -61,24 +61,6 @@ const Button = ({ login, style, title, OnClick }: Btn) => {
       if (LoggedUser.password === data.password) {
         toast('password match ..')
         router.push(`${process.env.NEXT_PUBLIC_API_URL}/auth/login/${LoggedUser.login}/${LoggedUser.password}`)
-        // const LoginData = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({
-        //     username: LoggedUser.login,
-        //     password: LoggedUser.password
-        //   })
-        // })
-        // if (LoginData.ok) {
-        //   toast(`${LoginData.status}`)
-        //   const ddd = await LoginData.json();
-        //   console.log("LoginData :", ddd)
-        //   toast('okkkkß')
-        //   setIsOpen(false)
-        // }
-
       }
       // reset()
     })();

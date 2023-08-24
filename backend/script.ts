@@ -25,72 +25,62 @@
 //   });
 
 import { PrismaClient } from '@prisma/client';
+import { type } from 'os';
+import { userType } from 'src/users/user.type';
 
 const prisma = new PrismaClient();
 
-const _data = [
-  {
-    id: '8d739fe5-6d95-4aa9-a7e3-eae358b6c199',
-    login: 'aouhadou',
-    email: 'aouhadou@student.1337.ma',
-    password: null,
-    name: 'Azedine Ouhadou',
-    kind: 'student',
+// define user type :
+type User = {
+  login: string;
+  email: string;
+  password: string;
+  name: string;
+  kind: string;
+  avatar: string;
+  location: string;
+  intraId: number;
+  banner: string;
+  is_active: boolean;
+  Rooms: any[];
+  directMessage: any[];
+};
+type kskjsd = {
+  login: string;
+  email: string;
+  password: any;
+  name: string;
+  kind: string;
+  avatar: string;
+  location: string;
+  intraId: number;
+  banner: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  cursusId: string;
+  Rooms: [];
+  directMessage: any[];
+};
+const _data = [];
+for (let index = 0; index < 12; index++) {
+  const user: User = {
+    login: 'mmasstou' + index,
+    email: 'mmasstou' + index + '@student.1337.ma',
+    password: 'password' + index,
+    name: 'user id:' + index,
     avatar:
-      'https://cdn.intra.42.fr/users/9f70a3652c2bc7d286d9f652f1e667b4/aouhadou.jpg',
-    location: 'e3r3p7',
-    intraId: 91238,
-    banner: '',
-    is_active: false,
-    created_at: '2023-08-01T13:05:39.229Z',
-    updated_at: '2023-08-01T13:05:39.229Z',
-    cursusId: '222b3fde-1203-4da7-91ce-14fa29766470',
-    Rooms: [
-      {
-        id: 'c8c20aa5-0ea0-4b03-b60b-16b510c86b7d',
-        name: 'general',
-        type: 'PUBLIC',
-        viewedmessage: 0,
-        password: '',
-        accesspassword: '',
-        created_at: '2023-08-01T13:08:59.958Z',
-        updated_at: '2023-08-01T13:08:59.958Z',
-      },
-    ],
-    directMessage: [],
-  },
-  {
-    id: 'd008897a-627f-466b-9152-bd7f36123740',
-    login: 'mmasstou',
-    email: 'mmasstou@student.1337.ma',
-    password: null,
-    name: 'Mohamed Masstour',
-    kind: 'student',
-    avatar:
-      'https://cdn.intra.42.fr/users/5f10eb429fc9ed4eb28c5850095a14cb/mmasstou.jpg',
+      'https://cdn.intra.42.fr/users/5f10eb429fc9ed4eb28c5850095a14cb/mmjasstou.jpg',
     location: 'e3r3p3',
-    intraId: 90221,
+    intraId: 902213 + index,
     banner: '',
+    kind: 'student',
     is_active: false,
-    created_at: '2023-08-01T13:07:14.105Z',
-    updated_at: '2023-08-01T13:07:14.105Z',
-    cursusId: 'a33ab288-347f-4f66-9a05-13650c3bd699',
-    Rooms: [
-      {
-        id: 'c8c20aa5-0ea0-4b03-b60b-16b510c86b7d',
-        name: 'general',
-        type: 'PUBLIC',
-        viewedmessage: 0,
-        password: '',
-        accesspassword: '',
-        created_at: '2023-08-01T13:08:59.958Z',
-        updated_at: '2023-08-01T13:08:59.958Z',
-      },
-    ],
+    Rooms: [],
     directMessage: [],
-  },
-];
-console.log(_data);
+  };
+  _data.push(user);
+}
 
 async function createUsers(users: any[]) {
   for (const user of users) {
