@@ -8,6 +8,10 @@ import axios from 'axios';
 
 Chart.register(...registerables);
 
+interface Props {
+  user_id: string | undefined;
+}
+
 interface BackendData {
   created_at: string;
   id: string;
@@ -23,15 +27,14 @@ interface UserData {
   result: number;
 }
 
-const Statistics = () => {
+const Statistics: React.FC<Props> = ({ user_id }) => {
   const jwtToken = Cookies.get('token');
-  const userId = Cookies.get('_id');
   const [history, setHistory] = useState<HistoriqueType[]>([]);
   const [UserDataOld, setUserDataOld] = useState<UserData[]>([]);
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/game/GetScore/${userId}`, {
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/game/GetScore/${user_id}`, {
         headers: {
           Authorization: `Bearer ${jwtToken}`,
           'Content-Type': 'application/json',
@@ -42,7 +45,7 @@ const Statistics = () => {
 
         if (fetchedData.length > 0) {
           const processedData = fetchedData.map((game: any) => {
-            if (game.player1Id !== userId) {
+            if (game.player1Id !== user_id) {
               let temp = game.player1Id;
               game.player1Id = game.player2Id;
               game.player2Id = temp;
