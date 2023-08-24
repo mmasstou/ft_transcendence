@@ -107,7 +107,11 @@ const ChanneLSettingsModaL = () => {
         );
         socket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`,
-            (data: any) => {
+            (data: { Ok: boolean }) => {
+                if (!data.Ok) {
+                    channeLConfirmActionHook.onClose()
+                    return toast.error("can't leave this channel")
+                }
                 // toast.success(data.message)
                 channeLConfirmActionHook.onClose()
                 channeLsettingsHook.onClose()

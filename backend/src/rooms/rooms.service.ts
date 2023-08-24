@@ -609,10 +609,12 @@ export class RoomsService {
   }): Promise<Rooms> {
     try {
       const { userId, roomId } = params;
+      // check if room is exist
       const room = await this.prisma.rooms.findUnique({
         where: { id: roomId },
         include: { members: true },
       });
+      // check if user is exist
       const User = await this.prisma.user.findUnique({
         where: { id: userId },
       });
@@ -622,25 +624,34 @@ export class RoomsService {
         if (!User)
           throw new NotFoundException(`User with ID ${userId} not found`);
       }
-
+      // check if user is member in room
       const member = await this.membersservice.findOne({
         userId: User.id,
         roomId: room.id,
       });
       if (!member) throw new Error();
+
+      const memberOwners = await this.findOwners({ channeLId: room.id });
+      console.log('memberOwners :', memberOwners);
+      console.log('memberOwners.member :', member);
+      if (memberOwners.length === 1 && memberOwners[0].id === member.userId)
+        throw new Error();
       const result = await this.prisma.$transaction(async (prisma) => {
+        // disconnect member from room
         const room = await prisma.rooms.update({
           where: { id: roomId },
           data: {
             members: { disconnect: { id: userId } },
           },
         });
+        // disconnect room from user
         await prisma.user.update({
           where: { id: userId },
           data: {
             Rooms: { disconnect: { id: roomId } },
           },
         });
+        // delete member
         await prisma.members.delete({
           where: { id: member.id },
         });

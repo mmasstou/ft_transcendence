@@ -385,8 +385,9 @@ export class RoomGateway implements OnGatewayConnection {
         roomId: room.id,
       });
       // chck if no User or room or member or this member is not Owner
-      if (!member || member.type !== UserTypeEnum.OWNER)
-        throw new NotFoundException();
+      if (!member && member.type !== UserTypeEnum.OWNER)
+        throw new UnauthorizedException();
+
       // delete room :
       const deleteRoom = await this.roomservice.remove(room.id);
       ResponseEventData.data = deleteRoom;
@@ -496,17 +497,16 @@ export class RoomGateway implements OnGatewayConnection {
       // leave room socket :
       client.leave(data.roomId);
       client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`, {
-        Ok: 'Oki',
+        Ok: true,
       });
     } catch (error) {
-      ResponseEventData.data = null;
-      ResponseEventData.status = responseEventStatusEnum.ERROR;
-      ResponseEventData.message = responseEventMessageEnum.ERROR;
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`, {
+        Ok: false,
+      });
     }
-    this.server.emit(
-      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-      ResponseEventData,
-    );
+    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+      Ok: false,
+    });
   }
 
   @SubscribeMessage('sendMessage')
@@ -599,19 +599,15 @@ export class RoomGateway implements OnGatewayConnection {
             accesspassword: data.accesspassword,
             password: data.password,
           };
-          const updateRoom = await this.prisma.rooms.update({
+          await this.prisma.rooms.update({
             where: { id: room.id },
             data: {
               ...dataRoom,
             },
           });
-          ResponseEventData.data = updateRoom;
-          ResponseEventData.status = responseEventStatusEnum.SUCCESS;
-          ResponseEventData.message = responseEventMessageEnum.SUCCESS;
-          client.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`,
-            ResponseEventData,
-          );
+          client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, {
+            OK: true,
+          });
         }
         // set access password :
         if (data.Updatetype === UpdateChanneLSendEnum.SETACCESSEPASSWORD) {
@@ -649,27 +645,17 @@ export class RoomGateway implements OnGatewayConnection {
             updateRoom,
           );
         }
-      }
+        this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+          OK: true,
+        });
+      } else throw new UnauthorizedException();
     } catch (error) {
       console.log('Chat-updateChanneL> error- +>');
-      ResponseEventData.data = null;
-      ResponseEventData.status = responseEventStatusEnum.ERROR;
-      ResponseEventData.message = responseEventMessageEnum.ERROR;
-
-      this.server.emit(
-        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-        ResponseEventData,
-      );
+      this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+        OK: false,
+      });
       return;
     }
-    ResponseEventData.data = room;
-    ResponseEventData.status = responseEventStatusEnum.SUCCESS;
-    ResponseEventData.message = responseEventMessageEnum.SUCCESS;
-
-    this.server.emit(
-      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-      ResponseEventData,
-    );
   }
   @SubscribeMessage('sendGameNotification')
   async sendGameNotification(
