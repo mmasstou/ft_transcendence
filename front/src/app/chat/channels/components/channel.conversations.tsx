@@ -116,7 +116,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const OnSubmit = () => {
         const sendMesage = message.trim()
         if (!sendMesage) {
-            toast.error("no message to send")
+            toast.error("prompt message empty")
             setInputValue('')
             return
         }
@@ -131,6 +131,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             senderId: Cookies.get('_id'),
             roomsId: channeLinfo.id
         })
+        setInputValue('')
+        setMessage('')
         setSendingMessage(true)
 
     }

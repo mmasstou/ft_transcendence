@@ -6,7 +6,6 @@ import { CgEditFlipH } from 'react-icons/cg';
 import { TbEdit, TbPassword } from 'react-icons/tb';
 import { VscGroupByRefType } from "react-icons/vsc";
 import { Channel } from 'diagnostics_channel';
-import SettingsProvider from '../../../modaLs/channel.settings.provider';
 import Input from '@/components/Input';
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, set } from 'react-hook-form';
 import Button from '../../../../components/Button';
@@ -38,6 +37,7 @@ import { PiPasswordBold } from 'react-icons/pi';
 import toast from 'react-hot-toast';
 import FindOneBySLug from '../../../actions/Channel/findOneBySlug';
 import ChanneLsettingsIndex from './channel.settings.channel.Index';
+import SettingsProvider from '../channel.settings.provider';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
@@ -252,7 +252,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     //         </div>
     //     </div>
     // )
-    let _body = <ChanneLsettingsIndex socket={socket} onClick={(data: {to : SETTINGSTEPS}) => {
+    let _body = <ChanneLsettingsIndex socket={socket} onClick={(data: { to: SETTINGSTEPS }) => {
         setStep(data.to)
     }} />
 
@@ -317,7 +317,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     if (step === SETTINGSTEPS.DELETECHANNEL) {
         _body = <ChanneLSettingsChanneLDeleteChannel room={ChanneLinfo} OnBack={OnBack} socket={socket} />
     }
-    return <SettingsProvider >
+    return <SettingsProvider socket={socket} >
         {_body}
     </SettingsProvider>
 }

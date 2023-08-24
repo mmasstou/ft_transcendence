@@ -64,6 +64,7 @@ export default function page() {
                 toast.error('channel not found');
                 return;
             }
+            socket?.emit('accessToroom', channeL);
             const User: userType | null = await getUserWithId(userId, token);
             if (!User) return
             setLoggedUser(User)

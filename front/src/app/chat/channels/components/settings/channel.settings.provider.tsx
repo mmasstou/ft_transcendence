@@ -46,7 +46,10 @@ export default function SettingsProvider(props: props) {
 
         setMounted(true)
         UpdateData();
-       
+        setTimeout(() => {
+            setLoading(false)
+        }, 400)
+
     }, [])
 
     React.useEffect(() => {
@@ -61,8 +64,9 @@ export default function SettingsProvider(props: props) {
     }, [props.socket])
 
     if (!IsMounted) return;
-    if(IsLoading) return <Loading />
-    return <div className="flex flex-col justify-between">
-       settings provider
+    if (IsLoading) return <Loading />
+    return <div className="flex flex-col justify-between max-h-[32rem]">
+      
+        {props.children}
     </div>
 }

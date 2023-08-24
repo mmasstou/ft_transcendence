@@ -13,10 +13,9 @@ const Modal = ({isVisible, onClose, children} : Props) => {
     <div className= {`fixed inset-0 bg-neutral-800/80  flex justify-center 
     md:items-center sm:items-center lg:py-[150px] z-50`} >
         <div className=" relative 
-          w-[90%]
-          md:w-3/6
-          lg:w-3/6
-          xl:w-3/6
+          max-w-[512px]
+          min-w-[380px]
+          w-full
           my-6
           mx-auto 
           h-full

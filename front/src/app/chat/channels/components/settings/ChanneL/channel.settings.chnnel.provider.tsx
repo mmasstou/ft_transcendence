@@ -12,6 +12,8 @@ import PermissionDenied from "../../channel.settings.permissiondenied";
 import { toast } from "react-hot-toast";
 import { tr } from "date-fns/locale";
 import Loading from "../CanneLSettingsLoading";
+import Settings from "@/components/Dashboard/Header/Settings";
+import SettingsProvider from "../channel.settings.provider";
 
 interface props {
     children: React.ReactNode;
@@ -46,7 +48,7 @@ export default function ChanneLsettingsProvider(props: props) {
 
         setMounted(true)
         UpdateData();
-       
+
     }, [])
 
     React.useEffect(() => {
@@ -61,8 +63,8 @@ export default function ChanneLsettingsProvider(props: props) {
     }, [props.socket])
 
     if (!IsMounted) return;
-    if(IsLoading) return <Loading />
-    return <div className="flex flex-col justify-between">
+    if (IsLoading) return <Loading />
+    return <SettingsProvider socket={null}>
         {LoggedMember?.type === UserTypeEnum.OWNER
             ? <div className="flex flex-col justify-start">
                 <div className=" flex flex-row items-center justify-start gap-3">
@@ -82,5 +84,5 @@ export default function ChanneLsettingsProvider(props: props) {
                 </div>
             </div>
             : <PermissionDenied />}
-    </div>
+    </SettingsProvider>
 }

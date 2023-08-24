@@ -94,7 +94,7 @@ const Button = ({ login, style, title, OnClick }: Btn) => {
             className={`rounded-full text-btn bg-secondary
                   ${style} w-[100px] h-[32px] lg:w-[120px] lg:h-[42px] mr-6 mt-5`}
           >
-            {title} ffff
+            {title}
           </button>
         ) : (
           <button
@@ -109,7 +109,7 @@ const Button = ({ login, style, title, OnClick }: Btn) => {
       </div>
       <Modal isVisible={isOpen} onClose={() => setIsOpen(false)}>
         <div
-          className={`flex justify-between items-center flex-col  min-h-[52vh]`}
+          className={`flex justify-around items-center flex-col h-full min-h-[720px]`}
         >
           {/* <h1
             className={`${styles.heading2} text-secondary flex justify-center `}
@@ -131,7 +131,7 @@ const Button = ({ login, style, title, OnClick }: Btn) => {
             <h1 className=" flex w-full justify-center text-2xl">Welcome</h1>
             <h4 className="text-center text-sm">Login to continue to transcendence Dashboard</h4>
           </div>
-          <div className='LoginWithUsername w-full flex flex-col items-center justify-center gap-4'>
+          <div className='LoginWithUsername w-full flex flex-col items-center justify-center gap-4 max-w-[380px]'>
             <div className="flex flex-col gap-4 w-full">
               <div className=" relative w-full">
                 <input

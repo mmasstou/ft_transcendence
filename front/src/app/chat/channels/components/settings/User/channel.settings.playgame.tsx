@@ -16,6 +16,8 @@ import getUserWithId from "../../../actions/getUserWithId";
 import { set } from "date-fns";
 import ChanneLSettingsBody from "../channel.settings.body";
 import Loading from "../CanneLSettingsLoading";
+import ChanneLsettingsProvider from "../ChanneL/channel.settings.chnnel.provider";
+import SettingsProvider from "../channel.settings.provider";
 interface props {
     onClick: (data: any) => void;
     Onback: () => void;
@@ -72,11 +74,19 @@ export default function ChanneLsettingsPlayGame(
 
     }, [socket]);
 
-    return <ChanneLSettingsBody
-        title={`Play with ${PLayer02?.login}`}
-        OnBack={Onback}
-        HasPermission={false}
+    return <SettingsProvider
+        socket={socket}
     >
+        <div className=" flex flex-row items-center justify-start gap-3">
+            {<Button
+                icon={IoChevronBackOutline}
+                outline
+                size={21}
+                labelsize={8}
+                onClick={Onback}
+            />}
+            <h3 className="capitalize text-md text-[#FFFFFF] font-semibold"> {`Play with ${PLayer01?.login}`} </h3>
+        </div>
         {LoadingGame ? <div>
             <Loading mode={gamemode} message={` Waiting for ${PLayer01?.login}  to accept the invitation ...`} />
         </div> : <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
@@ -85,10 +95,10 @@ export default function ChanneLsettingsPlayGame(
                     <Image src="/game-mode.svg" width={200} height={200} alt={""} />
                     {/* <h2 className=" capitalize font-extrabold text-white">permission denied</h2> */}
                 </div>
-                <h2>
+                {/* <h2>
                     P1 :{player1Id} - {PLayer02?.login} <br />
                     p2 : {player2Id} - {PLayer01?.login}
-                </h2>
+                </h2> */}
                 <div className="flex flex-col gap-3  w-full">
                     <button
                         onClick={() => {
@@ -149,7 +159,8 @@ export default function ChanneLsettingsPlayGame(
                 </div>
             </div>
         </div>}
+    </SettingsProvider>
 
-    </ChanneLSettingsBody>
+
 
 }

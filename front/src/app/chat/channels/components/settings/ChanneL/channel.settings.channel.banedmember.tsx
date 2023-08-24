@@ -82,7 +82,11 @@ export default function ChanneLSettingsChanneLBanedMember(
         });
     }, [socket])
 
-    return <ChanneLsettingsProvider socket={socket} label={`Baned Members :${User?.login}`} OnBack={OnBack}>
+    return <ChanneLsettingsProvider
+        socket={socket}
+        label={`Baned Members :${User?.login}`}
+        OnBack={OnBack}
+    >
         <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
             {Members && Members.map((member, index) => (
                 <ChannelSettingsUserMemberItem

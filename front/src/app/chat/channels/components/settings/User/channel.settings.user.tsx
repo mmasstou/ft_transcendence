@@ -24,7 +24,6 @@ import { toast } from "react-hot-toast";
 import StartGame from "../../../actions/startgame";
 import ChanneLsettingsPlayGame from "./channel.settings.playgame";
 import { steps } from "framer-motion";
-import SettingsProvider from "../../../modaLs/channel.settings.provider";
 import getLable from "../../../actions/getLable";
 import { tr } from "date-fns/esm/locale";
 import { set } from "date-fns";
@@ -32,6 +31,7 @@ import FilterMembers_IsBan_NotLoggedUser from "../../../actions/filterMembers_Is
 import { BiSolidFileFind } from "react-icons/bi";
 import ChanneLSettingsMemberFindModaL from "./channel.settings.user.findmember";
 import Loading from "../CanneLSettingsLoading";
+import SettingsProvider from "../channel.settings.provider";
 
 interface ChanneLUserSettingsProps {
     room: RoomsType | null;
@@ -245,7 +245,7 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
         }} />
     }
 
-    return <SettingsProvider >
+    return <SettingsProvider socket={socket} >
         {bodyContent}
     </SettingsProvider>
 }
