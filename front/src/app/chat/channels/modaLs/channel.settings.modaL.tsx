@@ -30,6 +30,9 @@ import ChanneLChatSettings from "../components/settings/ChanneL/channel.settings
 import ChanneLSettingsInfo from "../components/settings/channel.settings.info"
 import FindOneBySLug from "../actions/Channel/findOneBySlug"
 import ChanneLUserSettings from "../components/settings/User/channel.settings.user"
+import ChannelSettingsUserMemberItem from "../components/settings/User/channel.settings.user.memberItem"
+import SettingsProvider from "../components/settings/channel.settings.provider"
+import getChannelMembersWithId from "../actions/getChannelmembers"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',
@@ -42,11 +45,45 @@ const ChanneLSettingsModaL = () => {
     const [ChanneLInfo, setChanneLInfo] = useState<RoomsType | null>(null)
     const [UserInfo, setUserInfo] = useState<userType | null>(null)
     const [MemberInfo, setMemberInfo] = useState<membersType | null>(null)
+    const [aLLMembersList, setaLLMembersList] = React.useState<membersType[] | null>(null)
+    const [IsLoading, setLoading] = React.useState<boolean>(true)
 
     const token: any = Cookies.get('token');
     const UserId: any = Cookies.get('_id');
     if (!token || !UserId)
         return;
+
+
+
+    const UpdateData = async () => {
+        if (!UserId || !slug || !token) return;
+        const channeL: RoomsType | null = await FindOneBySLug(slug, token)
+        if (!channeL) return;
+        setChanneLInfo(channeL);
+        const member: membersType | null = await getMemberWithId(UserId, channeL.id, token)
+        if (!member) return;
+        setMemberInfo(member);
+        setTimeout(() => {
+            setLoading(false)
+        }, 400);
+    }
+    React.useEffect(() => {
+
+        setMounted(true)
+        UpdateData();
+
+    }, [])
+
+    React.useEffect(() => {
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+            if (!data) return
+            UpdateData();
+        });
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+            if (!data) return
+            UpdateData();
+        });
+    }, [socket])
 
     useEffect(() => {
         (async () => {
@@ -54,6 +91,9 @@ const ChanneLSettingsModaL = () => {
             if (!channeLinfo) return
             const userInfo = await getUserWithId(UserId, token)
             const memberInfo = await getMemberWithId(UserId, channeLinfo.id, token)
+            const aLLMembersList = await getChannelMembersWithId(channeLinfo.id, token)
+            if (!aLLMembersList) return
+            setaLLMembersList(aLLMembersList)
             setUserInfo(userInfo)
             setMemberInfo(memberInfo)
             setChanneLInfo(channeLinfo)
@@ -63,7 +103,7 @@ const ChanneLSettingsModaL = () => {
 
     const { setValue, watch, reset, } = useForm<FieldValues>({
         defaultValues: {
-            channeLtype: "ChatInfo"
+            channeLtype: "UserSettings"
         },
     });
 
@@ -74,10 +114,49 @@ const ChanneLSettingsModaL = () => {
         setValue(key, value, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
     }
 
-    const bodyContent = (
+
+    let bodyContent = (
         <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col min-h-[40rem] h-full">
+            <div className="flex flex-row justify-start gap-3 items-center text-white">
+                <span className={` text-3xl `}>#</span>
+                <div className="flex flex-row items-center justify-between w-full">
+                    <div className=" flex items-center gap-2">
+                        <h2 className="text-xl">{ChanneLInfo?.name}</h2>
+                        <span className=" text-secondary text-sm font-medium">{ChanneLInfo?.type}</span>
+                        <span className="text-xs font-medium">[ {aLLMembersList?.length} members ]</span>
+
+                    </div>
+                </div>
+            </div>
+            {MemberInfo && <ChannelSettingsUserMemberItem
+                member={MemberInfo}
+                socket={socket}
+                UserJoin={false}
+                UserOwne={false}
+                UserProfile
+                OnClick={() => { }} />}
+
+            <div className={`body flex flex-col gap-4 h-full w-full min-h-[32rem]`}>
+                {
+                    _channeLtype === "UserSettings"
+                        ? <ChanneLUserSettings
+                            socket={socket}
+                            room={ChanneLInfo}
+                            User={UserInfo}
+                            member={MemberInfo}
+                        />
+                        : _channeLtype === "ChatSettings"
+                        && <ChanneLChatSettings socket={socket} />
+                    // : ChanneLInfo && <ChanneLSettingsInfo
+                    //     socket={socket}
+                    //     room={ChanneLInfo}
+                    //     User={UserInfo}
+                    //     member={MemberInfo}
+                    // />
+                }
+            </div>
             <div className=" w-full flex flex-row h-max justify-around items-center mb-5 text-white ">
-                <Button
+                {/* <Button
                     icon={TbInfoSquareRoundedFilled}
                     label={"ChanneL Info"}
                     outline
@@ -85,7 +164,8 @@ const ChanneLSettingsModaL = () => {
                     showLabeL
                     IsActive={_channeLtype === "ChatInfo"}
                     onClick={() => { setcustomvalue("channeLtype", "ChatInfo") }}
-                /><Button
+                /> */}
+                <Button
                     icon={FaUsersCog}
                     label={"User Settings"}
                     outline
@@ -104,27 +184,12 @@ const ChanneLSettingsModaL = () => {
                     onClick={() => { setcustomvalue("channeLtype", "ChatSettings") }}
                 />
             </div>
-
-            <div className={`body flex flex-col gap-4 h-full w-full min-h-[38rem]`}>
-                {
-                    _channeLtype === "UserSettings"
-                        ? <ChanneLUserSettings
-                            socket={socket}
-                            room={ChanneLInfo}
-                            User={UserInfo}
-                            member={MemberInfo}
-                        />
-                        : _channeLtype === "ChatSettings"
-                            ? <ChanneLChatSettings socket={socket} />
-                            : ChanneLInfo && <ChanneLSettingsInfo
-                                socket={socket}
-                                room={ChanneLInfo}
-                                User={UserInfo}
-                                member={MemberInfo}
-                            />}
-            </div>
         </div>
     )
+    if (MemberInfo?.isban)
+        bodyContent = (<div>You Are Baned </div>)
+
+
     return <ChanneLModal IsOpen={IsOpen} title={` ${ChanneLInfo?.name} settings`} children={bodyContent} onClose={() => {
         onClose()
         reset()

@@ -23,7 +23,7 @@ import getMemberWithId from '../../../actions/getMemberWithId';
 import { Socket } from 'socket.io-client';
 import Image from 'next/image';
 import ChanneLSettingsChanneLBanedMember from './channel.settings.channel.banedmember';
-import ChanneLsettingsChanneLsetOwner from '../../channel.settings.channel.setOwner';
+import ChanneLsettingsChanneLsetOwner from './channel.settings.channel.setOwner';
 import ChanneLSettingsChanneLAccessPassword from '../../channel.settings.channel.accesspassword';
 import ChanneLaccessDeniedModaL from '../../../modaLs/channel.access.denied.modaL';
 import ChanneLSettingsChanneLChangeType from '../../channel.settings.channel.changetype';

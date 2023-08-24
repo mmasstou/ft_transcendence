@@ -13,9 +13,10 @@ interface IChannelSettingsUserMemberItemProps {
     IsLoading?: boolean
     background?: boolean
     label: string
+    showLabeL?: boolean
 }
 export default function ChannelSettingsUserMemberItemOption(
-    { icon: Icon, size, IsActivate, disabled, IsLoading, background, Onclick, label }: IChannelSettingsUserMemberItemProps) {
+    { icon: Icon, size, IsActivate, disabled, IsLoading, background, Onclick, label , showLabeL }: IChannelSettingsUserMemberItemProps) {
     const [Ismounted, setIsmounted] = useState<boolean>(false)
 
     React.useEffect(() => setIsmounted(true))
@@ -26,6 +27,7 @@ export default function ChannelSettingsUserMemberItemOption(
         icon={Icon}
         size={size}
         outline
+        showLabeL={showLabeL}
         IsActive={IsActivate}
         label={label}
         responsive

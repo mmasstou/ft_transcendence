@@ -14,7 +14,7 @@ export default function ChanneLSettingsMemberFindModaL(
     const [ChanneLInfo, setChanneLInfo] = React.useState<RoomsType | null>(null)
 
     return <ChanneLSettingsBody
-    title={`find membes from ${ChanneLInfo?.name}`}
+    title={`find membes from`}
     OnBack={OnBack}
     HasPermission={false} >
 <div>

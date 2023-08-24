@@ -19,7 +19,7 @@ export default async function FilterMembers_IsBan_NotLoggedUser(
     if (response.ok) {
         const membersList : membersType[] =  await response.json()
         let IsBan_NotLoggedUserList = membersList.filter((member : membersType) => {
-            return (member.isban !== true)
+            return (member.isban !== true && member.userId !== UserId)
         })
       return IsBan_NotLoggedUserList;
     }

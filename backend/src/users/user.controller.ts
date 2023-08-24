@@ -24,14 +24,17 @@ export class UserController {
     return this.usersService.create(createUserDto);
   }
 
-  // @UseGuards(JwtAuthGuard)
   @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
-
-  @UseGuards(JwtAuthGuard)
+  @Get('login/:login')
+  getUserWithLogin(@Param('login') login: string) {
+    return this.usersService.findOneLogin({ login });
+  }
+  // @UseGuards(JwtAuthGuard)
   @Get('login')
   getLoginUser(@Req() request: Request) {
     const User_payload: any = request.user;
@@ -43,13 +46,13 @@ export class UserController {
     return this.usersService.findOne({ id });
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() data: UpdateUserDto) {
     return this.usersService.update({ id, data });
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);

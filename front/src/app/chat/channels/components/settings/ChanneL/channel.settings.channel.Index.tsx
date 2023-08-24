@@ -12,6 +12,7 @@ import { FaChessQueen, FaUserTimes } from "react-icons/fa";
 import { Socket } from "socket.io-client";
 import getMemberWithId from "../../../actions/getMemberWithId";
 import getChannelMembersWithId from "../../../actions/getChannelmembers";
+import { CgEditFlipH } from "react-icons/cg";
 
 interface props {
     onClick: (data: { to: SETTINGSTEPS }) => void;
@@ -77,6 +78,13 @@ export default function ChanneLsettingsIndex(props: props) {
                     }}
                     icon={FaChessQueen}
                     label={"set owner"}
+                />
+                 <ChanneLSettingsItem
+                    onClick={() => {
+                        props.onClick({ to: SETTINGSTEPS.CHANGECHANNEL })
+                    }}
+                    icon={CgEditFlipH}
+                    label={"Change Type"}
                 />
                 {/* <ChanneLSettingsOptionItem
                     onClick={OnChangeChannel}

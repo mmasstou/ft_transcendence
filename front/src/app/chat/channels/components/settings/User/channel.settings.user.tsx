@@ -123,30 +123,6 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
 
     }, [socket])
 
-    // React.useEffect(() => {
-
-    //     (async () => {
-    //         if (!room)
-    //             return;
-    //         const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
-    //         if (channeLLMembers) setMembers(channeLLMembers)
-    //         // const __filterMembers = channeLLMembers.filter((member: membersType) => member.userId !== UserId)
-    //         // filter if member is ban or member userId === loged userId
-    //         // const filterdmembers = channeLLMembers.filter((member: membersType) => member.isban !== true)
-    //         // setMembers(filterdmembers.filter((member: membersType) => member.userId !== UserId))
-    //         // }
-
-    //     })();
-    //     setUpdate(false);
-
-    //     (async () => {
-
-    //         const channeLLMembers = UserId && await getMemberWithId(UserId, room.id, token)
-    //         if (channeLLMembers && channeLLMembers.statusCode !== 200) {
-    //             setLogedMember(channeLLMembers)
-    //         }
-    //     })();
-    // }, [])
 
     const handlOnclick = (data: { updateType?: updatememberEnum, member: membersType }) => {
         console.log("ana hanananananan")

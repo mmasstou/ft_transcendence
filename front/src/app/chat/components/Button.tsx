@@ -58,7 +58,7 @@ const Button: React.FC<ButtonProps> = ({
         transition
         items-center
         w-max
-        px-2
+        px-2 z-10
         ${outline ? ' bg-transparent' : 'bg-rose-500'}
        ${border ? outline ? 'border-black' : 'border-rose-500' : ''}
        ${IsActive ? ' text-secondary' : IsBan ? ' text-isban' : 'text-white'}

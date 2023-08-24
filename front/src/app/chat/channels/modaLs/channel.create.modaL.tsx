@@ -10,7 +10,7 @@ import {
   useFieldArray,
   set,
 } from 'react-hook-form';
-import { MouseEvent, useEffect, useState } from 'react';
+import { ChangeEvent, MouseEvent, useEffect, useState } from 'react';
 import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
@@ -38,6 +38,9 @@ const ChanneLCreateModaL = () => {
   const [userId, setuserId] = useState<userType | null>(null);
   const [InputValue, setInputValue] = useState('');
   const [IsLoading, setIsLoading] = useState<boolean>(false)
+  const [channeLnameInput, setchanneLnameInput] = useState<string>('')
+  const [channeLpasswordInput, setchanneLpasswordInput] = useState<string>('')
+
 
   let users: any[] = [];
   useEffect(() => {
@@ -53,7 +56,7 @@ const ChanneLCreateModaL = () => {
   type formValues = {
     channel_name: string;
     friends: userType[];
-    ChanneLpassword: string;
+    channeLpassword: string;
     channeLtype: string;
   };
 
@@ -67,16 +70,16 @@ const ChanneLCreateModaL = () => {
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
-      channel_name: '',
+      channeLname: '',
       friends: selectedFriends,
-      ChanneLpassword: '',
-      channeLtype: '',
+      channeLpassword: '',
+      channeLtype: "PUBLIC",
     },
   });
 
   const friends = watch('friends');
-  const _channel_name = watch('channel_name');
-  const _channeLpassword = watch('ChanneLpassword');
+  const channeLname = watch('channeLname');
+  const channeLpassword = watch('channeLpassword');
   const _channeLtype = watch('channeLtype');
 
   // Argument of type 'string' is not assignable to parameter of type '"channel_name" | "friends" | `friends.${number}` | `friends.${number}.id` | `friends.${number}.login` | `friends.${number}.email` | `friends.${number}.password` | `friends.${number}.first_name` | `friends.${number}.last_name` | `friends.${number}.kind` | `friends.${number}.image` | `friends.${number}.is_active`
@@ -88,11 +91,14 @@ const ChanneLCreateModaL = () => {
     });
   };
 
+  const resetALL = () => {
+    reset();
+    setchanneLnameInput('');
+    setchanneLpasswordInput('')
+
+  }
   const onSubmit: SubmitHandler<FieldValues> = async (Data: any) => {
     // create private room : createroom
-    setcustomvalue(_channel_name, "")
-    reset();
-    setInputValue("");
 
     const token: any = Cookies.get('token');
     const User_ID: string | undefined = Cookies.get('_id');
@@ -108,15 +114,14 @@ const ChanneLCreateModaL = () => {
       _friends.push(__friends)
     }
     _friends.push(LoginUser)
+    console.log('NEXT_PUBLIC_SOCKET_EVENT_CHAT_CREATE :', Data)
+    resetALL()
     socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_CREATE}`, {
-      name: Data.channel_name,
+      name: Data.channeLname,
       friends: _friends,
       type: Data.channeLtype,
-      channeLpassword: Data.ChanneLpassword
-    },
-      (response: any) => {
-        console.log('join response : ', response)
-      });
+      channeLpassword: Data.channeLpassword
+    });
     socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, (room: any) => {
       if (!room.data) {
         toast(room.message)
@@ -127,6 +132,18 @@ const ChanneLCreateModaL = () => {
     })
   }
 
+  const onChangeChanneLname = (event: ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    setValue('channeLname', event.target.value)
+    setchanneLnameInput(event.target.value)
+  }
+
+  const onChangeChanneLpassword = (event: ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    setValue('channeLpassword', event.target.value)
+    setchanneLpasswordInput(event.target.value)
+  }
+
   if (IsLoading) {
     toast.loading("fitching dependencies ... !")
 
@@ -134,50 +151,66 @@ const ChanneLCreateModaL = () => {
   const bodyContent = (
     <div className="  w-full p-4 md:p-6 flex flex-col justify-between min-h-[34rem]">
       <div className="body flex flex-col gap-4">
-        <div className="body flex flex-col gap-2 py-4">
-          <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel name </h1>
-          <Input
-            onChange={(e: any) => { setcustomvalue(_channel_name, e.target.value) }}
-            id={"channel_name"} lable={"channel name"}
-            register={register}
-            errors={errors} />
+        <div className=" relative w-full">
+          <input
+
+            id={'channeLname'}
+            {...register('channeLname', { required: true })}
+            placeholder=" "
+            type={'text'}
+            value={channeLnameInput}
+            onChange={onChangeChanneLname}
+            disabled={IsLoading}
+            className={` text-white peer w-full p-2 pt-6 text-xl bg-transparent text-[var(--white)] focus:bg-transparent font-light border rounded-md outline-none transition disabled:opacity-70 disabled:cursor-not-allowed ${errors['channeLname'] ? 'border-rose-500 focus:border-rose-500' : 'border-neutral-300 focus:border-secondary'}`}
+          />
+          <label htmlFor="" className={`capitalize text-[var(--white)] absolute text-md duration-150 transform -translate-x-3 top-5 z-10 origin-[0] left-7 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 ${(channeLname.length !== 0 || !channeLname) ? 'scale-75 -translate-y-4' : ''} ${errors['channeLname'] ? 'text-rose-500' : 'text-zinc-500'}`}>channel name</label>
         </div>
         <div className="flex flex-col gap-3">
           <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel type </h1>
           <div className=" w-full flex flex-row justify-between items-center ">
+
+            <Button
+              icon={HiLockOpen}
+              label={"public"}
+              outline
+              showLabeL
+              IsActive={_channeLtype === "PUBLIC"}
+              onClick={() => { setcustomvalue("channeLtype", "PUBLIC") }}
+            />
             <Button
               icon={GoEyeClosed}
               label={"private"}
               outline
+              showLabeL
               IsActive={_channeLtype === "PRIVATE"}
               onClick={() => { setcustomvalue("channeLtype", "PRIVATE") }}
             />
             <Button
               icon={HiLockClosed}
-              label={"public"}
-              outline
-              IsActive={_channeLtype === "PUBLIC"}
-              onClick={() => { setcustomvalue("channeLtype", "PUBLIC") }}
-            />
-            <Button
-              icon={HiLockOpen}
               label={"protected"}
               outline
+              showLabeL
               IsActive={_channeLtype === "PROTECTED"}
               onClick={() => { setcustomvalue("channeLtype", "PROTECTED") }}
             />
           </div>
         </div>
         {/* if protacted */}
-        {_channeLtype === "PROTECTED" && <div>
-          <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel password </h1>
-          <Input
-            onChange={(e: any) => { setcustomvalue(_channeLpassword, e.target.value) }}
-            id={"ChanneLpassword"} lable={"ChanneLpassword"}
-            register={register}
-            type="password"
-            errors={errors} />
-        </div>
+        {_channeLtype === "PROTECTED" &&
+          <div className=" relative w-full">
+            <input
+
+              id={'channeLpassword'}
+              {...register('channeLpassword', { required: true })}
+              placeholder=" "
+              type={'password'}
+              value={channeLpasswordInput}
+              onChange={onChangeChanneLpassword}
+              disabled={IsLoading}
+              className={` text-white peer w-full p-2 pt-6 text-xl bg-transparent text-[var(--white)] focus:bg-transparent font-light border rounded-md outline-none transition disabled:opacity-70 disabled:cursor-not-allowed ${errors['channeLpassword'] ? 'border-rose-500 focus:border-rose-500' : 'border-neutral-300 focus:border-secondary'}`}
+            />
+            <label htmlFor="" className={` capitalize text-[var(--white)] absolute text-md duration-150 transform -translate-x-3 top-5 z-10 origin-[0] left-7 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 ${(channeLpassword.length !== 0 || !channeLpassword) ? 'scale-75 -translate-y-4' : ''} ${errors['channeLpassword'] ? 'text-rose-500' : 'text-zinc-500'}`}>channel password</label>
+          </div>
         }
         {aLLfriends !== null && <Select
           disabled={false}

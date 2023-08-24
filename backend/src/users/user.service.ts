@@ -118,14 +118,9 @@ export class UserService {
       if (!token) {
         throw new UnauthorizedException();
       }
-      payload = await this.jwtService
-        .verifyAsync(token, {
-          secret: process.env.JWT_SECRET,
-        })
-        .catch((error) => {
-          console.log('token jwt expired');
-          throw new UnauthorizedException();
-        });
+      payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       const login: string = payload.login;

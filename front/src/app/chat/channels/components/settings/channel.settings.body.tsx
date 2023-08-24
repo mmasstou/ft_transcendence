@@ -15,12 +15,12 @@ export default function ChanneLSettingsBody(
     return <div className="flex flex-col justify-between">
         <div className="flex flex-col justify-start">
             <div className=" flex flex-row items-center justify-start gap-3">
-                {OnBack && <Button
+                {<Button
                     icon={IoChevronBackOutline}
                     outline
                     size={21}
                     labelsize={8}
-                    onClick={OnBack}
+                    onClick={OnBack ? OnBack : ()=> {}}
                 />}
                 {title && <h3 className="capitalize text-md text-[#FFFFFF] font-semibold"> {title} </h3>}
             </div>

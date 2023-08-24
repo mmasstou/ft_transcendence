@@ -16,11 +16,11 @@
 }
 
 .spinner {
-    border: 6px solid #fff;
-    border-top: 6px solid #1EF0AE;
+    border: 3px solid #fff;
+    border-top: 3px solid #1EF0AE;
     border-radius: 50%;
-    width: 80px;
-    height: 80px;
+    width: 65px;
+    height: 65px;
     animation: spin 1s linear infinite;
 }
 

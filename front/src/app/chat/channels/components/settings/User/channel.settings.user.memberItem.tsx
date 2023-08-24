@@ -21,7 +21,8 @@ import ChannelSettingsUserMemberItemOption from "../../channel.settings.user.mem
 import MuteTime from "../../channel.settings.user.mutetime";
 import ChanneLSettingsUserMemberItemActions from "./channel.settings.user.memberItem.actions";
 import { VscPersonAdd } from "react-icons/vsc";
-import { AiOutlineUserAdd } from "react-icons/ai";
+import { AiFillDelete, AiOutlineUserAdd } from "react-icons/ai";
+import { IoLogOut } from "react-icons/io5";
 
 
 interface IChannelSettingsUserMemberItemProps {
@@ -31,9 +32,10 @@ interface IChannelSettingsUserMemberItemProps {
     UserJoin?: boolean
     UserOwne?: boolean
     UserBan?: boolean
+    UserProfile?: boolean
 }
 export default function ChannelSettingsUserMemberItem(
-    { member, socket, UserJoin, OnClick, UserOwne, UserBan }: IChannelSettingsUserMemberItemProps) {
+    { member, socket, UserJoin, OnClick, UserOwne, UserBan, UserProfile }: IChannelSettingsUserMemberItemProps) {
     const [IsMounted, setIsMounted] = React.useState(false)
     const [UserInfo, setUserInfo] = React.useState<userType | null>(null)
     const router = useRouter()
@@ -109,7 +111,7 @@ export default function ChannelSettingsUserMemberItem(
                         <Image src={UserInfo ? UserInfo?.avatar : '/avatar.png'} alt="avatar" width={24} height={24} />
                     </div> */}
                     <div className=" hidden sm:flex">
-                        <UserAvatar User={UserInfo ? UserInfo : undefined} size={42} image={UserInfo ? UserInfo?.avatar : '/avatar.png'} />
+                        <UserAvatar User={UserInfo ? UserInfo : undefined} size={42} showsatatus={UserProfile && false} image={UserInfo ? UserInfo?.avatar : '/avatar.png'} />
 
                     </div>
                     <div>
@@ -131,7 +133,7 @@ export default function ChannelSettingsUserMemberItem(
                     </div>
                 </div>
                 <div className="flex flex-row gap-3 justify-center items-center">
-                    {!UserJoin && !UserOwne && !UserBan
+                    {!UserJoin && !UserOwne && !UserBan && !UserProfile
                         && <>
 
                             {<ChanneLSettingsUserMemberItemActions
@@ -177,12 +179,30 @@ export default function ChannelSettingsUserMemberItem(
                         icon={FaChessQueen}
                         size={24}
                         IsActivate={member.type === UserTypeEnum.OWNER}
-                        label={`${member.type === UserTypeEnum.OWNER ? 'remove as Owner':'set as Owner' }`}
+                        label={`${member.type === UserTypeEnum.OWNER ? 'remove as Owner' : 'set as Owner'}`}
                         background
                         Onclick={() => {
                             OnClick({ updateType: updatememberEnum.SETOWNER, member: member })
                         }}
                     />}
+                    {UserProfile && !member.isban && <>
+                        <ChannelSettingsUserMemberItemOption
+                            icon={IoLogOut}
+                            size={21}
+                            label={`Leave`}
+                            background
+                            Onclick={() => {
+                                OnClick({ updateType: updatememberEnum.SETOWNER, member: member })
+                            }} />
+                           {member.type === UserTypeEnum.OWNER && <ChannelSettingsUserMemberItemOption
+                            icon={AiFillDelete}
+                            size={21}
+                            label={'Delete'}
+                            background
+                            Onclick={() => {
+                                OnClick({ updateType: updatememberEnum.SETOWNER, member: member })
+                            }} />}
+                    </>}
 
                 </div>
             </div>

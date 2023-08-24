@@ -16,7 +16,7 @@ export default function SettingsProvider({ children }: SettingsProviderProps) {
         }, 400)
     }, [])
     if (!Ismounted) return null
-    return <div className='flex flex-col gap-4'>{
+    return <div className='flex flex-col gap-4 max-h-[32vh]'>{
         IsLoading ? <Loading /> : children}</div>
 
 }

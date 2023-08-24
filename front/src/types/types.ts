@@ -123,6 +123,8 @@ export enum updatememberEnum {
   SETOWNER = 'SETOWNER',
   ACCESSPASSWORD = 'ACCESSPASSWORD',
   ADDMEMBER = 'ADDMEMBER',
+  LEAVECHANNEL = 'LEAVECHANNEL',
+  DELETECHANNEL = 'DELETECHANNEL',
 }
 
 export enum UpdateChanneLSendEnum {
