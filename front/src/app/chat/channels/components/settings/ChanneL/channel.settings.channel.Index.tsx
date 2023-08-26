@@ -89,7 +89,7 @@ export default function ChanneLsettingsIndex(props: props) {
                     icon={CgEditFlipH}
                     label={"Change Type"}
                 />
-                {!ChanneLinfo?.hasAccess &&
+                {/* {!ChanneLinfo?.hasAccess &&
                     <ChanneLSettingsItem
 
                         onClick={() => {
@@ -97,22 +97,22 @@ export default function ChanneLsettingsIndex(props: props) {
                         }}
                         icon={TbPassword}
                         label={"set access password"}
-                    />}
+                    />} */}
 
-                {<ChanneLSettingsItem
+                {/* {<ChanneLSettingsItem
                         onClick={() => {
                             props.onClick({ to: SETTINGSTEPS.REMOVEACCESSPASSWORD })
                         }}
                         icon={IoBagRemove}
                         label={"remove access password"}
-                    />}
-                    {<ChanneLSettingsItem
+                    />} */}
+                    {/* {<ChanneLSettingsItem
                     onClick={() => {
                         props.onClick({ to: SETTINGSTEPS.EDITACCESSPASSWORD })
                     }}
                         icon={PiPasswordBold}
                         label={"edit access password"}
-                    />}
+                    />} */}
                 {/* <ChanneLSettingsOptionItem
                     onClick={OnChangeChannel}
                     icon={CgEditFlipH}

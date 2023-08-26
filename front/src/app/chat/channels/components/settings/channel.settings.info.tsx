@@ -119,7 +119,6 @@ export default function ChanneLSettingsInfo(
             const channeLNotifications = await getChanneLNotifications(ChanneLId, token)
 
             if (!channeLNotifications) return
-            console.log("channeLNotifications :", channeLNotifications)
             setChanneLNotifications(channeLNotifications)
         })();
     }, [updaterequestNotification])
@@ -209,10 +208,6 @@ export default function ChanneLSettingsInfo(
 
 
     if (Isloading) return
-    console.log("ownerUserList :", ownerUserList)
-    console.log("ownersList :", ownersList)
-
-
     return <div className="flex flex-col justify-between min-h-[39rem]">
         {!LogedMember?.isban ?
             <>

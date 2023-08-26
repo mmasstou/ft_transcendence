@@ -12,9 +12,11 @@ import Loading from "../components/settings/CanneLSettingsLoading"
 import React from "react"
 import Button from "../../components/Button"
 import { toast } from "react-hot-toast"
+import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
 
 export default function ChanneLFindRoommodaL() {
     const { IsOpen, onClose, onOpen, socket } = ChanneLFindRoommodaLHook()
+    const channeLPasswordAccessHook = ChanneLPasswordAccessHook()
     const [searchInput, setsearchInput] = useState("")
     const searchInputRef = useRef<HTMLInputElement | null>(null);
     const [IsLoading, setIsLoading] = useState(false)
@@ -50,6 +52,20 @@ export default function ChanneLFindRoommodaL() {
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
             (data: { Ok: boolean, room: RoomsType }) => { UpdateData(); }
         )
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`,
+             (data) => {
+                if (!data) return
+                const { Ok, message } = data
+                if (!Ok) {
+                    channeLPasswordAccessHook.onClose()
+                    return toast.error(message)}
+                if (Ok) {
+                    channeLPasswordAccessHook.onClose()
+                    return toast.success(message)
+                }
+                
+             });
     }, [socket])
 
     // get data from backend :

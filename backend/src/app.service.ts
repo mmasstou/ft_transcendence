@@ -21,7 +21,7 @@ export class AppService {
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      console.log('Chat-> handleSocketConnection +> :', payload.login);
+      // console.log('Chat-> handleSocketConnection +> :', payload.login);
       return true;
       // console server socket id :
     } catch {

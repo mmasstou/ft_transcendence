@@ -138,7 +138,6 @@ export class RoomGateway implements OnGatewayConnection {
                 `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
                 { OK: true },
               );
-              console.log('SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE is false');
             }, 10000);
           }
         }
@@ -196,99 +195,83 @@ export class RoomGateway implements OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody()
     data: {
+      password?: string;
       userid: string;
       roomid: string;
     },
   ) {
-    console.log('SOCKET_EVENT_JOIN_MEMBER:', data);
-
-    const ResponseEventData: responseEvent = {
-      status: responseEventStatusEnum.SUCCESS,
-      message: responseEventMessageEnum.WELLCOME,
-      data: null,
-    };
+    // check if room exist :
     const room = await this.roomservice.findOne({ id: data.roomid });
-    try {
-      // check if member is already in room database :
-      const existMember = await this.memberService.findOne({
-        userId: data.userid,
-        roomId: room.id,
-      });
-      if (existMember) {
-        // check if member is ban :
-        if (existMember.isban) {
-          ResponseEventData.status = responseEventStatusEnum.ERROR;
-          ResponseEventData.message = responseEventMessageEnum.BAN;
-          ResponseEventData.data = existMember;
-          this.server.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-            { OK: true },
-          );
-          return;
-        }
-        // update member :
-        const member = await this.memberService.update({
-          id: existMember.id,
-          ismute: false,
-          type: UserType.USER,
-        });
-        // add member to room :
-        const roomJoined = await this.roomservice.joinToRoom(
-          data.userid,
-          member.id,
-          room.id,
-        );
-        console.log('roomJoined :', roomJoined);
-        ResponseEventData.status = responseEventStatusEnum.SUCCESS;
-        ResponseEventData.message = responseEventMessageEnum.WELLCOMEBACK;
-        ResponseEventData.data = roomJoined;
-        // send response to client :
-
-        this.server.emit(
-          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-          { OK: true },
-        );
-      }
-      // create member :
-      const member = await this.memberService.create({
-        user: data.userid,
-        roomId: data.roomid,
-        type: UserType.USER,
-      });
-      // add member to room :
-      const roomJoined = await this.roomservice.joinToRoom(
-        data.userid,
-        member.id,
-        room.id,
-      );
-      ResponseEventData.status = responseEventStatusEnum.SUCCESS;
-      ResponseEventData.message = responseEventMessageEnum.WELLCOME;
-      ResponseEventData.data = member;
-      // send response to client :
-
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
-        Ok: true,
-        room: room,
-      });
-    } catch (error) {
-      console.log('Chat-> joinmember error- +>', error);
-      // send response to client :
+    // check if user exist :
+    const user = await this.usersService.findOne({ id: data.userid });
+    if (!room || !user) {
       client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
         Ok: false,
+        message: 'room or user not exist',
       });
-
-      ResponseEventData.status = responseEventStatusEnum.ERROR;
-      ResponseEventData.message = responseEventMessageEnum.CANTJOIN;
-      ResponseEventData.data = null;
+      return;
     }
-    this.server.emit(
-      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-      { OK: true },
+    // check if room is protected :
+    if (room.type === RoomType.PROTECTED) {
+      // check if password is empty :
+      const isPasswordEmpty = !data.password.trim();
+      if (isPasswordEmpty) {
+        client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+          Ok: false,
+          message: 'password is empty',
+        });
+        return;
+      }
+      // check if password is correct :
+      const isPasswordCorrect = await this.usersService.comparePasswords(
+        data.password,
+        room.password,
+      );
+      if (!isPasswordCorrect) {
+        client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+          Ok: false,
+          message: 'password is not correct',
+        });
+        return;
+      }
+    }
+    // create member :
+    const memberId = await this.memberService.create({
+      type: UserType.USER,
+      user: data.userid,
+      roomId: data.roomid,
+    });
+    if (!memberId) {
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+        Ok: false,
+        message: 'you cant join to this room',
+      });
+      return;
+    }
+
+    // join to room :
+    const JoinRoom = await this.roomservice.joinToRoom(
+      data.userid,
+      memberId.id,
+      data.roomid,
     );
-    this.server.emit(
-      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-      ResponseEventData,
-    );
+
+    if (!JoinRoom) {
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+        Ok: false,
+        message: 'you cant join to this room',
+      });
+      return;
+    }
+    // send response to client :
+    client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+      Ok: true,
+      message: 'you are join to this room',
+    });
+    // send event to all client that user join to room :
+    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+      Ok: true,
+    });
   }
   @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_CREATE}`)
   async createRoom(
@@ -307,7 +290,6 @@ export class RoomGateway implements OnGatewayConnection {
       data: null,
     };
     try {
-      console.log('SOCKET_EVENT_CHAT_CREATE :', data);
       const { name, type, friends, channeLpassword } = data;
       const LogedUser = await this.usersService.getUserInClientSocket(client);
       if (!LogedUser) throw new Error();
@@ -327,14 +309,18 @@ export class RoomGateway implements OnGatewayConnection {
           null,
         );
       } else {
+        // create room :
+        // hash password :
+        const hashPassword = await this.usersService.hashPassword(
+          channeLpassword,
+        );
         const newRoom = await this.roomservice.create({
           name,
           type,
           friends,
-          channeLpassword,
+          channeLpassword: hashPassword,
         });
         if (!newRoom) throw new Error();
-        console.log('newRoom :', newRoom);
         ResponseEventData.status = responseEventStatusEnum.SUCCESS;
         ResponseEventData.message = responseEventMessageEnum.CHANNELCREATED;
         ResponseEventData.data = newRoom;
@@ -423,11 +409,9 @@ export class RoomGateway implements OnGatewayConnection {
       data.roomId,
       data.userId,
     );
-    console.log('Chat-> responseMemberData- +>', _isMemberInRoom);
     if (_isMemberInRoom !== null && !client.rooms.has(data.roomId)) {
       // await client.join(data.roomId);
       // send response to client :
-      console.log('Chat-> JoinRoom +> user :', User.login);
     }
     client.emit('JoinRoomResponseEvent', {
       status: JoinStatusEnum.JOINED,
@@ -446,12 +430,6 @@ export class RoomGateway implements OnGatewayConnection {
       // get user from client :
       const LogedUser = await this.usersService.getUserInClientSocket(client);
       if (!LogedUser) return;
-      console.log(
-        'Chat-> joinRoom +> user :%s has join to room :%s with socket %s',
-        LogedUser.login,
-        room.name,
-        client.id,
-      );
       // check if member is already in room database :
       const _isMemberInRoom = await this.roomservice.isMemberInRoom(
         data.id,
@@ -536,10 +514,8 @@ export class RoomGateway implements OnGatewayConnection {
         content: data.content,
         userId: User.id,
       });
-      console.log('Chat-> sendMessage +> messages :', messages);
       // send message to all client in the room :
       this.server.to(room.id).emit('newmessage', messages);
-      console.log('+> %s sending message to %s', User.name, room.name);
       // this.server.emit('message', messages);
     } catch (error) {
       if (error) {
@@ -560,7 +536,6 @@ export class RoomGateway implements OnGatewayConnection {
     };
     const room = await this.roomservice.findOne({ id: data.room.id });
     try {
-      console.log('Chat-> updateChanneL +> data :', data);
       const LogedUser = await this.usersService.getUserInClientSocket(client);
       if (!LogedUser) return;
       const responseMemberData = await this.roomservice.isMemberInRoom(
@@ -596,31 +571,41 @@ export class RoomGateway implements OnGatewayConnection {
           **/
           let message = 'password changed success';
           try {
-            console.log('Update protacted password');
-            // check if password is correct :
-            if (data.password !== room.password) {
-              console.log('password is not correct');
+            // chack if password is empty :
+            const isPasswordEmpty = !data.newpassword.trim();
+            if (isPasswordEmpty) {
+              message = 'password is empty';
+              throw new Error();
+            }
+            // check if password is correct:
+            const isPasswordCorrect = await this.usersService.comparePasswords(
+              data.password,
+              room.password,
+            );
+            if (!isPasswordCorrect) {
               message = 'password is not correct';
               throw new Error();
             }
             // check if new password and confirm password is the same :
             if (data.newpassword !== data.confirmpassword) {
-              console.log('new password and confirm password is not the same');
               message = 'new password and confirm password is not the same';
               throw new Error();
             }
             // check if new password is the same as old password :
             if (data.newpassword === room.password) {
-              console.log('new password is the same as old password');
               message = 'new password is the same as old password';
               throw new Error();
             }
             // update password :
+            // hash new password :
+            const hashPassword = await this.usersService.hashPassword(
+              data.newpassword,
+            );
             const dataRoom = {
               name: room.name,
               type: room.type,
               accesspassword: room.accesspassword,
-              password: data.newpassword,
+              password: hashPassword,
             };
             await this.prisma.rooms.update({
               where: { id: room.id },
@@ -661,12 +646,64 @@ export class RoomGateway implements OnGatewayConnection {
         }
         // change type of room :
         if (data.Updatetype === UpdateChanneLSendEnum.CHANGETYPE) {
-          const dataRoom = {
-            name: room.name,
-            type: data.roomtype,
-            accesspassword: data.accesspassword,
-            password: data.password,
-          };
+          /*
+          
+            CHANGETYPE PasswordCorrect : {
+            roomtype: 'PROTECTED',
+            room: {
+              id: 'b6b80bb0-363b-4d4e-b2ef-56da0bc44213',
+              name: 'memores',
+              type: 'PUBLIC',
+              viewedmessage: 0,
+              password: null,
+              hasAccess: false,
+              accesspassword: '',
+              created_at: '2023-08-26T09:21:42.629Z',
+              updated_at: '2023-08-26T12:33:15.447Z',
+              slug: 'memores',
+              members: [ [Object] ]
+            },
+            Updatetype: 'CHANGETYPE',
+            password: '11',
+            confirmpassword: '11',
+            accesspassword: ''
+          }
+
+          **/
+
+          let message = 'type changed success';
+          let dataRoom: any = {};
+          // check if channel is protected :
+          if (data.roomtype === RoomType.PROTECTED) {
+            const isPasswordEmpty = !data.password.trim();
+            if (isPasswordEmpty) {
+              message = 'password is empty';
+              throw new Error();
+            }
+            if (data.password !== data.confirmpassword) {
+              message = 'password is not match confirm password';
+              throw new Error();
+            }
+
+            const hashPassword = await this.usersService.hashPassword(
+              data.password,
+            );
+            dataRoom = {
+              name: room.name,
+              type: data.roomtype,
+              accesspassword: room.accesspassword,
+              password: hashPassword,
+            };
+          }
+          // check if password is match  confirm password :
+          else {
+            dataRoom = {
+              name: room.name,
+              type: data.roomtype,
+              accesspassword: room.accesspassword,
+              password: room.password,
+            };
+          }
           await this.prisma.rooms.update({
             where: { id: room.id },
             data: {
@@ -675,6 +712,7 @@ export class RoomGateway implements OnGatewayConnection {
           });
           client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, {
             OK: true,
+            message,
           });
         }
         // set access password :
@@ -689,7 +727,6 @@ export class RoomGateway implements OnGatewayConnection {
               ...dataRoom,
             },
           });
-          console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
           client.emit(
             `${process.env.SOCKET_EVENT_RESPONSE_CHAT_SET_ACCESS_PASSWORD}`,
             updateRoom,
@@ -707,7 +744,6 @@ export class RoomGateway implements OnGatewayConnection {
               ...dataRoom,
             },
           });
-          console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
           client.emit(
             `${process.env.SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD}`,
             updateRoom,
@@ -763,18 +799,11 @@ export class RoomGateway implements OnGatewayConnection {
     @MessageBody()
     Resp: { response: string; sendTo: userType; mode: string },
   ) {
-    console.log('Response : ', Resp);
     const User = await this.usersService.getUserInClientSocket(client);
     const sendToUser = await this.usersService.findOne({
       id: Resp.sendTo.id,
     });
     if (!User || !sendToUser) return;
-    console.log('Chat-> GameResponseToChat +> Response :', {
-      Response: Resp.response === 'Accept' ? true : false,
-      User: User,
-      sender: sendToUser,
-      mode: Resp.mode,
-    });
     this.server.emit('GameResponseToChatToUser', {
       Response: Resp.response === 'Accept' ? true : false,
       User: User,

@@ -87,8 +87,6 @@ export default function ChanneLSettingsChanneLChangePassword(
 
     const onSubmit: SubmitHandler<FieldValues> = async (res: any) => {
         if (!channeLInfo) return;
-        console.log("anannanananannanananan", channeLInfo)
-        // if (channeLInfo.password.toLowerCase() !== ChanneLpasswordInput.toLowerCase()) return
         const data: UpdateChanneLSendData = {
             Updatetype: UpdateChanneLSendEnum.CHANGEPROTACTEDPASSWORD,
             room: channeLInfo,
@@ -96,13 +94,6 @@ export default function ChanneLSettingsChanneLChangePassword(
             password: ChanneLpasswordInput,
             confirmpassword: confirmChanneLpasswordInput
         }
-        // chack if  password is not empty and if password is not equal to confirm password
-        // console.log("set access password :", data)
-        // if (!data.password || !data.confirmpassword) return
-        // if (data.password.toLowerCase() !== data.confirmpassword.toLowerCase()) {
-        //     return
-        // }
-
         const __message = 'are ypu sure you whon to edit this channel password ?';
         __message && channeLConfirmActionHook.onOpen(
             <button

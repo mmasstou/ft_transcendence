@@ -18,7 +18,6 @@ export default function ChanneLSettingsChanneLDeleteChannel(
         const channeLsettingsHook = ChanneLsettingsHook()
         const router = useRouter()
         socket?.on("deleteChannelResponseEvent", (data) => {
-            console.log("deleteChannelResponseEvent : " , data);
             if (data){
                 channeLsettingsHook.onClose()
                 router.push("/chat/channels");

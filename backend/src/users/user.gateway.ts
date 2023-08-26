@@ -33,6 +33,8 @@ export class UserGateway implements OnGatewayConnection {
         clientOnLigne.set(User.id, [...ListSocket, socket]);
         // clientOnLigne.get(User.id).push(socket.id);
       } else clientOnLigne.set(User.id, [socket]);
+      // update user status to online
+      await this.usersService.updateUserStatus(User.id, 'online');
       //   console.log('++handleConnection++clientOnLigne> : %s ->', User.login);
       //   clientOnLigne.get(User.id).forEach((socket) => {
       //     console.log(socket.id);
@@ -40,6 +42,8 @@ export class UserGateway implements OnGatewayConnection {
       return User;
     }
   }
+  // handel disconnect
+
   //   on client socket disconnect remove socket.id from clientOnLigne that disconnected
   @SubscribeMessage('disconnect')
   async handleDisconnect(socket: Socket) {
@@ -54,6 +58,7 @@ export class UserGateway implements OnGatewayConnection {
         }
         // console.log('--handleDisconnect--clientOnLigne> : %s ->', User.login);
         console.table(clientOnLigne.get(User.id));
+        await this.usersService.updateUserStatus(User.id, 'offline');
       }
       return User;
     }
@@ -72,7 +77,6 @@ export class UserGateway implements OnGatewayConnection {
     };
     const User = await this.usersService.getUserInClientSocket(client);
     // const sender = await this.usersService.getUserById(data.userId);
-    console.log('User-> data :', data);
     this.server.emit('GameResponse', Response);
   }
 
@@ -89,7 +93,6 @@ export class UserGateway implements OnGatewayConnection {
     };
     const User = await this.usersService.getUserInClientSocket(client);
     // const sender = await this.usersService.getUserById(data.userId);
-    console.log('User-> data :', data);
     this.server.emit('GameResponse', Response);
   }
 
@@ -107,10 +110,6 @@ export class UserGateway implements OnGatewayConnection {
       let Friends: User[] | undefined = undefined;
       const User = await this.usersService.getUserInClientSocket(client);
       if (!User) return;
-
-      console.log('User :', User);
-      console.log('searchquery :', data.searchquery);
-      console.log('channeL :', data.channeL);
       if (data.searchquery) {
         Friends = await this.prisma.user.findMany({
           where: {

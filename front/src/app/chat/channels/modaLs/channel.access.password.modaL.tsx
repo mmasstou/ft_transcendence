@@ -49,24 +49,13 @@ const ChanneLPasswordAccessModaL = () => {
         if (!UserId || !room) return;
         // create private room : createroom
         // check if passaword is room password
-        if (accesstype === "JOIN") {
-            console.log("Acces password :", room?.password)
-            console.log("InputValue :", InputValue)
-            if (InputValue !== room?.password) {
-                toast.error('the password not match');
-                setInputValue('')
-                return
-            }
-        }
-        if (accesstype === "ACCESS") {
-            if (InputValue !== room?.accesspassword) {
-                toast.error('the password not match');
-                setInputValue('')
-                return
-            }
+        const evenData = {
+            password : InputValue,
+            ...data
         }
         console.log("the password is match you can acces now!")
-        socket?.emit(event, data);
+        socket?.emit(event, evenData);
+        setInputValue("")
         onClose()
     }
 
@@ -125,7 +114,7 @@ const ChanneLPasswordAccessModaL = () => {
                 peer-focus:scale-75 peer-focus:-translate-y-4
                 ${(InputValue.length !== 0 || !InputValue) ? 'scale-75 -translate-y-4' : ''}
                 text-zinc-500`}>
-                            type Password
+                            type Password lkk
                         </label>
                     </div>
                 </div>

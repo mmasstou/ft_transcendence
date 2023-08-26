@@ -38,7 +38,6 @@ const Dashboard = ({ children }: Props) => {
 
   React.useEffect(() => {
     socket?.on('GameNotificationResponse', (data) => {
-      console.log("GameNotificationResponse data :", data)
       setNotifications(data)
 
       return () => {
@@ -66,7 +65,6 @@ const Dashboard = ({ children }: Props) => {
         id: `${Cookies.get("_id")}`
       }
     });
-    toast('NEXT_PUBLIC_USERSOCKET_URL_WS dashboard')
 
     const chatSocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
       transports: ['websocket'],
@@ -161,7 +159,6 @@ const Dashboard = ({ children }: Props) => {
         Notifications && <MyToast
           OnAccept={() => {
             if (!params) return;
-            console.log("++++++++++++++++++++++++>:", userId)
             socket?.emit('AcceptGame', { userId: userId, sender: Notifications.sender, mode: Notifications.mode })
             chatSocket?.emit('GameResponseToChat', { response: 'Accept', sendTo: Notifications.sender, mode: Notifications.mode })
             setNotifications(null)

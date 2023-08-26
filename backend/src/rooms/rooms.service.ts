@@ -47,7 +47,6 @@ export class RoomsService {
         const element = Room.members[index];
         if (element.userId === User.id) {
           return true;
-          console.log('element :', element);
         }
       }
       throw new NotFoundException();
@@ -91,7 +90,6 @@ export class RoomsService {
   async findOneBySLug(params: { slug: string }) {
     const { slug } = params;
     try {
-      console.log('++findOneBySLug++>', slug);
       const room = await this.prisma.rooms.findUnique({
         where: { slug },
         include: { members: true },
@@ -559,7 +557,6 @@ export class RoomsService {
     roomId: string,
   ): Promise<Rooms | null> {
     try {
-      console.log('Chat -Input- joinToRoom +> :', userId, memberId, roomId);
       const room = await this.prisma.rooms.findUnique({
         where: { id: roomId },
         include: { members: true },
@@ -597,7 +594,7 @@ export class RoomsService {
       // console.log('Chat -- joinToRoom +> :', result);
       return result;
     } catch (error) {
-      console.log('Chat - error -> joinToRoom');
+      console.log('Chat - error -> joinToRoom', error);
       return null;
     }
   }
@@ -632,8 +629,6 @@ export class RoomsService {
       if (!member) throw new Error();
 
       const memberOwners = await this.findOwners({ channeLId: room.id });
-      console.log('memberOwners :', memberOwners);
-      console.log('memberOwners.member :', member);
       if (memberOwners.length === 1 && memberOwners[0].id === member.userId)
         throw new Error();
       const result = await this.prisma.$transaction(async (prisma) => {

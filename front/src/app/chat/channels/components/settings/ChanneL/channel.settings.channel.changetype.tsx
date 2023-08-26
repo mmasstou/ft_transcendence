@@ -124,27 +124,31 @@ export default function ChanneLSettingsChanneLChangeType(
         }
         // check if selected type is not equal to current type
         if (data.channeLtype === RoomTypeEnum.PROTECTED) {
-
             toast(`OnSubmit`);
-            if (data.newChanneLpassword === "" || data.newChanneLpassword !== data.confirmChanneLpassword) return;
-            if (data.newChanneLpassword === data.confirmChanneLpassword) {
-
-                onSubmit({
-                    roomtype: RoomTypeEnum.PROTECTED,
-                    room: ChanneLinfo,
-                    Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
-                    password: data.newChanneLpassword,
-                    confirmpassword: data.confirmChanneLpassword,
-                    accesspassword: ''
-                });
-            }
+            onSubmit({
+                roomtype: RoomTypeEnum.PROTECTED,
+                room: ChanneLinfo,
+                Updatetype: UpdateChanneLSendEnum.CHANGETYPE,
+                password: data.newChanneLpassword,
+                confirmpassword: data.confirmChanneLpassword,
+                accesspassword: ''
+            });
         }
     }
 
     useEffect(() => {
 
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, (data) => {
-            if (!slug) return;
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, (res) => {
+            if (!slug || !res) return;
+            if (res.OK) {
+                OnBack();
+                channeLConfirmActionHook.onClose()
+                return toast.success('type changed successfully')
+            }
+            if (!res.OK) {
+                channeLConfirmActionHook.onClose()
+                return toast.error(res.message)
+            }
             (async () => {
                 const ChanneLinfo = await FindOneBySLug(slug, token)
                 if (ChanneLinfo) setChanneLinfo(ChanneLinfo);

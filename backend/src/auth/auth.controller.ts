@@ -29,8 +29,8 @@ export class AuthController {
     @Param('username') username: string,
     @Param('password') password: string,
   ) {
-    console.log('Login Data username:', username);
-    console.log('Login Data password:', password);
+    // console.log('Login Data username:', username);
+    // console.log('Login Data password:', password);
     const result = await this.authService.signInWithLogin(username, password);
     if (!result) throw new BadRequestException('Unauthenticated');
     const { token, userId } = result;
@@ -42,7 +42,7 @@ export class AuthController {
       httpOnly: false,
       sameSite: false,
     });
-    console.log('result :', result);
+    // console.log('result :', result);
     return res.redirect(`${process.env.AUTH_REDIRECT_URI}`);
   }
 
@@ -56,7 +56,6 @@ export class AuthController {
   @Get('callback')
   async IntraAuthCallback(@Req() req: any, @Res() res: Response) {
     try {
-      console.log('async IntraAuthCallback');
       const result = await this.authService.signIn(req.user);
       const { accessToken } = result;
       res.cookie('token', accessToken, {

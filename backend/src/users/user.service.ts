@@ -6,6 +6,7 @@ import { UpdateUserDto } from './dtos/UpdateUserDto';
 import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { RoomsService } from 'src/rooms/rooms.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -158,11 +159,31 @@ export class UserService {
           socketId: data.socketId,
         },
       });
-      console.log('++createUserSocket++userSocket>', userSocket);
       return userSocket;
     } catch (error) {
       console.log('++createUserSocket++error>', error);
       return null;
     }
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
+  }
+
+  async comparePasswords(
+    enteredPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return await bcrypt.compare(enteredPassword, hashedPassword);
+  }
+
+  async updateUserStatus(id: string, status: string) {
+    return await this.prisma.user.update({
+      where: { id },
+      data: {
+        status: status,
+      },
+    });
   }
 }

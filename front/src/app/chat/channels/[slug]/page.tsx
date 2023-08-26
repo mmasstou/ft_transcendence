@@ -115,7 +115,8 @@ export default function page() {
             if (resp === null) {
                 toast.error(`dont have permission to access this channel`);
                 router.push('/chat/channels/');
-            } else toast.success(`${resp.LogedUser.login} connected with ${socket.id} to chat ${resp.channeL.name}`)
+                return;
+            } 
 
         });
 

@@ -83,8 +83,6 @@ export default function ChanneLSettingsChanneLAccessPassword(
 
     const onSubmit : SubmitHandler<FieldValues> = async (resp: any) =>  {
         if (!channeLInfo) return;
-        if (confirmChanneLpasswordInput.toLowerCase() !== ChanneLpasswordInput.toLowerCase()) return
-        console.log("anannanananannanananan", channeLInfo)
         const data: UpdateChanneLSendData = {
             Updatetype: UpdateChanneLSendEnum.SETACCESSEPASSWORD,
             room: channeLInfo,
@@ -116,7 +114,6 @@ export default function ChanneLSettingsChanneLAccessPassword(
             setChanneLpasswordInput('')
             setconfirmChanneLpasswordInput('')
             if (!data) return
-            console.log("NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE :", data)
             channeLConfirmActionHook.onClose()
             setchanneLInfo(data)
 

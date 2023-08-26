@@ -56,7 +56,6 @@ export default function ChanneLSettingsMemberJoinModaL(
                 token, // Pass the token as an authentication parameter
             },
         });
-        toast('NEXT_PUBLIC_USERSOCKET_URL_WS addmember')
         setUsersocket(_socket);
         (async () => {
             const ChanneL = await FindOneBySLug(slug, token);

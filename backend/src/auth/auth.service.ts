@@ -23,7 +23,6 @@ export class AuthService {
     if (!userExists) {
       return null;
     }
-    console.log('async signInWithLogin :', userExists);
     if (userExists.password === password) {
       const token = await this.generateJwt({
         login: userExists.login,
@@ -40,10 +39,6 @@ export class AuthService {
     }
   }
   async signIn(user: Prisma.UserUncheckedCreateInput) {
-    // if (!user) {
-    //   throw new BadRequestException('Unauthenticated');
-    // }
-    console.log('+++++++++++++++> ana hna');
     const userExists = await this.usersService.findOneLogin({
       login: user.login,
     });
