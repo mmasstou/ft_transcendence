@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  Res,
+} from '@nestjs/common';
 import { User, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dtos/UpdateUserDto';
@@ -81,6 +86,73 @@ export class UserService {
       },
     });
   }
+
+  // Friends Actions
+
+  async addFriend(userId: string, friendId: string) {
+    try {
+      const friend = await this.prisma.friendship.create({
+        data: {
+          userId: userId,
+          friendId: friendId,
+        },
+      });
+      return friend;
+    } catch (error) {
+      console.error('Error adding friend:', error);
+    }
+  }
+
+  async removeFriend(friendId: string, userId: string) {
+    try {
+      const deletedFriendships = await this.prisma.friendship.deleteMany({
+        where: {
+          OR: [
+            {
+              userId: userId,
+              friendId: friendId,
+            },
+            {
+              userId: friendId,
+              friendId: userId,
+            },
+          ],
+        },
+      });
+      if (deletedFriendships.count === 0) throw new NotFoundException();
+      return deletedFriendships;
+    } catch (error) {
+      console.error('Error removing friend:', error);
+    }
+  }
+
+  async isFriend(userId: string, friendId: string) {
+    const existingFriendship = await this.prisma.friendship.findFirst({
+      where: {
+        OR: [
+          { userId: userId, friendId: friendId },
+          { userId: friendId, friendId: userId },
+        ],
+      },
+    });
+    if (existingFriendship) return true;
+    return false;
+  }
+
+  async getFriends(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        friends: true,
+      },
+    });
+    if (!user) return [];
+    const friends = user.friends;
+    if (!friends) return [];
+    return friends;
+  }
+
+  // End Friends Actions
 
   async create(data: Prisma.UserCreateInput): Promise<User> {
     const Req_Data: Prisma.UserCreateInput = data;

@@ -9,6 +9,7 @@ import {
   UseGuards,
   Req,
   BadRequestException,
+  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/CreateUserDto';
@@ -27,7 +28,13 @@ export class UserController {
 
   // @UseGuards(JwtAuthGuard)
   // @UseGuards(JwtAuthGuard)
-
+  @UseGuards(JwtAuthGuard)
+  @Get('friends/all')
+  async getFriends(@Req() request: Request) {
+    const User: any = request.user;
+    const id: any = User.id;
+    return await this.usersService.getFriends(id);
+  }
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -62,6 +69,54 @@ export class UserController {
       throw new BadRequestException('Login already exist');
     }
     return await this.usersService.update({ id, data });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('addfriend')
+  async addFriend(@Body('friendId') friendId: string, @Req() request: Request) {
+    if (friendId === null || friendId === 'undefined' || !friendId) {
+      request.res.status(400).send('bad request, missing parameter');
+      throw new BadRequestException('Missing parameters');
+    }
+    const friend = await this.usersService.findOne({ id: friendId });
+    if (!friend) {
+      request.res.status(404).send('user not found');
+      throw new BadRequestException('user not found');
+    }
+
+    // check if the user is not already friend
+    const User: any = request.user;
+    const id: any = User.id;
+    if (await this.usersService.isFriend(friendId, id)) {
+      request.res.status(400).send('user already friend');
+      throw new BadRequestException('user already friend');
+    }
+    return await this.usersService.addFriend(id, friendId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('removefriend')
+  async removeFriend(
+    @Body('friendId') friendId: string,
+    @Res() res: any,
+    @Req() request: Request,
+  ) {
+    const User: any = request.user;
+    const id: any = User.id;
+    if (friendId === null || friendId === 'undefined' || !friendId) {
+      res.status(400).send('bad request, missing parameter');
+      throw new BadRequestException('Missing parameters');
+    }
+    const isFriend = await this.usersService.isFriend(id, friendId);
+    if (!isFriend) {
+      res.status(404).send('Friend not found');
+      throw new BadRequestException('Friend not found');
+    }
+    const removeFriend = await this.usersService.removeFriend(friendId, id);
+    if (removeFriend) {
+      res.status(200).send('Friend removed');
+      return removeFriend;
+    }
   }
 
   @UseGuards(JwtAuthGuard)

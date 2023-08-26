@@ -84,19 +84,23 @@ const PublicProfile: React.FC<ProfileProps> = ({
       flex flex-col justify-start items-center gap-6 z-[999]"
       >
         <div className="text-white w-full h-1/5  relative">
-          <Image
-            src={user?.banner ? user.banner : ''}
-            objectFit="cover"
-            layout="fill"
-            alt="Banner Image"
-          />
+          {user?.banner ? (
+            <Image
+              src={user?.banner ? user.banner : ''}
+              objectFit="cover"
+              layout="fill"
+              alt="Banner Image"
+            />
+          ) : (
+            <div className="bg-[#243230] w-full h-full" />
+          )}
           <div className="absolute -bottom-10 left-10">
             <Image
               className="rounded-full border-2 border-secondary w-[120px] h-[120px]"
               src={user?.avatar ? user.avatar : ''}
               width={120}
               height={120}
-              alt="leaderboard icon"
+              alt="avatar"
             />
           </div>
         </div>
