@@ -45,7 +45,7 @@ interface ChanneLUserSettingsProps {
 export default function ChanneLUserSettings({ socket, member, User, room }: ChanneLUserSettingsProps) {
 
     const query = useParams();
-    const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
+    const slug: string = typeof query.slug === 'string' ? query.slug : '';
     const [IsMounted, setIsMounted] = React.useState(false)
     const [members, setMembers] = React.useState<membersType[]>([])
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)

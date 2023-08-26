@@ -25,7 +25,7 @@ import ChanneLSettingsChanneLBanedMember from './channel.settings.channel.banedm
 import ChanneLsettingsChanneLsetOwner from './channel.settings.channel.setOwner';
 import ChanneLSettingsChanneLAccessPassword from '../../channel.settings.channel.accesspassword';
 import ChanneLaccessDeniedModaL from '../../../modaLs/channel.access.denied.modaL';
-import ChanneLSettingsChanneLChangeType from '../../channel.settings.channel.changetype';
+import ChanneLSettingsChanneLChangeType from './channel.settings.channel.changetype';
 import getChannelWithId from '../../../actions/getChannelWithId';
 import ChanneLSettingsOptionItem from './channel.settings.channel.Item';
 import { AiOutlineDelete } from 'react-icons/ai';
@@ -278,6 +278,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     }
     if (step === SETTINGSTEPS.ACCESSPASSWORD && !ChanneLinfo?.hasAccess) {
         _body = <ChanneLSettingsChanneLAccessPassword
+        
             setUpdate={setUpdate}
             socket={socket}
             OnBack={OnBack}

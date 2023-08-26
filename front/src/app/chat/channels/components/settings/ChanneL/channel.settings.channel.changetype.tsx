@@ -7,21 +7,21 @@ import Input from "@/components/Input";
 import { GoEyeClosed } from "react-icons/go";
 import { BsArrowRightShort, BsSaveFill } from "react-icons/bs";
 import { HiLockClosed, HiLockOpen } from "react-icons/hi";
-import ChanneLSettingsOptionItem from "./settings/ChanneL/channel.settings.channel.Item";
+import ChanneLSettingsOptionItem from "./channel.settings.channel.Item";
 import { IconBaseProps } from "react-icons";
 import React, { use, useCallback, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useParams, useSearchParams } from "next/navigation";
-import getChannelWithId from "../actions/getChannelWithId";
-import ChanneLSettingsAlert from "./channel.settings.alerts";
+import getChannelWithId from "../../../actions/getChannelWithId";
+import ChanneLSettingsAlert from "../../channel.settings.alerts";
 import { setConstantValue } from "typescript";
-import Button from "../../components/Button";
-import ChanneLSettingsBody from "./settings/channel.settings.body";
-import ChanneLSettingsTitle from "./channel.settings.title";
-import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
+import Button from "../../../../components/Button";
+import ChanneLSettingsBody from "../channel.settings.body";
+import ChanneLSettingsTitle from "../../channel.settings.title";
+import ChanneLConfirmActionHook from "../../../hooks/channel.confirm.action";
 import { toast } from "react-hot-toast";
 import { TbLockCheck } from "react-icons/tb";
-import FindOneBySLug from "../actions/Channel/findOneBySlug";
+import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -101,7 +101,6 @@ export default function ChanneLSettingsChanneLChangeType(
     }
 
     const _OnSubmit: SubmitHandler<FieldValues> = (data: any) => {
-        toast(`OnSubmit`);
         if (!ChanneLinfo) return;
         if (data.channeLtype === RoomTypeEnum.PRIVATE) {
             onSubmit({
@@ -125,8 +124,11 @@ export default function ChanneLSettingsChanneLChangeType(
         }
         // check if selected type is not equal to current type
         if (data.channeLtype === RoomTypeEnum.PROTECTED) {
+
+            toast(`OnSubmit`);
             if (data.newChanneLpassword === "" || data.newChanneLpassword !== data.confirmChanneLpassword) return;
             if (data.newChanneLpassword === data.confirmChanneLpassword) {
+
                 onSubmit({
                     roomtype: RoomTypeEnum.PROTECTED,
                     room: ChanneLinfo,
@@ -174,7 +176,6 @@ export default function ChanneLSettingsChanneLChangeType(
                     />
                     <ChanneLSettingsOptionItem
                         onClick={() => {
-                            setValue('channeLtype', RoomTypeEnum.PROTECTED)
                             if (ChanneLinfo?.type !== RoomTypeEnum.PROTECTED)
                                 setPasswordPopup(true)
                         }}
@@ -217,7 +218,11 @@ export default function ChanneLSettingsChanneLChangeType(
                             <div className=" relative w-full flex justify-center items-center">
                                 <button
                                     type={'submit'}
-                                    onClick={handleSubmit(_OnSubmit)}
+                                    onClick={() => {
+                                        setValue('channeLtype', RoomTypeEnum.PROTECTED)
+                                        handleSubmit(_OnSubmit)()
+                                    }
+                                    }
                                     className={` relative flex gap-2 disabled:opacity-70 disabled:cursor-not-allowed rounded-lg hover:opacity-80 capitalize transition items-center w-full px-10 z-10 py-3 font-light text-sm bg-secondary`}>
                                     <TbLockCheck />
                                     save</button>

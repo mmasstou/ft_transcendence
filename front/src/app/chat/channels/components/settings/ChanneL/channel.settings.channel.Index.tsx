@@ -13,6 +13,9 @@ import { Socket } from "socket.io-client";
 import getMemberWithId from "../../../actions/getMemberWithId";
 import getChannelMembersWithId from "../../../actions/getChannelmembers";
 import { CgEditFlipH } from "react-icons/cg";
+import { TbPassword } from "react-icons/tb";
+import { IoBagRemove } from "react-icons/io5";
+import { PiPasswordBold } from "react-icons/pi";
 
 interface props {
     onClick: (data: { to: SETTINGSTEPS }) => void;
@@ -79,13 +82,37 @@ export default function ChanneLsettingsIndex(props: props) {
                     icon={FaChessQueen}
                     label={"set owner"}
                 />
-                 <ChanneLSettingsItem
+                <ChanneLSettingsItem
                     onClick={() => {
                         props.onClick({ to: SETTINGSTEPS.CHANGECHANNEL })
                     }}
                     icon={CgEditFlipH}
                     label={"Change Type"}
                 />
+                {!ChanneLinfo?.hasAccess &&
+                    <ChanneLSettingsItem
+
+                        onClick={() => {
+                            props.onClick({ to: SETTINGSTEPS.ACCESSPASSWORD })
+                        }}
+                        icon={TbPassword}
+                        label={"set access password"}
+                    />}
+
+                {<ChanneLSettingsItem
+                        onClick={() => {
+                            props.onClick({ to: SETTINGSTEPS.REMOVEACCESSPASSWORD })
+                        }}
+                        icon={IoBagRemove}
+                        label={"remove access password"}
+                    />}
+                    {<ChanneLSettingsItem
+                    onClick={() => {
+                        props.onClick({ to: SETTINGSTEPS.EDITACCESSPASSWORD })
+                    }}
+                        icon={PiPasswordBold}
+                        label={"edit access password"}
+                    />}
                 {/* <ChanneLSettingsOptionItem
                     onClick={OnChangeChannel}
                     icon={CgEditFlipH}

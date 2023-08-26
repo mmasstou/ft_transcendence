@@ -2,7 +2,7 @@
 import { IoChevronBackOutline } from "react-icons/io5";
 import { Socket } from "socket.io-client";
 import Button from "../../components/Button";
-import { RoomsType, UpdateChanneLSendData, UpdateChanneLSendEnum, UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types";
+import { RoomTypeEnum, RoomsType, UpdateChanneLSendData, UpdateChanneLSendEnum, UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types";
 import ChannelSettingsUserMemberItem from "./settings/User/channel.settings.user.memberItem";
 import Image from "next/image";
 import ChanneLSettingsBody from "./settings/channel.settings.body";
@@ -15,6 +15,7 @@ import { toast } from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
 import getChannelWithId from "../actions/getChannelWithId";
 import ChanneLConfirmActionHook from "../hooks/channel.confirm.action";
+import { TbLockCheck } from "react-icons/tb";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -80,7 +81,7 @@ export default function ChanneLSettingsChanneLAccessPassword(
 
     // }, [channeLId])
 
-    const onSubmit = async () => {
+    const onSubmit : SubmitHandler<FieldValues> = async (resp: any) =>  {
         if (!channeLInfo) return;
         if (confirmChanneLpasswordInput.toLowerCase() !== ChanneLpasswordInput.toLowerCase()) return
         console.log("anannanananannanananan", channeLInfo)
@@ -122,30 +123,16 @@ export default function ChanneLSettingsChanneLAccessPassword(
         })
     }, [socket])
 
-
-
-    const footer = (
-        <div className='flex flex-row justify-between items-center'>
-
-            <Button
-                type
-                label={"Save"}
-                outline
-                onClick={() => onSubmit()}
-            />
-        </div>
-    )
-
     return (
         <ChanneLSettingsBody
             title={` ${title ? title : `set access password :${User?.login} - ${LogedMember?.type}`}`}
             OnBack={OnBack}
             HasPermission={LogedMember?.type !== UserTypeEnum.OWNER && LogedMember?.type !== UserTypeEnum.ADMIN}
-            footer={footer}
         >
             <div className="flex flex-col justify-between min-h-[24rem] w-full">
-                <form className='flex flex-col gap-5 p-4'>
-                    <div className=" relative w-full">
+                <form className='flex flex-col min-h-[24rem] h-full justify-between'>
+                   <div className="flex flex-col gap-5 p-4">
+                   <div className=" relative w-full">
                         <input
                             id={'ChanneLpassword'}
                             {...register('ChanneLpassword', { required: true })}
@@ -182,6 +169,20 @@ export default function ChanneLSettingsChanneLAccessPassword(
                             className={`text-[var(--white)] absolute text-md duration-150 transform -translate-x-3 top-5 z-10 origin-[0] left-7 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 ${(ChanneLpasswordInput.length !== 0 || !ChanneLpasswordInput) ? 'scale-75 -translate-y-4' : ''} ${errors['confirmChanneLpassword'] ? 'text-rose-500' : 'text-zinc-500'} `}> confirm password
                         </label>
                     </div>
+                   </div>
+                    <div className=" relative w-full flex justify-center items-center">
+                                <button
+                                    type={'submit'}
+                                    onClick={() => {
+                                        handleSubmit(onSubmit)()
+                                    }
+                                    }
+                                    className={` relative flex gap-2 disabled:opacity-70 disabled:cursor-not-allowed rounded-lg hover:opacity-80 capitalize transition items-center w-full px-10 z-10 py-3 font-light text-sm bg-secondary`}>
+                                    <TbLockCheck />
+                                    save</button>
+                            </div>
+
+
                     {/* <Input id="confirmChanneLpassword" lable="confirm password" type="password" register={register} errors={errors} onChange={(event) => { setcustomvalue('confirmChanneLpassword', event.target.value) }} /> */}
                 </form>
             </div>
