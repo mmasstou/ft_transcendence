@@ -572,24 +572,92 @@ export class RoomGateway implements OnGatewayConnection {
         // check type of update :
         // change protacted password :
         if (data.Updatetype === UpdateChanneLSendEnum.CHANGEPROTACTEDPASSWORD) {
-          console.log('Update protacted password');
-          const dataRoom = {
-            name: room.name,
-            type: room.type,
-            accesspassword: room.accesspassword,
-            password: data.password,
-          };
-          const updateRoom = await this.prisma.rooms.update({
-            where: { id: room.id },
-            data: {
-              ...dataRoom,
-            },
-          });
-          console.log('Chat-> updateChanneL +> updateRoom :', updateRoom);
-          client.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`,
-            updateRoom,
-          );
+          /*
+            Update protacted password
+            Chat-> updateChanneL +> updateRoom : {
+              Updatetype: 'CHANGEPROTACTEDPASSWORD',
+              room: {
+                id: 'b6b80bb0-363b-4d4e-b2ef-56da0bc44213',
+                name: 'memores',
+                type: 'PROTECTED',
+                viewedmessage: 0,
+                password: '1111',
+                hasAccess: false,
+                accesspassword: '',
+                created_at: '2023-08-26T09:21:42.629Z',
+                updated_at: '2023-08-26T09:23:09.219Z',
+                slug: 'memores',
+                members: [ [Object] ]
+              },
+              newpassword: '4',
+              password: '3',
+              confirmpassword: '3'
+            }
+          **/
+          let message = 'password changed success';
+          try {
+            console.log('Update protacted password');
+            // check if password is correct :
+            if (data.password !== room.password) {
+              console.log('password is not correct');
+              message = 'password is not correct';
+              throw new Error();
+            }
+            // check if new password and confirm password is the same :
+            if (data.newpassword !== data.confirmpassword) {
+              console.log('new password and confirm password is not the same');
+              message = 'new password and confirm password is not the same';
+              throw new Error();
+            }
+            // check if new password is the same as old password :
+            if (data.newpassword === room.password) {
+              console.log('new password is the same as old password');
+              message = 'new password is the same as old password';
+              throw new Error();
+            }
+            // update password :
+            const dataRoom = {
+              name: room.name,
+              type: room.type,
+              accesspassword: room.accesspassword,
+              password: data.newpassword,
+            };
+            await this.prisma.rooms.update({
+              where: { id: room.id },
+              data: {
+                ...dataRoom,
+              },
+            });
+            client.emit(
+              `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`,
+              { OK: true, message },
+            );
+            return;
+          } catch (error) {
+            client.emit(
+              `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`,
+              { OK: false, message },
+            );
+            return;
+          }
+
+          // const dataRoom = {
+          //   name: room.name,
+          //   type: room.type,
+          //   accesspassword: room.accesspassword,
+          //   password: data.password,
+          // };
+          // const updateRoom = await this.prisma.rooms.update({
+          //   where: { id: room.id },
+          //   data: {
+          //     ...dataRoom,
+          //   },
+          // });
+          // console.log('Chat-> updateChanneL +> updateRoom :', data);
+          // client.emit(
+          //   `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`,
+          //   { OK: true },
+          // );
         }
         // change type of room :
         if (data.Updatetype === UpdateChanneLSendEnum.CHANGETYPE) {

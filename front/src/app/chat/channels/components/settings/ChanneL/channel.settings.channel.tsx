@@ -31,7 +31,7 @@ import ChanneLSettingsOptionItem from './channel.settings.channel.Item';
 import { AiOutlineDelete } from 'react-icons/ai';
 import ChanneLSettingsChanneLDeleteChannel from '../../channel.settings.channel.deletechannel';
 import PermissionDenied from '../../channel.settings.permissiondenied';
-import ChanneLSettingsChanneLChangePassword from '../../channel.settings.channel.changepassword';
+import ChanneLSettingsChanneLChangePassword from './channel.settings.channel.changepassword';
 import ChanneLConfirmActionHook from '../../../hooks/channel.confirm.action';
 import { PiPasswordBold } from 'react-icons/pi';
 import toast from 'react-hot-toast';

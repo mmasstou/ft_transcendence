@@ -137,6 +137,7 @@ export enum UpdateChanneLSendEnum {
 export type UpdateChanneLSendData = {
   Updatetype: UpdateChanneLSendEnum;
   password?: string;
+  newpassword?: string;
   confirmpassword?: string;
   accesspassword?: string;
   roomtype?: RoomTypeEnum;
