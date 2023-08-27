@@ -190,6 +190,65 @@ export class RoomGateway implements OnGatewayConnection {
     }
   }
 
+  @SubscribeMessage(`${process.env.SOCKET_EVENT_ADD_MEMBER}`)
+  async Addmember(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    data: {
+      userid: string;
+      roomid: string;
+    },
+  ) {
+    // check if room exist :
+    const room = await this.roomservice.findOne({ id: data.roomid });
+    // check if user exist :
+    const user = await this.usersService.findOne({ id: data.userid });
+    if (!room || !user) {
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`, {
+        Ok: false,
+        message: 'room or user not exist',
+      });
+      return;
+    }
+    // create member :
+    const memberId = await this.memberService.create({
+      type: UserType.USER,
+      user: data.userid,
+      roomId: data.roomid,
+    });
+    if (!memberId) {
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`, {
+        Ok: false,
+        message: `you cant Add ${user.login} to this room`,
+      });
+      return;
+    }
+
+    // join to room :
+    const JoinRoom = await this.roomservice.joinToRoom(
+      data.userid,
+      memberId.id,
+      data.roomid,
+    );
+
+    if (!JoinRoom) {
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`, {
+        Ok: false,
+        message: `you are add ${user.login} to this room`,
+      });
+      return;
+    }
+    // send response to client :
+    client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`, {
+      Ok: true,
+      message: 'you are join to this room',
+    });
+    // send event to all client that user join to room :
+    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+      Ok: true,
+    });
+  }
+
   @SubscribeMessage(`${process.env.SOCKET_EVENT_JOIN_MEMBER}`)
   async joinmember(
     @ConnectedSocket() client: Socket,

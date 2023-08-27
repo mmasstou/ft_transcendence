@@ -170,7 +170,7 @@ export default function ChanneLSettingsMemberJoinModaL(
                                 if (!ChanneLInfo)
                                     return;
                                 socket?.emit(
-                                    `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
+                                    `${process.env.NEXT_PUBLIC_SOCKET_EVENT_ADD_MEMBER}`,
                                     {
                                         userid: Friend.id,
                                         roomid: ChanneLInfo.id

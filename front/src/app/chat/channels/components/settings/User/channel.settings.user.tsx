@@ -32,6 +32,7 @@ import { BiSolidFileFind } from "react-icons/bi";
 import ChanneLSettingsMemberFindModaL from "./channel.settings.user.findmember";
 import Loading from "../CanneLSettingsLoading";
 import SettingsProvider from "../channel.settings.provider";
+import { data } from "autoprefixer";
 
 interface ChanneLUserSettingsProps {
     room: RoomsType | null;
@@ -62,6 +63,13 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
 
 
 
+    const UpdateData = async () => {
+        const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
+        if (channeLLMembers) setMembers(channeLLMembers)
+        const channeLLMember = await getMemberWithId(UserId, room.id, token)
+        if (!channeLLMember) return;
+        setLogedMember(channeLLMember)
+    }
     React.useEffect(() => {
         setIsMounted(true);
         (async () => {
@@ -73,17 +81,23 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
 
     // check for rooms socket events :
     React.useEffect(() => {
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`,
+            (data: any) => {
+                UpdateData()
+            });
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
             (response: { OK: boolean }) => {
                 channeLConfirmActionHook.onClose()
                 if (response.OK) {
-                    (async () => {
-                        const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
-                        if (channeLLMembers) setMembers(channeLLMembers)
-                        const channeLLMember = await getMemberWithId(UserId, room.id, token)
-                        if (!channeLLMember) return;
-                        setLogedMember(channeLLMember)
-                    })();
+                    // (async () => {
+                    //     const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
+                    //     if (channeLLMembers) setMembers(channeLLMembers)
+                    //     const channeLLMember = await getMemberWithId(UserId, room.id, token)
+                    //     if (!channeLLMember) return;
+                    //     setLogedMember(channeLLMember)
+                    // })();
+                    UpdateData()
                 }
                 if (!response.OK) { }
 

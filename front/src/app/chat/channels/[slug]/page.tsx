@@ -53,6 +53,10 @@ export default function page() {
                 token, // Pass the token as an authentication parameter
             },
         });
+        (async () => {
+            const channeL: RoomsType = await FindOneBySLug(slug, token);
+            channeL && socket?.emit('accessToroom', channeL);
+        })();
         setSocket(Clientsocket);
         return () => { Clientsocket.disconnect() }
     }, [])
