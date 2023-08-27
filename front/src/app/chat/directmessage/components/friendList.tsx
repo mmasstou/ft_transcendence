@@ -2,7 +2,7 @@ import React from 'react'
 
 function FriendList() {
   return (
-    <div>From Componenet Friend List</div>
+    <div className='text-white'>From Componenet Friend List</div>
   )
 }
 

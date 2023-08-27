@@ -9,19 +9,41 @@ import Button from '../components/Button';
 import { BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse, BsPersonAdd, BsFillPeopleFill, BsPeople } from "react-icons/bs";
 import { IconType } from 'react-icons';
 import PrivateConversation from './components/privateConversation';
+import Cookies from 'js-cookie';
+import SearchModal from './components/searchModal';
 
 
 const metadata = {
   title: 'Transcendence',
   description: 'Online Pong Game',
 };
+
+const token = Cookies.get('token');
+const currentId = Cookies.get('_id');
+
+
 export default function page() {
     const router = usePathname();
 	const [isOpen, setOpening] = useState<boolean>(false);
 	const [createConversation, setConvCreation] = useState(false);
 	const [openFriendList, setFriendList] = useState(false);
+	const [users, setUsers] = useState([]);
 
-	useEffect(() => {}, [isOpen, openFriendList])
+	async function getUsers() {
+		const res = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
+			method: 'GET',
+			headers: {
+			  'Content-Type': 'application/json',
+			  Authorization: `Bearer ${token}`,
+			},
+		  })).json();
+		const filtredUsers = res.filter((user) => user.id != currentId)
+		setUsers(filtredUsers);
+	}
+
+	useEffect(() => {
+		getUsers();
+	}, [isOpen, openFriendList, users])
 
   return (
     <Dashboard>
@@ -80,7 +102,8 @@ export default function page() {
 				}
 			</div>
 		</div>
-		<PrivateConversation isOpen={isOpen} openFriendList={openFriendList} createConversation={createConversation} setFriendList={setFriendList} setConvCreation={setConvCreation}/>
+		<PrivateConversation isOpen={isOpen} openFriendList={openFriendList} setFriendList={setFriendList}/>
+		<SearchModal open={createConversation}  onClose={() => setConvCreation(false)} users={users}/>
 	</div>
     </Dashboard>
   )

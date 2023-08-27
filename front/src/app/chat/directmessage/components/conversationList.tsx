@@ -2,7 +2,7 @@ import React from 'react'
 
 function ConversationList() {
   return (
-    <div>From Componenet Conversation List</div>
+    <div className='text-white'>From Componenet Conversation List</div>
   )
 }
 

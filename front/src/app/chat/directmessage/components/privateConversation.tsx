@@ -11,27 +11,10 @@ import SearchModal from './searchModal';
 const token = Cookies.get('token');
 const currentId = Cookies.get('_id');
 
-function PrivateConversation({ isOpen, openFriendList, createConversation, setFriendList, setConvCreation }: {isOpen: boolean, createConversation: boolean, setConvCreation: any}) {
+function PrivateConversation({ isOpen, openFriendList, setFriendList }: {isOpen: boolean}) {
 
-	const [users, setUsers] = useState([]);
 	const [convBody, setConvBody] = useState<string | null>(null);
 	const [open, setOpen] = useState(false);
-
-	async function getUsers() {
-		const res = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
-			method: 'GET',
-			headers: {
-			  'Content-Type': 'application/json',
-			  Authorization: `Bearer ${token}`,
-			},
-		  })).json();
-		const filtredUsers = res.filter((user) => user.id != currentId)
-		setUsers(filtredUsers);
-	}
-
-	useEffect(() => {
-		getUsers();
-	}, [])
 
   return (
 	<div className='flex h-full w-full'>
@@ -39,20 +22,7 @@ function PrivateConversation({ isOpen, openFriendList, createConversation, setFr
 			<ConversationList />
 		</div> : <></>}
 		<div className='flex justify-center min-w-2/3 w-full border-[1px] border-[#243230]'>
-			<div className=''>
-				<p>Conversation Body</p>
-				<button onClick={() => {setOpen(true);}} className='text-white bg-[#243230] p-[10px]'>Show</button>
-				<SearchModal open={open}  onClose={() => setOpen(false)} users={users}/>
-			</div>
-			{createConversation ?
-			<div className='bg-[#243230] h-[250px] w-[250px] flex flex-col justify-center gap-1 z-10'>
-				<Button
-					icon={AiFillCloseCircle}
-					outline
-					onClick={() => setConvCreation(false)}
-					/>
-				<SearchList setConvCreation={setConvCreation} users={users}/>
-			</div> : <></>}
+			<p className='text-white'>Conversation Body</p>
 		</div>
 		{openFriendList ? <div className=' bg-[#243230] h-full w-[20%] min-w-[200px] max-w-[350px] '>
 			<FriendList />
