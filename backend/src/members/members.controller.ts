@@ -12,7 +12,8 @@ import {
 import { MembersService } from './members.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
 import { Request } from 'express';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserType } from '@prisma/client';
+import { userType } from 'src/users/user.type';
 @Controller('members')
 export class MembersController {
   constructor(private readonly messageService: MembersService) {}
@@ -58,7 +59,8 @@ export class MembersController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body('type') type: Prisma.EnumUserTypeFieldUpdateOperationsInput,
+    @Body('type')
+    type: Prisma.EnumUserTypeFieldUpdateOperationsInput | UserType,
   ) {
     return this.messageService.update({ id, type });
   }

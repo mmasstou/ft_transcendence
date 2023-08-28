@@ -1,8 +1,8 @@
 import React, { use, useEffect } from "react";
 import LefttsideModaL from "../modaLs/LeftsideModal";
 import ChanneLSidebarItem from "./channel.sidebar.item";
-import { RoomsType, membersType, messagesType } from "@/types/types";
-import { useSearchParams } from "next/navigation";
+import { RoomsType, membersType, messagesType, userType } from "@/types/types";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { Socket } from "socket.io-client";
 import RightsideModaL from "../modaLs/RightsideModal";
@@ -13,12 +13,17 @@ import RightsidebarHook from "../hooks/RightSidebarHook";
 import ChanneLsettingsHook from "../hooks/channel.settings";
 import LoginHook from "@/hooks/auth/login";
 import getChannels from "../actions/getChanneLs";
+import MyToast from "@/components/ui/Toast/MyToast";
+import sorteChanneLsWithName from "../actions/sorteChanneLsWithName";
+import MemberHasPermissionToAccess from "../actions/MemberHasPermissionToAccess";
 
 export default function ChanneLbody({ children, socket }: { children: React.ReactNode; socket: Socket | null }) {
+    const query = useParams();
     const [IsMounted, setIsMounted] = React.useState(false)
     const [ChanneLs, setChannel] = React.useState<RoomsType[] | null>(null)
     const [ChanneLsActiveID, setChanneLsActive] = React.useState<string | null>(null)
     const [ChanneLsmembers, setchanneLsmembers] = React.useState<membersType[] | null>(null)
+    const slug: string = query.slug && typeof query.slug === 'string' ? query.slug : query.slug[0];
     const [viewed, setviewed] = React.useState<number>(0)
     const [update, setUpdate] = React.useState<boolean>(false)
     const params = useSearchParams()
@@ -26,50 +31,25 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
     const channelsettingsHook = ChanneLsettingsHook()
     const rightsidebar = RightsidebarHook()
     const loginHook = LoginHook()
+    const [Notifications, setNotifications] = React.useState<any[]>([])
+    const token: any = Cookies.get('token');
+    const userId: any = Cookies.get('_id');
+    const router = useRouter()
 
-    socket?.on('updateChanneLResponseEvent', (data) => {
-        setUpdate(true)
-    })
-    useEffect(() => {
-        setTimeout(() => {
-            const token: any = Cookies.get('token');
-            (async () => {
-                if (!token)
-                    return;
-                const resp = await getChannels(token)
-                if (resp) {
-                
-                    console.log("getChannels data :", resp)
-                    setChannel(resp);
-                }
-                // console.log("resp :", resp)
-            }
-            )();
-        }, 1000);
+    if (!token || !userId)
+        return;
 
-        
-    }, [loginHook, update])
+
+
+
 
     useEffect(() => {
-
-        if (params) {
-            setChanneLsActive(params.get('r'));
-            (async () => {
-                const channeLLid = params.get('r')
-                const token: any = Cookies.get('token');
-                if (!channeLLid)
-                    return;
-                const channeLLMembers = await getChannelWithId(channeLLid, token)
-                if (channeLLMembers && channeLLMembers.statusCode !== 200){
-                    setchanneLsmembers(channeLLMembers)
-                } 
-
-            })();
-        }
-    }, [params, rightsidebar, channelsettingsHook])
-
-    useEffect(() => {
-        setIsMounted(true)
+        setIsMounted(true);
+        (async () => {
+            const ChanneLs = await getChannels(token)
+            if(!ChanneLs) return
+            setChannel(ChanneLs);
+        })();
     }, [])
 
     if (!IsMounted)
@@ -79,13 +59,13 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
             <LefttsideModaL>
                 {
                     ChanneLs && ChanneLs.map((room: RoomsType, key) => (
-                        <ChanneLSidebarItem key={key} room={room} socket={socket} viewd={8} active={room.id === ChanneLsActiveID} />
+                        <ChanneLSidebarItem key={key} room={room}  viewd={8} active={room.slug === slug} />
                     ))
                 }
             </LefttsideModaL>
-           <div className={`${(leftSidebar.IsOpen || rightsidebar.IsOpen) && 'hidden md:flex'} w-full`}>
-           {children}
-           </div>
+            <div className={`${(leftSidebar.IsOpen || rightsidebar.IsOpen) && 'hidden md:flex'} w-full`}>
+                {children}
+            </div>
             <RightsideModaL>
                 {
                     ChanneLsmembers && ChanneLsmembers.map((member: membersType, key: number) => (

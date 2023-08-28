@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 const Home_Header = () => {
   const router = useRouter();
   return (
-    <header className="flex justify-between items-center  ">
+    <header className="flex justify-between items-center container mx-auto md:px-10 xl:px-20">
       <motion.div
         initial={{
           x: -500,

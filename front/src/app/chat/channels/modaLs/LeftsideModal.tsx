@@ -5,9 +5,28 @@ import LeftSidebarHook from "../hooks/LeftSidebarHook"
 export default function LefttsideModaL({children} :{children ?: ReactNode} ) {
 
     const leftSidebar = LeftSidebarHook()
+    const [isMobile, setIsMobile] = React.useState(false)
 
  
-
+    React.useEffect(() => {
+        window.addEventListener('resize', () => {
+          const screenWidth = window.innerWidth;
+          setIsMobile(screenWidth <= 767);
+        });
+    
+        return () => {
+          window.removeEventListener('resize', () => {
+            const screenWidth = window.innerWidth;
+            setIsMobile(screenWidth <= 767);
+          });
+        };
+      }, []);
+    
+      React.useEffect(() => {
+        if (isMobile) leftSidebar.onClose()
+      }, [isMobile])
+    
+    
 
     if (!leftSidebar.IsOpen)
         return null

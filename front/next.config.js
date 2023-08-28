@@ -5,10 +5,8 @@
 
 const nextConfig = {};
 
-module.exports = nextConfig;
-
 module.exports = {
     images: {
-        domains: ['images.unsplash.com', 'cdn.intra.42.fr', 'res.cloudinary.com'],
+        domains: ['images.unsplash.com', 'cdn.intra.42.fr', 'res.cloudinary.com', 'https://cdn.intra.42.fr'],
     },
 }

@@ -4,19 +4,27 @@ import * as Popover from '@radix-ui/react-popover';
 import Cookies from 'js-cookie';
 import MyAvatar from '@/components/profile/MyAvatar';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import axios from 'axios';
+import { userType } from '@/types/types';
 
 export interface User {
   login?: string;
 }
 
 export const Logout: React.FC = (): JSX.Element => {
+  const [IsMounted, setIsMounted] = useState(false);
   const router = useRouter();
-  const [user, setUser] = useState<User>({});
+  const [user, setUser] = useState<userType | null>(null);
   const id = Cookies.get('_id');
+
   useEffect(() => {
-    axios.get(`http://localhost:80/api/users/${id}`).then((res) => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if(!IsMounted) return;
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`).then((res) => {
       setUser(res.data);
     });
   }, [id]);
@@ -47,7 +55,7 @@ export const Logout: React.FC = (): JSX.Element => {
       <Popover.Trigger asChild aria-controls="radix-:R1mcq:">
         <button aria-label="Update dimensions">
           <div className="cursor-pointer w-[32px] h-[32px]">
-            <MyAvatar />
+            {<MyAvatar User={user} />}
           </div>
         </button>
       </Popover.Trigger>
@@ -57,10 +65,10 @@ export const Logout: React.FC = (): JSX.Element => {
           sideOffset={5}
         >
           <div className="flex flex-col items-center gap-2">
-            <p className="text-sm xl:text-lg">{user.login} 👋</p>
+            <p className="text-sm xl:text-lg">{user && user?.login} 👋</p>
             <div className="w-3/4 border-b-[0.1vh] border-white opacity-50"></div>
             <a
-              onClick={logoutHandle}
+              onClick={() => {}}
               href="/"
               className="flex justify-between items-center my-1 hover:text-red-500"
             >

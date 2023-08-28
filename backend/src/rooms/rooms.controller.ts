@@ -31,9 +31,27 @@ export class RoomsController {
   // }
 
   @UseGuards(JwtAuthGuard)
+  @Get('public&protected')
+  findPublicAndProtected(@Req() request: Request) {
+    const userIds: any = request.user;
+    const login: string = userIds.login;
+    return this.roomsService.findPublicAndProtected(login);
+  }
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.roomsService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('notification/:channeLId')
+  findNotifications(
+    @Req() request: Request,
+    @Param('channeLId') channeLId: string,
+  ) {
+    const userIds: any = request.user;
+    const login: string = userIds.login;
+    return this.roomsService.findNotifications({ login, channeLId });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -45,9 +63,30 @@ export class RoomsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':name')
-  findOne(@Param('name') name: string) {
-    return this.roomsService.findOne({ name });
+  @Get('owners/:channeLId')
+  findOwners(@Param('channeLId') channeLId: string) {
+    return this.roomsService.findOwners({ channeLId });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('HasPermissionToAccess/:userId/:roomId')
+  async HasPermissionToAccess(
+    @Param('roomId') roomId: string,
+    @Param('userId') userId: string,
+  ) {
+    return await this.roomsService.HasPermissionToAccess({ roomId, userId });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.roomsService.findOne({ id });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('slug/:slug')
+  findOneBySLug(@Param('slug') slug: string) {
+    return this.roomsService.findOneBySLug({ slug });
   }
 
   @UseGuards(JwtAuthGuard)

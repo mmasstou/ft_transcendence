@@ -1,5 +1,8 @@
+'use client';
 import React from 'react';
 import Dashboard from '../Dashboard';
+import Cookies from 'js-cookie';
+import { Socket, io } from 'socket.io-client';
 
 const metadata = {
   title: 'Transcendence',
