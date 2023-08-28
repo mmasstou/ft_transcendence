@@ -16,18 +16,20 @@ import { CreateUserDto } from './dtos/CreateUserDto';
 import { UpdateUserDto } from './dtos/UpdateUserDto';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
-import { IntraAuthGuard } from 'src/auth/guards/intra-oauth.guard';
+import { NotificationsGateway } from 'src/notifications/notifications.gateway';
+
 @Controller('users')
 export class UserController {
-  constructor(private readonly usersService: UserService) {}
+  constructor(
+    private readonly usersService: UserService,
+    private notificationsGateway: NotificationsGateway,
+  ) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @UseGuards(JwtAuthGuard)
   @UseGuards(JwtAuthGuard)
   @Get('friends/all')
   async getFriends(@Req() request: Request) {
@@ -71,28 +73,41 @@ export class UserController {
     return await this.usersService.update({ id, data });
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('addfriend')
-  async addFriend(@Body('friendId') friendId: string, @Req() request: Request) {
-    if (friendId === null || friendId === 'undefined' || !friendId) {
-      request.res.status(400).send('bad request, missing parameter');
-      throw new BadRequestException('Missing parameters');
-    }
-    const friend = await this.usersService.findOne({ id: friendId });
-    if (!friend) {
-      request.res.status(404).send('user not found');
-      throw new BadRequestException('user not found');
-    }
+  // friends actions
 
-    // check if the user is not already friend
-    const User: any = request.user;
-    const id: any = User.id;
-    if (await this.usersService.isFriend(friendId, id)) {
-      request.res.status(400).send('user already friend');
-      throw new BadRequestException('user already friend');
-    }
-    return await this.usersService.addFriend(id, friendId);
+  // send friend request
+  @UseGuards(JwtAuthGuard)
+  @Post('friend-requests/send')
+  async sendFriendRequest(
+    @Req() req,
+    @Body('receiverId') receiverId: string,
+  ): Promise<void> {
+    const senderId = req.user.id;
+    await this.usersService.sendFriendRequest(senderId, receiverId);
+
+    // Notify the receiver about the friend request
+    this.notificationsGateway.sendNotification(
+      receiverId,
+      'You have a new friend request.',
+    );
   }
+
+  // accept friend request
+  // @UseGuards(JwtAuthGuard)
+  // @Post('friend-requests/accept')
+  // async acceptFriendRequest(
+  //   @Req() req,
+  //   @Body('senderId') senderId: string,
+  // ): Promise<void> {
+  //   const receiverId = req.user.id;
+  //   await this.usersService.acceptFriendRequest(senderId, receiverId);
+
+  //   // Notify the sender about the friend request
+  //   this.notificationsGateway.sendNotification(
+  //     senderId,
+  //     'Your friend request has been accepted.',
+  //   );
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Delete('removefriend')
@@ -118,6 +133,8 @@ export class UserController {
       return removeFriend;
     }
   }
+
+  // end of friends actions
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')

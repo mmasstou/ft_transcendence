@@ -89,19 +89,64 @@ export class UserService {
 
   // Friends Actions
 
-  async addFriend(userId: string, friendId: string) {
+  // send friend request
+  async sendFriendRequest(senderId: string, receiverId: string): Promise<void> {
     try {
-      const friend = await this.prisma.friendship.create({
-        data: {
-          userId: userId,
-          friendId: friendId,
+      const existingRequest = await this.prisma.friendship.findFirst({
+        where: {
+          userId: senderId,
+          friendId: receiverId,
         },
       });
-      return friend;
+
+      if (existingRequest) {
+        throw new BadRequestException('Friend request already sent.');
+      }
+
+      await this.prisma.friendship.create({
+        data: {
+          userId: senderId,
+          friendId: receiverId,
+          status: 'PENDING',
+        },
+      });
+      return;
     } catch (error) {
-      console.error('Error adding friend:', error);
+      throw new BadRequestException(error.message);
     }
   }
+
+  // accept friend request
+  // async acceptFriendRequest(
+  //   senderId: string,
+  //   receiverId: string,
+  // ): Promise<void> {
+  //   try {
+  //     const existingRequest = await this.prisma.friendship.findFirst({
+  //       where: {
+  //         userId: senderId,
+  //         friendId: receiverId,
+  //       },
+  //     });
+
+  //     if (!existingRequest) {
+  //       throw new BadRequestException('Friend request not found.');
+  //     }
+
+  //     await this.prisma.friendship.update({
+  //       where: {
+  //         userId: senderId,
+  //         friendId: receiverId,
+  //       },
+  //       data: {
+  //         status: 'ACCEPTED',
+  //       },
+  //     });
+  //     return;
+  //   } catch (error) {
+  //     throw new BadRequestException(error.message);
+  //   }
+  // }
 
   async removeFriend(friendId: string, userId: string) {
     try {
