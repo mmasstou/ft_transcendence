@@ -5,6 +5,9 @@ import Button from '../../components/Button';
 import { CgProfile } from 'react-icons/cg';
 import { BiMessageAdd } from 'react-icons/bi';
 import { AiOutlineMessage } from 'react-icons/ai';
+import { RiPingPongFill, RiPingPongLine } from 'react-icons/ri';
+import { TbPingPong } from 'react-icons/tb';
+import CustumBtn from './custumBtn';
 
 
 const token = Cookies.get('token');
@@ -15,6 +18,33 @@ function SearchList({ setConvCreation, users }) {
 	const [list, setList] = useState([]);
 	const [searchedLogin, setLogin] = useState<string>('');
 	const inputRef = useRef(null);
+	const [windowSize, setWindowSize] = useState({
+		width: window.innerWidth,
+		height: window.innerHeight,
+	  });
+	const [iconSize, setIconSize] = useState(window.innerWidth <= 640 ? 18 : 22)
+	
+	useEffect(() => {
+		const handleResize = () => {
+			setWindowSize({
+			width: window.innerWidth,
+			height: window.innerHeight,
+		});
+		  
+		if (windowSize.width <= 640)
+			setIconSize(18);
+		else
+		  	setIconSize(22);
+
+		};
+	
+		window.addEventListener('resize', handleResize);
+	
+		// Cleanup function to remove the event listener
+		return () => {
+		  window.removeEventListener('resize', handleResize);
+		};
+	}, [windowSize, iconSize]);
 
 	const clickUserProfile = (user) => {
 		console.log(`Redirect to ${user.login} Profile`);
@@ -23,6 +53,11 @@ function SearchList({ setConvCreation, users }) {
 
 	const openConversation = (user) => {
 		console.log(`Open Conversation between ${user.id} : ${currentId}`);
+		setConvCreation(false);
+	}
+
+	const invateToGame = (user) => {
+		console.log(`Invite ${user.login} to the game`);
 		setConvCreation(false);
 	}
 
@@ -57,19 +92,20 @@ function SearchList({ setConvCreation, users }) {
 	}, [searchedLogin]);
 
   return (
-	<div className='flex flex-col  h-[500px] w-[500px]'>
+	<div className='flex flex-col  md:w-[500px]  md:min-w-sm sm:w-[400px] h-[500px]'>
 		<input type='text' placeholder='login' ref={inputRef} value={searchedLogin} onChange={(e) => {setLogin(e.target.value);}} 
 			className='bg-[#3E504D] text-white rounded-lg py-[10px] px-[15px] border focus:border-[#1EF0AE] outline-none'/>
 		<ul className='mt-[10px] max-h-[100%] overflow-auto'>
 			{list.length ? list.map((user) => (
 				<li key={user.id} className='mt-[2px] mb-[6px] text-white  flex justify-around p-[5px]'>
-					<section className='flex items-center gap-10 p-2'>
+					<section className='flex items-center gap-4 md:gap-10 p-2'>
 						<Image src={user.avatar} alt='avatar' width={40} height={40} className='rounded-[50%]'/>
 						<p>{user.login}</p>
 					</section>
-					<section className='flex'>
-						<Button icon={AiOutlineMessage} outline small onClick={() => {openConversation(user)}}/>
-						<Button icon={CgProfile} outline small onClick={() => {clickUserProfile(user)}}/>
+					<section className='flex gap-1 sm:gap-2 md:gap-4'>
+						<CustumBtn icon={AiOutlineMessage} onClick={() => openConversation(user)} size={iconSize} />
+						<CustumBtn icon={CgProfile} onClick={() => clickUserProfile(user)} size={iconSize} />
+						<CustumBtn icon={TbPingPong} onClick={() => invateToGame(user)} size={iconSize} />
 					</section>
 				</li>
 			)) : searchedLogin.length ? <li className='m-[2px] text-[#1EF0AE] font-thin flex justify-around items-center p-[5px] rounded-lg'>No User</li> : <></>}

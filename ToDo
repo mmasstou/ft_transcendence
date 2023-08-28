@@ -14,8 +14,6 @@
 	- Friend list component (Modal) 👁🖥
 
     - Frontend :
-            + Restructure the code refactoring required.
-            + Design the idea first
-            + Create search modal
             + Responsive
-            + Conversation and Friend lists
+			+ auto Focus in users search barre
+            + Conversation and Friend lists apperance
