@@ -34,9 +34,9 @@ export class MessagesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll() {
-    return this.messageService.findAll();
+  @Get('channeL/:id')
+  findALLForChanneL(@Param('id') id: string) {
+    return this.messageService.findALLForChanneL(id);
   }
 
   @UseGuards(JwtAuthGuard)

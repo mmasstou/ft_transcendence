@@ -39,11 +39,11 @@ function check_col(table: any) {
     table.ball.y < table.player1.position + 16
   ) {
     // colleg with player1
-    let centerPlayer = table.player1.position + 8;
-    let ballOffset = table.ball.y - centerPlayer;
-    let ballPositionOnPaddle = ballOffset / 16;
-    let maxAngle = Math.PI * 0.9;
-    let angle = ballPositionOnPaddle * maxAngle;
+    const centerPlayer = table.player1.position + 8;
+    const ballOffset = table.ball.y - centerPlayer;
+    const ballPositionOnPaddle = ballOffset / 16;
+    const maxAngle = Math.PI * 0.9;
+    const angle = ballPositionOnPaddle * maxAngle;
     table.ball.ball_speed.x = -Math.cos(angle);
     table.ball.ball_speed.y = Math.sin(angle);
   } else if (
@@ -52,11 +52,11 @@ function check_col(table: any) {
     table.ball.y < table.player2.position + 16
   ) {
     // colleg with player2
-    let centerPlayer = table.player2.position + 8;
-    let ballOffset = table.ball.y - centerPlayer;
-    let ballPositionOnPaddle = ballOffset / 16;
-    let maxAngle = Math.PI * 0.9;
-    let angle = ballPositionOnPaddle * maxAngle;
+    const centerPlayer = table.player2.position + 8;
+    const ballOffset = table.ball.y - centerPlayer;
+    const ballPositionOnPaddle = ballOffset / 16;
+    const maxAngle = Math.PI * 0.9;
+    const angle = ballPositionOnPaddle * maxAngle;
     table.ball.ball_speed.x = Math.cos(angle);
     table.ball.ball_speed.y = Math.sin(angle);
   }
@@ -407,7 +407,6 @@ class MyGateway implements OnGatewayConnection {
         table_obj.player1.GameSetting.setData(
           user.bg_color,
           user.ball_color,
-
           user.paddle_color,
           user.avatar,
         );

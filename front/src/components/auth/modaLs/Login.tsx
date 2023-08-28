@@ -34,33 +34,7 @@ const Login = () => {
         }
     });
 
-    useEffect(() => {
-
-        const socket: Socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/User`, {
-            auth: {
-                token: `${token}`,
-                id: `${Cookies.get("_id")}`
-            }
-        });
-        setSocket(socket);
-
-        // const messageSocket: messageSocket = {
-        //     roomId: roomid,
-        //     messageContent: message
-        // }
-        // // if (message) {
-
-        // socket && socket.emit("sendMessage", messageSocket, () => setmessages(""));
-        socket && socket.on("connected", (data) => {
-            // console.log("data :", data)
-        })
-
-
-        return () => {
-            socket && socket.disconnect();
-        };
-
-    }, [])
+   
 
     const onSubmit: SubmitHandler<FieldValues> = async (data: any) => {
 

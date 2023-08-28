@@ -6,7 +6,7 @@ import { UserService } from 'src/users/user.service';
 import { PrismaService } from 'src/prisma.service';
 
 @Module({
-    providers: [GameService, UserService, MyGateway, BallGateway, PrismaService],
-    controllers: [GameController],
+  providers: [GameService, UserService, MyGateway, BallGateway, PrismaService],
+  controllers: [GameController],
 })
 export class GameModule {}

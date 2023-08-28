@@ -1,13 +1,29 @@
 'use client'
-import { FormEvent, ReactNode, useState } from "react";
+import { FormEvent, ReactNode, useEffect, useRef, useState } from "react";
+import { Socket } from "socket.io-client";
 
 
-interface ConversationsMessagesInterface{
-    Content : ReactNode
+interface ConversationsMessagesInterface {
+    Content: ReactNode;
+    socket: Socket | null
 }
 
-export default function ConversationsMessages( {Content} : ConversationsMessagesInterface ) {
-    return <div className="ConversationsMessages relative h-[74vh] md:h-[74vh] p-4 overflow-y-scroll gap-2" >
-       {Content}
-    </div>
+export default function ConversationsMessages({ Content, socket }: ConversationsMessagesInterface) {
+    const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+
+    useEffect(() => {
+        socket?.on('message', (message: any) => {
+            if (chatContainerRef.current) {
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight ;
+                chatContainerRef.current.scrollTop - 600
+                console.log("chatContainerRef.current.scrollTop :",chatContainerRef.current.scrollTop)
+                console.log("chatContainerRef.current.scrollHeight :",chatContainerRef.current.scrollHeight)
+            }
+        })
+    }, [socket])
+
+    // Scroll to the last message when new messages are added
+
+    return {Content}
 }

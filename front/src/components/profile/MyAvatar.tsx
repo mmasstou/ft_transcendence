@@ -5,12 +5,14 @@ import style from '@/components/Home/style';
 import Cookies from 'js-cookie';
 import { userType } from '@/types/types';
 import getUserWithId from '@/app/chat/channels/actions/getUserWithId';
+import { toast } from 'react-hot-toast';
 
-const MyAvatar = () => {
-  const [LogedUser, setLogedUser] = React.useState<userType | null>(null);
+const MyAvatar = ({ User }: { User?: userType | null }) => {
+  const [LogedUser, setLogedUser] = React.useState<userType | null | undefined>(User);
 
   React.useEffect(() => {
-    (async () => {
+   (async () => {
+      toast('loading user data ...')
       const token = Cookies.get('token');
       const userId = Cookies.get('_id');
       if (!token || !userId) return;
@@ -19,19 +21,19 @@ const MyAvatar = () => {
     })();
   }, []);
 
-  return (
-    <Avatar.Root
-      className={`${style.flexCenter} flex-inline align-middle overflow-hidden select-none
+return (
+  <Avatar.Root
+    className={`${style.flexCenter} flex-inline align-middle overflow-hidden select-none
             rounded-full w-full h-full`}
-    >
-      <Avatar.Image
-        className="w-full h-full object-cover border-secondary rounded-full"
-        src={LogedUser?.avatar}
-        sizes="100%"
-        alt="User Avatar"
-      />
-    </Avatar.Root>
-  );
+  >
+    <Avatar.Image
+      className="w-full h-full object-cover border-secondary rounded-full"
+      src={LogedUser?.avatar}
+      sizes="100%"
+      alt="User Avatar"
+    />
+  </Avatar.Root>
+);
 };
 
 export default MyAvatar;

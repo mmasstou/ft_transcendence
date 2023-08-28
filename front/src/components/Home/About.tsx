@@ -25,6 +25,7 @@ const About = () => {
           a net.
         </p>
         <Button
+          OnClick={() => { }}
           login={false}
           style="text-secondary bg-transparent  border border-secondary 
                         hover:bg-secondary hover:text-btn"
