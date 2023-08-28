@@ -16,7 +16,7 @@ const Achpage = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:80/api/users/${id}`)
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`)
       .then((res) => {
         setUser(res.data);
       })

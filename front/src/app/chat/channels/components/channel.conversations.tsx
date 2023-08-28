@@ -51,7 +51,17 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
+    const UpdateData = async () => {
+        // get logged member :
+        if (!channeLinfo) return
+        const channeL: RoomsType | null = await FindOneBySLug(slug, token)
+        if (!channeL) return
+        setChanneLinfo(channeL)
+        const member: membersType | null = await getMemberWithId(__userId, channeLinfo?.id, token)
+        setLogedMember(member);
+    }
     // show this last message in the screan :
+
     React.useEffect(() => {
         setTimeout(() => {
             if (chatContainerRef.current) {
@@ -96,23 +106,29 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             }, 500);
         })();
     }, [])
-
     // // listen to message event and send the incomming message to client
     React.useEffect(() => {
-        if (!channeLinfo) return;
-        socket?.on('newmessage', (newMessage: any) => {
-            (async () => {
-                const response = await getChanneLMessages(channeLinfo.id, token)
-                if (!response) return
-                setMessages(response)
-            })();
+        socket?.on('newmessage', (newMessage: messagesType) => {
+            setMessages((prev) => [...prev, newMessage])
             FocusedOnSendMessageInput()
             setSendingMessage(false);
-            setInputValue('')
-            
+            if (newMessage.senderId === Cookies.get('_id')) {
+                setInputValue('')
+                setMessage('')
+            }
         })
-    }, [message, socket, InputValue])
+    }, [])
 
+    React.useEffect(() => {
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+            if (!data) return
+            UpdateData();
+        });
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+            if (!data) return
+            UpdateData();
+        });
+    }, [socket])
     const OnSubmit = () => {
         const sendMesage = message.trim()
         if (!sendMesage) {
@@ -136,12 +152,16 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         setSendingMessage(true)
 
     }
-    const FocusedOnSendMessageInput = () =>{
+    const FocusedOnSendMessageInput = () => {
         setTimeout(() => {
             if (InputRef.current) {
                 InputRef.current.focus();
             }
         }, 100); // sleep .1s ; waiting search input to mounted in focus on it
+    }
+    const checkLimitCharacters = (input: string) => {
+        if (input.length > 512) return toast.error("you can't send more than 512 characters")
+        setInputValue(input);
     }
 
     if (!IsMounted) return null
@@ -193,7 +213,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                         event.key === "Enter" ? OnSubmit() : null
                                     }
                                     onChange={(event) => {
-                                        setInputValue(event.target.value);
+                                        checkLimitCharacters(event.target.value)
+
                                         setMessage(event.target.value);
                                     }}
                                     value={InputValue}
@@ -201,7 +222,10 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                     type="search"
                                     name=""
                                     id="" />
-                                {InputValue.length !== 0 && <Button icon={IoSend} disabled={SendingMessage} outline small onClick={OnSubmit} />}
+                                {InputValue.length !== 0 && <div className="flex gap-1">
+                                    <span className=" text-[8px] text-center max-w-max flex w-full">{InputValue.length} / 512</span>
+                                    <Button icon={IoSend} disabled={SendingMessage} outline small onClick={OnSubmit} />
+                                </div>}
                             </div>
                         </div>
                     </div>

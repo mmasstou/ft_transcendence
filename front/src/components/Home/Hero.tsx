@@ -31,6 +31,7 @@ const Hero = () => {
           to become a champion.
         </p>
         <Button
+          OnClick={() => { }}
           login={false}
           style="text-btn hover:text-white bg-secondary "
           title="Get Started Now"

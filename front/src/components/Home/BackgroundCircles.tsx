@@ -10,7 +10,7 @@ const BackgroundCircles = () => {
       animate={{
         scale: [0.5, 0.8, 1, 1, 0.8],
         opacity: [0.1, 0.2, 0.4, 0.8, 0.6, 0.4],
-        Radius: ['20%', '20%', '50%', '80%', '20%'],
+        radius: ['20%', '20%', '50%', '80%', '20%'],
       }}
       transition={{
         duration: 2.5,

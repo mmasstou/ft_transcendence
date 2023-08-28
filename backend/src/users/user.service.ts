@@ -5,7 +5,6 @@ import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dtos/UpdateUserDto';
 import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
-import { RoomsService } from 'src/rooms/rooms.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()

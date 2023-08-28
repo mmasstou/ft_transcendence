@@ -18,6 +18,7 @@ import ChanneLSettingsBody from "../channel.settings.body";
 import ChanneLsettingsProvider from "../ChanneL/channel.settings.chnnel.provider";
 import SettingsProvider from "../channel.settings.provider";
 import Loading from "../../loading";
+import ChanneLsettingsHook from "../../../hooks/channel.settings";
 interface props {
     onClick: (data: any) => void;
     Onback: () => void;
@@ -47,6 +48,7 @@ export default function ChanneLsettingsPlayGame(
     const [PLayer01, setPLayer01] = React.useState<userType | null>(null)
     const [PLayer02, setPLayer02] = React.useState<userType | null>(null)
     const [gamemode, setgamemode] = React.useState<string>('')
+    const channeLsettingsHook = ChanneLsettingsHook()
     const UserId = Cookies.get('_id')
     const token: any = Cookies.get('token');
     if (!UserId || !token) return;
@@ -71,6 +73,23 @@ export default function ChanneLsettingsPlayGame(
         }) => {
             setLoadingGame(false)
         })
+        socket?.on('GameResponse', (data: any) => {
+            toast(`sdjghdsffdsfhdsfjdhgfjfgdh`);
+            (async () => {
+                if (!token) return;
+                const body = {       ///////////////////////////////////////////////////////// body
+                    player2Id: data.sender.id,
+                    player1Id: data.userId,
+                    mode: data.mode
+                }
+                const g = await StartGame(body, token);
+                if (!g) return;
+                toast(`satart game`);
+                channeLsettingsHook.onClose()
+                router.push(`/game/${data.mode}/friend`)
+            })();
+        }
+        )
 
     }, [socket]);
 
@@ -88,7 +107,7 @@ export default function ChanneLsettingsPlayGame(
             <h3 className="capitalize text-md text-[#FFFFFF] font-semibold"> {`Play with ${PLayer01?.login}`} </h3>
         </div>
         {LoadingGame ? <div>
-            < Loading  chat mode={gamemode} message={` Waiting for ${PLayer01?.login}  to accept the invitation ...`} />
+            < Loading chat mode={gamemode} message={` Waiting for ${PLayer01?.login}  to accept the invitation ...`} />
         </div> : <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
             <div className="flex flex-col h-full w-full justify-start gap-4 items-center min-h-[34rem] ">
                 <div className="flex flex-col justify-center items-center gap-3">
