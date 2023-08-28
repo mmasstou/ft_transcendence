@@ -237,7 +237,9 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
         </>
     )
     if (step === USERSETTINGSTEPS.PLAYGAME) {
-        bodyContent = <ChanneLsettingsPlayGame socket={socket} Onback={() => { setStep(USERSETTINGSTEPS.INDEX) }}
+        bodyContent = <ChanneLsettingsPlayGame
+            socket={socket}
+            Onback={() => { setStep(USERSETTINGSTEPS.INDEX) }}
             onClick={function (mode: any): void {
                 // send initaion to player 02
                 socket?.emit('sendGameNotification', {
@@ -246,7 +248,9 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
                     mode: mode
                 })
 
-            }} player1Id={PlayGameWith?.userId} player2Id={LogedMember?.userId} />
+            }}
+            player1Id={PlayGameWith?.userId}
+            player2Id={LogedMember?.userId} />
     }
     if (step === USERSETTINGSTEPS.MEMBERJOIN) {
         bodyContent = <ChanneLSettingsMemberJoinModaL OnClick={() => { setStep(USERSETTINGSTEPS.INDEX) }} socket={socket} OnBack={() => {
@@ -254,9 +258,10 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
         }} />
     }
     if (step === USERSETTINGSTEPS.FINDMEMBER) {
-        bodyContent = <ChanneLSettingsMemberFindModaL OnClick={() => { setStep(USERSETTINGSTEPS.INDEX) }} socket={socket} OnBack={() => {
-            setStep(USERSETTINGSTEPS.INDEX)
-        }} />
+        bodyContent = <ChanneLSettingsMemberFindModaL
+            OnClick={() => { setStep(USERSETTINGSTEPS.INDEX) }} socket={socket} OnBack={() => {
+                setStep(USERSETTINGSTEPS.INDEX)
+            }} />
     }
 
     return <SettingsProvider socket={socket} >
