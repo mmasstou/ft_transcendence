@@ -1,8 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
-import about from '../../../public/about.svg';
-import data from '../../../public/lotties/hero.json';
+import data from '../../../public/lotties/about.json';
 import Button from './CTA';
 import styles from './style';
 import { useRouter } from 'next/navigation';
@@ -47,11 +45,10 @@ const About = () => {
         />
       </motion.div>
 
-      <div className={`${styles.flexStart} mr-10 lg:pr-10 relative`}>
+      <div className={`${styles.flexStart} mr-10 relative`}>
         <motion.div
-          className="object-fit z-[5]"
           initial={{
-            x: -200,
+            x: 200,
             opacity: 0,
           }}
           transition={{ duration: 1.2 }}

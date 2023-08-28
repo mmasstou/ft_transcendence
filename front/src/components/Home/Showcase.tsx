@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import show from '../../../public/show.svg';
-import data from '../../../public/lotties/hero.json';
+import data from '../../../public/lotties/show.json';
 import Button from './CTA';
 import styles from './style';
 import { useRouter } from 'next/navigation';
@@ -61,21 +61,6 @@ const Showcase = () => {
           >
             <Lottie options={defaultOptions} height={600} width={600} />
           </motion.div>
-          {/* <AnimatedImage
-            initial={{
-              x: 200,
-              opacity: 0,
-            }}
-            transition={{ duration: 1.2 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className=""
-            src={show}
-            alt="ping pong tabe image"
-            width={600}
-            height={500}
-            priority={false}
-          /> */}
           <div className="absolute z-[3] right-20 top-0 w-[50%] h-[50%] rounded-full white__gradient" />
           <div className="absolute z-[0] right-20 bottom-20 w-[50%] h-[50%] rounded-full pink__gradient" />
         </div>
