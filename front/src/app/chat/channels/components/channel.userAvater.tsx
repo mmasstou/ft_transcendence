@@ -1,30 +1,59 @@
 import { userType } from "@/types/types";
+import { set } from "date-fns";
 import Image from "next/image"
+import React from "react";
 import { IconType } from "react-icons";
 import { PiGameControllerFill } from "react-icons/pi";
 import { RiRadioButtonFill, RiRadioButtonLine } from "react-icons/ri";
+import Loading from "./loading";
+import { useRouter } from "next/navigation";
+import MyAvatar from "@/components/profile/MyAvatar";
+import * as Avatar from '@radix-ui/react-avatar';
 
-export function UserAvatar({ image, size, User, showsatatus = true }: { image: string; size?: number; User?: userType, showsatatus?: boolean }) {
+export function UserAvatar(
+    { image, size, User, showsatatus = true }:
+        { image: string; size?: number; User?: userType, showsatatus?: boolean }) {
+    if (!User) return;
+    const [IsMounted, setIsMounted] = React.useState(false)
+    const [IsLoading, setIsLoading] = React.useState(true)
+    const [imageUrl, setImageUrl] = React.useState<string>('/avatar.png')
+    const router = useRouter()
     const _size = size ? size : 28
     const _color = User && User.status !== 'online' ? User.status === 'offline' ? 'danger' : 'yellow-500' : 'secondary'
     const Icon: IconType = User && User.status === 'online' ? RiRadioButtonLine : PiGameControllerFill
-    let imageUrl = ''
-    fetch(image)
-        .then(response => {
-            if (response.ok) {
-                imageUrl = image
-            } else {
-                imageUrl = '/avatar.png'
+
+    React.useEffect(() => {
+        setIsLoading(true);
+        (async () => {
+            try {
+                const response = await fetch(image);
+                if (!response.ok) {
+                    return;
+                }
+                setImageUrl(image)
+
+            } catch (error: any) {
+                console.error("An error occurred while fetching the image:", error.message);
             }
-        })
-        .catch(error => {
-            console.error("An error occurred while fetching the image:", error);
-        });
-    return <div className={`relative min-w-[${_size}px] `}>
-        {showsatatus && User && <div className={`absolute right-0 bottom-0 z-10 flex flex-row items-center gap-2 fill-${_color} text-${_color} bg-[#243230e0] rounded-full p-[1px]`}><Icon size={_size / 3} /></div>}
-        <div className={`image  min-w-[${_size}px] rounded-full overflow-hidden relative z-[9]`}>
-            {/* <div className="flex flex-row items-center gap-2 fill-secondary text-secondary"><RiRadioButtonLine size={12} /></div> */}
-            <Image className="" src={image} alt={"avatar"} width={_size} height={_size} />
-        </div>
+            setIsMounted(true)
+
+        })();
+        setIsLoading(false);
+    }, [])
+
+    return <div className="cursor-pointer w-[32px] h-[32px]">
+        <Avatar.Root
+            className={`flex justify-center items-center flex-inline align-middle overflow-hidden select-none
+            rounded-full w-full h-full`}
+        >
+            <Avatar.Image
+                className="w-full h-full object-cover border-secondary rounded-full"
+                src={User?.avatar}
+                sizes="100%"
+                alt="User Avatar"
+            />
+        </Avatar.Root>
+
+        {/* {User && <MyAvatar User={User} />} */}
     </div>
 }

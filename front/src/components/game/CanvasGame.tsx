@@ -4,12 +4,12 @@ import {Socket, io} from 'socket.io-client';
 import {TableMap} from '../../../tools/class';
 import Cookies from "js-cookie";
 import {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall} from './gameFunc';
-import LeaveButton from '@/components/game/LeaveButton';
 import GameResult from "./GameResult";
 import MatchMaking from "./MatchMaking";
+import { useRouter } from "next/navigation";
 
 const TableMap: TableMap = new Map();
-const url = process.env.NEXT_PUBLIC_GAMESOCKET_URL_WS;
+const url = process.env.NEXT_PUBLIC_SOCKET_URL;
 const IPmachine = url + '/game';
 const IPmachineBall = url + '/ball';
 const AllTime = 75;
@@ -18,21 +18,22 @@ const targetScore = 5;
 /// game settings /// on % of the canvas
 let player_width = 6.25;
 
-function pongFunc(divRef: RefObject<HTMLDivElement>) {
+function pongFunc(divRef: RefObject<HTMLDivElement>, router: any) {
   
-  let isvertical;
-  const  canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isMounted, setIsMounted] = useState(false);
-  const DivCanvas = isMounted ? document.getElementById('CanvasGameDiv'): null;
-  const [Table_obj, setTable_obj] = useState<any>(null);
-  const [Status, setStatus] = useState(false);
-  const [socket, setSocket] = useState<any>(null);
-  const [ballSocket, setBallSocket] = useState<any>(null);
-  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-  const [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null}>({
+  let     isvertical;
+  const   canvasRef = useRef<HTMLCanvasElement>(null);
+  const   [isMounted, setIsMounted] = useState(false);
+  const   DivCanvas = isMounted ? document.getElementById('CanvasGameDiv'): null;
+  const   [Table_obj, setTable_obj] = useState<any>(null);
+  const   [Status, setStatus] = useState(false);
+  const   [socket, setSocket] = useState<any>(null);
+  const   [ballSocket, setBallSocket] = useState<any>(null);
+  const   [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const   [images, setImages] = useState<{ img1: HTMLImageElement | null, img2: HTMLImageElement | null, pause: HTMLImageElement | null, exit: HTMLImageElement | null}>({
         img1: null,
         img2: null,
         pause: null,
+        exit: null, 
       });
     const [Player1, setPlayer1] = useState(Table_obj ? Table_obj.player1.position : 50);
     const [Player2, setPlayer2] = useState(Table_obj ? Table_obj.player2.position : 50);
@@ -65,15 +66,52 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
             socket.emit('setStatus', {status:false, tableId: Table_obj.tableId});
       }
 
+    async function ExitGame(event: { clientX: number; clientY: number; }) {
+      if (isMounted && canvas && !Status) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const is_vertical = canvasSize.height > canvasSize.width ? true : false;
+        const radius = is_vertical ? canvasSize.width * 0.06: canvasSize.height * 0.06;
+        if (
+          (is_vertical && x >= (canvasSize.width) && x <= (canvasSize.width + (radius * 3)) && (y >= (canvasSize.height * (2 / 3) - (radius * 2.5))) && y <= (canvasSize.height * (2 / 3)))
+          || (!is_vertical && x >= (canvasSize.width * (2 / 3) - radius * 2.5) && x <= (canvasSize.width * (2 / 3)) && y >= (canvasSize.height) && y <= (canvasSize.height + (radius * 3)))
+            ) {
+              router.push('/game');
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/game/leaveGame`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  UserId: Cookies.get('_id'),
+                  TableId: Cookies.get('tableId'),
+                }),
+              });
+    }
+  }
+}
+
     function MouseFunction(event: { clientX: number; clientY: number; }) {
-      if (!Status)
-      return;
-        let updatePlayer;
-        let max_variable = 100 - (100 / player_width);
-        if (isMounted && canvas) {
-          const rect = canvas.getBoundingClientRect();
-          const x = event.clientX - rect.left;
-          const y = event.clientY - rect.top;
+      if (isMounted && canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const is_vertical = canvasSize.height > canvasSize.width ? true : false;
+        const radius = is_vertical ? canvasSize.width * 0.06: canvasSize.height * 0.06;
+        if (!Status) {
+          if (
+            (is_vertical && x >= (canvasSize.width) && x <= (canvasSize.width + (radius * 3)) && (y >= (canvasSize.height * (2 / 3) - (radius * 2.5))) && y <= (canvasSize.height * (2 / 3)))
+            || (!is_vertical && x >= (canvasSize.width * (2 / 3) - radius * 2.5) && x <= (canvasSize.width * (2 / 3)) && y >= (canvasSize.height) && y <= (canvasSize.height + (radius * 3)))
+            ) {
+            DivCanvas && (DivCanvas.style.cursor = "pointer");
+        } else {
+          DivCanvas && (DivCanvas.style.cursor = "default");
+        }
+        }
+        else {
+          let updatePlayer;
+          let max_variable = 100 - (100 / player_width);
           if (x >= 0 && y >= 0 && x <= rect.width && y <= rect.height) {
             let position1 = Player1;
             let position2 = Player2;
@@ -98,9 +136,29 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
               if (updatePlayer != position2)
               socket.emit("setPlayer2", {Player: updatePlayer, tableId: Table_obj.tableId});
               }
+            }
+            }
           }
+      }
+
+    function moveBot() {
+      if (BallObj.y > 8 && BallObj.y < 92 && BallObj.x < 50) {
+        const random =( Math.random() * 0.5) + 0.5;
+        if (Math.round(BallObj.y) > Math.round(Player2 + 8)) {
+          socket.emit("setBot", {Player: Player2 + 1, tableId: Table_obj.tableId});
+          setPlayer2(Player2 + random);
+        }
+        else if (Math.round(BallObj.y) < Math.round(Player2 + 8)) {
+          socket.emit("setBot", {Player: Player2 - 1, tableId: Table_obj.tableId});
+          setPlayer2(Player2 - random);
         }
       }
+    }
+
+    function handleTouchMove(e: TouchEvent) {
+      console.log(e.touches[0].clientX, e.touches[0].clientY)
+      MouseFunction({clientX: e.touches[0].clientX, clientY: e.touches[0].clientY})
+    }
 
     function keyFunction(e: KeyboardEvent) {
       let position1 = Player1;
@@ -135,7 +193,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
                   socket.emit("setPlayer2", {Player: position2 + 1, tableId: Table_obj.tableId});
             }
           }
-        }
+    }
 
     function handleResize() {
       let height = 0;
@@ -172,22 +230,26 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     const img1 = new Image();
     const img2 = new Image();
     const pause = new Image();
+    const exit = new Image();
     function checkImageLoaded() {
         Table_obj.imageLoad++;
-        if (Table_obj.imageLoad == 3) {
+        if (Table_obj.imageLoad == 4) {
             setImages({
                 img1:img1,
                 img2:img2,
                 pause:pause,
+                exit:exit,
             })
         }
     }
     img1.src = Table_obj.player1.GameSetting.avatar;
     img2.src = Table_obj.player2.GameSetting.avatar;
     pause.src = "/pause.png";
+    exit.src = "/exit.png";
     img1.onload = checkImageLoaded;
     img2.onload = checkImageLoaded;
     pause.onload = checkImageLoaded;
+    exit.onload = checkImageLoaded;
     handleResize();
     setBallObj({
         x:Table_obj.ball.x,
@@ -234,12 +296,8 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
           socket && socket.disconnect();
           socketBall && socketBall.disconnect();
       };
-
-  //client namespace disconnect
-  // transport close
   }, [])
     
-
     // useEffect for background
     useEffect(() => {
       if (LeaveGame) {
@@ -249,17 +307,21 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       if (isReady) {
         if (!Cookies.get('tableId'))
           Cookies.set('tableId', Table_obj.tableId);
-        const obj = drawBackground(Table_obj, canvas, canvasSize, socket, DivCanvas);
+        const obj = drawBackground(Table_obj, canvas, canvasSize, socket, DivCanvas, images);
         setScore({first: Table_obj.player1.score, second: Table_obj.player2.score});
         window.addEventListener("resize", handleResize);
         window.addEventListener("mousemove", MouseFunction)
         window.addEventListener("keydown", StartPause)
+        window.addEventListener("click", ExitGame);
+        window.addEventListener('touchmove', handleTouchMove, { passive: false });
         return () => {
           obj.backgroundCtx && obj.backgroundCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
           canvas?.parentNode && canvas.parentNode.contains(obj.backgroundLayer) && canvas.parentNode.removeChild(obj.backgroundLayer);
           window.removeEventListener("resize", handleResize);
-          window.removeEventListener("mousemove", MouseFunction)
-          window.removeEventListener("keydown", StartPause)
+          window.removeEventListener("mousemove", MouseFunction);
+          window.removeEventListener('click', ExitGame);
+          window.removeEventListener("keydown", StartPause);
+          window.removeEventListener('touchmove', handleTouchMove);
         }
       }
             
@@ -305,7 +367,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
     useEffect(() => {
       if (isReady) {
           const obj = drawingBall(canvas, BallObj, socket, Table_obj, canvasSize);
-          Table_obj.player2.UserId == 'Bot' && BallObj.y > 8 && BallObj.y < 92 && socket.emit("setBot", {Player: BallObj.y - 8, tableId: Table_obj.tableId}) && setPlayer2(BallObj.y - 8);   /////////////// bot /////////////// need more calculation
+          Table_obj.player2.UserId == 'Bot' && moveBot();
           return () => {
             obj.ballCtx && obj.ballCtx.clearRect(0, 0,  canvasSize.width, canvasSize.height);
             canvas?.parentNode && canvas.parentNode.removeChild(obj.ballLayer);
@@ -413,21 +475,18 @@ function pongFunc(divRef: RefObject<HTMLDivElement>) {
       LeaveGame && (YouWin || (!YouWin && !YouLose && !YouDraw))  ? <GameResult result="win" /> :
       LeaveGame && YouLose ? <GameResult result="lose" /> :
       LeaveGame && YouDraw ? <GameResult result="draw" /> :
-      <>
-        <LeaveButton isvertical={isvertical} isReady={isReady} isMobile={isMobile} />
-        <div id="CanvasGameDiv">
-          <canvas id="GameCanvas" ref={canvasRef} width={isvertical ? canvasSize.width * 1.15 : canvasSize.width} height={isvertical ? canvasSize.height : canvasSize.height * 1.15} />
-        </div>
-      </>
-
+      <div id="CanvasGameDiv">
+        <canvas id="GameCanvas" ref={canvasRef} width={isvertical ? canvasSize.width * 1.15 : canvasSize.width} height={isvertical ? canvasSize.height : canvasSize.height * 1.15} />
+      </div>
     );
 }
 
 export default function CanvasGame() {
     const divRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
   return (
     <div ref={divRef} className='flex flex-col gap-2 w-full h-full justify-center items-center'>
-        {pongFunc(divRef)}
+        {pongFunc(divRef, router)}
     </div>
   );
 }

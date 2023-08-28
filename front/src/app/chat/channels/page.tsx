@@ -43,21 +43,31 @@ export default function page() {
   const token = Cookies.get('token');
   if (!UserId || !token) return;
 
+  if (IsMounted) {
+    document.title = "Transcendence - Chat/channeL"
+  }
+
+
+  const GetData = async () => {
+    // update channels :
+    const ChanneLs = await getChannels(token)
+    if (!ChanneLs) return
+    setChannel(ChanneLs)
+  }
+
   React.useEffect(() => {
-    (async () => {
-      const ChanneLs = await getChannels(token)
-      if (!ChanneLs) return
-      setChannel(ChanneLs)
-      // setIsLoading(false)
-    })();
-    const Clientsocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
+    if (!token)
+      return;
+    const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/chat`, {
+      transports: ['websocket'],
       auth: {
         token, // Pass the token as an authentication parameter
       },
     });
-    setSocket(Clientsocket)
+    setSocket(socket)
+    GetData()
     setIsMounted(true)
-    return () => { Clientsocket.disconnect() }
+    return () => { socket.disconnect() }
   }, [])
 
   React.useEffect(() => {
@@ -68,14 +78,7 @@ export default function page() {
     // leave the channeLs :
     socket?.on(
       `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-      (data: any) => {
-        (async () => {
-          // update channels :
-          const ChanneLs = await getChannels(token)
-          if (!ChanneLs) return
-          setChannel(ChanneLs)
-        })();
-      })
+      (data: any) => GetData())
   }, [socket])
 
 

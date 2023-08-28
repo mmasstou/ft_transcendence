@@ -15,9 +15,9 @@ import { Socket } from "socket.io-client";
 import getUserWithId from "../../../actions/getUserWithId";
 import { set } from "date-fns";
 import ChanneLSettingsBody from "../channel.settings.body";
-import Loading from "../CanneLSettingsLoading";
 import ChanneLsettingsProvider from "../ChanneL/channel.settings.chnnel.provider";
 import SettingsProvider from "../channel.settings.provider";
+import Loading from "../../loading";
 interface props {
     onClick: (data: any) => void;
     Onback: () => void;
@@ -88,7 +88,7 @@ export default function ChanneLsettingsPlayGame(
             <h3 className="capitalize text-md text-[#FFFFFF] font-semibold"> {`Play with ${PLayer01?.login}`} </h3>
         </div>
         {LoadingGame ? <div>
-            <Loading mode={gamemode} message={` Waiting for ${PLayer01?.login}  to accept the invitation ...`} />
+            < Loading  chat mode={gamemode} message={` Waiting for ${PLayer01?.login}  to accept the invitation ...`} />
         </div> : <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
             <div className="flex flex-col h-full w-full justify-start gap-4 items-center min-h-[34rem] ">
                 <div className="flex flex-col justify-center items-center gap-3">

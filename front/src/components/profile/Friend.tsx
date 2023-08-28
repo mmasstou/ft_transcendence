@@ -4,13 +4,10 @@ import FriendCard from './FriendCard';
 
 const Friend = () => {
   return (
-    <div
-      className="bg-[#243230] rounded-[5px] text-white flex flex-col items-center 
-            px-2  m-2 mt-5 max-h-[30vh] overflow-y-scroll"
-    >
-      <FriendCard />
-      <FriendCard />
-      <FriendCard />
+    <div className="bg-[#243230] rounded-md text-white flex flex-col p-2 xl:p-3 overflow-auto">
+      <FriendCard username="mehdi" />
+      <FriendCard username="mehdi" inGame />
+      <FriendCard username="mehdi" online />
     </div>
   );
 };

@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "next dev -p 8080",
         "build": "next build",
-        "start": "next start",
+        "start": "next start -p 8080",
         "lint": "next lint",
         "prettier": "prettier --write ."
     },
@@ -18,7 +18,7 @@
         "@radix-ui/react-progress": "^1.0.3",
         "@radix-ui/react-switch": "^1.0.3",
         "@types/node": "20.2.5",
-        "@types/react": "18.2.8",
+        "@types/react": "^18.2.8",
         "@types/react-dom": "18.2.4",
         "@types/socket.io-client": "^3.0.0",
         "autoprefixer": "^10.4.14",

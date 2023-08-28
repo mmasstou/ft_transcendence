@@ -48,7 +48,7 @@ export default function page() {
 
 
     React.useEffect(() => {
-        const Clientsocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
+        const Clientsocket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/chat`, {
             auth: {
                 token, // Pass the token as an authentication parameter
             },

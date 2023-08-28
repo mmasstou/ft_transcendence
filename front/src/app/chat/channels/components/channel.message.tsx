@@ -56,7 +56,7 @@ const Message: FC<Imessage> = ({ message, userid, isForOwner }) => {
         <div className={`ffffffff  relative flex flex-col min-w-[220px]  max-w-[340px] sm:max-w-[600px] lg:max-w-[700px]   break-words  ${!isForOwner ? 'justify-end' : ' justify-start'}`}>
             <div className={`flex ${!isForOwner ? 'flex-row' : ' flex-row-reverse '} justify-between`}>
                 <div className={`MessagesenderInfo flex ${!isForOwner ? 'flex-row' : ' flex-row-reverse '} items-center p-1 gap-2`}>
-                    <UserAvatar size={32} image={senderInfo?.avatar} />
+                    <UserAvatar size={32} image={senderInfo?.avatar} User={senderInfo} />
                     <h3 className="text-base font-light text-[#FFFFFF]">{senderInfo?.login}</h3>
                 </div>
                 <div className={`flex ${!isForOwner ? 'flex-row' : ' flex-row-reverse '} gap-2 justify-center items-center`}>

@@ -11,9 +11,9 @@ import { useParams } from "next/navigation";
 import PermissionDenied from "../../channel.settings.permissiondenied";
 import { toast } from "react-hot-toast";
 import { tr } from "date-fns/locale";
-import Loading from "../CanneLSettingsLoading";
 import Settings from "@/components/Dashboard/Header/Settings";
 import SettingsProvider from "../channel.settings.provider";
+import Loading from "../../loading";
 
 interface props {
     children: React.ReactNode;
@@ -63,7 +63,7 @@ export default function ChanneLsettingsProvider(props: props) {
     }, [props.socket])
 
     if (!IsMounted) return;
-    if (IsLoading) return <Loading />
+    if (IsLoading) return <Loading background />
     return <SettingsProvider socket={null}>
         {LoggedMember?.type === UserTypeEnum.OWNER
             ? <div className="flex flex-col justify-start">

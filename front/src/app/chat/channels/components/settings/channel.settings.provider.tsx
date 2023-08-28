@@ -8,10 +8,10 @@ import Cookies from "js-cookie";
 import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { tr } from "date-fns/locale";
-import Loading from "./CanneLSettingsLoading";
 import PermissionDenied from "../channel.settings.permissiondenied";
 import FindOneBySLug from "../../actions/Channel/findOneBySlug";
 import getMemberWithId from "../../actions/getMemberWithId";
+import Loading from "../loading";
 
 interface props {
     children: React.ReactNode;
@@ -64,9 +64,7 @@ export default function SettingsProvider(props: props) {
     }, [props.socket])
 
     if (!IsMounted) return;
-    if (IsLoading) return <Loading />
     return <div className="flex flex-col justify-between max-h-[32rem]">
-      
-        {props.children}
+        {IsLoading ? < Loading  /> : props.children}
     </div>
 }

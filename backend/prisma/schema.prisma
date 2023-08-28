@@ -26,7 +26,7 @@ enum RoomType {
 model UserSocket {
   id         String   @id @default(uuid())
   socketId   String
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -41,9 +41,19 @@ model User {
   name                          String?
   kind                          String?
   avatar                        String?
-  bg_color                      String[]               @default(["#918CA9", "#211F2F"])
-  paddle_color                  String?                @default("#E0E0E0")
-  ball_color                    String?                @default("#E0E0E0")
+  bg_color                      String[]        @default(["#918CA9", "#211F2F"])
+  paddle_color                  String?         @default("#E0E0E0")
+  ball_color                    String?         @default("#E0E0E0")
+  MyScore                       Match[]         @relation("Player1")
+  Other                         Match[]         @relation("Player2")
+  status                        String          @default("online")
+  TotalWin                      Int             @default(0)
+  TotalLose                     Int             @default(0)
+  TotalDraw                     Int             @default(0)
+  cleanSheet                    Boolean         @default(false)
+  Machine                       Boolean         @default(false)
+  TotalMatch                    Int             @default(0)
+  Level                         Float           @default(0.0)
   location                      String?
   intraId                       Int?
   banner                        String?
@@ -55,22 +65,20 @@ model User {
   Rooms                         Rooms[]
   directMessage                 DirectMessage[]
   UserSocket                    UserSocket[]
-  cursusId                      String?
   Notification                  Notification[]
   ChanneLNotifications          ChanneLNotifications[]
   twoFactorAuthenticationSecret String?
-  twoFA                         Boolean                @default(false)
-  MyScore                       Match[]                @relation("Player1")
-  Other                         Match[]                @relation("Player2")
-  status                        String                 @default("online") // need to be checked
+  twoFA                         Boolean         @default(false)
+  logedFirstTime                Boolean         @default(false)
 }
 
 model Match {
-  id           String @id @default(uuid())
-  player1      User   @relation(name: "Player1", fields: [player1Id], references: [id])
+  id           String   @id @default(uuid())
+  created_at   DateTime @default(now())
+  player1      User     @relation(name: "Player1", fields: [player1Id], references: [id], onDelete: Cascade)
   player1Id    String
   player1Score Int
-  player2      User   @relation(name: "Player2", fields: [player2Id], references: [id])
+  player2      User     @relation(name: "Player2", fields: [player2Id], references: [id], onDelete: Cascade)
   player2Id    String
   player2Score Int
 }
@@ -117,15 +125,15 @@ model DirectMessage {
   name       String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  User       User?    @relation(fields: [userId], references: [id])
+  User       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String?
 }
 
 model Members {
-  id         String    @id @default(uuid())
-  user       User      @relation(fields: [userId], references: [id])
-  RoomId     Rooms?    @relation(fields: [roomsId], references: [id])
-  type       UserType  @default(USER)
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  RoomId     Rooms?   @relation(fields: [roomsId], references: [id], onDelete: Cascade)
+  type       UserType @default(USER)
   userId     String
   roomsId    String?
   isban      Boolean   @default(false)
@@ -138,8 +146,8 @@ model Members {
 model Messages {
   content    String
   id         String   @id @default(uuid())
-  sender     User     @relation(fields: [senderId], references: [id])
-  roomId     Rooms?   @relation(fields: [roomsId], references: [id])
+  sender     User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  roomId     Rooms?   @relation(fields: [roomsId], references: [id], onDelete: Cascade)
   senderId   String
   viewed     Int      @default(0)
   roomsId    String?

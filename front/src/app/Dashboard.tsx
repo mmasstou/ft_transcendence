@@ -59,14 +59,14 @@ const Dashboard = ({ children }: Props) => {
 
   useEffect(() => {
 
-    const socket: Socket = io(`${process.env.NEXT_PUBLIC_USERSOCKET_URL_WS}`, {
+    const socket: Socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/User`, {
       auth: {
         token: `${token}`,
         id: `${Cookies.get("_id")}`
       }
     });
 
-    const chatSocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
+    const chatSocket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/chat`, {
       transports: ['websocket'],
       auth: {
         token: token,
@@ -82,33 +82,6 @@ const Dashboard = ({ children }: Props) => {
 
   }, [])
 
-  // React.useEffect(() => {
-  //   if (!token)
-  //     return;
-  //   const chatSocket = io(`${process.env.NEXT_PUBLIC_CHAT_URL_WS}`, {
-  //     transports: ['websocket'],
-  //     auth: {
-  //       token: token,
-  //     },
-  //   });
-  //   // socket.on('jwt_expired', () => {
-  //   //   console.log("jwt_expired")
-  //   //   Cookies.remove('token')
-  //   //   Cookies.remove('_id')
-  //   // })
-  //   // Handle socket events here
-  //   socket.on('connect', () => {
-
-  //     setSocket(socket)
-  //     Cookies.set('socket', socket.id)
-  //   });
-
-  //   // Clean up the socket connection when the component unmounts
-  //   return () => {
-  //     socket.disconnect();
-  //     socket.close()
-  //   };
-  // }, []);
   useEffect(() => {
     socket?.on('GameResponse', (data: any) => {
       if (data.response === 'Accept') {

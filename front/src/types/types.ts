@@ -85,6 +85,11 @@ export type userType = {
   twoFactorAuthenticationSecret: string;
   twoFA: boolean;
   status: string;
+  TotalWin: number;
+  TotalLose: number;
+  TotalMatch: number;
+  TotalDraw: number;
+  Level: number;
 };
 
 export type cursusType = {

@@ -5,16 +5,19 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  Param,
   Post,
-  Query,
 } from '@nestjs/common';
-import { MyGateway, BallGateway } from './game.gateway';
+import { MyGateway } from './game.gateway';
+import { PrismaService } from 'src/prisma.service';
+import { GameService } from './game.service';
 
 @Controller('game')
 export class GameController {
   constructor(
     private GameGateway: MyGateway,
-    private BallGateway: BallGateway,
+    private prisma: PrismaService,
+    private GameService: GameService,
   ) {}
 
   @Post('/FriendGame')
@@ -49,6 +52,7 @@ export class GameController {
           HttpStatus.CONFLICT,
         );
     } catch (err) {
+      // console.log(err);
       throw new HttpException(
         { reason: err.response.reason },
         HttpStatus.CONFLICT,
@@ -93,4 +97,42 @@ export class GameController {
   /**{       ///////////////////////////////////////////////////////// body
         "table_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
         } */
+
+  @Get('/GetScore/:id')
+  async getUserScores(@Param('id') userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        MyScore: true,
+        Other: true,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const matchList = user.MyScore.concat(user.Other);
+    const sortedmatchList = matchList.sort((item1, item2) => {
+      if (item1.created_at > item2.created_at) {
+        return -1;
+      }
+      if (item1.created_at < item2.created_at) {
+        return 1;
+      }
+      return 0;
+    });
+
+    return matchList;
+  }
+
+  @Post('/UpdateTheme')
+  async updateTheme(@Body() body: any) {
+    try {
+      await this.GameService.updateTheme(body);
+    } catch (err) {
+      throw new HttpException(
+        { reason: 'User not found' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
 }

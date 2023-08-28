@@ -18,9 +18,9 @@ import getChannelWithId from "../../../actions/getChannelWithId";
 import { RiSearchLine } from "react-icons/ri";
 import ChanneLSettingsBody from "../channel.settings.body";
 import { toast } from "react-hot-toast";
-import Loading from "../CanneLSettingsLoading";
 import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
 import getMemberWithId from "../../../actions/getMemberWithId";
+import Loading from "../../loading";
 
 interface IChannelSettingsMemberJoinModalProps {
     OnBack: () => void;
@@ -51,7 +51,7 @@ export default function ChanneLSettingsMemberJoinModaL(
 
     React.useEffect(() => {
         setIsMounted(true);
-        const _socket = io(`${process.env.NEXT_PUBLIC_USERSOCKET_URL_WS}`, {
+        const _socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/User`, {
             auth: {
                 token, // Pass the token as an authentication parameter
             },

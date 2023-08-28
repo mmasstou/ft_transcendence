@@ -16,11 +16,13 @@ import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { JwtAuthGuard } from './guards/jwt-oauth.guard';
 import { UserService } from 'src/users/user.service';
+import { PrismaService } from 'src/prisma.service';
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private readonly userService: UserService,
+    private readonly prisma: PrismaService,
   ) {}
 
   @Get('login/:username/:password')
@@ -66,6 +68,9 @@ export class AuthController {
         httpOnly: false,
         sameSite: false,
       });
+      if (req.user.logedFirstTime) {
+        return res.redirect(`${process.env.AUTH_REDIRECT_LOGIN}`);
+      }
       if (req.user.twoFA) {
         return res.redirect(`${process.env.AUTH_REDIRECT_2FA}`);
       } else {
@@ -79,9 +84,15 @@ export class AuthController {
   @Get('logout')
   @UseGuards(JwtAuthGuard)
   async logout(@Req() req: any, @Res() res: Response): Promise<any> {
+    await this.prisma.user.update({
+      where: { email: req.user.email },
+      data: {
+        logedFirstTime: false,
+      },
+    });
     // res.clearCookie('token');
+    // res.clearCookie('accessToken');
     // res.clearCookie('_id');
-    // res.redirect('http://localhost:8080');
     res.sendStatus(200);
   }
 

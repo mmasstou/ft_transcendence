@@ -50,6 +50,15 @@ export class UserService {
     });
   }
 
+  async setAvatar(NewAvatar: string, id: string) {
+    return this.prisma.user.update({
+      where: { id: id },
+      data: {
+        avatar: NewAvatar,
+      },
+    });
+  }
+
   async findOne(params: { id: string }): Promise<any> {
     const { id } = params;
     const user = await this.prisma.user.findUnique({
@@ -185,5 +194,11 @@ export class UserService {
         status: status,
       },
     });
+  }
+  isLoginValid(login: string): boolean {
+    if (login.length < 6) return false;
+    if (login.length > 8) return false;
+    if (!login.match(/^[A-z][A-z0-9-_]{5,7}$/)) return false;
+    return true;
   }
 }

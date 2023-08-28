@@ -40,9 +40,11 @@ lerna-debug.log*
 
 # backend :
 backend/prisma/migrations
-
+backend/uploads
 # database:
 databases/data/
 
 
 */package-lock.json
+.env
+ToDo

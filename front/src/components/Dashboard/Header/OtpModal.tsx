@@ -56,29 +56,21 @@ const Otp: React.FC<Props> = ({ setOpenModal, setTwoFA }) => {
       twoFactorAuthenticationCode: otpSend,
     };
     axios
-      .post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/2fa/authenticate`,
-        userData,
-        {
-          headers: {
-            Authorization: `Bearer ${yourJwtToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/2fa/authenticate`, userData, {
+        headers: {
+          Authorization: `Bearer ${yourJwtToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
       .then((response) => {
         if (response.status === 200) {
           axios
-            .post(
-              `${process.env.NEXT_PUBLIC_BASE_URL}api/2fa/turn-on`,
-              userData,
-              {
-                headers: {
-                  Authorization: `Bearer ${yourJwtToken}`,
-                  'Content-Type': 'application/json',
-                },
-              }
-            )
+            .post(`${process.env.NEXT_PUBLIC_API_URL}/2fa/turn-on`, userData, {
+              headers: {
+                Authorization: `Bearer ${yourJwtToken}`,
+                'Content-Type': 'application/json',
+              },
+            })
             .then((response) => {
               if (response.status === 200) {
                 setTwoFA(true);
@@ -102,9 +94,15 @@ const Otp: React.FC<Props> = ({ setOpenModal, setTwoFA }) => {
       })
       .catch((err) => {
         setOtp(new Array(6).fill(''));
-        toast.error(
-          `${err.response.data.message} 🤔 Please try again or generate new Qr code`
-        );
+        if (err.response && err.response.status === 401) {
+          toast.error(
+            `Wrong otp code 🤔 Please try again or generate new Qr code`
+          );
+        } else {
+          toast.error(
+            `${err.response.data.message} 🤔 Please try again or generate new Qr code`
+          );
+        }
         console.clear();
         return;
       });
@@ -112,7 +110,7 @@ const Otp: React.FC<Props> = ({ setOpenModal, setTwoFA }) => {
 
   const handleQrCode = () => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_BASE_URL}api/2fa/generate`, {
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/2fa/generate`, {
         responseType: 'blob',
         headers: {
           Authorization: `Bearer ${yourJwtToken}`,
