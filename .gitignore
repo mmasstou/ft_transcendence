@@ -41,6 +41,7 @@ lerna-debug.log*
 # backend :
 backend/prisma/migrations
 backend/uploads
+backend/.env
 # database:
 databases/data/
 

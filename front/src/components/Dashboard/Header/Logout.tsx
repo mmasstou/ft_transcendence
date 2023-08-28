@@ -24,7 +24,7 @@ export const Logout: React.FC = (): JSX.Element => {
 
   useEffect(() => {
     if(!IsMounted) return;
-    axios.get(`http://localhost:80/api/users/${id}`).then((res) => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`).then((res) => {
       setUser(res.data);
     });
   }, [id]);

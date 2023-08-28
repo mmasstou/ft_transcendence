@@ -5,7 +5,7 @@ import { UserAvatar } from "../../channel.userAvater";
 // icons :
 import { TbDeviceGamepad2, TbUserX } from "react-icons/tb";
 import { SlBan, SlOptionsVertical } from "react-icons/sl";
-import { FaChessQueen, FaUserPlus, FaUserShield, FaVolumeMute, FaVolumeUp, FaBan} from "react-icons/fa";
+import { FaChessQueen, FaUserPlus, FaUserShield, FaVolumeMute, FaVolumeUp, FaBan } from "react-icons/fa";
 import { UserTypeEnum, membersType, updatememberEnum, updatememberType, userType } from "@/types/types";
 import React, { ReactNode } from "react";
 import Cookies from "js-cookie";
@@ -13,7 +13,7 @@ import getUserWithId from "../../../actions/getUserWithId";
 import { GrUserAdmin } from "react-icons/gr";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { Socket } from "socket.io-client";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import getMemberWithId from "../../../actions/getMemberWithId";
 import ChanneLsettingsHook from "../../../hooks/channel.settings";
 import Image from "next/image";
@@ -23,6 +23,7 @@ import ChanneLSettingsUserMemberItemActions from "./channel.settings.user.member
 import { VscPersonAdd } from "react-icons/vsc";
 import { AiFillDelete, AiOutlineUserAdd } from "react-icons/ai";
 import { IoLogOut } from "react-icons/io5";
+import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
 
 
 interface IChannelSettingsUserMemberItemProps {
@@ -36,6 +37,8 @@ interface IChannelSettingsUserMemberItemProps {
 }
 export default function ChannelSettingsUserMemberItem(
     { member, socket, UserJoin, OnClick, UserOwne, UserBan, UserProfile }: IChannelSettingsUserMemberItemProps) {
+    const query = useParams();
+    const slug: string = typeof query.slug === 'string' ? query.slug : '';
     const [IsMounted, setIsMounted] = React.useState(false)
     const [UserInfo, setUserInfo] = React.useState<userType | null>(null)
     const router = useRouter()
@@ -51,6 +54,7 @@ export default function ChannelSettingsUserMemberItem(
     React.useEffect(() => {
         setIsMounted(true)
     }, [])
+
     React.useEffect(() => {
         (async () => {
             const token: any = Cookies.get('token');
@@ -58,12 +62,12 @@ export default function ChannelSettingsUserMemberItem(
             setUserInfo(response)
 
             // get loged member :
-            const channeLLid = params.get('r')
+            const channeLLid = await FindOneBySLug(slug, token)
             if (!channeLLid)
                 return;
 
-            const channeLLMembers = UserId && await getMemberWithId(UserId, channeLLid, token)
-            if (channeLLMembers && channeLLMembers.statusCode !== 200) {
+            const channeLLMembers = UserId && await getMemberWithId(UserId, channeLLid.id, token)
+            if (channeLLMembers) {
                 setLogedMember(channeLLMembers)
             }
         })();
@@ -128,8 +132,8 @@ export default function ChannelSettingsUserMemberItem(
                             <>
                                 {member.type === UserTypeEnum.OWNER && <FaChessQueen size={14} fill="#FFBF00" />}
                                 {member.type === UserTypeEnum.ADMIN && <MdAdminPanelSettings size={14} fill="#FFBF00" />}
-                                {member.ismute && <FaVolumeMute size={14} fill="#FFCC00" />} 
-                                {member.isban && <FaBan size={14} fill="#ED6C03" />} 
+                                {member.ismute && <FaVolumeMute size={14} fill="#FFCC00" />}
+                                {member.isban && <FaBan size={14} fill="#ED6C03" />}
                             </>
                         </div>
                     </div>
@@ -141,8 +145,6 @@ export default function ChannelSettingsUserMemberItem(
                             {<ChanneLSettingsUserMemberItemActions
                                 hasPermissions={
                                     LogedMember?.type !== UserTypeEnum.USER
-                                    && member.type !== UserTypeEnum.OWNER
-                                    && member.userId !== UserId
                                 }
                                 member={member}
                                 OnClick={(data) => OnClick(data)} type={""}

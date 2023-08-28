@@ -16,7 +16,6 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 
 import ChanneLModal from './channel.modal';
-import Select from '../../components/Select';
 import ChanneLcreatemodaLHook from '../hooks/channel.create.hook';
 import ChanneLmodaLheader from '../components/channel.modal.header';
 import Input from '@/components/Input';
@@ -29,6 +28,7 @@ import { GoEyeClosed } from 'react-icons/go';
 import { HiLockClosed, HiLockOpen } from 'react-icons/hi';
 import getUsers from '../actions/getUsers';
 import { toast } from 'react-hot-toast';
+import Select from '../../components/Select';
 
 const ChanneLCreateModaL = () => {
   const { IsOpen, onClose, onOpen, socket, selectedFriends } =

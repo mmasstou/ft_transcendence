@@ -40,7 +40,7 @@ import * as cookieParser from 'cookie-parser';
     MessagesService,
     TwoFactorAuthenticationService,
   ],
-  exports: [UserService, PrismaService, MembersService, RoomsService],
+  // exports: [UserService, PrismaService, MembersService, RoomsService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
