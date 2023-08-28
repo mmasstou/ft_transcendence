@@ -55,7 +55,6 @@ model User {
   TotalMatch                    Int             @default(0)
   Level                         Float           @default(0.0)
   location                      String?
-  cursus_users                  Cursus?         @relation(fields: [cursusId], references: [id])
   intraId                       Int?
   banner                        String?
   is_active                     Boolean         @default(false)
@@ -66,7 +65,6 @@ model User {
   Rooms                         Rooms[]
   directMessage                 DirectMessage[]
   UserSocket                    UserSocket[]
-  cursusId                      String?
   twoFactorAuthenticationSecret String?
   twoFA                         Boolean         @default(false)
   logedFirstTime                Boolean         @default(false)
@@ -75,20 +73,12 @@ model User {
 model Match {
   id           String   @id @default(uuid())
   created_at   DateTime @default(now())
-  player1      User     @relation(name: "Player1", fields: [player1Id], references: [id])
+  player1      User     @relation(name: "Player1", fields: [player1Id], references: [id], onDelete: Cascade)
   player1Id    String
   player1Score Int
-  player2      User     @relation(name: "Player2", fields: [player2Id], references: [id])
+  player2      User     @relation(name: "Player2", fields: [player2Id], references: [id], onDelete: Cascade)
   player2Id    String
   player2Score Int
-}
-
-model Cursus {
-  id    String @id @default(uuid())
-  grade String
-  level Float
-  // blackholed_at String
-  User  User[]
 }
 
 model Rooms {
@@ -110,14 +100,14 @@ model DirectMessage {
   name       String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  User       User?    @relation(fields: [userId], references: [id])
+  User       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String?
 }
 
 model Members {
   id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id])
-  RoomId     Rooms?   @relation(fields: [roomsId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  RoomId     Rooms?   @relation(fields: [roomsId], references: [id], onDelete: Cascade)
   type       UserType @default(USER)
   userId     String
   roomsId    String?
@@ -130,8 +120,8 @@ model Members {
 model Messages {
   content    String
   id         String   @id @default(uuid())
-  sender     User     @relation(fields: [senderId], references: [id])
-  roomId     Rooms?   @relation(fields: [roomsId], references: [id])
+  sender     User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  roomId     Rooms?   @relation(fields: [roomsId], references: [id], onDelete: Cascade)
   senderId   String
   viewed     Int      @default(0)
   roomsId    String?
