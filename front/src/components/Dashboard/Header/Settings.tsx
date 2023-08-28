@@ -74,9 +74,9 @@ interface Props {
 const Settings: React.FC<Props> = ({ login }) => {
   const userData: userType | null = getUserData();
   const users: userType[] | null = getAllUsers();
-  useEffect(() => {
-    console.log(users);
-  }, [users]);
+  // useEffect(() => {
+  //   console.log(users);
+  // }, [users]);
 
   const router = useRouter();
 
@@ -197,8 +197,12 @@ const Settings: React.FC<Props> = ({ login }) => {
           }
         }
       } catch (error: any) {
-        toast.error(error.message);
-        console.clear();
+        if (error.response.status === 400) {
+          return;
+        } else {
+          toast.error(error.message);
+          console.clear();
+        }
       }
     }
     router.push('/profile');

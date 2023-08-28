@@ -2,11 +2,23 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import about from '../../../public/about.svg';
+import data from '../../../public/lotties/hero.json';
 import Button from './CTA';
 import styles from './style';
+import { useRouter } from 'next/navigation';
+import Lottie from 'react-lottie';
 
 const About = () => {
-  const AnimatedImage = motion(Image);
+  const router = useRouter();
+
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: data,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice',
+    },
+  };
   return (
     <section
       className={` ${styles.paddingY} ${styles.flexCenter}  flex-col md:p-5 
@@ -15,7 +27,7 @@ const About = () => {
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        transition={{ duration: 1.5 }}
+        transition={{ duration: 1 }}
         className={` ${styles.flexCenter} pl-4 flex-col text-center`}
       >
         <h1 className={` ${styles.heading} md:text-[45px] mb-4`}>About Game</h1>
@@ -25,6 +37,9 @@ const About = () => {
           a net.
         </p>
         <Button
+          OnClick={() => {
+            router.push(`${process.env.NEXT_PUBLIC_API_URL}/auth/callback`);
+          }}
           login={false}
           style="text-secondary bg-transparent  border border-secondary 
                         hover:bg-secondary hover:text-btn"
@@ -33,7 +48,8 @@ const About = () => {
       </motion.div>
 
       <div className={`${styles.flexStart} mr-10 lg:pr-10 relative`}>
-        <AnimatedImage
+        <motion.div
+          className="object-fit z-[5]"
           initial={{
             x: -200,
             opacity: 0,
@@ -41,14 +57,9 @@ const About = () => {
           transition={{ duration: 1.2 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          width={600}
-          height={500}
-          className="object-cover p-0 m-4 z-[5] ml-5 pl-5"
-          style={{ width: '600px', height: '500px' }}
-          src={about}
-          alt="ping pong tabe image"
-          priority={false}
-        />
+        >
+          <Lottie options={defaultOptions} height={600} width={600} />
+        </motion.div>
         <div className="absolute z-[3] -left-1/2 top-0 w-[50%] h-[50%] rounded-full white__gradient" />
         <div className="absolute z-[0] -left-1/2 bottom-0 w-[50%] h-[50%] rounded-full pink__gradient" />
       </div>

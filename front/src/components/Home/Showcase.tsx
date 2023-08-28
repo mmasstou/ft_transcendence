@@ -2,11 +2,24 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import show from '../../../public/show.svg';
+import data from '../../../public/lotties/hero.json';
 import Button from './CTA';
 import styles from './style';
+import { useRouter } from 'next/navigation';
+import Lottie from 'react-lottie';
 
 const Showcase = () => {
+  const router = useRouter();
   const AnimatedImage = motion(Image);
+
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: data,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice',
+    },
+  };
   return (
     <div>
       <section
@@ -26,6 +39,9 @@ const Showcase = () => {
             boards to become a champion.
           </p>
           <Button
+            OnClick={() => {
+              router.push(`${process.env.NEXT_PUBLIC_API_URL}/auth/callback`);
+            }}
             login={false}
             style="text-secondary bg-transparent border border-secondary 
                         hover:bg-secondary hover:text-btn"
@@ -34,7 +50,18 @@ const Showcase = () => {
         </motion.div>
 
         <div className="ml-4 relative">
-          <AnimatedImage
+          <motion.div
+            initial={{
+              x: 200,
+              opacity: 0,
+            }}
+            transition={{ duration: 1.2 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <Lottie options={defaultOptions} height={600} width={600} />
+          </motion.div>
+          {/* <AnimatedImage
             initial={{
               x: 200,
               opacity: 0,
@@ -48,7 +75,7 @@ const Showcase = () => {
             width={600}
             height={500}
             priority={false}
-          />
+          /> */}
           <div className="absolute z-[3] right-20 top-0 w-[50%] h-[50%] rounded-full white__gradient" />
           <div className="absolute z-[0] right-20 bottom-20 w-[50%] h-[50%] rounded-full pink__gradient" />
         </div>

@@ -10,10 +10,10 @@ interface Btn {
   login: boolean;
   style: string;
   title: string;
-  OnClick : () => void
+  OnClick: () => void;
 }
 
-const Button = ({ login, style, title, OnClick}: Btn) => {
+const Button = ({ login, style, title, OnClick }: Btn) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
@@ -52,7 +52,7 @@ const Button = ({ login, style, title, OnClick}: Btn) => {
             width={250}
             height={500}
             alt="Login vector"
-            priority={true}
+            priority
           />
           <p className={`${styles.paragraph} text-[11px] lg:text[16px] p-2`}>
             You can login via these option :
