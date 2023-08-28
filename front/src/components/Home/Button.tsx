@@ -1,10 +1,10 @@
 "use client"
 import { useState } from "react"
-import Modal from "../../modals/Modal";
 import styles from "./style";
 import LoginButton from "./LoginButton";
 import loginImg from "../../../public/login.png";
 import Image from "next/image";
+import Modal from "../modals/Modal";
 
 interface Btn {
   login: boolean, 
@@ -49,7 +49,7 @@ const Button = ({login, style, title}: Btn) => {
             <p className={`${styles.paragraph} text-[11px] lg:text[16px] p-2`}>
               You can login via these option :
             </p>
-            <LoginButton  label="Login With 42" />
+            <LoginButton  label="Login With 42" OnClick={function (): void {} } />
           </div>
        </Modal>
     </>

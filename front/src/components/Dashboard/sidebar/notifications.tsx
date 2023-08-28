@@ -10,7 +10,7 @@ const Notifications = () => {
 
 
     useEffect(() => {
-        const socket: Socket = io("http://localhost:80/notification", {
+        const socket: Socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/notification`, {
             auth: {
                 token: `${token}`
             }
@@ -33,7 +33,7 @@ const Notifications = () => {
     }, [])
 
     socket && socket.on('notification', (data: { status: boolean, token: string }) => {
-     // console.log("notification :", data)
+        // console.log("notification :", data)
         if (data.token === token)
             setnotification(data.status)
     })

@@ -75,7 +75,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${changa.className}`} suppressHydrationWarning={true}>
         {isLoading ? < Loading background /> : <Dashboard>
-          <div className=' absolute top-0 left-0 text-danger bg-white'>channeL route</div>
           <div className="--channeL relative h-full flex flex-col border-4 border-[#24323044] ">
             {/* nav bar */}
 
