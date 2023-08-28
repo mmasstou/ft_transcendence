@@ -48,7 +48,7 @@ const About = () => {
       <div className={`${styles.flexStart} mr-10 relative`}>
         <motion.div
           initial={{
-            x: 200,
+            x: -200,
             opacity: 0,
           }}
           transition={{ duration: 1.2 }}
