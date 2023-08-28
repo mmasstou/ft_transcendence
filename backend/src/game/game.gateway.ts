@@ -99,32 +99,37 @@ async function SetUserMatchNumber(
   }
   const user1 = Win != 'Bot' ? UserMap.get(Win) : null;
   const user2 = Lose != 'Bot' ? UserMap.get(Lose) : null;
-  user1 && await gameService.updateTotalMatches({
-    id: Win,
-    TotalWin: user1.User.TotalWin + 1,
-    TotalLose: user1.User.TotalLose,
-    TotalDraw: user1.User.TotalDraw,
-  });
-  user2 && await gameService.updateTotalMatches({
-    id: Lose,
-    TotalWin: user2.User.TotalWin,
-    TotalLose: user2.User.TotalLose + 1,
-    TotalDraw: user2.User.TotalDraw,
-  });
-  user1 && await gameService.updateTotalMatch({
-    id: Win,
-    TotalMatch: user1.User.TotalMatch + 1,
-  });
-  user2 && await gameService.updateTotalMatch({
-    id: Lose,
-    TotalMatch: user2.User.TotalMatch + 1,
-  });
-  
+  user1 &&
+    (await gameService.updateTotalMatches({
+      id: Win,
+      TotalWin: user1.User.TotalWin + 1,
+      TotalLose: user1.User.TotalLose,
+      TotalDraw: user1.User.TotalDraw,
+    }));
+  user2 &&
+    (await gameService.updateTotalMatches({
+      id: Lose,
+      TotalWin: user2.User.TotalWin,
+      TotalLose: user2.User.TotalLose + 1,
+      TotalDraw: user2.User.TotalDraw,
+    }));
+  user1 &&
+    (await gameService.updateTotalMatch({
+      id: Win,
+      TotalMatch: user1.User.TotalMatch + 1,
+    }));
+  user2 &&
+    (await gameService.updateTotalMatch({
+      id: Lose,
+      TotalMatch: user2.User.TotalMatch + 1,
+    }));
+
   if (Lose === 'Bot' || Win === 'Bot') return;
-  await gameService.updateLevel({
-    id: Win,
-    level: user1.User.Level + diff * 0.1,
-  });
+  user1 &&
+    (await gameService.updateLevel({
+      id: Win,
+      level: user1.User.Level + diff * 0.1,
+    }));
 }
 
 async function setcleanSheet(gameService: GameService, user: string) {
@@ -215,7 +220,7 @@ class BallGateway implements OnGatewayConnection {
         .emit('joinRoomBall', id);
     }
   }
-  
+
   async handleConnection(socket: Socket) {
     const { token } = socket.handshake.auth; // Extract the token from the auth object
     let payload: any = '';
@@ -530,14 +535,14 @@ class MyGateway implements OnGatewayConnection {
             table.player1.UserId,
             table.player2.UserId,
             1,
-          )
+          );
         } else {
           SetUserMatchNumber(
             this.GameService,
             table.player2.UserId,
             table.player1.UserId,
             1,
-          )
+          );
         }
         await this.GameService.CreateScore({
           Player1: table.player1.UserId,
@@ -587,7 +592,6 @@ class MyGateway implements OnGatewayConnection {
     }
   }
 
-
   @SubscribeMessage('joinToRoomGame')
   JoinToRoomGame(client: any, data: any) {
     client.join(data);
@@ -610,7 +614,11 @@ class MyGateway implements OnGatewayConnection {
     const UsId = client.handshake.auth.UserId;
     const TableId = UserMap.get(UsId) && UserMap.get(UsId).TableId;
     if (data[0] == 'transport close') {
-      console.log('--> Client', UserMap.get(UsId).User.login, 'reload the game page');
+      console.log(
+        '--> Client',
+        UserMap.get(UsId).User.login,
+        'reload the game page',
+      );
       if (
         UserMap.get(UsId) &&
         UserMap.get(UsId).TableId &&
@@ -619,7 +627,11 @@ class MyGateway implements OnGatewayConnection {
         TableMap.get(TableId).Status = false;
         this.server.to(TableId).emit('setStatus', false);
         UserMap.get(UsId).timeOut = setTimeout(async () => {
-          console.log('--> Client', UserMap.get(UsId).User.login, 'logout from the game page');
+          console.log(
+            '--> Client',
+            UserMap.get(UsId).User.login,
+            'logout from the game page',
+          );
           await this.GameService.updateStatus({ id: UsId, status: 'online' });
           if (UserMap.get(UsId)) {
             this.server.to(TableId).emit('leaveGame');
@@ -634,7 +646,7 @@ class MyGateway implements OnGatewayConnection {
             RandomListTime.deleteElement(UsId);
             UserMap.delete(UsId);
           }
-        },10000);
+        }, 10000);
       }
     } else {
       console.log('--> Client', UsId, 'logout from the game page');

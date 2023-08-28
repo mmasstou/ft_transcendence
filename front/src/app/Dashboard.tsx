@@ -37,7 +37,12 @@ const Dashboard = ({ children }: Props) => {
 
 
   React.useEffect(() => {
-    socket?.on('GameNotificationResponse', (data) => {
+    socket?.on('GameNotificationResponse', (data: {
+      message: string,
+      sender: userType,
+      senderSocketId: string,
+      mode: string
+    }) => {
       setNotifications(data)
 
       return () => {
@@ -132,7 +137,14 @@ const Dashboard = ({ children }: Props) => {
         Notifications && <MyToast
           OnAccept={() => {
             if (!params) return;
-            socket?.emit('AcceptGame', { userId: userId, sender: Notifications.sender, mode: Notifications.mode })
+            socket?.emit('AcceptGame',
+              {
+                userId: userId,
+                sender: Notifications.sender,
+                senderSocketId: Notifications.senderSocketId,
+                mode: Notifications.mode
+
+              })
             chatSocket?.emit('GameResponseToChat', { response: 'Accept', sendTo: Notifications.sender, mode: Notifications.mode })
             setNotifications(null)
           }}

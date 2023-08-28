@@ -70,7 +70,7 @@ const Message: FC<Imessage> = ({ message, userid, isForOwner }) => {
             <div className={`flex flex-col gap-1 bg-[#24323044]  p-2  mb-1 ${!isForOwner ? 'rounded-bl-[21px] rounded-r-[21px]' : 'rounded-br-[21px] rounded-l-[21px]'}`}>
                 <div className="message-body flex flex-row items-center gap-4">
                     <div className="message-box flex flex-col gap-1 w-full">
-                        <div className="body p-1 text-base text-[#65656B]  ">{message.content}</div>
+                        <p className="body p-1 text-base text-[#65656B]  ">{message.content}</p>
                     </div>
                 </div>
             </div>

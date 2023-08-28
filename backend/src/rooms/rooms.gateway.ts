@@ -1,4 +1,8 @@
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
@@ -9,7 +13,14 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Members, RoomType, Rooms, User, UserType } from '@prisma/client';
+import {
+  Members,
+  Messages,
+  RoomType,
+  Rooms,
+  User,
+  UserType,
+} from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JoinStatusEnum } from './types/room.joinStatus';
 import { UserService } from 'src/users/user.service';
@@ -66,6 +77,7 @@ export type responseEvent = {
   type?: responseEventTypeEnum;
   data: Rooms | Members | User | null;
 };
+@Injectable()
 @WebSocketGateway({ namespace: 'chat' })
 export class RoomGateway implements OnGatewayConnection {
   constructor(
@@ -568,7 +580,7 @@ export class RoomGateway implements OnGatewayConnection {
       }
 
       // console.log('Chat-> responseMemberData- +>', responseMemberData);
-      const messages = await this.messageservice.create({
+      const messages: Messages = await this.messageservice.create({
         roomId: room.id,
         content: data.content,
         userId: User.id,
@@ -822,6 +834,7 @@ export class RoomGateway implements OnGatewayConnection {
   }
   @SubscribeMessage('sendGameNotification')
   async sendGameNotification(
+    @ConnectedSocket() client: Socket,
     @MessageBody() data: { userId: string; senderId: string; mode: string },
   ) {
     try {
@@ -842,6 +855,7 @@ export class RoomGateway implements OnGatewayConnection {
             socket.emit('GameNotificationResponse', {
               message: `wants to play ${data.mode} mode game with you`,
               sender: snderUser,
+              senderSocketId: client.id,
               mode: data.mode,
             });
           });
@@ -870,6 +884,7 @@ export class RoomGateway implements OnGatewayConnection {
       mode: Resp.mode,
     });
   }
+
   // @SubscribeMessage('askToPlayGameWith')
   // async askToPlayGameWith(@MessageBody() data: {}) {}
 }

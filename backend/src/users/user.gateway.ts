@@ -11,13 +11,14 @@ import { UserService } from './user.service';
 import { Members, RoomType, Rooms, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { userType } from './user.type';
-
+import { RoomGateway } from 'src/rooms/rooms.gateway';
 export const clientOnLigne = new Map<string, Socket[]>();
 @WebSocketGateway({ namespace: 'User' })
 export class UserGateway implements OnGatewayConnection {
   constructor(
     private readonly usersService: UserService,
     private prisma: PrismaService,
+    private readonly roomGateway: RoomGateway,
   ) {}
 
   @WebSocketServer()
@@ -66,7 +67,13 @@ export class UserGateway implements OnGatewayConnection {
 
   @SubscribeMessage('AcceptGame')
   async handleAcceptGame(
-    @MessageBody() data: { userId: string; sender: any; mode: string },
+    @MessageBody()
+    data: {
+      userId: string;
+      sender: userType;
+      mode: string;
+      senderSocketId: string;
+    },
     @ConnectedSocket() client: Socket,
   ) {
     const Response = {
@@ -77,7 +84,11 @@ export class UserGateway implements OnGatewayConnection {
     };
     const User = await this.usersService.getUserInClientSocket(client);
     // const sender = await this.usersService.getUserById(data.userId);
-    this.server.emit('GameResponse', Response);
+    this.roomGateway.server
+      .to(data.senderSocketId)
+      .emit('GameResponse', Response);
+    console.log('++handleAcceptGame++Response>');
+    client.emit('GameResponse', Response);
   }
 
   @SubscribeMessage('DenyGame')

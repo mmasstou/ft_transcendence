@@ -3,30 +3,23 @@
 import React from "react";
 
 // components :
-import ConversationsInput from "./channel.conversations.input";
-import ConversationsMessages from "./channel.conversations.messages";
 
 // hooks :
 import { Socket } from "socket.io-client";
 
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
-import Message from "./channel.message";
-import LeftSidebarHook from "../hooks/LeftSidebarHook";
-import ConversationsTitlebar from "./channel.conversations.titlebar";
-import getChanneLMessages from "../actions/getChanneLMessages";
-import Cookies from "js-cookie";
-import getMemberWithId from "../actions/getMemberWithId";
 import { RoomsType, membersType, messagesType } from "@/types/types";
-import ChanneLsettingsHook from "../hooks/channel.settings";
-import getChannelWithId from "../actions/getChannelWithId";
+import Cookies from "js-cookie";
+import Image from "next/image";
+import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
-import BanMember from "./channel.settings.banmember";
-import MemberHasPermissionToAccess from "../actions/MemberHasPermissionToAccess";
-import FindOneBySLug from "../actions/Channel/findOneBySlug";
-import { BsSendFill } from "react-icons/bs";
-import Button from "../../components/Button";
 import { IoSend } from "react-icons/io5";
+import Button from "../../components/Button";
+import FindOneBySLug from "../actions/Channel/findOneBySlug";
+import getChanneLMessages from "../actions/getChanneLMessages";
+import getMemberWithId from "../actions/getMemberWithId";
+import ConversationsTitlebar from "./channel.conversations.titlebar";
+import Message from "./channel.message";
+import BanMember from "./channel.settings.banmember";
 
 
 export default function Conversations({ socket }: { socket: Socket | null }) {
@@ -39,19 +32,26 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const [channeLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
     const [message, setMessage] = React.useState("")
     const [InputValue, setInputValue] = React.useState("")
-    const [scrollmessage, setscrollmessage] = React.useState(false)
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
-    const params = useSearchParams()
     const token = Cookies.get('token')
     const __userId = Cookies.get('_id')
     if (!token || !__userId) return
-    const router = useRouter()
     const InputRef = React.useRef<HTMLInputElement | null>(null);
     const [LoadingMessages, setLoadingMessages] = React.useState<boolean>(false)
     const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
+    const UpdateData = async () => {
+        // get logged member :
+        if (!channeLinfo) return
+        const channeL: RoomsType | null = await FindOneBySLug(slug, token)
+        if (!channeL) return
+        setChanneLinfo(channeL)
+        const member: membersType | null = await getMemberWithId(__userId, channeLinfo?.id, token)
+        setLogedMember(member);
+    }
     // show this last message in the screan :
+
     React.useEffect(() => {
         setTimeout(() => {
             if (chatContainerRef.current) {
@@ -85,34 +85,38 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             }
 
             // get messages :
-            const toastId = toast.loading('waiting to get OLd messages ...');
             const response = await getChanneLMessages(_roomInfo.id, token)
             if (!response) return
             setMessages(response)
             setTimeout(() => {
                 setLoadingMessages(false);
                 FocusedOnSendMessageInput()
-                toast.remove(toastId)
             }, 500);
         })();
     }, [])
-
     // // listen to message event and send the incomming message to client
     React.useEffect(() => {
-        if (!channeLinfo) return;
-        socket?.on('newmessage', (newMessage: any) => {
-            (async () => {
-                const response = await getChanneLMessages(channeLinfo.id, token)
-                if (!response) return
-                setMessages(response)
-            })();
+        socket?.on('newmessage', (newMessage: messagesType) => {
+            setMessages((prev) => [...prev, newMessage])
             FocusedOnSendMessageInput()
             setSendingMessage(false);
-            setInputValue('')
-            
+            if (newMessage.senderId === Cookies.get('_id')) {
+                setInputValue('')
+                setMessage('')
+            }
         })
-    }, [message, socket, InputValue])
+    }, [])
 
+    React.useEffect(() => {
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+            if (!data) return
+            UpdateData();
+        });
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+            if (!data) return
+            UpdateData();
+        });
+    }, [socket])
     const OnSubmit = () => {
         const sendMesage = message.trim()
         if (!sendMesage) {
@@ -136,12 +140,16 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         setSendingMessage(true)
 
     }
-    const FocusedOnSendMessageInput = () =>{
+    const FocusedOnSendMessageInput = () => {
         setTimeout(() => {
             if (InputRef.current) {
                 InputRef.current.focus();
             }
         }, 100); // sleep .1s ; waiting search input to mounted in focus on it
+    }
+    const checkLimitCharacters = (input: string) => {
+        if (input.length > 512) return toast.error("you can't send more than 512 characters")
+        setInputValue(input);
     }
 
     if (!IsMounted) return null
@@ -193,7 +201,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                         event.key === "Enter" ? OnSubmit() : null
                                     }
                                     onChange={(event) => {
-                                        setInputValue(event.target.value);
+                                        checkLimitCharacters(event.target.value)
+
                                         setMessage(event.target.value);
                                     }}
                                     value={InputValue}
@@ -201,7 +210,10 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                     type="search"
                                     name=""
                                     id="" />
-                                {InputValue.length !== 0 && <Button icon={IoSend} disabled={SendingMessage} outline small onClick={OnSubmit} />}
+                                {InputValue.length !== 0 && <div className="flex gap-1">
+                                    <span className=" text-[8px] text-center max-w-max flex w-full">{InputValue.length} / 512</span>
+                                    <Button icon={IoSend} disabled={SendingMessage} outline small onClick={OnSubmit} />
+                                </div>}
                             </div>
                         </div>
                     </div>

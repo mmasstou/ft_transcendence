@@ -29,7 +29,7 @@ export default function ChanneLSettingsUserMemberItemActions(
         />}
         {<ChannelSettingsUserMemberItemOption
             icon={TbUserX}
-            label={`set as Admin`}
+            label={`kik member`}
             size={24}
             disabled={member.type === UserTypeEnum.OWNER}
             Onclick={() => {

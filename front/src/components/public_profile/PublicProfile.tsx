@@ -105,7 +105,7 @@ const PublicProfile: React.FC<ProfileProps> = ({
           <UserStats user={user} />
 
           <div className="flex justify-around items-center">
-            <Button text="Message" />
+            <Button  text="Message" />
             <Button text="Add Friend" block={false} />
           </div>
           <div className="mx-4 mt-10 h-1/4">

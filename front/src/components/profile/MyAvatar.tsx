@@ -5,14 +5,12 @@ import style from '@/components/Home/style';
 import Cookies from 'js-cookie';
 import { userType } from '@/types/types';
 import getUserWithId from '@/app/chat/channels/actions/getUserWithId';
-import { toast } from 'react-hot-toast';
 
 const MyAvatar = ({ User }: { User?: userType | null }) => {
   const [LogedUser, setLogedUser] = React.useState<userType | null | undefined>(User);
 
   React.useEffect(() => {
    (async () => {
-      toast('loading user data ...')
       const token = Cookies.get('token');
       const userId = Cookies.get('_id');
       if (!token || !userId) return;
