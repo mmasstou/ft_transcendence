@@ -26,7 +26,7 @@ enum RoomType {
 model UserSocket {
   id         String   @id @default(uuid())
   socketId   String
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -34,9 +34,9 @@ model UserSocket {
 
 // models :
 model User {
-  id                            String          @id @default(uuid())
-  login                         String          @unique
-  email                         String          @unique
+  id                            String                 @id @default(uuid())
+  login                         String                 @unique
+  email                         String                 @unique
   password                      String?
   name                          String?
   kind                          String?
@@ -57,14 +57,16 @@ model User {
   location                      String?
   intraId                       Int?
   banner                        String?
-  is_active                     Boolean         @default(false)
-  created_at                    DateTime        @default(now())
-  updated_at                    DateTime        @updatedAt
+  is_active                     Boolean                @default(false)
+  created_at                    DateTime               @default(now())
+  updated_at                    DateTime               @updatedAt
   Members                       Members[]
   Messages                      Messages[]
   Rooms                         Rooms[]
   directMessage                 DirectMessage[]
   UserSocket                    UserSocket[]
+  Notification                  Notification[]
+  ChanneLNotifications          ChanneLNotifications[]
   twoFactorAuthenticationSecret String?
   twoFA                         Boolean         @default(false)
   logedFirstTime                Boolean         @default(false)
@@ -81,18 +83,41 @@ model Match {
   player2Score Int
 }
 
+model Notification {
+  id         String   @id @default(uuid())
+  content    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  User       User     @relation(fields: [userId], references: [id])
+  userId     String
+}
+
+model ChanneLNotifications {
+  id         String   @id @default(uuid())
+  content    String
+  User       User     @relation(fields: [userId], references: [id])
+  channel    Rooms    @relation(fields: [channelId], references: [id])
+  channelId  String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  userId     String
+}
+
 model Rooms {
-  id             String     @id @default(uuid())
-  name           String     @unique
-  type           RoomType   @default(PUBLIC)
-  members        Members[]
-  messages       Messages[]
-  viewedmessage  Int        @default(0)
-  password       String?
-  accesspassword String?    @default("")
-  created_at     DateTime   @default(now())
-  updated_at     DateTime   @updatedAt
-  User           User[]
+  id                   String                 @id @default(uuid())
+  name                 String                 @unique
+  type                 RoomType               @default(PUBLIC)
+  members              Members[]
+  messages             Messages[]
+  viewedmessage        Int                    @default(0)
+  password             String?
+  hasAccess            Boolean                @default(false)
+  accesspassword       String?                @default("")
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @updatedAt
+  User                 User[]
+  slug                 String                 @unique @default(uuid())
+  ChanneLNotifications ChanneLNotifications[]
 }
 
 model DirectMessage {
@@ -111,10 +136,11 @@ model Members {
   type       UserType @default(USER)
   userId     String
   roomsId    String?
-  isban      Boolean  @default(false)
-  ismute     Boolean  @default(false)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  isban      Boolean   @default(false)
+  ismute     Boolean   @default(false)
+  mute_at    DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
 }
 
 model Messages {

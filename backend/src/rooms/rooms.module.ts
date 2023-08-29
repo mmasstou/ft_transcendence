@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 import { UserService } from 'src/users/user.service';
 import { MembersService } from 'src/members/members.service';
 import { MessagesService } from 'src/messages/messages.service';
+import { RoomGateway } from './rooms.gateway';
 
 @Module({
   controllers: [RoomsController],
@@ -15,5 +16,6 @@ import { MessagesService } from 'src/messages/messages.service';
     MembersService,
     MessagesService,
   ],
+  // exports: [RoomsService, RoomGateway],
 })
 export class RoomsModule {}

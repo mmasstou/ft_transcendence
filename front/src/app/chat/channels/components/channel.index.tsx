@@ -1,6 +1,6 @@
 // imports :
 import { FC, MouseEvent, use, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 // components :
 import ChatNavbarLink from "../../components/chat.navbar.link";
@@ -14,13 +14,17 @@ import LeftSidebarHook from "../hooks/LeftSidebarHook";
 // Icons :
 import { HiChatBubbleLeftRight } from "react-icons/hi2";
 import { FaUsers } from "react-icons/fa";
-import { BsJournalPlus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from "react-icons/bs";
+import { BsFillHandIndexFill, BsJournalPlus, BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from "react-icons/bs";
 import { FiUsers } from "react-icons/fi";
 import Conversations from "./channel.conversations";
 import ChanneLcreatemodaLHook from "../hooks/channel.create.hook";
 import { Socket } from "socket.io-client";
 import RightsidebarHook from "../hooks/RightSidebarHook";
 import ChanneLsettingsHook from "../hooks/channel.settings";
+import { RiSearch2Fill, RiSearchLine } from "react-icons/ri";
+import ChanneLFindRoommodaLHook from "../hooks/channel.find.room.hook";
+import { RoomsType } from "@/types/types";
+import { toast } from "react-hot-toast";
 
 // env vars :
 interface ChannelIndexProps {
@@ -36,9 +40,11 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
     const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
     const channeLsettingsHook = ChanneLsettingsHook()
     const rightsidebarHook = RightsidebarHook()
+    const channeLFindRoommodaLHook = ChanneLFindRoommodaLHook()
+    const params = useSearchParams()
 
     useEffect(() => { setIsMounted(true) }, [])
-
+   
     if (!IsMounted) return null
     return (
         <div className="--channeL relative h-full flex flex-col border-4 border-[#24323044] ">
@@ -77,19 +83,26 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
                         active={router.includes('channels')}
                     />
                 </div>
-                <div className="flex justify-end items-center gap-2">
+                <div className="flex justify-end items-center gap-2"> 
+                <Button
+                        icon={RiSearchLine}
+                        small
+                        outline
+                        onClick={() => {channeLFindRoommodaLHook.onOpen(socket) }}
+                    />
                     <Button
                         icon={BsJournalPlus}
                         small
                         outline
                         onClick={() => {channeLcreatemodaLHook.onOpen([], socket) }}
                     />
-                    <Button
+                    {params && params.get('r') && <Button
                         icon={FiUsers}
                         small
                         outline
                         onClick={() => {rightsidebarHook.IsOpen ? rightsidebarHook.onClose() : rightsidebarHook.onOpen([]) }}
-                    />
+                    />}
+                   
                 </div>
             </div>
 

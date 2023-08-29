@@ -6,8 +6,23 @@ import { Logout } from './Logout';
 import Settings from './Settings';
 import * as Popover from '@radix-ui/react-popover';
 import Notification from '@/components/profile/Notification';
+import { Socket } from 'socket.io-client';
+import React from 'react';
+import { membersType, userType } from '@/types/types';
+import MyToast from '@/components/ui/Toast/MyToast';
 
-const Header: React.FC = (): JSX.Element => {
+
+const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
+  const [Notifications, setNotifications] = React.useState<any[] | null>(null)
+
+  // socket?.on('GameNotificationResponse', (data) => {
+  //   console.log("GameNotificationResponse data :", data)
+  //   Notifications !== null
+  //   ? setNotifications([...Notifications, data])
+  //   : setNotifications([data])
+  //   setshownotification(true)
+  // })
+
   return (
     <>
       <div className="flex justify-center items-center">
@@ -40,14 +55,14 @@ const Header: React.FC = (): JSX.Element => {
                       Notifications
                     </h1>
                     <Notification
-                      avatar="/avatar.jpg"
+                      avatar="/avatar.png"
                       name="mehdi"
                       message="send a friend request."
                       isFriend
                       isOnline
                     />
                     <Notification
-                      avatar="/avatar.jpg"
+                      avatar="/avatar.png"
                       name="mehdi"
                       message="send a friend request."
                       isFriend
@@ -55,7 +70,7 @@ const Header: React.FC = (): JSX.Element => {
                     <Notification
                       isFriend
                       directMessage
-                      avatar="/avatar.jpg"
+                      avatar="/avatar.png"
                       name="mehdi"
                       message="send a friend request."
                     />

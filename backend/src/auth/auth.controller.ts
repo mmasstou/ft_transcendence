@@ -8,6 +8,8 @@ import {
   Get,
   Req,
   Res,
+  BadRequestException,
+  Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -23,12 +25,28 @@ export class AuthController {
     private readonly prisma: PrismaService,
   ) {}
 
-  // @HttpCode(HttpStatus.OK)
-  // @Post('login')
-  // signIn(@Body() signInDto: Record<string, any>) {
-  //   console.log('Login Data :', signInDto);
-  //   return this.authService.signIn(signInDto.username, signInDto.password);
-  // }
+  @Get('login/:username/:password')
+  async signIn(
+    @Res() res: Response,
+    @Param('username') username: string,
+    @Param('password') password: string,
+  ) {
+    // console.log('Login Data username:', username);
+    // console.log('Login Data password:', password);
+    const result = await this.authService.signInWithLogin(username, password);
+    if (!result) throw new BadRequestException('Unauthenticated');
+    const { token, userId } = result;
+    res.cookie('token', token, {
+      httpOnly: false,
+      sameSite: false,
+    });
+    res.cookie('_id', userId.id, {
+      httpOnly: false,
+      sameSite: false,
+    });
+    // console.log('result :', result);
+    return res.redirect(`${process.env.AUTH_REDIRECT_URI}`);
+  }
 
   // @UseGuards(AuthGuard('42'))
   @Get('42')
