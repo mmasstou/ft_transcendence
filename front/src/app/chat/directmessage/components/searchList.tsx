@@ -46,19 +46,24 @@ function SearchList({ setConvCreation, users }) {
 		};
 	}, [windowSize, iconSize]);
 
+	function updateConvCreation() {
+		setConvCreation(false);
+		setLogin('');
+	}
+
 	const clickUserProfile = (user) => {
 		console.log(`Redirect to ${user.login} Profile`);
-		setConvCreation(false);
+		updateConvCreation();
 	}
 
 	const openConversation = (user) => {
 		console.log(`Open Conversation between ${user.id} : ${currentId}`);
-		setConvCreation(false);
+		updateConvCreation();
 	}
 
 	const invateToGame = (user) => {
 		console.log(`Invite ${user.login} to the game`);
-		setConvCreation(false);
+		updateConvCreation();
 	}
 
 	async function getConversation (userLogin: string) {
@@ -75,11 +80,11 @@ function SearchList({ setConvCreation, users }) {
 	function formatList () {
 		if (searchedLogin !== '')
 		{
-			setList(users.filter((user) => {
-				const partLogin = user.login.substring(0, searchedLogin.length);
-				return (partLogin !== '' && partLogin === searchedLogin);
-			}))
-			// setList([...users, ...users, ...users, ...users, ...users, ...users]);
+			// setList(users.filter((user) => {
+			// 	const partLogin = user.login.substring(0, searchedLogin.length);
+			// 	return (partLogin !== '' && partLogin === searchedLogin);
+			// }))
+			setList([...users, ...users, ...users, ...users, ...users, ...users]);
 		}
 		else
 			setList([])
@@ -92,10 +97,10 @@ function SearchList({ setConvCreation, users }) {
 	}, [searchedLogin]);
 
   return (
-	<div className='flex flex-col  md:w-[500px]  md:min-w-sm sm:w-[400px] h-[500px]'>
+	<div className='flex flex-col  max-w-[500px] w-full max-h-[400px] h-[50%] border'>
 		<input type='text' placeholder='login' ref={inputRef} value={searchedLogin} onChange={(e) => {setLogin(e.target.value);}} 
 			className='bg-[#3E504D] text-white rounded-lg py-[10px] px-[15px] border focus:border-[#1EF0AE] outline-none'/>
-		<ul className='mt-[10px] max-h-[100%] overflow-auto'>
+		<ul className='mt-[10px] max-h-full overflow-auto'>
 			{list.length ? list.map((user) => (
 				<li key={user.id} className='mt-[2px] mb-[6px] text-white  flex justify-around p-[5px]'>
 					<section className='flex items-center gap-4 md:gap-10 p-2'>

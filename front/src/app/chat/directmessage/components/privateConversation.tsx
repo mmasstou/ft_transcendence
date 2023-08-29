@@ -5,7 +5,6 @@ import { AiFillCloseCircle } from 'react-icons/ai';
 import SearchList from './searchList';
 import ConversationList from './conversationList';
 import FriendList from './friendList';
-import SearchModal from './searchModal';
 
 
 const token = Cookies.get('token');
