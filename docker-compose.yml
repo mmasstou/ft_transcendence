@@ -16,20 +16,20 @@ services:
   #   volumes:
   #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front:/frontend:rw
   #    # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
-  # backend:
-  #   build: backend/
-  #   container_name: backend
-  #   env_file:
-  #     - backend/.env
-  #   ports:
-  #     - 80:80
-  #     - 5555:5555
-  #     - 5556:5556
-  #     - 5550:5550
-  #   networks:
-  #     - APInetwork
-  #   depends_on:
-  #     - database
+  backend:
+    build: backend/
+    container_name: backend
+    env_file:
+      - backend/.env
+    ports:
+      - 80:80
+      - 5555:5555
+      - 5556:5556
+      - 5550:5550
+    networks:
+      - APInetwork
+    depends_on:
+      - database
   database:
     image: postgres:13
     container_name: database
@@ -39,8 +39,8 @@ services:
       - 5432:5432
     networks:
       - APInetwork
-    # volumes:
-    #   - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
+    volumes:
+      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
   
 networks:
   APInetwork:

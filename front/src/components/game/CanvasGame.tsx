@@ -1,7 +1,7 @@
 "use client"
 import {RefObject, useEffect, useRef, useState } from "react";
 import {Socket, io} from 'socket.io-client';
-import {TableMap} from '../../../tools/class';
+import {TableMap} from '../../types/gameType';
 import Cookies from "js-cookie";
 import {drawBackground, drawScore, Player1Draw, Player2Draw, drawingBall} from './gameFunc';
 import GameResult from "./GameResult";
