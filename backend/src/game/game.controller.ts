@@ -21,7 +21,7 @@ export class GameController {
   ) {}
 
   @Post('/FriendGame')
-  async selectFriendGame(@Body() body: any) {
+  async selectFriendGame(@Body() body: {player1Id: string; player2Id: string; mode: string}) {
     try {
       const result = await this.GameGateway.CreateFriendTable(body);
       if (result != undefined)
@@ -36,14 +36,9 @@ export class GameController {
       );
     }
   }
-  /** {       ///////////////////////////////////////////////////////// body
-        "player1Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
-        "player2Id": "2c8f719b-ddb0-430c-bb73-42460cc33a3a",
-        "mode": "time" / "score"
-        } */
 
   @Post('/BotGame')
-  async selectBotGame(@Body() body: any) {
+  async selectBotGame(@Body() body: {playerId: string; mode: string}) {
     try {
       const result = await this.GameGateway.CreateBotTable(body);
       if (result != undefined)
@@ -52,7 +47,6 @@ export class GameController {
           HttpStatus.CONFLICT,
         );
     } catch (err) {
-      // console.log(err);
       throw new HttpException(
         { reason: err.response.reason },
         HttpStatus.CONFLICT,
@@ -60,13 +54,8 @@ export class GameController {
     }
   }
 
-  /** {       ///////////////////////////////////////////////////////// body
-        "playerId": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
-        "mode": "time"
-        } */
-
   @Post('/RandomGame')
-  async selectRandomGame(@Body() body: any) {
+  async selectRandomGame(@Body() body: {playerId: string; mode: string}) {
     try {
       const result = await this.GameGateway.CreateRandomTable(body);
       if (result != undefined) {
@@ -82,21 +71,12 @@ export class GameController {
       );
     }
   }
-  /** {       ///////////////////////////////////////////////////////// body
-        "playerId": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
-        "mode": "time"
-        } */
 
   @Post('/leaveGame')
-  leaveGame(@Body() body: any) {
-    // console.log("body: ", body);
+  leaveGame(@Body() body: {UserId: string; TableId: string}) {
     this.GameGateway.LeaveGame(body);
-    // const promise = this.GameGateway.LeaveGame(body);
   }
 
-  /**{       ///////////////////////////////////////////////////////// body
-        "table_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
-        } */
 
   @Get('/GetScore/:id')
   async getUserScores(@Param('id') userId: string) {
@@ -125,7 +105,7 @@ export class GameController {
   }
 
   @Post('/UpdateTheme')
-  async updateTheme(@Body() body: any) {
+  async updateTheme(@Body() body: {id: string; theme: {background: string[], paddle: string, ball: string;}}) {
     try {
       await this.GameService.updateTheme(body);
     } catch (err) {

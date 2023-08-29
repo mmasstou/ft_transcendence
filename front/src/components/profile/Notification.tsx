@@ -1,10 +1,11 @@
+import Cookies from 'js-cookie';
 import Image from 'next/image';
 import React, { FC } from 'react';
+import toast from 'react-hot-toast';
 
 type NotificationProps = {
-  name: string;
-  avatar: string;
   message: string;
+  friendshipData: any;
   directMessage?: boolean;
 } & (
   | {
@@ -17,14 +18,40 @@ type NotificationProps = {
     }
 );
 
+const token = Cookies.get('token');
 const Notification: FC<NotificationProps> = ({
-  avatar,
   isFriend,
   isOnline,
   message,
-  name,
+  friendshipData,
   directMessage,
 }) => {
+  const [friend, setfriend] = React.useState<any | null>(null);
+  if (!token) {
+    toast.error('You are not logged in');
+    return <div></div>;
+  }
+
+  React.useEffect(() => {
+    (async () => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${friendshipData.userId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setfriend(data);
+        console.log('friend data: ', data);
+        return;
+      }
+    })();
+  }, []);
   return (
     <div className="bg-primary rounded-md p-2">
       <div className="flex flex-col gap-1 lg:gap-2">
@@ -37,15 +64,21 @@ const Notification: FC<NotificationProps> = ({
             {isFriend && (
               <div
                 className={`w-3 h-3 rounded-full ${
-                  isOnline ? 'bg-green-500' : 'bg-gray-500'
+                  friend?.status ? 'bg-green-500' : 'bg-gray-500'
                 } absolute right-0 2xl:right-1 bottom-0 z-10`}
               ></div>
             )}
-            <Image src={avatar} alt="" className="rounded-full" fill priority />
+            <Image
+              src={friend?.avatar}
+              alt=""
+              className="rounded-full"
+              fill
+              priority
+            />
           </div>
           <h3 className="text-xs lg:text-sm tracking-wider">
             <strong className="text-secondary text-sm lg:text-base capitalize">
-              {name}
+              {friend && friend.login}
             </strong>{' '}
             {isFriend && directMessage === true ? `: ${message}` : message}
           </h3>

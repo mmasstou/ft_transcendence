@@ -187,17 +187,40 @@ export class UserService {
     return false;
   }
 
+  // get all friends
   async getFriends(userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        friends: true,
-      },
-    });
-    if (!user) return [];
-    const friends = user.friends;
-    if (!friends) return [];
-    return friends;
+    try {
+      const friends = await this.prisma.friendship.findMany({
+        where: {
+          OR: [
+            {
+              userId: userId,
+              status: 'ACCEPTED',
+            },
+            {
+              friendId: userId,
+              status: 'ACCEPTED',
+            },
+          ],
+        },
+      });
+      if (!friends) throw new NotFoundException();
+      return friends;
+    } catch (error) {
+      console.log('++getFriends++error>', error.message);
+    }
+  }
+
+  async getFriend(id: string) {
+    try {
+      const friend = await this.prisma.friendship.findUnique({
+        where: { id },
+      });
+      if (!friend) throw new NotFoundException();
+      return friend;
+    } catch (error) {
+      console.log('++getFriend++error>', error.message);
+    }
   }
 
   // End Friends Actions

@@ -10,11 +10,17 @@ import { Socket } from 'socket.io-client';
 import React from 'react';
 import { membersType, userType } from '@/types/types';
 import MyToast from '@/components/ui/Toast/MyToast';
+import Cookies from 'js-cookie';
+import { toast } from 'react-hot-toast';
 
+const token = Cookies.get('token');
 
 const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
-  const [Notifications, setNotifications] = React.useState<any[] | null>(null)
-
+  const [notifications, setnotifications] = React.useState<any[] | null>(null);
+  if (!token) {
+    toast.error('You are not logged in');
+    return <div></div>;
+  }
   // socket?.on('GameNotificationResponse', (data) => {
   //   console.log("GameNotificationResponse data :", data)
   //   Notifications !== null
@@ -22,6 +28,28 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
   //   : setNotifications([data])
   //   setshownotification(true)
   // })
+  React.useEffect(() => {
+    (async () => {
+      // get all friend request
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/friends/all`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setnotifications(data);
+        console.log('notification data: ', data);
+        return;
+      }
+      toast.error(res.statusText);
+    })();
+  }, []);
 
   return (
     <>
@@ -54,26 +82,18 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
                     <h1 className="tracking-wide ml-2 font-bold sm:text-lg 2xl:text-xl">
                       Notifications
                     </h1>
-                    <Notification
-                      avatar="/avatar.png"
-                      name="mehdi"
-                      message="send a friend request."
-                      isFriend
-                      isOnline
-                    />
-                    <Notification
-                      avatar="/avatar.png"
-                      name="mehdi"
-                      message="send a friend request."
-                      isFriend
-                    />
-                    <Notification
-                      isFriend
-                      directMessage
-                      avatar="/avatar.png"
-                      name="mehdi"
-                      message="send a friend request."
-                    />
+
+                    {notifications &&
+                      notifications.map(
+                        (friendshipData: any, index: number) => (
+                          <Notification
+                            friendshipData={friendshipData}
+                            key={index}
+                            message="send a friend request."
+                            isFriend
+                          />
+                        )
+                      )}
                   </div>
                   <Popover.Arrow className="fill-[#2B504B]" />
                 </Popover.Content>

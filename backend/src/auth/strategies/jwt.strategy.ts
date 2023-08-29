@@ -17,6 +17,7 @@ export type JwtPayload = {
   banner: string;
   id: number;
   intraId: number;
+  userId: string;
 };
 
 @Injectable()
@@ -52,7 +53,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       avatar: payload.avatar,
       name: payload.name,
       banner: payload.banner,
-      id: payload.id,
+      id: user.id,
       intraId: payload.intraId,
     };
   }

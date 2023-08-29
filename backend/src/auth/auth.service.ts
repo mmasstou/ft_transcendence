@@ -53,6 +53,7 @@ export class AuthService {
       avatar: userExists.avatar,
       name: userExists.name,
       banner: userExists.banner,
+      userId: userExists.id,
       intraId: userExists.intraId,
       logedFirstTime: userExists.logedFirstTime,
     });
@@ -75,6 +76,7 @@ export class AuthService {
         email: newUser.email,
         avatar: newUser.avatar,
         name: newUser.name,
+        userId: newUser.id,
         banner: newUser.banner,
         intraId: newUser.intraId,
         logedFirstTime: newUser.logedFirstTime,
