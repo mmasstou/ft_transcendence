@@ -2,17 +2,26 @@ import React, { FC } from 'react';
 import { TiUserAdd } from 'react-icons/ti';
 import { BiJoystick } from 'react-icons/bi';
 import { UserCardProps } from '@/types/UserCardTypes';
+import Image from 'next/image';
 
 const UserCard: FC<UserCardProps> = ({
   username,
   addRequest,
   online,
   inGame,
+  avatar,
 }) => {
   return (
     <div className=" bg-container rounded-xl my-3 p-2 xl:p-3 flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <div className="h-10 w-10 xl:w-14 xl:h-14 bg-black rounded-full"></div>
+        <Image
+          src={avatar}
+          height={50}
+          width={50}
+          priority
+          alt={username}
+          className="rounded-full border border-secondary"
+        />
         <h3 className="xl:text-lg">{username}</h3>
       </div>
       <div className="flex items-center text-xs xl:text-sm gap-2">
