@@ -1,10 +1,17 @@
-export interface UserCardProps {
+export type UserCardProps =  {
   username: string;
   userId: string;
   avatar: string;
-  addRequest?: boolean;
-  online?: boolean;
-  inGame?: boolean;
+  status : 'online' | 'offline' | 'inGame';
   socket:any;
   mode: string;
-}
+} & (
+  | {
+      addRequest?: true;
+      status: never;
+    }
+  | {
+      addRequest?: false;
+      status: 'online' | 'offline' | 'inGame';
+    }
+);

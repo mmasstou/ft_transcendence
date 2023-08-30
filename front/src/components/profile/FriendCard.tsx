@@ -9,12 +9,11 @@ const SenderId = Cookies.get('_id');
 const UserCard: FC<UserCardProps> = ({
   username,
   userId,
-  addRequest,
-  online,
-  inGame,
+  status,
   avatar,
   socket,
   mode,
+  addRequest,
 }) => {
   const [invited, setInvited] = useState(false);
 
@@ -53,7 +52,7 @@ const UserCard: FC<UserCardProps> = ({
             Add Friend
           </button>
         ) : (
-          online && (
+          status === 'online' && (
             <button
               disabled={invited}
               onClick={handleInvite}
@@ -67,7 +66,7 @@ const UserCard: FC<UserCardProps> = ({
                   size={16}
                 />
               ) : (
-                online && (
+                status === 'online' && (
                   <BiJoystick
                     className="mr-1 fill-sky-500 group-enabled:group-hover:fill-container"
                     size={16}
@@ -81,18 +80,18 @@ const UserCard: FC<UserCardProps> = ({
         {!addRequest && (
           <div
             className={`border flex gap-1 items-center p-1 px-2 xl:px-3 rounded-xl ${
-              inGame
+              status === 'inGame'
                 ? 'border-orange-500'
-                : online
+                : status === 'online'
                 ? 'border-green-500'
                 : 'border-yellow-500'
             }`}
           >
             <div
               className={`w-2 h-2 rounded-full ${
-                inGame
+                status === 'inGame'
                   ? 'bg-orange-500'
-                  : online
+                  : status === 'online'
                   ? 'bg-green-500'
                   : 'bg-yellow-500'
               }`}
@@ -100,15 +99,19 @@ const UserCard: FC<UserCardProps> = ({
             <span
               className={`
             ${
-              inGame
+              status === 'inGame'
                 ? 'text-orange-500'
-                : online
+                : status === 'online'
                 ? 'text-green-500'
                 : 'text-yellow-500'
             }
           `}
             >
-              {inGame ? 'In Game' : online && !inGame ? 'Online' : 'Offline'}
+              {status === 'inGame'
+                ? 'In Game'
+                : status === 'online'
+                ? 'Online'
+                : 'Offline'}
             </span>
           </div>
         )}
