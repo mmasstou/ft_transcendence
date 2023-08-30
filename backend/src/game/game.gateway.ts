@@ -123,7 +123,7 @@ async function SetUserMatchNumber(
   user1 &&
     (await gameService.updateLevel({
       id: Win,
-      level: user1.User.Level + diff * 0.1,
+      level: parseFloat((user1.User.Level + diff * 0.1).toFixed(1)),
     }));
 }
 
