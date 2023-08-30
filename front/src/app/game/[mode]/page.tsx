@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import UserCard from '@/components/profile/FriendCard';
-import {Socket, io } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import StartGame from '@/app/chat/channels/actions/startgame';
 
 interface User {
@@ -17,12 +17,13 @@ interface User {
   login: string;
   avatar: string;
   Level: number;
+  is_active: boolean;
 }
 
 const page = ({ params }: { params: { mode: string } }) => {
   const [users, setUsers] = useState<User[]>([]);
   const id = Cookies.get('_id');
-  const token = Cookies.get('token')
+  const token = Cookies.get('token');
   const router = useRouter();
   if (params.mode !== 'time' && params.mode !== 'score') router.push('/404');
 
@@ -45,28 +46,30 @@ const page = ({ params }: { params: { mode: string } }) => {
   }, [setUsers]);
 
   useEffect(() => {
-    if(!token) return
+    if (!token) return;
     const Clientsocket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/chat`, {
       auth: {
         token,
       },
     });
     setSocket(Clientsocket);
-    return () => { Clientsocket.disconnect() }
-}, [])
+    return () => {
+      Clientsocket.disconnect();
+    };
+  }, []);
 
-
-  socket && socket.on('GameResponse', async (data:any) => {
-    const body = {
-      player1Id: data.sender.id,
-      player2Id: data.userId,
-      mode: data.mode
-    }
-    if (!token) return;
-    const g = await StartGame(body, token);
-    if (!g) return;
+  socket &&
+    socket.on('GameResponse', async (data: any) => {
+      const body = {
+        player1Id: data.sender.id,
+        player2Id: data.userId,
+        mode: data.mode,
+      };
+      if (!token) return;
+      const g = await StartGame(body, token);
+      if (!g) return;
       router.push(`/game/${data.mode}/friend`);
-  })
+    });
 
   return (
     <Dashboard>
