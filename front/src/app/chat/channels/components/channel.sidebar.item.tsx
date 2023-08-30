@@ -1,14 +1,10 @@
-import { RoomTypeEnum, RoomsType } from "@/types/types"
+import { RoomsType } from "@/types/types"
 import Cookies from "js-cookie"
-import { useRouter, useSearchParams } from "next/navigation"
-import { use, useCallback, useEffect, useState } from "react"
-import { Socket } from "socket.io-client"
-import LeftSidebarHook from "../hooks/LeftSidebarHook"
-import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
 import Link from "next/link"
-import { ro } from "date-fns/locale"
-import React from "react"
-import getChannelWithId from "../actions/getChannelWithId"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useState } from "react"
+import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
+import LeftSidebarHook from "../hooks/LeftSidebarHook"
 
 interface ChanneLSidebarItemProps {
   room: RoomsType,
@@ -25,8 +21,9 @@ const ChanneLSidebarItem = ({ room, active, onClick, viewd }: ChanneLSidebarItem
   const userId = Cookies.get('_id')
   const token = Cookies.get('token')
   if (!token || !userId) return;
-
+// leaveRoomSocket
   const channeLPasswordAccessHook = ChanneLPasswordAccessHook()
+
   let JoinData: any = room
   if (userId) {
     JoinData.loginUser = userId
@@ -36,7 +33,9 @@ const ChanneLSidebarItem = ({ room, active, onClick, viewd }: ChanneLSidebarItem
 
 
   return <Link href={`/chat/channels/${room.slug}`}
-    onClick={() => leftSidebar.onClose()}
+    onClick={() => {
+      leftSidebar.onClose()
+    }}
     className={`flex flex-row gap-3 justify-between px-1 items-center w-full  ${active ? ' text-secondary' : 'text-white'}`}>
     <div className="flex flex-row justify-start gap-3 items-center">
       <span className={` text-2xl `}>#</span>

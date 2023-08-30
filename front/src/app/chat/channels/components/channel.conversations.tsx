@@ -106,6 +106,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     // // listen to message event and send the incomming message to client
     React.useEffect(() => {
         socket?.on('newmessage', (newMessage: messagesType) => {
+
+            if (newMessage.roomsId !== channeLinfo?.id) return
             setMessages((prev) => [...prev, newMessage])
             FocusedOnSendMessageInput()
             setSendingMessage(false);

@@ -558,10 +558,10 @@ export class RoomGateway implements OnGatewayConnection {
       );
 
       // chack if user in room :
-      const isClientInRoom = client.rooms.has(data.roomId) || false;
-      if (!isClientInRoom && _isMemberInRoom) {
-        await client.join(data.id);
-      }
+      // const isClientInRoom = client.rooms.has(data.roomId) || false;
+      // if (!isClientInRoom && _isMemberInRoom) {
+      //   await client.join(data.id);
+      // }
       // check if member is muted or ban :
       if (_isMemberInRoom.ismute) {
         client.emit('sendMessageResponse', {
@@ -591,6 +591,36 @@ export class RoomGateway implements OnGatewayConnection {
       if (error) {
         console.log('Chat-sendMessage> error- +>', error);
       }
+    }
+  }
+
+  @SubscribeMessage(`leaveRoomSocket`)
+  async leaveRoomSocket(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    try {
+      const room = await this.roomservice.findOne({ id: data.roomId });
+      const User = await this.usersService.getUserInClientSocket(client);
+      if (!User || !room) return;
+      // check if member is already in room database :
+      const _isMemberInRoom = await this.roomservice.isMemberInRoom(
+        room.id,
+        User.id,
+      );
+      if (_isMemberInRoom) {
+        await client.leave(data.roomId);
+        // send response to client :
+        client.emit('leaveRoomSocketResponse', {
+          OK: true,
+          message: 'you are leave the room',
+        });
+      } else throw new Error();
+    } catch (error) {
+      client.emit('leaveRoomSocketResponse', {
+        OK: false,
+        message: 'you are not member or not in the socket channel yet',
+      });
     }
   }
 
