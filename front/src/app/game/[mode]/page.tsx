@@ -17,7 +17,7 @@ interface User {
   login: string;
   avatar: string;
   Level: number;
-  is_active: boolean;
+  status: 'inGame' | 'online' | 'offline';
 }
 
 const page = ({ params }: { params: { mode: string } }) => {
@@ -33,8 +33,8 @@ const page = ({ params }: { params: { mode: string } }) => {
     mode: params.mode,
   };
   const [socket, setSocket] = useState<Socket>();
-  useEffect(() => {
-    axios
+  const getUsers = async () => {
+    await axios
       .get(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
         headers: {
           Authorization: `Bearer ${Cookies.get('token')}`,
@@ -43,7 +43,7 @@ const page = ({ params }: { params: { mode: string } }) => {
       .then((res) => {
         setUsers(res.data);
       });
-  }, [setUsers]);
+  };
 
   useEffect(() => {
     if (!token) return;
@@ -136,7 +136,10 @@ const page = ({ params }: { params: { mode: string } }) => {
               </button>
               <Dialog.Root>
                 <Dialog.Trigger asChild>
-                  <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-orange-500 rounded-xl font-bold text-orange-500 focus:outline-none">
+                  <button
+                    onClick={getUsers}
+                    className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-orange-500 rounded-xl font-bold text-orange-500 focus:outline-none"
+                  >
                     Friend
                   </button>
                 </Dialog.Trigger>
@@ -158,7 +161,7 @@ const page = ({ params }: { params: { mode: string } }) => {
                               username={user.login}
                               userId={user.id}
                               avatar={user.avatar}
-                              online
+                              status={user.status}
                               socket={socket}
                               mode={params.mode}
                             />
