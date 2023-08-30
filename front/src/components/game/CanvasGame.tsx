@@ -77,7 +77,7 @@ function pongFunc(divRef: RefObject<HTMLDivElement>, router: any) {
           (is_vertical && x >= (canvasSize.width) && x <= (canvasSize.width + (radius * 3)) && (y >= (canvasSize.height * (2 / 3) - (radius * 2.5))) && y <= (canvasSize.height * (2 / 3)))
           || (!is_vertical && x >= (canvasSize.width * (2 / 3) - radius * 2.5) && x <= (canvasSize.width * (2 / 3)) && y >= (canvasSize.height) && y <= (canvasSize.height + (radius * 3)))
             ) {
-              router.push('/game');
+              router.replace('/game');
               const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/game/leaveGame`, {
                 method: 'POST',
                 headers: {

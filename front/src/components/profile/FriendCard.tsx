@@ -3,13 +3,18 @@ import { TiUserAdd } from 'react-icons/ti';
 import { BiJoystick } from 'react-icons/bi';
 import { UserCardProps } from '@/types/UserCardTypes';
 import Image from 'next/image';
+import Cookies  from 'js-cookie';
 
+const SenderId = Cookies.get('_id');
 const UserCard: FC<UserCardProps> = ({
   username,
+  userId,
   addRequest,
   online,
   inGame,
   avatar,
+  socket,
+  mode,
 }) => {
   return (
     <div className=" bg-container rounded-xl my-3 p-2 xl:p-3 flex items-center justify-between">
@@ -35,7 +40,9 @@ const UserCard: FC<UserCardProps> = ({
           </button>
         ) : (
           online && (
-            <button className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors">
+            <button 
+            onClick={() => { socket.emit('sendGameNotification', {userId: userId, senderId: SenderId, mode: mode}) }}
+            className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors">
               {addRequest ? (
                 <TiUserAdd
                   className="mr-1 fill-sky-500 group-hover:fill-container"
@@ -46,6 +53,7 @@ const UserCard: FC<UserCardProps> = ({
                   <BiJoystick
                     className="mr-1 fill-sky-500 group-hover:fill-container"
                     size={16}
+                   
                   />
                 )
               )}
