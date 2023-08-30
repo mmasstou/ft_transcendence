@@ -74,7 +74,7 @@ export default function page() {
         // if (!IsMounted) return
 
         setSocket(ChanneLContextee.socket);
-
+        
         (async () => {
             const channeL: RoomsType = await FindOneBySLug(slug, token);
             if (!channeL) {
@@ -85,6 +85,8 @@ export default function page() {
             const channels = await getChannels(token)
             if (!channels) return
             setChannel(channels)
+            // ChanneLContextee.setChanneLdata(channels)
+
             const User: userType | null = await getUserWithId(userId, token);
             if (!User) return
             const member: membersType | null = channeL && userId && await getMemberWithId(User.id, channeL.id, token)

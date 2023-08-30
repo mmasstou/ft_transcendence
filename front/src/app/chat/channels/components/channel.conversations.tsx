@@ -21,7 +21,8 @@ import ConversationsTitlebar from "./channel.conversations.titlebar";
 import Message from "./channel.message";
 import BanMember from "./channel.settings.banmember";
 import { CiVolumeMute } from "react-icons/ci";
-import { tr } from "date-fns/locale";
+import { is, tr } from "date-fns/locale";
+import { ChanneLContext } from "../providers/channel.provider";
 
 export default function Conversations({ socket }: { socket: Socket | null }) {
 
@@ -41,7 +42,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const [LoadingMessages, setLoadingMessages] = React.useState<boolean>(true)
     const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
-
+    const ChanneLContextee: any = React.useContext(ChanneLContext)
+    // if (!IsMounted) console.log('Conversations ChanneLContextee', ChanneLContextee.ChanneLdata.channeLInfo)
     const UpdateData = async () => {
         // get logged member :
         if (!channeLinfo) return
@@ -49,7 +51,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         if (!channeL) return
         setChanneLinfo(channeL)
         const member: membersType | null = await getMemberWithId(__userId, channeLinfo?.id, token)
-        member &&  setLogedMember(member);
+        member && setLogedMember(member);
     }
     // show this last message in the screan :
 
@@ -63,6 +65,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
     React.useEffect(() => {
         if (LogedMember?.userId !== __userId) return
+        UpdateData()
         setTimeout(() => {
             if (InputRef.current) {
                 InputRef.current.focus();
@@ -95,7 +98,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                 FocusedOnSendMessageInput()
             }, 900);
         })();
-        socket?.on('sendMessageResponse', (res : {OK : boolean ,message : string }) => {
+
+        socket?.on('sendMessageResponse', (res: { OK: boolean, message: string }) => {
             if (!res.OK) {
                 toast.error(res.message)
                 setLoadingMessages(false);
@@ -105,8 +109,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     }, [])
     // // listen to message event and send the incomming message to client
     React.useEffect(() => {
+        if (!IsMounted || !channeLinfo) return
         socket?.on('newmessage', (newMessage: messagesType) => {
-
             if (newMessage.roomsId !== channeLinfo?.id) return
             setMessages((prev) => [...prev, newMessage])
             FocusedOnSendMessageInput()
@@ -116,7 +120,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                 setMessage('')
             }
         })
-    }, [])
+    }, [IsMounted])
 
     React.useEffect(() => {
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
@@ -167,15 +171,15 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     if (!IsMounted) return null
 
     return <div className=" relative flex flex-col items-center w-full">
-        
+
         {LogedMember?.ismute && <div className=" absolute top-0 left-0 w-full h-[83vh] md:h-[88vh]">
             <div className="relative flex justify-center items-center h-full w-full bg-[#24323083] z-[48] ">
-            <div className=" absolute w-full h-[83vh] md:h-[88vh] flex justify-center items-center z-[49] ">
-            </div>
-               <div className="flex flex-col">
-               <CiVolumeMute className=" text-secondary" size={120} />
-                {/* <p className="text-white">you Are Muted</p> */}
-               </div>
+                <div className=" absolute w-full h-[83vh] md:h-[88vh] flex justify-center items-center z-[49] ">
+                </div>
+                <div className="flex flex-col">
+                    <CiVolumeMute className=" text-secondary" size={120} />
+                    {/* <p className="text-white">you Are Muted</p> */}
+                </div>
             </div>
         </div>}
 
@@ -231,7 +235,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                         setMessage(event.target.value);
                                     }}
                                     value={InputValue}
-                                    placeholder={`${ !LogedMember?.ismute ? `Message to @${channeLinfo.name}` : 'you  dont have permission to send message in this channel'}`}
+                                    placeholder={`${!LogedMember?.ismute ? `Message to @${channeLinfo.name}` : 'you  dont have permission to send message in this channel'}`}
                                     type="search"
                                     name=""
                                     id="" />
@@ -241,8 +245,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                 </div>}
                             </div>
                         </div>
-                        
-                            }
+
+                        }
                     </div>
                     : <BanMember LogedMember={LogedMember} User={undefined} room={channeLinfo} />
                 }

@@ -54,7 +54,7 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
             if (!channeL || !member) return;
             toast.success('connected to channel');
             setChanneLdata({ channeLInfo: channeL, member: member })
-            // channeL && ChatSocket?.emit('d', channeL);
+            channeL && ChatSocket?.emit('accessToroom', channeL);
         })();
         setChatSocket(Clientsocket);
         return () => { Clientsocket.disconnect() }
