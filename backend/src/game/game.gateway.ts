@@ -123,7 +123,7 @@ async function SetUserMatchNumber(
   user1 &&
     (await gameService.updateLevel({
       id: Win,
-      level: user1.User.Level + diff * 0.1,
+      level: parseFloat((user1.User.Level + diff * 0.1).toFixed(1)),
     }));
 }
 
@@ -166,7 +166,10 @@ class BallGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
-  async CreateFriendTable(data: {player1Id: string, player2Id: string}, id: string) {
+  async CreateFriendTable(
+    data: { player1Id: string; player2Id: string },
+    id: string,
+  ) {
     if (
       UserMap.get(data.player1Id) &&
       UserMap.get(data.player1Id).SocketId &&
@@ -204,7 +207,7 @@ class BallGateway implements OnGatewayConnection {
     }
   }
 
-  async CreateBotTable(data: {playerId: string}, id: string) {
+  async CreateBotTable(data: { playerId: string }, id: string) {
     if (
       UserMap.get(data.playerId) &&
       UserMap.get(data.playerId).SocketId &&
@@ -307,7 +310,11 @@ class MyGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
-  async CreateFriendTable(data: {player1Id: string, player2Id: string, mode: string}) {
+  async CreateFriendTable(data: {
+    player1Id: string;
+    player2Id: string;
+    mode: string;
+  }) {
     if (!UserMap.has(data.player1Id)) {
       const _User = await this.usersService.findOne({ id: data.player1Id });
       _User && UserMap.set(_User.id, { User: _User, Status: 'online' });
@@ -318,9 +325,9 @@ class MyGateway implements OnGatewayConnection {
     }
     if (
       (UserMap.get(data.player1Id) &&
-        UserMap.get(data.player1Id).Status == 'InGame') ||
+        UserMap.get(data.player1Id).Status == 'inGame') ||
       (UserMap.get(data.player2Id) &&
-        UserMap.get(data.player2Id).Status == 'InGame')
+        UserMap.get(data.player2Id).Status == 'inGame')
     ) {
       return new Error('User already in game');
     } else {
@@ -335,14 +342,14 @@ class MyGateway implements OnGatewayConnection {
       ) {
         UserMap.get(data.player1Id).User = await this.GameService.updateStatus({
           id: data.player1Id,
-          status: 'InGame',
+          status: 'inGame',
         });
         UserMap.get(data.player2Id).User = await this.GameService.updateStatus({
           id: data.player2Id,
-          status: 'InGame',
+          status: 'inGame',
         });
-        UserMap.get(data.player1Id).Status = 'InGame';
-        UserMap.get(data.player2Id).Status = 'InGame';
+        UserMap.get(data.player1Id).Status = 'inGame';
+        UserMap.get(data.player2Id).Status = 'inGame';
         UserMap.get(data.player1Id).TableId = table_obj.tableId;
         UserMap.get(data.player2Id).TableId = table_obj.tableId;
         const user1 = UserMap.get(data.player1Id).User;
@@ -380,12 +387,12 @@ class MyGateway implements OnGatewayConnection {
     }
   }
 
-  async CreateBotTable(data: {playerId: string, mode: string}) {
+  async CreateBotTable(data: { playerId: string; mode: string }) {
     if (!UserMap.has(data.playerId)) {
       const _User = await this.usersService.findOne({ id: data.playerId });
       _User && UserMap.set(_User.id, { User: _User, Status: 'online' });
     }
-    if (UserMap.get(data.playerId).Status == 'InGame')
+    if (UserMap.get(data.playerId).Status == 'inGame')
       return new Error('User already in game');
     else {
       if (
@@ -395,9 +402,9 @@ class MyGateway implements OnGatewayConnection {
       ) {
         const user = await this.GameService.updateStatus({
           id: data.playerId,
-          status: 'InGame',
+          status: 'inGame',
         });
-        UserMap.get(data.playerId).Status = 'InGame';
+        UserMap.get(data.playerId).Status = 'inGame';
         table_obj.tableId = uuidv4();
         UserMap.get(data.playerId).TableId = table_obj.tableId;
         table_obj.GameMode = data.mode;
@@ -431,13 +438,12 @@ class MyGateway implements OnGatewayConnection {
     }
   }
 
-
-  async CreateRandomTable(data: {playerId: string, mode: string}) {
+  async CreateRandomTable(data: { playerId: string; mode: string }) {
     if (!UserMap.has(data.playerId)) {
       const _User = await this.usersService.findOne({ id: data.playerId });
       _User && UserMap.set(_User.id, { User: _User, Status: 'online' });
     }
-    if (UserMap.get(data.playerId).Status == 'InGame') {
+    if (UserMap.get(data.playerId).Status == 'inGame') {
       return new Error('User already in game');
     } else {
       if (
@@ -447,9 +453,9 @@ class MyGateway implements OnGatewayConnection {
       ) {
         const user = await this.GameService.updateStatus({
           id: data.playerId,
-          status: 'InGame',
+          status: 'inGame',
         });
-        UserMap.get(data.playerId).Status = 'InGame';
+        UserMap.get(data.playerId).Status = 'inGame';
         const obj = new random_obj();
         obj.player.setUserId(data.playerId);
         obj.player.GameSetting.setData(
@@ -512,7 +518,7 @@ class MyGateway implements OnGatewayConnection {
     }
   }
 
-  async LeaveGame(data: {UserId: string, TableId: string}) {
+  async LeaveGame(data: { UserId: string; TableId: string }) {
     const leavedUser = data.UserId;
     const table = TableMap.get(data.TableId);
     if (table) {
@@ -595,7 +601,7 @@ class MyGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('setPlayer1')
-  SetPlayer1(client: Socket, data: {tableId: string, Player: number}) {
+  SetPlayer1(client: Socket, data: { tableId: string; Player: number }) {
     if (
       TableMap.get(data.tableId) &&
       TableMap.get(data.tableId).player1.position != data.Player
@@ -709,7 +715,7 @@ class MyGateway implements OnGatewayConnection {
     }
   }
   @SubscribeMessage('setPlayer2')
-  SetPlayer2(client: Socket, data: {tableId: string, Player: number}) {
+  SetPlayer2(client: Socket, data: { tableId: string; Player: number }) {
     if (
       TableMap.get(data.tableId) &&
       TableMap.get(data.tableId).player2.position != data.Player
@@ -720,7 +726,7 @@ class MyGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('setBot')
-  SetBot(client: Socket, data: {tableId: string, Player: number}) {
+  SetBot(client: Socket, data: { tableId: string; Player: number }) {
     if (
       TableMap.get(data.tableId) &&
       TableMap.get(data.tableId).player2.position != data.Player
@@ -729,7 +735,7 @@ class MyGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('setStatus')
-  SetStatus(client: Socket, data: {tableId: string, status: boolean}) {
+  SetStatus(client: Socket, data: { tableId: string; status: boolean }) {
     if (
       TableMap.get(data.tableId) &&
       TableMap.get(data.tableId).Status != data.status
@@ -741,7 +747,7 @@ class MyGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('GameOver')
-  GameOver(client: Socket, data: {tableId: string}) {
+  GameOver(client: Socket, data: { tableId: string }) {
     if (TableMap.get(data.tableId)) {
       const player1 = TableMap.get(data.tableId).player1.UserId;
       const player2 = TableMap.get(data.tableId).player2.UserId;

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, use, useState, useEffect } from 'react';
 import { TiUserAdd } from 'react-icons/ti';
 import { BiJoystick } from 'react-icons/bi';
 import { UserCardProps } from '@/types/UserCardTypes';
@@ -16,7 +16,7 @@ const UserCard: FC<UserCardProps> = ({
   addRequest,
 }) => {
   const [invited, setInvited] = useState(false);
-
+  let timeout: NodeJS.Timeout;
   const handleInvite = () => {
     socket.emit('sendGameNotification', {
       userId: userId,
@@ -24,10 +24,21 @@ const UserCard: FC<UserCardProps> = ({
       mode: mode,
     });
     setInvited(true);
-    setTimeout(() => {
+    timeout = setTimeout(() => {
       setInvited(false);
     }, 8000);
   };
+
+  useEffect(() => {
+    socket && socket.on('GameResponseToChatToUser', (data: any) => {
+      if (data.User.id === userId) {
+        setInvited(false);
+        clearTimeout(timeout);
+      }
+    });
+
+  },[])
+
 
   return (
     <div className=" bg-container rounded-xl my-3 p-2 xl:p-3 flex items-center justify-between">
