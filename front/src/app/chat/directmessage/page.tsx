@@ -7,11 +7,8 @@ import { FaUsers } from "react-icons/fa";
 import ChatNavbarLink from '../components/chat.navbar.link';
 import Button from '../components/Button';
 import { BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse, BsPersonAdd, BsFillPeopleFill, BsPeople } from "react-icons/bs";
-import { IconType } from 'react-icons';
 import PrivateConversation from './components/privateConversation';
 import Cookies from 'js-cookie';
-import SearchModal from './components/searchModal';
-
 
 const metadata = {
   title: 'Transcendence',
@@ -25,25 +22,10 @@ const currentId = Cookies.get('_id');
 export default function page() {
     const router = usePathname();
 	const [isOpen, setOpening] = useState<boolean>(false);
-	const [createConversation, setConvCreation] = useState(false);
 	const [openFriendList, setFriendList] = useState(false);
-	const [users, setUsers] = useState([]);
 
-	async function getUsers() {
-		const res = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
-			method: 'GET',
-			headers: {
-			  'Content-Type': 'application/json',
-			  Authorization: `Bearer ${token}`,
-			},
-		  })).json();
-		const filtredUsers = res.filter((user) => user.id != currentId)
-		setUsers(filtredUsers);
-	}
 
-	useEffect(() => {
-		getUsers();
-	}, [isOpen, openFriendList, users])
+	useEffect(() => {}, [isOpen, openFriendList])
 
   return (
     <Dashboard>

@@ -80,11 +80,11 @@ function SearchList({ setConvCreation, users }) {
 	function formatList () {
 		if (searchedLogin !== '')
 		{
-			// setList(users.filter((user) => {
-			// 	const partLogin = user.login.substring(0, searchedLogin.length);
-			// 	return (partLogin !== '' && partLogin === searchedLogin);
-			// }))
-			setList([...users, ...users, ...users, ...users, ...users, ...users]);
+			setList(users.filter((user) => {
+				const partLogin = user.login.substring(0, searchedLogin.length);
+				return (partLogin !== '' && partLogin === searchedLogin);
+			}))
+			// setList([...users, ...users, ...users, ...users, ...users, ...users]);
 		}
 		else
 			setList([])

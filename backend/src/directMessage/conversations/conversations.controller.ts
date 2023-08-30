@@ -1,10 +1,19 @@
-import { Controller, Get, Param, UseGuards, Req, Body, Post, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+  Req,
+  Body,
+  Post,
+  Delete,
+} from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
 
 @Controller('conversations')
 export class ConversationsController {
-  constructor(private readonly conversationService: ConversationsService) { }
+  constructor(private readonly conversationService: ConversationsService) {}
 
   @UseGuards(JwtAuthGuard)
   @Get()
@@ -15,53 +24,47 @@ export class ConversationsController {
   @UseGuards(JwtAuthGuard)
   @Get(':single')
   async findOne(@Body() reqBody: any) {
-
     //? body : { users: [id1, id2] }
 
     const [fs, sc] = reqBody.usersId;
     const criteria = {
       where: {
-				AND: [
-					{users: {some: {id: fs}}} ,
-					{users: {some: {id: sc}}}
-				]
-			} 
+        AND: [{ users: { some: { id: fs } } }, { users: { some: { id: sc } } }],
+      },
     };
-    
+
     const response = await this.conversationService.findConversation(criteria);
-    if (response != null)
-      return response;
+    if (response != null) return response;
 
     return this.conversationService.createNewConversation({
       data: {
-        content: "... Created When Not Found!!",
+        content: '... Created When Not Found!!',
         users: {
-          connect: reqBody.usersId.map((id) => ({id}))
-        }
-      }
+          connect: reqBody.usersId.map((id) => ({ id })),
+        },
+      },
     });
   }
 
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() reqBody: any) {
-
-    //? body : { 
+    //? body : {
     //?         content: "....Content...",
-    //?         users: [id1, id2] 
+    //?         users: [id1, id2]
     //?        }
 
-    const {content, usersId} = reqBody;
+    const { content, usersId } = reqBody;
 
     const criteria = {
       data: {
         content: content,
         users: {
-          connect: usersId.map((id) => ({id}))
-        }
-      }
-    }
-    return this.conversationService.createNewConversation(criteria)
+          connect: usersId.map((id) => ({ id })),
+        },
+      },
+    };
+    return this.conversationService.createNewConversation(criteria);
   }
 
   @UseGuards(JwtAuthGuard)
