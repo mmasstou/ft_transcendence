@@ -119,38 +119,6 @@ export class UserService {
     }
   }
 
-  // accept friend request
-  // async acceptFriendRequest(
-  //   senderId: string,
-  //   receiverId: string,
-  // ): Promise<void> {
-  //   try {
-  //     const existingRequest = await this.prisma.friendship.findFirst({
-  //       where: {
-  //         userId: senderId,
-  //         friendId: receiverId,
-  //       },
-  //     });
-
-  //     if (!existingRequest) {
-  //       throw new BadRequestException('Friend request not found.');
-  //     }
-
-  //     await this.prisma.friendship.update({
-  //       where: {
-  //         userId: senderId,
-  //         friendId: receiverId,
-  //       },
-  //       data: {
-  //         status: 'ACCEPTED',
-  //       },
-  //     });
-  //     return;
-  //   } catch (error) {
-  //     throw new BadRequestException(error.message);
-  //   }
-  // }
-
   async removeFriend(friendId: string, userId: string) {
     try {
       const deletedFriendships = await this.prisma.friendship.deleteMany({
@@ -185,6 +153,23 @@ export class UserService {
     });
     if (existingFriendship) return true;
     return false;
+  }
+  // get all  friend requests
+
+  async getFriendRequests(userId: string) {
+    try {
+      const friendRequests = await this.prisma.friendship.findMany({
+        where: {
+          friendId: userId,
+          status: 'PENDING',
+        },
+      });
+      if (!friendRequests) throw new NotFoundException();
+      console.log('++getFriendRequests++>:\n', friendRequests);
+      return friendRequests;
+    } catch (error) {
+      console.log('++getFriendRequests++error>', error.message);
+    }
   }
 
   // get all friends

@@ -6,7 +6,7 @@ import MyToast from '@/components/ui/Toast/MyToast';
 import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { use, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { Socket, io } from 'socket.io-client';
 import StartGame from './chat/channels/actions/startgame';
@@ -26,60 +26,34 @@ const Dashboard = ({ children }: Props) => {
   const router = useRouter();
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const [chatSocket, setchatSocket] = React.useState<Socket | null>(null);
-  const params = useSearchParams()
-  const [Notifications, setNotifications] = React.useState<any>(null)
-  const channeLsettingsHook = ChanneLsettingsHook()
-  const userId = Cookies.get('_id')
+  const params = useSearchParams();
+  const [Notifications, setNotifications] = React.useState<any>(null);
+  const channeLsettingsHook = ChanneLsettingsHook();
+  const userId = Cookies.get('_id');
   const token: any = Cookies.get('token');
+  const [notifUpdate, setnotifUpdate] = React.useState<boolean>(false);
+
+  const [pendingRequests, setPendingRequests] = React.useState<any>([]);
+  const [requestBackUp, setRequestBackUp] = React.useState<any>([]);
+
   if (!token || !userId) return;
 
-  // handle socket connection
-  useEffect(() => {
-    
-    const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/notifications`, {
-      auth: {
-        token: `${token}`,
-        id: `${Cookies.get('_id')}`,
-      },
-    });
-
-    socket.on('connect', () => {
-      console.log('socket connected');
-    });
-
-    socket.on('notification', (data) => {
-      console.log(data);
-      if (data.message === 'You have a new friend request.') {
-        toast.success(data.message);
-      }
-    });
-
-    socket.on('reconnect', (attemptNumber) => {
-      console.log(`Reconnected after attempt ${attemptNumber}`);
-    });
-
-    // return () => {
-    //   socket.disconnect();
-    // };
-  }, []);
-  // end handle socket connection
-
-
-
   React.useEffect(() => {
-    socket?.on('GameNotificationResponse', (data: {
-      message: string,
-      sender: userType,
-      senderSocketId: string,
-      mode: string
-    }) => {
-      setNotifications(data)
+    socket?.on(
+      'GameNotificationResponse',
+      (data: {
+        message: string;
+        sender: userType;
+        senderSocketId: string;
+        mode: string;
+      }) => {
+        setNotifications(data);
 
-      return () => {
-        setNotifications(null)
+        return () => {
+          setNotifications(null);
+        };
       }
-
-    })
+    );
   }, [socket]);
 
   useEffect(() => {
@@ -91,14 +65,12 @@ const Dashboard = ({ children }: Props) => {
     };
   }, [token]);
 
-
   useEffect(() => {
-
     const socket: Socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/User`, {
       auth: {
         token: `${token}`,
-        id: `${Cookies.get("_id")}`
-      }
+        id: `${Cookies.get('_id')}`,
+      },
     });
 
     const chatSocket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/chat`, {
@@ -108,48 +80,58 @@ const Dashboard = ({ children }: Props) => {
       },
     });
     setSocket(socket);
-    setchatSocket(chatSocket)
-    socket && socket.on("connected", (data) => { })
+    setchatSocket(chatSocket);
+    socket && socket.on('connected', (data) => {});
     return () => {
       socket && socket.disconnect();
-      chatSocket && chatSocket.disconnect()
+      chatSocket && chatSocket.disconnect();
     };
-
-  }, [])
+  }, []);
 
   useEffect(() => {
+    if (notifUpdate === false) return;
+    setPendingRequests(requestBackUp[requestBackUp.length - 1]);
+    setnotifUpdate(false);
+  }, [notifUpdate]);
+
+  useEffect(() => {
+    socket?.on('notification', (request: any) => {
+      setPendingRequests((prevRequests: any) => [...prevRequests, request]);
+      setRequestBackUp((prevRequests: any) => [...prevRequests, request]);
+      setnotifUpdate(true);
+      toast('You have a new friend request', { icon: '🤗' });
+    });
+
     socket?.on('GameResponse', (data: any) => {
       if (data.response === 'Accept') {
-
         if (data.sender.id === userId) {
           (async () => {
             if (!token) return;
-            const body = {       ///////////////////////////////////////////////////////// body
+            const body = {
               player2Id: data.sender.id,
               player1Id: data.userId,
-              mode: data.mode
-            }
+              mode: data.mode,
+            };
             const g = await StartGame(body, token);
             if (!g) return;
-            channeLsettingsHook.onClose()
-            router.push(`/game/${data.mode}/friend`)
+            channeLsettingsHook.onClose();
+            router.push(`/game/${data.mode}/friend`);
           })();
-
         }
         if (data.userId === userId) {
-          channeLsettingsHook.onClose()
-          router.push(`/game/${data.mode}/friend`)
+          channeLsettingsHook.onClose();
+          router.push(`/game/${data.mode}/friend`);
         }
       }
       if (data.response === 'Deny') {
         if (data.userId === userId) {
-          toast('You denied your friend invitation', { icon: '🤗' })
+          toast('You denied your friend invitation', { icon: '🤗' });
         }
         if (data.sender.id === userId) {
-          toast('Your friend denied your invitation', { icon: '🤗' })
+          toast('Your friend denied your invitation', { icon: '🤗' });
         }
       }
-    })
+    });
   }, [socket]);
 
   return (
@@ -163,34 +145,44 @@ const Dashboard = ({ children }: Props) => {
       <ChanneLFindRoommodaL />
       <ChanneLaccessDeniedModaL />
       <ChanneLPasswordAccessModaL />
-      {
-        Notifications && <MyToast
+      {Notifications && (
+        <MyToast
           OnAccept={() => {
             if (!params) return;
-            socket?.emit('AcceptGame',
-              {
-                userId: userId,
-                sender: Notifications.sender,
-                senderSocketId: Notifications.senderSocketId,
-                mode: Notifications.mode
-
-              })
-            chatSocket?.emit('GameResponseToChat', { response: 'Accept', sendTo: Notifications.sender, mode: Notifications.mode })
-            setNotifications(null)
+            socket?.emit('AcceptGame', {
+              userId: userId,
+              sender: Notifications.sender,
+              senderSocketId: Notifications.senderSocketId,
+              mode: Notifications.mode,
+            });
+            chatSocket?.emit('GameResponseToChat', {
+              response: 'Accept',
+              sendTo: Notifications.sender,
+              mode: Notifications.mode,
+            });
+            setNotifications(null);
           }}
           OnDeny={() => {
-            socket?.emit('DenyGame', { userId: userId, sender: Notifications.sender, mode: Notifications.mode })
-            chatSocket?.emit('GameResponseToChat', { response: 'Deny', sendTo: Notifications.sender, mode: Notifications.mode })
-            setNotifications(null)
+            socket?.emit('DenyGame', {
+              userId: userId,
+              sender: Notifications.sender,
+              mode: Notifications.mode,
+            });
+            chatSocket?.emit('GameResponseToChat', {
+              response: 'Deny',
+              sendTo: Notifications.sender,
+              mode: Notifications.mode,
+            });
+            setNotifications(null);
           }}
           isOpen
           user={Notifications.sender.login}
           message={Notifications.message}
         />
-      }
+      )}
       <div className="dashboard bg-primary overflow-y-auto">
         <header className="bg-transparent flex items-center justify-between px-5 ">
-          <Header socket={null} />
+          <Header socket={socket} pendingRequests={pendingRequests} />
         </header>
 
         <main className="">{children}</main>

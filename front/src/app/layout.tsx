@@ -1,4 +1,3 @@
-'use client';
 import './globals.css';
 import { Changa, Lato } from 'next/font/google';
 import React from 'react';

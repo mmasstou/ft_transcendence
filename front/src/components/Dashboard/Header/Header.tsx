@@ -15,7 +15,12 @@ import { toast } from 'react-hot-toast';
 
 const token = Cookies.get('token');
 
-const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
+interface Props {
+  socket: Socket | null;
+  pendingRequests: any;
+}
+
+const Header: React.FC<Props> = ({ socket, pendingRequests }): JSX.Element => {
   const [notifications, setnotifications] = React.useState<any[] | null>(null);
   if (!token) {
     toast.error('You are not logged in');
@@ -31,8 +36,9 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
   React.useEffect(() => {
     (async () => {
       // get all friend request
+      console.log('get all friend request');
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/friends/all`,
+        `${process.env.NEXT_PUBLIC_API_URL}/users/friendRequests`,
         {
           method: 'GET',
           headers: {
@@ -44,12 +50,14 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
       if (res.ok) {
         const data = await res.json();
         setnotifications(data);
-        console.log('notification data: ', data);
         return;
       }
       toast.error(res.statusText);
     })();
-  }, []);
+  }, [pendingRequests]);
+
+  console.log('pendingFriendRequest in Header: ', pendingRequests);
+  console.log('notifications: ', notifications);
 
   return (
     <>
@@ -84,13 +92,15 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
                     </h1>
 
                     {notifications &&
-                      notifications.map(
+                      notifications?.map(
                         (friendshipData: any, index: number) => (
                           <Notification
                             friendshipData={friendshipData}
                             key={index}
                             message="send a friend request."
                             isFriend
+                            socket={socket}
+                            pendingRequests={pendingRequests}
                           />
                         )
                       )}

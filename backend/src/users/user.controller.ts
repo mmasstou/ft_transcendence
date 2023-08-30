@@ -44,6 +44,14 @@ export class UserController {
     return await this.usersService.getFriend(id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('friendRequests')
+  async getFriendRequests(@Req() request: Request) {
+    const User: any = request.user;
+    const id: any = User.id;
+    return await this.usersService.getFriendRequests(id);
+  }
+
   @Get()
   findAll() {
     return this.usersService.findAll();
