@@ -36,7 +36,7 @@ const ChanneLSidebarItem = ({ room, active, onClick, viewd }: ChanneLSidebarItem
 
 
   return <Link href={`/chat/channels/${room.slug}`}
-    onClick={() => setSelectedchanneL(room)}
+    onClick={() => leftSidebar.onClose()}
     className={`flex flex-row gap-3 justify-between px-1 items-center w-full  ${active ? ' text-secondary' : 'text-white'}`}>
     <div className="flex flex-row justify-start gap-3 items-center">
       <span className={` text-2xl `}>#</span>

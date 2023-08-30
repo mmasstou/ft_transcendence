@@ -13,7 +13,7 @@ interface ILeftSidebar {
 
 
 const LeftSidebarHook = create<ILeftSidebar>((set) => ({
-    IsOpen: true,
+    IsOpen: false,
     default: false,
     selectedItem: null,
     onOpen: (item: OLdMessages[]) => set({ IsOpen: true, selectedItem: item }),

@@ -10,7 +10,6 @@ import MemberHasPermissionToAccess from '../actions/MemberHasPermissionToAccess'
 import { RoomsType, membersType, userType } from '@/types/types';
 import ChanneLIndex from '../components/channel.index';
 import FindOneBySLug from '../actions/Channel/findOneBySlug';
-import InitSocket from '../actions/InitSocket';
 import Loading from '../components/loading';
 import Conversations from '../components/channel.conversations';
 import RightsideModaL from '../modaLs/RightsideModal';
@@ -83,6 +82,9 @@ export default function page() {
                 toast.error('channel not found');
                 return;
             }
+            const channels = await getChannels(token)
+            if (!channels) return
+            setChannel(channels)
             const User: userType | null = await getUserWithId(userId, token);
             if (!User) return
             const member: membersType | null = channeL && userId && await getMemberWithId(User.id, channeL.id, token)
@@ -97,14 +99,14 @@ export default function page() {
             toast.success('channel found');
             setIsLoading(false);
         })();
-        ChanneLContextee.socket?.on('accessToroomResponse', (resp: { channeL: RoomsType, LogedUser: userType }) => {
-            if (resp === null) {
-                toast.error(`dont have permission to access this channel`);
-                router.push('/chat/channels/');
-                return;
-            }
+        // ChanneLContextee.socket?.on('accessToroomResponse', (resp: { channeL: RoomsType, LogedUser: userType }) => {
+        //     if (resp === null) {
+        //         toast.error(`dont have permission to access this channel`);
+        //         router.push('/chat/channels/');
+        //         return;
+        //     }
 
-        });
+        // });
 
         // check for channels :
         // leave the channeLs :

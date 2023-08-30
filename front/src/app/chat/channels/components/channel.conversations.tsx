@@ -21,6 +21,7 @@ import ConversationsTitlebar from "./channel.conversations.titlebar";
 import Message from "./channel.message";
 import BanMember from "./channel.settings.banmember";
 import { CiVolumeMute } from "react-icons/ci";
+import { tr } from "date-fns/locale";
 
 export default function Conversations({ socket }: { socket: Socket | null }) {
 
@@ -37,7 +38,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const __userId = Cookies.get('_id')
     if (!token || !__userId) return
     const InputRef = React.useRef<HTMLInputElement | null>(null);
-    const [LoadingMessages, setLoadingMessages] = React.useState<boolean>(false)
+    const [LoadingMessages, setLoadingMessages] = React.useState<boolean>(true)
     const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
@@ -92,7 +93,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             setTimeout(() => {
                 setLoadingMessages(false);
                 FocusedOnSendMessageInput()
-            }, 500);
+            }, 900);
         })();
         socket?.on('sendMessageResponse', (res : {OK : boolean ,message : string }) => {
             if (!res.OK) {
@@ -166,7 +167,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     return <div className=" relative flex flex-col items-center w-full">
         
         {LogedMember?.ismute && <div className=" absolute top-0 left-0 w-full h-[83vh] md:h-[88vh]">
-            <div className="relative flex justify-center items-start h-full w-full bg-[#24323083] z-[48] ">
+            <div className="relative flex justify-center items-center h-full w-full bg-[#24323083] z-[48] ">
             <div className=" absolute w-full h-[83vh] md:h-[88vh] flex justify-center items-center z-[49] ">
             </div>
                <div className="flex flex-col">

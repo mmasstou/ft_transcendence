@@ -119,13 +119,6 @@ export default function RootLayout({
                     outline
                     onClick={() => { channeLcreatemodaLHook.onOpen([], createRoomSocket) }}
                   />
-                  {slug && <Button
-                    icon={FiUsers}
-                    small
-                    outline
-                    onClick={() => { rightsidebarHook.IsOpen ? rightsidebarHook.onClose() : rightsidebarHook.onOpen([]) }}
-                  />}
-
                 </div>
               </div>
               <div className="channeLbody relative h-full flex ">
