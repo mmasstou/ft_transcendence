@@ -29,6 +29,7 @@ import { HiLockClosed, HiLockOpen } from 'react-icons/hi';
 import getUsers from '../actions/getUsers';
 import { toast } from 'react-hot-toast';
 import Select from '../../components/Select';
+import React from 'react';
 
 const ChanneLCreateModaL = () => {
   const { IsOpen, onClose, onOpen, socket, selectedFriends } =
@@ -42,6 +43,7 @@ const ChanneLCreateModaL = () => {
   const [channeLpasswordInput, setchanneLpasswordInput] = useState<string>('')
 
 
+  IsOpen && (document.body.style.display = 'hidden');
   let users: any[] = [];
   useEffect(() => {
     (async function getFriends() {
@@ -51,7 +53,19 @@ const ChanneLCreateModaL = () => {
       const _list = resp && resp.filter((user: any) => user.id !== User_ID);
       setfriends(_list);
     })();
+    
   }, []);
+  
+  React.useEffect(() => {
+    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, (room: any) => {
+      if (!room.OK) {
+        toast(room.message)
+        return
+      }
+      route.push(`/chat/channels/${room.data.slug}`)
+      onClose()
+    })
+  }, [socket]);
 
   type formValues = {
     channel_name: string;
@@ -122,14 +136,6 @@ const ChanneLCreateModaL = () => {
       type: Data.channeLtype,
       channeLpassword: Data.channeLpassword
     });
-    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, (room: any) => {
-      if (!room.data) {
-        toast(room.message)
-        return
-      }
-      route.push(`/chat/channels/${room.data.slug}`)
-      onClose()
-    })
   }
 
   const onChangeChanneLname = (event: ChangeEvent<HTMLInputElement>) => {

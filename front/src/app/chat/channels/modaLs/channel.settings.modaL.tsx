@@ -31,7 +31,7 @@ import ChanneLSettingsInfo from "../components/settings/channel.settings.info"
 import FindOneBySLug from "../actions/Channel/findOneBySlug"
 import ChanneLUserSettings from "../components/settings/User/channel.settings.user"
 import ChannelSettingsUserMemberItem from "../components/settings/User/channel.settings.user.memberItem"
-import SettingsProvider from "../components/settings/channel.settings.provider"
+import SettingsProvider from "../providers/channel.settings.provider"
 import getChannelMembersWithId from "../actions/getChannelmembers"
 import ChanneLConfirmActionHook from "../hooks/channel.confirm.action"
 import toast from "react-hot-toast"
@@ -220,16 +220,8 @@ const ChanneLSettingsModaL = () => {
                             //     member={MemberInfo}
                             // />
                         }
-                    </div> <div className=" w-full flex flex-row h-max justify-around items-center mb-5 text-white ">
-                        {/* <Button
-                    icon={TbInfoSquareRoundedFilled}
-                    label={"ChanneL Info"}
-                    outline
-                    responsive
-                    showLabeL
-                    IsActive={_channeLtype === "ChatInfo"}
-                    onClick={() => { setcustomvalue("channeLtype", "ChatInfo") }}
-                /> */}
+                    </div> 
+                    <div className=" w-full flex flex-row h-max justify-around items-center mb-5 text-white ">
                         <Button
                             icon={FaUsersCog}
                             label={"User Settings"}

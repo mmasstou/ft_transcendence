@@ -16,7 +16,7 @@ import getUserWithId from "../../../actions/getUserWithId";
 import { set } from "date-fns";
 import ChanneLSettingsBody from "../channel.settings.body";
 import ChanneLsettingsProvider from "../ChanneL/channel.settings.chnnel.provider";
-import SettingsProvider from "../channel.settings.provider";
+import SettingsProvider from "../../../providers/channel.settings.provider";
 import Loading from "../../loading";
 import ChanneLsettingsHook from "../../../hooks/channel.settings";
 interface props {

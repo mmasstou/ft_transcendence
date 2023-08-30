@@ -66,13 +66,6 @@ export default function ChanneLbody({ children, socket }: { children: React.Reac
             <div className={`${(leftSidebar.IsOpen || rightsidebar.IsOpen) && 'hidden md:flex'} w-full`}>
                 {children}
             </div>
-            <RightsideModaL>
-                {
-                    ChanneLsmembers && ChanneLsmembers.map((member: membersType, key: number) => (
-                        <ChanneLsmembersItem key={key} member={member} />
-                    ))
-                }
-            </RightsideModaL>
         </div>
     )
 }
