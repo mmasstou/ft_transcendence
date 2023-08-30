@@ -69,6 +69,9 @@ export type responseEvent = {
   type?: responseEventTypeEnum;
   data: Rooms | Members | User | null;
 };
+let time: any;
+export const TimeOutList = new Map<string, NodeJS.Timeout>();
+
 @Injectable()
 @WebSocketGateway({ namespace: 'chat' })
 export class RoomGateway implements OnGatewayConnection {
@@ -125,26 +128,55 @@ export class RoomGateway implements OnGatewayConnection {
         // mute member :
         if (data.updateType === updatememberEnum.MUTEMEMBER) {
           const __isMute: boolean = __member.ismute === true ? false : true;
+          const timeOnMute: any = new Date();
+          timeOnMute.setMinutes(timeOnMute.getMinutes() + 5);
+
           const member = await this.prisma.members.update({
             where: { id: data.member.id },
             data: {
               ismute: __isMute,
-              // mute_at: Date.now().toString(),
+              mute_at: timeOnMute,
             },
           });
+          // if (member.timeout) {
+          //   console.log('Chat-> member.timeout- +>', member.timeout);
+          //   clearTimeout(parseInt(member.timeout, 10));
+          // }
+          if (TimeOutList.has(data.member.id)) {
+            console.log('Chat-> TimeOutList- +>', TimeOutList);
+            const tt = TimeOutList.get(data.member.id);
+            clearTimeout(tt);
+            TimeOutList.delete(data.member.id);
+          }
           if (member.ismute) {
-            setTimeout(() => {
-              const member = (async () => {
-                return await this.prisma.members.update({
-                  where: { id: data.member.id },
-                  data: { ismute: false },
-                });
-              })();
+            time = setTimeout(async () => {
+              console.log('Chat-> time- +1>');
+              // const member = (async () => {
+              const member = await this.prisma.members.update({
+                where: { id: data.member.id },
+                data: { ismute: false },
+              });
+              // })();
               this.server.emit(
                 `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
                 { OK: true },
               );
-            }, 60000);
+            }, 20000);
+            console.log('Chat-> time- +2> :', time);
+            if (time) {
+              TimeOutList.set(data.member.id, time);
+              time = null;
+            }
+            // await this.prisma.members.update({
+            //   where: { id: data.member.id },
+            //   data: {
+            //     timeout: time.toString(),
+            //   },
+            // });
+          }
+          if (!member.ismute) {
+            console.log('Chat-> time- +3>');
+            clearTimeout(time);
           }
         }
         // kick member :

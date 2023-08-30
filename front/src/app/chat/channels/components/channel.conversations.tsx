@@ -23,6 +23,7 @@ import BanMember from "./channel.settings.banmember";
 import { CiVolumeMute } from "react-icons/ci";
 import { is, tr } from "date-fns/locale";
 import { ChanneLContext } from "../providers/channel.provider";
+import ChannelConversationsMute from "./channel.conversations.mute";
 
 export default function Conversations({ socket }: { socket: Socket | null }) {
 
@@ -48,10 +49,16 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         // get logged member :
         if (!channeLinfo) return
         const channeL: RoomsType | null = await FindOneBySLug(slug, token)
-        if (!channeL) return
+        if (!channeL) {
+            toast.error('no channeL')
+            return
+        }
         setChanneLinfo(channeL)
-        const member: membersType | null = await getMemberWithId(__userId, channeLinfo?.id, token)
-        member && setLogedMember(member);
+        const member: membersType | null = await getMemberWithId(__userId, channeL?.id, token)
+        if (member) {
+            toast.success(`member updated ${member.id}`);
+            setLogedMember(member);
+        }
     }
     // show this last message in the screan :
 
@@ -125,10 +132,20 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     React.useEffect(() => {
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
             if (!data.OK) return
+            toast.success('member updated 02');
             UpdateData();
+            // (async () => {
+            //     if (!channeLinfo) return
+            //     const channeL: RoomsType | null = await FindOneBySLug(slug, token)
+            //     if (!channeL) return
+            //     setChanneLinfo(channeL)
+            //     const member: membersType | null = await getMemberWithId(__userId, channeLinfo?.id, token)
+            //     member && setLogedMember(member);
+            // })();
         });
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
             if (!data.OK) return
+            toast.success('member updated 01');
             UpdateData();
         });
     }, [socket])
@@ -171,18 +188,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     if (!IsMounted) return null
 
     return <div className=" relative flex flex-col items-center w-full">
-
-        {LogedMember?.ismute && <div className=" absolute top-0 left-0 w-full h-[83vh] md:h-[88vh]">
-            <div className="relative flex justify-center items-center h-full w-full bg-[#24323083] z-[48] ">
-                <div className=" absolute w-full h-[83vh] md:h-[88vh] flex justify-center items-center z-[49] ">
-                </div>
-                <div className="flex flex-col">
-                    <CiVolumeMute className=" text-secondary" size={120} />
-                    {/* <p className="text-white">you Are Muted</p> */}
-                </div>
-            </div>
-        </div>}
-
+        <ChannelConversationsMute IsActive={LogedMember?.ismute ? true : false} />
         {channeLinfo
             ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col sm:flex`}>
                 <ConversationsTitlebar

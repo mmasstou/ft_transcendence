@@ -26,6 +26,15 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
     const router = useRouter();
 
 
+    const UpdateData = async () => {
+        if (!slug) return null;
+        const channeL: RoomsType = await FindOneBySLug(slug, token);
+        const member: membersType | null = channeL && userId && await getMemberWithId(userId, channeL.id, token)
+
+        if (!channeL || !member) return null;
+        setChanneLdata({ channeLInfo: channeL, member: member })
+        return channeL;
+    }
     React.useEffect(() => {
         if (!token || !userId || userId === undefined) {
             toast.error('Please login first > channeL provider');
@@ -47,13 +56,7 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
             }
             setUser(User);
             toast(slug === undefined ? 'undefined' : slug)
-            if (!slug) return;
-            const channeL: RoomsType = await FindOneBySLug(slug, token);
-            const member: membersType | null = channeL && userId && await getMemberWithId(userId, channeL.id, token)
-
-            if (!channeL || !member) return;
-            toast.success('connected to channel');
-            setChanneLdata({ channeLInfo: channeL, member: member })
+            const channeL = await UpdateData();
             channeL && ChatSocket?.emit('accessToroom', channeL);
         })();
         setChatSocket(Clientsocket);
@@ -71,7 +74,25 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
             // window.location.reload()
             // toast.success("connected to channel ChanneLProvider");
         });
+
     }, [])
+
+    React.useEffect(() => {
+        ChatSocket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            (data: { OK: true, message?: string }) => {
+                if (!data.OK) return
+                toast.success('member updated');
+                UpdateData();
+            });
+        ChatSocket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`,
+            (data: { OK: true, message?: string }) => {
+                if (!data.OK) return
+                toast.success('member updated');
+                UpdateData();
+            });
+    }, [ChatSocket])
 
     if (!ChatSocket) return null
 
