@@ -61,11 +61,11 @@ export const Logout: React.FC = (): JSX.Element => {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
-          className="text-white py-6 px-2 xl:px-6 rounded w-[200px] mr-3 bg-[#2B504B] shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)] "
+          className="text-white py-6 px-2 xl:px-6 rounded w-[200px] mr-3 bg-[#2B504B] shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)] z-[1999999]"
           sideOffset={5}
         >
           <div className="flex flex-col items-center gap-2">
-            <p className="text-sm xl:text-lg">{user && user?.login} 👋</p>
+            <p className="text-sm xl:text-lg">{user?.login} 👋</p>
             <div className="w-3/4 border-b-[0.1vh] border-white opacity-50"></div>
             <a
               onClick={() => {}}

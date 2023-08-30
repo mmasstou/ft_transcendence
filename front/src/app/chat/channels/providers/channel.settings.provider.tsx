@@ -1,18 +1,13 @@
 'use client'
-import Button from "@/app/chat/components/Button";
-import { RoomsType, UserTypeEnum, membersType } from "@/types/types";
-import React from "react";
-import { IoChevronBackOutline } from "react-icons/io5";
-import { Socket } from "socket.io-client";
+import { RoomsType, membersType } from "@/types/types";
 import Cookies from "js-cookie";
 import { useParams } from "next/navigation";
-import { toast } from "react-hot-toast";
-import { tr } from "date-fns/locale";
-import PermissionDenied from "../channel.settings.permissiondenied";
-import FindOneBySLug from "../../actions/Channel/findOneBySlug";
-import getMemberWithId from "../../actions/getMemberWithId";
-import Loading from "../loading";
-
+import React, { createContext } from "react";
+import { Socket } from "socket.io-client";
+import FindOneBySLug from "../actions/Channel/findOneBySlug";
+import getMemberWithId from "../actions/getMemberWithId";
+import Loading from "../components/loading";
+export const ChanneLsettingsContext = createContext({});
 interface props {
     children: React.ReactNode;
     socket: Socket | null;
@@ -65,6 +60,10 @@ export default function SettingsProvider(props: props) {
 
     if (!IsMounted) return;
     return <div className="flex flex-col justify-between max-h-[32rem]">
-        {IsLoading ? < Loading  /> : props.children}
+        {IsLoading
+            ? < Loading />
+            : <ChanneLsettingsContext.Provider value={{ ChanneLinfo, LoggedMember, slug }}>
+                {props.children}
+            </ChanneLsettingsContext.Provider>}
     </div>
 }

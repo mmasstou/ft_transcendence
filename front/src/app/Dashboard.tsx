@@ -1,25 +1,23 @@
 'use client';
-import './dashboard.css';
+import Header from '@/components/Dashboard/Header/Header';
 import Sidebar from '@/components/Dashboard/sidebar/Sidebar';
 import Login from '@/components/auth/modaLs/Login';
+import MyToast from '@/components/ui/Toast/MyToast';
+import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
-import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
-import ChanneLPasswordAccessModaL from './chat/channels/modaLs/channel.access.password.modaL';
-import { useEffect } from 'react';
-import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
-import Header from '@/components/Dashboard/Header/Header';
-import ChanneLFindRoommodaL from './chat/channels/modaLs/channel.find.room.modaL';
 import { Socket, io } from 'socket.io-client';
-import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
-import { membersType, userType } from '@/types/types';
-import MyToast from '@/components/ui/Toast/MyToast';
-import ChanneLConfirmActionModaL from './chat/channels/modaLs/channel.confirm.action';
-import { ro } from 'date-fns/locale';
 import StartGame from './chat/channels/actions/startgame';
 import ChanneLsettingsHook from './chat/channels/hooks/channel.settings';
+import ChanneLaccessDeniedModaL from './chat/channels/modaLs/channel.access.denied.modaL';
+import ChanneLPasswordAccessModaL from './chat/channels/modaLs/channel.access.password.modaL';
+import ChanneLConfirmActionModaL from './chat/channels/modaLs/channel.confirm.action';
+import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
+import ChanneLFindRoommodaL from './chat/channels/modaLs/channel.find.room.modaL';
+import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
+import './dashboard.css';
 interface Props {
   children: React.ReactNode;
 }
@@ -33,7 +31,6 @@ const Dashboard = ({ children }: Props) => {
   const channeLsettingsHook = ChanneLsettingsHook()
   const userId = Cookies.get('_id')
   const token: any = Cookies.get('token');
-  if (!token || !userId) return;
 
 
   React.useEffect(() => {
@@ -54,6 +51,7 @@ const Dashboard = ({ children }: Props) => {
 
   useEffect(() => {
     if (!token) {
+      toast.error('Please login first > dashboard');
       router.push('/');
     }
     return () => {

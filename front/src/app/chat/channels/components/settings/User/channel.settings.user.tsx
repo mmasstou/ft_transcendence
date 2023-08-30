@@ -31,7 +31,7 @@ import FilterMembers_IsBan_NotLoggedUser from "../../../actions/filterMembers_Is
 import { BiSolidFileFind } from "react-icons/bi";
 import ChanneLSettingsMemberFindModaL from "./channel.settings.user.findmember";
 import Loading from "../CanneLSettingsLoading";
-import SettingsProvider from "../channel.settings.provider";
+import SettingsProvider from "../../../providers/channel.settings.provider";
 import { data } from "autoprefixer";
 
 interface ChanneLUserSettingsProps {

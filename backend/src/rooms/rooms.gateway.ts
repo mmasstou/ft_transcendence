@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -12,7 +7,6 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
 import {
   Members,
   Messages,
@@ -21,21 +15,19 @@ import {
   User,
   UserType,
 } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { JoinStatusEnum } from './types/room.joinStatus';
-import { UserService } from 'src/users/user.service';
-import { RoomsService } from './rooms.service';
-import { MessagesService } from 'src/messages/messages.service';
+import { Server, Socket } from 'socket.io';
 import { MembersService } from 'src/members/members.service';
+import { MessagesService } from 'src/messages/messages.service';
 import { PrismaService } from 'src/prisma.service';
-import { AppService } from 'src/app.service';
+import { clientOnLigne } from 'src/users/user.gateway';
+import { UserService } from 'src/users/user.service';
 import { UserTypeEnum, userType } from 'src/users/user.type';
+import { RoomsService } from './rooms.service';
+import { JoinStatusEnum } from './types/room.joinStatus';
 import {
   UpdateChanneLSendData,
   UpdateChanneLSendEnum,
 } from './types/upatecahnnel';
-import { clientOnLigne } from 'src/users/user.gateway';
-import { trace } from 'console';
 enum updatememberEnum {
   SETADMIN = 'SETADMIN',
   BANMEMBER = 'BANMEMBER',
@@ -92,8 +84,10 @@ export class RoomGateway implements OnGatewayConnection {
 
   async handleConnection(socket: Socket) {
     const User = await this.usersService.getUserInClientSocket(socket);
-    User &&
+    if (User) {
       console.log('Chat-> %s connected with socketId :', User.login, socket.id);
+      this.server.emit('ref', { socketId: socket.id });
+    }
   }
 
   @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_MEMBER_UPDATE}`)
@@ -150,7 +144,7 @@ export class RoomGateway implements OnGatewayConnection {
                 `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
                 { OK: true },
               );
-            }, 10000);
+            }, 60000);
           }
         }
         // kick member :
@@ -355,30 +349,21 @@ export class RoomGateway implements OnGatewayConnection {
       channeLpassword?: string;
     },
   ) {
-    const ResponseEventData: responseEvent = {
-      status: responseEventStatusEnum.SUCCESS,
-      message: responseEventMessageEnum.DELETESUCCESS,
-      data: null,
-    };
     try {
       const { name, type, friends, channeLpassword } = data;
       const LogedUser = await this.usersService.getUserInClientSocket(client);
       if (!LogedUser) throw new Error();
+      // check if name is empty :
+      const isNameEmpty = !name.trim();
+      if (isNameEmpty) throw new Error('name is empty');
       // check if the room name exist :
       const existChanneLname = await this.roomservice.findOneByName({ name });
       if (existChanneLname) {
-        ResponseEventData.status = responseEventStatusEnum.ERROR;
-        ResponseEventData.message = responseEventMessageEnum.CHANNELEXIST;
-        ResponseEventData.data = null;
         // send response to the client that the name exist
-        client.emit(
-          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`,
-          ResponseEventData,
-        );
-        this.server.emit(
-          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-          null,
-        );
+        client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, {
+          OK: false,
+          message: 'the channel name exist',
+        });
       } else {
         // create room :
         // hash password :
@@ -392,28 +377,27 @@ export class RoomGateway implements OnGatewayConnection {
           channeLpassword: hashPassword,
         });
         if (!newRoom) throw new Error();
-        ResponseEventData.status = responseEventStatusEnum.SUCCESS;
-        ResponseEventData.message = responseEventMessageEnum.CHANNELCREATED;
-        ResponseEventData.data = newRoom;
+
         // send response to the client that the name exist
-        client.emit(
-          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`,
-          ResponseEventData,
-        );
+        client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, {
+          OK: true,
+          message: 'Channel created success',
+          data: newRoom,
+        });
       }
       // send message that room is created :
-      this.server.emit(
-        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-        ResponseEventData,
-      );
+      this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+        OK: true,
+      });
     } catch (error) {
-      ResponseEventData.status = responseEventStatusEnum.ERROR;
-      ResponseEventData.message = responseEventMessageEnum.CHANNELEXIST;
-      ResponseEventData.data = null;
-      this.server.emit(
-        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-        ResponseEventData,
-      );
+      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, {
+        OK: false,
+        message: error.message,
+        data: null,
+      });
+      this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+        OK: false,
+      });
     }
   }
 
@@ -577,6 +561,21 @@ export class RoomGateway implements OnGatewayConnection {
       const isClientInRoom = client.rooms.has(data.roomId) || false;
       if (!isClientInRoom && _isMemberInRoom) {
         await client.join(data.id);
+      }
+      // check if member is muted or ban :
+      if (_isMemberInRoom.ismute) {
+        client.emit('sendMessageResponse', {
+          OK: false,
+          message: 'you are muted',
+        });
+        return;
+      }
+      if (_isMemberInRoom.isban) {
+        client.emit('sendMessageResponse', {
+          OK: false,
+          message: 'you are ban',
+        });
+        return;
       }
 
       // console.log('Chat-> responseMemberData- +>', responseMemberData);

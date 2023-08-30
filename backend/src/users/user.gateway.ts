@@ -36,6 +36,27 @@ export class UserGateway implements OnGatewayConnection {
       } else clientOnLigne.set(User.id, [socket]);
       // update user status to online
       await this.usersService.updateUserStatus(User.id, 'online');
+      // (() => {
+      //   clientOnLigne.forEach((sockets, id) => {
+      //     console.log(`Client ID: ${id}`);
+      //     console.log('Socket IDs:');
+      //     sockets.forEach((socket, index) => {
+      //       console.log(`++> ws ${index + 1}: ${socket.id}`);
+      //     });
+      //   });
+      // })();
+
+      for (const [clientId, sockets] of clientOnLigne) {
+        const ClientUserId: User = await this.usersService.findOne({
+          id: clientId,
+        });
+        console.log(`Client ID: ${ClientUserId.login}`);
+
+        // Iterate through each socket in the array
+        for (const socket of sockets) {
+          console.log(`Socket ID: ${socket.id}`);
+        }
+      }
       //   console.log('++handleConnection++clientOnLigne> : %s ->', User.login);
       //   clientOnLigne.get(User.id).forEach((socket) => {
       //     console.log(socket.id);

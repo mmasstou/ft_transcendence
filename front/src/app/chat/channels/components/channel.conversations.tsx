@@ -20,7 +20,7 @@ import getMemberWithId from "../actions/getMemberWithId";
 import ConversationsTitlebar from "./channel.conversations.titlebar";
 import Message from "./channel.message";
 import BanMember from "./channel.settings.banmember";
-
+import { CiVolumeMute } from "react-icons/ci";
 
 export default function Conversations({ socket }: { socket: Socket | null }) {
 
@@ -48,7 +48,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         if (!channeL) return
         setChanneLinfo(channeL)
         const member: membersType | null = await getMemberWithId(__userId, channeLinfo?.id, token)
-        setLogedMember(member);
+        member &&  setLogedMember(member);
     }
     // show this last message in the screan :
 
@@ -61,6 +61,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     }, [messages, socket, InputValue, message])
 
     React.useEffect(() => {
+        if (LogedMember?.userId !== __userId) return
         setTimeout(() => {
             if (InputRef.current) {
                 InputRef.current.focus();
@@ -93,6 +94,13 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                 FocusedOnSendMessageInput()
             }, 500);
         })();
+        socket?.on('sendMessageResponse', (res : {OK : boolean ,message : string }) => {
+            if (!res.OK) {
+                toast.error(res.message)
+                setLoadingMessages(false);
+                return
+            }
+        })
     }, [])
     // // listen to message event and send the incomming message to client
     React.useEffect(() => {
@@ -109,14 +117,15 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
     React.useEffect(() => {
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
-            if (!data) return
+            if (!data.OK) return
             UpdateData();
         });
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
-            if (!data) return
+            if (!data.OK) return
             UpdateData();
         });
     }, [socket])
+
     const OnSubmit = () => {
         const sendMesage = message.trim()
         if (!sendMesage) {
@@ -154,7 +163,19 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
     if (!IsMounted) return null
 
-    return <div className="flex flex-col items-center w-full">
+    return <div className=" relative flex flex-col items-center w-full">
+        
+        {LogedMember?.ismute && <div className=" absolute top-0 left-0 w-full h-[83vh] md:h-[88vh]">
+            <div className="relative flex justify-center items-start h-full w-full bg-[#24323083] z-[48] ">
+            <div className=" absolute w-full h-[83vh] md:h-[88vh] flex justify-center items-center z-[49] ">
+            </div>
+               <div className="flex flex-col">
+               <CiVolumeMute className=" text-secondary" size={120} />
+                {/* <p className="text-white">you Are Muted</p> */}
+               </div>
+            </div>
+        </div>}
+
         {channeLinfo
             ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col sm:flex`}>
                 <ConversationsTitlebar
@@ -165,7 +186,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                     OnSubmit={function (event: React.FormEvent<HTMLInputElement>): void { }}
                 />
                 {!LogedMember?.isban ?
-                    <div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5">
+
+                    <div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5 ">
                         <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll flex flex-col gap-3" >
                             {
                                 !LoadingMessages ? messages && messages.length ?
@@ -181,7 +203,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                     : <div>Loading geting OLd messages ...</div>
                             }
                         </div>
-                        <div className="w-full relative px-6">
+                        {<div className="w-full relative px-6">
 
                             {SendingMessage && <div className=" text-secondary text-[10px] capitalize absolute -top-4 left-4 bg-[#161F1E] ">sending ....</div>}
                             <div className="ConversationsInput w-full h-[54px] bg-[#24323044] text-[#ffffff]  text-[16px]  rounded-[12px] flex justify-end items-center">
@@ -189,7 +211,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                     ref={InputRef}
                                     onFocus={() => setIsInputFocused(true)}
                                     onBlur={() => setIsInputFocused(false)}
-                                    disabled={SendingMessage}
+                                    disabled={SendingMessage || LogedMember?.ismute}
                                     className="focus:outline-none placeholder:text-[#b6b6b6e3] placeholder:text-base placeholder:font-thin w-full py-1 px-4 bg-transparent"
                                     onSubmit={(event: any) => {
                                         setMessage(event.target.value);
@@ -206,7 +228,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                         setMessage(event.target.value);
                                     }}
                                     value={InputValue}
-                                    placeholder={`Message to @${channeLinfo.name}`}
+                                    placeholder={`${ !LogedMember?.ismute ? `Message to @${channeLinfo.name}` : 'you  dont have permission to send message in this channel'}`}
                                     type="search"
                                     name=""
                                     id="" />
@@ -216,6 +238,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                 </div>}
                             </div>
                         </div>
+                        
+                            }
                     </div>
                     : <BanMember LogedMember={LogedMember} User={undefined} room={channeLinfo} />
                 }

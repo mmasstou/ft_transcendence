@@ -37,7 +37,7 @@ import { PiPasswordBold } from 'react-icons/pi';
 import toast from 'react-hot-toast';
 import FindOneBySLug from '../../../actions/Channel/findOneBySlug';
 import ChanneLsettingsIndex from './channel.settings.channel.Index';
-import SettingsProvider from '../channel.settings.provider';
+import SettingsProvider from '../../../providers/channel.settings.provider';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
