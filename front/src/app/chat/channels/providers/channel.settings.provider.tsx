@@ -11,7 +11,7 @@ import { ChanneLContext } from "./channel.provider";
 export const ChanneLsettingsContext = createContext({});
 interface props {
     children: React.ReactNode;
-    socket: Socket | null;
+    socket?: Socket | null;
     OnBack?: () => void;
     label?: string;
     channeLId?: string;
