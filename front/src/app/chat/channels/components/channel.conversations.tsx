@@ -45,20 +45,21 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
     const ChanneLContextee: any = React.useContext(ChanneLContext)
     // if (!IsMounted) console.log('Conversations ChanneLContextee', ChanneLContextee.ChanneLdata.channeLInfo)
-    const UpdateData = async () => {
+    const UpdateData = () => {
         // get logged member :
-        if (!channeLinfo) return
-        const channeL: RoomsType | null = await FindOneBySLug(slug, token)
-        if (!channeL) {
-            toast.error('no channeL')
-            return
-        }
-        setChanneLinfo(channeL)
-        const member: membersType | null = await getMemberWithId(__userId, channeL?.id, token)
-        if (member) {
-            toast.success(`member updated ${member.id}`);
-            setLogedMember(member);
-        }
+        (async () => {
+            const channeL: RoomsType | null = await FindOneBySLug(slug, token)
+            if (!channeL) {
+                toast.error('no channeL')
+                return
+            }
+            setChanneLinfo(channeL)
+            const member: membersType | null = await getMemberWithId(__userId, channeL?.id, token)
+            if (member) {
+                toast.success(`member updated ${member.id}`);
+                setLogedMember(member);
+            }
+        })();
     }
     // show this last message in the screan :
 

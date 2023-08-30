@@ -264,7 +264,7 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
             }} />
     }
 
-    return <SettingsProvider socket={socket} >
+    return <SettingsProvider  >
         {bodyContent}
     </SettingsProvider>
 }

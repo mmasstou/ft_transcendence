@@ -94,7 +94,6 @@ export default function ChanneLsettingsPlayGame(
     }, [socket]);
 
     return <SettingsProvider
-        socket={socket}
     >
         <div className=" flex flex-row items-center justify-start gap-3">
             {<Button

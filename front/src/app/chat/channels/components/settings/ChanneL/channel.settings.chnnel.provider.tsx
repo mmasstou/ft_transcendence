@@ -63,7 +63,7 @@ export default function ChanneLsettingsProvider(props: props) {
     }, [props.socket])
 
     if (!IsMounted) return;
-    return <SettingsProvider socket={null}>
+    return <SettingsProvider>
         {LoggedMember?.type === UserTypeEnum.OWNER
             ? <div className="flex flex-col justify-start">
                 <div className=" flex flex-row items-center justify-start gap-3">
