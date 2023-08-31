@@ -108,15 +108,4 @@ export class UserService {
       where: { id },
     });
   }
-
-  async getUserDirectMessages(userId: string) {
-    // Add your logic to fetch the direct messages for the user from the database or any other source
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        directMessage: true,
-      },
-    });
-    return user;
-  }
 }
