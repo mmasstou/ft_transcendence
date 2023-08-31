@@ -63,7 +63,7 @@ const HistoriqueCard: React.FC<Props> = (game) => {
   }, []);
 
   return (
-    <div className="bg-[#3E504D]  w-full flex justify-between items-center py-2 px-3 lg:py-3 lg:px-4 rounded-md">
+    <div className="bg-[#3E504D] w-full flex justify-between items-center py-2 px-3 lg:py-3 lg:px-4 rounded-md">
       <div className="flex flex-col overflow-hidden items-center justify-center">
         <div className="h-10 w-10 md:h-12 md:w-12 xl:h-16 xl:w-16">
           <MyAvatar />
@@ -75,8 +75,13 @@ const HistoriqueCard: React.FC<Props> = (game) => {
 
       <div className="flex items-center cursor-default text-sm xl:text-xl tracking-widest">
         <div
-          className={`p-2 lg:p-3 bg-transparent text-secondary flex justify-center gap-1 xl:gap-2 items-center border rounded-2xl border-secondary 
-                `}
+          className={`p-2 lg:p-3 bg-transparent border ${
+            game.game.plyerScore > game.game.oponentScore
+              ? 'text-secondary border-secondary'
+              : game.game.plyerScore < game.game.oponentScore
+              ? 'text-red-500 border-red-500'
+              : 'text-yellow-500 border-yellow-500'
+          } flex justify-center gap-1 xl:gap-2 items-center rounded-2xl`}
         >
           <span className="font-semibold">{game.game.plyerScore}</span>{' '}
           <span className="font-semibold">VS</span>{' '}
