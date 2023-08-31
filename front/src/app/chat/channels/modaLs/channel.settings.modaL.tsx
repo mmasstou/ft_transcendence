@@ -1,40 +1,26 @@
 "use client"
-import ContactHook from "@/hooks/contactHook"
-import { TiArrowMinimise } from "react-icons/ti"
-import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler, useFieldArray, set } from "react-hook-form"
-import React, { MouseEvent, useEffect, useState } from "react"
-import { RoomsType, UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types"
+import { RoomsType, membersType, updatememberEnum, userType } from "@/types/types"
 import Cookies from "js-cookie"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
+import React, { useEffect, useState } from "react"
+import { FieldValues, useForm } from "react-hook-form"
 
 
-import ChanneLModal from "./channel.modal"
-import Select from "../../components/Select"
-import ChanneLcreatemodaLHook from "../hooks/channel.create.hook"
-import ChanneLmodaLheader from "../components/channel.modal.header"
-import Input from "@/components/Input"
-import getUserWithId from "../actions/getUserWithId"
 import Button from "../../components/Button"
+import getUserWithId from "../actions/getUserWithId"
+import ChanneLModal from "./channel.modal"
 
-import ChanneLsettingsHook from "../hooks/channel.settings"
-import getMemberWithId from "../actions/getMemberWithId"
-import { GoEyeClosed } from "react-icons/go"
-import { HiLockClosed, HiLockOpen } from "react-icons/hi"
-import { GrUserSettings } from "react-icons/gr"
-import { RiChatSettingsLine } from "react-icons/ri"
+import toast from "react-hot-toast"
 import { FaUsersCog } from "react-icons/fa"
-import Image from "next/image"
-import { TbInfoSquareRoundedFilled, TbUserPlus } from "react-icons/tb"
-import getChannelWithId from "../actions/getChannelWithId"
-import ChanneLChatSettings from "../components/settings/ChanneL/channel.settings.channel"
-import ChanneLSettingsInfo from "../components/settings/channel.settings.info"
+import { RiChatSettingsLine } from "react-icons/ri"
 import FindOneBySLug from "../actions/Channel/findOneBySlug"
+import getChannelMembersWithId from "../actions/getChannelmembers"
+import getMemberWithId from "../actions/getMemberWithId"
+import ChanneLChatSettings from "../components/settings/ChanneL/channel.settings.channel"
 import ChanneLUserSettings from "../components/settings/User/channel.settings.user"
 import ChannelSettingsUserMemberItem from "../components/settings/User/channel.settings.user.memberItem"
-import SettingsProvider from "../providers/channel.settings.provider"
-import getChannelMembersWithId from "../actions/getChannelmembers"
 import ChanneLConfirmActionHook from "../hooks/channel.confirm.action"
-import toast from "react-hot-toast"
+import ChanneLsettingsHook from "../hooks/channel.settings"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',
@@ -119,7 +105,13 @@ const ChanneLSettingsModaL = () => {
                 route.refresh();
             }
         );
-    }, [socket])
+        return () => {
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`)
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`)
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_DELETE}`)
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`)
+        }
+    }, [])
 
     useEffect(() => {
         (async () => {

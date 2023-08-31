@@ -27,9 +27,9 @@ import ChannelConversationsMute from "./channel.conversations.mute";
 
 const token: string | undefined = Cookies.get('token')
 const UserId: string | undefined = Cookies.get('_id')
-export default function Conversations({ socket }: { socket: Socket | null, slug: string }) {
-    const query = useParams();
-    const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
+export default function Conversations({ socket, slug }: { socket: Socket | null, slug: string }) {
+    // const query = useParams();
+    // const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
     const chatContainerRef = React.useRef<HTMLDivElement | null>(null);
     const [IsMounted, setIsMounted] = React.useState(false)
     const [messages, setMessages] = React.useState<messagesType[]>([])

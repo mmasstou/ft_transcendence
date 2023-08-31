@@ -19,10 +19,7 @@ export default function ChanneLSettingsItem(
     }: ChanneLSettingsOptionItemProps
 ) {
     return <button
-    onClick={() => {
-        console.log(`ChanneLSettingsOptionItem : ${label}`)
-        onClick()
-    }}
+    onClick={onClick}
     className={`flex flex-row justify-between items-center shadow p-2 rounded border
     ${color ? 'hover:border-'+ color : 'hover:border-secondary'}  
     ${IsActive ? ' border-IsActive' : 'border-transparent'}

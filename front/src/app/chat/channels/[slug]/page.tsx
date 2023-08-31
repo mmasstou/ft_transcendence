@@ -38,7 +38,7 @@ export default function page({ params }: { params: { slug: string } }) {
 
     React.useEffect(() => {
         if (!token || !userId) return router.push('/');
-        if (params.slug !== undefined) return router.push('/chat/channels/');
+        if (!params.slug) return;
 
         setSocket(ChanneLContextee.socket);
 

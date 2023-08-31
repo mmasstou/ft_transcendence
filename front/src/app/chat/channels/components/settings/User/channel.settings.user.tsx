@@ -1,38 +1,23 @@
-import React, { useEffect } from "react";
-import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 import { RoomsType, USERSETTINGSTEPS, UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types";
-import ChanneLsettingsHook from "../../../hooks/channel.settings";
 import Cookies from "js-cookie";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Socket } from "socket.io-client";
-import getUserWithId from "../../../actions/getUserWithId";
-import getMemberWithId from "../../../actions/getMemberWithId";
-import Image from "next/image";
-import ChanneLUserSettingsModaL from "../../../modaLs/channel.user.settings.modal";
-import Button from "../../../../components/Button";
-import { TbUserPlus } from "react-icons/tb";
-import ChanneLSettingsMemberJoinModaL from "./channel.settings.user.addmember";
-import { IoChevronBackOutline } from "react-icons/io5";
-import { BsArrowRightShort } from "react-icons/bs";
-import { MdOutlineScoreboard } from "react-icons/md";
-import { TfiTimer } from "react-icons/tfi";
-import ChanneLConfirmActionBtn from "../channel.confirm.action.Btn";
-import ChanneLConfirmActionHook from "../../../hooks/channel.confirm.action";
-import getmessage from "../../../actions/member.action.message";
-import axios from "axios";
-import { toast } from "react-hot-toast";
-import StartGame from "../../../actions/startgame";
-import ChanneLsettingsPlayGame from "./channel.settings.playgame";
-import { steps } from "framer-motion";
-import getLable from "../../../actions/getLable";
-import { tr } from "date-fns/esm/locale";
-import { set } from "date-fns";
-import FilterMembers_IsBan_NotLoggedUser from "../../../actions/filterMembers_IsBan_NotLoggedUser";
+import React from "react";
 import { BiSolidFileFind } from "react-icons/bi";
-import ChanneLSettingsMemberFindModaL from "./channel.settings.user.findmember";
-import Loading from "../CanneLSettingsLoading";
+import { TbUserPlus } from "react-icons/tb";
+import { Socket } from "socket.io-client";
+import Button from "../../../../components/Button";
+import FilterMembers_IsBan_NotLoggedUser from "../../../actions/filterMembers_IsBan_NotLoggedUser";
+import getLable from "../../../actions/getLable";
+import getMemberWithId from "../../../actions/getMemberWithId";
+import getmessage from "../../../actions/member.action.message";
+import StartGame from "../../../actions/startgame";
+import ChanneLConfirmActionHook from "../../../hooks/channel.confirm.action";
+import ChanneLsettingsHook from "../../../hooks/channel.settings";
 import SettingsProvider from "../../../providers/channel.settings.provider";
-import { data } from "autoprefixer";
+import ChanneLsettingsPlayGame from "./channel.settings.playgame";
+import ChanneLSettingsMemberJoinModaL from "./channel.settings.user.addmember";
+import ChanneLSettingsMemberFindModaL from "./channel.settings.user.findmember";
+import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 
 interface ChanneLUserSettingsProps {
     room: RoomsType | null;
@@ -44,18 +29,12 @@ interface ChanneLUserSettingsProps {
 
 
 export default function ChanneLUserSettings({ socket, member, User, room }: ChanneLUserSettingsProps) {
-
-    const query = useParams();
-    const slug: string = typeof query.slug === 'string' ? query.slug : '';
     const [IsMounted, setIsMounted] = React.useState(false)
     const [members, setMembers] = React.useState<membersType[]>([])
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
     const [step, setStep] = React.useState<USERSETTINGSTEPS>(USERSETTINGSTEPS.INDEX)
     const [PlayGameWith, setPlayGameWith] = React.useState<membersType | null>(null)
     const channeLConfirmActionHook = ChanneLConfirmActionHook()
-    const [update, setUpdate] = React.useState<boolean>(false)
-    const channeLsettingsHook = ChanneLsettingsHook()
-    const params = useSearchParams()
     const UserId = Cookies.get('_id')
     const router = useRouter()
     const token: any = Cookies.get('token');
@@ -90,13 +69,6 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
             (response: { OK: boolean }) => {
                 channeLConfirmActionHook.onClose()
                 if (response.OK) {
-                    // (async () => {
-                    //     const channeLLMembers = await FilterMembers_IsBan_NotLoggedUser(room.id, token, UserId)
-                    //     if (channeLLMembers) setMembers(channeLLMembers)
-                    //     const channeLLMember = await getMemberWithId(UserId, room.id, token)
-                    //     if (!channeLLMember) return;
-                    //     setLogedMember(channeLLMember)
-                    // })();
                     UpdateData()
                 }
                 if (!response.OK) { }
@@ -119,13 +91,6 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
                     player2Id: LogedMember?.userId,
                     mode: "time"
                 }
-                // await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/game/BotGame`, body).then((result) => {
-                //     console.log("await axios.post(`${process.env.NEXT_PUBLIC :", result)
-                //     router.push('/game/score/robot')
-                // }).catch(() => {
-                //     toast.error("error")
-                // })
-
                 const token: any = Cookies.get('token');
                 if (!token) return;
                 const g = await StartGame(body, token);
@@ -134,12 +99,17 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
             })();
         })
 
+        return () => {
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`)
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`)
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`)
+            socket?.off('GameNotificationResponse')
+        }
 
-    }, [socket])
+    }, [])
 
 
     const handlOnclick = (data: { updateType?: updatememberEnum, member: membersType }) => {
-        console.log("ana hanananananan")
         if (!data) return;
         if (data.updateType === "PLAYGAME") {
             setStep(USERSETTINGSTEPS.PLAYGAME)
@@ -151,8 +121,6 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
         }
         // handlOnclick(data)
         const __message = data.updateType ? getmessage(data.updateType) : ''
-        console.log("const __message = getmessage(data.updateType) :", __message)
-        console.log("const __message = getmessage(data.updateType) :", data.updateType)
         __message && channeLConfirmActionHook.onOpen(
             <button
                 onClick={() => {
@@ -165,33 +133,8 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
         )
     }
 
-    const updatemembers = (itemId: string, updateMemberData: membersType) => {
-        console.log("members :", members)
-        console.log("updateMemberData :", updateMemberData)
-        console.log("itemId :", itemId)
-        members && toast(members?.length.toString())
-        let found: boolean = false;
-        const updatedItems = members && members.map(item => {
-            if (item.id === itemId) {
-                found = true;
-                return { ...updateMemberData }
-            }
-            else return item
-        }
-        );
-        if (updatedItems && !found) setMembers([...members, updateMemberData]);
-        else setMembers(updatedItems);
-        updatedItems && toast(updatedItems?.length.toString())
-
-    };
-
-    if (!IsMounted)
-        return (<div className="Members flex p-4">
-            <div className="flex flex-row items-center p-1 gap-1">
-                <h3 className="text-base font-light text-[#FFFFFF]">Loading...</h3>
-            </div>
-        </div>)
-
+    if (!IsMounted) return null;
+        
     let bodyContent = (
         <>
             <div className="flex flex-row justify-end items-center gap-2">
