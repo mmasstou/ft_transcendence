@@ -31,11 +31,11 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('friends/all')
+  @Get('sendingrequests/all')
   async getFriends(@Req() request: Request) {
     const User: any = request.user;
     const id: any = User.id;
-    return await this.usersService.getFriends(id);
+    return await this.usersService.getAllSendingRequests(id);
   }
 
   @UseGuards(JwtAuthGuard)

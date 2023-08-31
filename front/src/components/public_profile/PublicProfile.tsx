@@ -8,6 +8,7 @@ import { BiUserPlus, BiUserX } from 'react-icons/bi';
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
+import { MdPendingActions } from 'react-icons/md';
 
 interface ProfileProps {
   user: userType | null;
@@ -22,6 +23,35 @@ interface ButtonProps {
 
 const Button: React.FC<ButtonProps> = ({ text, user, isFriend }) => {
   const token = Cookies.get('token');
+  const [isPending, setIsPending] = useState<boolean>(false);
+  const [isSent, setIsSent] = useState<boolean>(false);
+  const [pending, setPending] = useState<any>([]);
+  const [isRemoved, setIsRemoved] = useState<boolean>(false);
+
+  useEffect(() => {
+    const token = Cookies.get('token');
+    try {
+      (async () => {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/sendingrequests/all`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setPending(data);
+        }
+      })();
+    } catch (error) {
+      console.log('error in get pending request: ', error);
+    }
+  }, [isSent]);
+
   const sendFriendRequest = async () => {
     const PostData = {
       receiverId: user?.id,
@@ -39,6 +69,9 @@ const Button: React.FC<ButtonProps> = ({ text, user, isFriend }) => {
             body: JSON.stringify(PostData),
           }
         );
+        if (response.ok) {
+          setIsSent(true);
+        }
       } catch (err: any) {
         console.log(err.message);
       }
@@ -61,6 +94,9 @@ const Button: React.FC<ButtonProps> = ({ text, user, isFriend }) => {
           body: JSON.stringify(PostData),
         }
       );
+      if (response.ok) {
+        setIsRemoved(true);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -73,6 +109,14 @@ const Button: React.FC<ButtonProps> = ({ text, user, isFriend }) => {
       removeFrined();
     }
   };
+
+  useEffect(() => {
+    if (pending.length > 0) {
+      setIsPending(true);
+    }
+  }, [pending]);
+
+  console.log('pending: ', pending);
 
   return (
     <>
@@ -87,11 +131,26 @@ const Button: React.FC<ButtonProps> = ({ text, user, isFriend }) => {
       ) : (
         <button
           onClick={handleFriendRequest}
+          disabled={isPending}
           className="flex justify-evenly items-center border-2 border-[#D9D9D9] rounded-full
      p-2 text-[#D9D9D9] hover:opacity-70 w-[10rem]"
         >
-          {isFriend ? <BiUserX /> : <BiUserPlus />}
-          <span>{text}</span>
+          {isPending ? (
+            <>
+              <MdPendingActions />
+              <span>Pending Request</span>
+            </>
+          ) : isFriend && !isRemoved ? (
+            <>
+              <BiUserX />
+              <span>Remove Friend</span>
+            </>
+          ) : (
+            <>
+              <BiUserPlus />
+              <span>Add Friend</span>
+            </>
+          )}
         </button>
       )}
     </>

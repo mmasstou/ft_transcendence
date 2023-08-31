@@ -243,7 +243,7 @@ export class UserService {
     }
   }
 
-  // get all friends
+  // get all accepted friends
   async getFriends(userId: string) {
     try {
       const friends = await this.prisma.friendship.findMany({
@@ -270,6 +270,21 @@ export class UserService {
     }
   }
 
+  async getAllSendingRequests(userId: string) {
+    try {
+      const friends = await this.prisma.friendship.findMany({
+        where: {
+          userId: userId,
+          status: 'PENDING',
+        },
+      });
+      if (!friends) throw new NotFoundException();
+      return friends;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async getFriend(id: string) {
     try {
       const friend = await this.prisma.friendship.findUnique({
@@ -278,7 +293,7 @@ export class UserService {
       if (!friend) throw new NotFoundException();
       return friend;
     } catch (error) {
-      console.log('++getFriend++error>>>>: ', error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
