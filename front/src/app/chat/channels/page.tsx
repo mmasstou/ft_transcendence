@@ -1,35 +1,21 @@
 "use client";
 // imports  :
-import React from 'react'
-import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { Socket, io } from 'socket.io-client';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
+import React from 'react';
+import { Socket, io } from 'socket.io-client';
 // components :
-import Dashboard from '@/app/Dashboard';
-import Button from '../components/Button';
-import ChatNavbarLink from '../components/chat.navbar.link';
-import LefttsideModaL from './modaLs/LeftsideModal';
 import ChanneLSidebarItem from './components/channel.sidebar.item';
+import LefttsideModaL from './modaLs/LeftsideModal';
 // hooks :
 import LeftSidebarHook from './hooks/LeftSidebarHook';
-import ChanneLcreatemodaLHook from './hooks/channel.create.hook';
 import RightsidebarHook from './hooks/RightSidebarHook';
-import ChanneLFindRoommodaLHook from './hooks/channel.find.room.hook';
 // helpers :
 import getChannels from './actions/getChanneLs';
 // icons :
-import { HiChatBubbleLeftRight } from 'react-icons/hi2';
-import { FaUsers } from 'react-icons/fa';
-import { RiSearchLine } from 'react-icons/ri';
-import { BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs';
-import { FiUsers } from 'react-icons/fi';
-import { AiOutlineUsergroupAdd } from 'react-icons/ai';
 // types :
 import { RoomsType } from '@/types/types';
-import InitSocket from './actions/InitSocket';
-import FindOneBySLug from './actions/Channel/findOneBySlug';
-import { toast } from 'react-hot-toast';
 
 export default function page() {
   const [IsMounted, setIsMounted] = React.useState(false)
@@ -89,7 +75,7 @@ export default function page() {
       <LefttsideModaL>
         {
           ChanneLs && ChanneLs.map((room: RoomsType, key) => (
-            <ChanneLSidebarItem key={key} room={room} viewd={8} active={room.slug === slug} />
+            <ChanneLSidebarItem key={key} room={room}  active={room.slug === slug} />
           ))
         }
       </LefttsideModaL>

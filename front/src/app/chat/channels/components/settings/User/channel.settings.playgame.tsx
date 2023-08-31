@@ -1,24 +1,20 @@
-import Button from "../../../../components/Button";
-import Image from "next/image"
-import StartGame from "../../../actions/startgame";
+import { userType } from "@/types/types";
 import Cookies from "js-cookie";
-import toast from "react-hot-toast";
-import { IoChevronBackOutline } from "react-icons/io5";
-import { TfiTimer } from "react-icons/tfi";
-import { BsArrowRightShort } from "react-icons/bs";
-import { MdOutlineScoreboard } from "react-icons/md";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { USERSETTINGSTEPS, membersType, userType } from "@/types/types";
 import React from "react";
+import toast from "react-hot-toast";
+import { BsArrowRightShort } from "react-icons/bs";
+import { IoChevronBackOutline } from "react-icons/io5";
+import { MdOutlineScoreboard } from "react-icons/md";
+import { TfiTimer } from "react-icons/tfi";
 import { Socket } from "socket.io-client";
+import Button from "../../../../components/Button";
 import getUserWithId from "../../../actions/getUserWithId";
-import { set } from "date-fns";
-import ChanneLSettingsBody from "../channel.settings.body";
-import ChanneLsettingsProvider from "../ChanneL/channel.settings.chnnel.provider";
-import SettingsProvider from "../channel.settings.provider";
-import Loading from "../../loading";
+import StartGame from "../../../actions/startgame";
 import ChanneLsettingsHook from "../../../hooks/channel.settings";
+import SettingsProvider from "../../../providers/channel.settings.provider";
+import Loading from "../../loading";
 interface props {
     onClick: (data: any) => void;
     Onback: () => void;
@@ -74,7 +70,6 @@ export default function ChanneLsettingsPlayGame(
             setLoadingGame(false)
         })
         socket?.on('GameResponse', (data: any) => {
-            toast(`sdjghdsffdsfhdsfjdhgfjfgdh`);
             (async () => {
                 if (!token) return;
                 const body = {       ///////////////////////////////////////////////////////// body
@@ -84,7 +79,6 @@ export default function ChanneLsettingsPlayGame(
                 }
                 const g = await StartGame(body, token);
                 if (!g) return;
-                toast(`satart game`);
                 channeLsettingsHook.onClose()
                 router.push(`/game/${data.mode}/friend`)
             })();
@@ -94,7 +88,6 @@ export default function ChanneLsettingsPlayGame(
     }, [socket]);
 
     return <SettingsProvider
-        socket={socket}
     >
         <div className=" flex flex-row items-center justify-start gap-3">
             {<Button
@@ -132,7 +125,7 @@ export default function ChanneLsettingsPlayGame(
                                 })();
                             }
                             else {
-                                toast(`${PLayer01?.login} is On Game`)
+                                toast(`${PLayer01?.login} is On ${PLayer01?.status} }`)
                             }
                         }}
                         className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-[#FFCC00] hover:border">
@@ -160,7 +153,7 @@ export default function ChanneLsettingsPlayGame(
                                 })();
                             }
                             else {
-                                toast(`${PLayer01?.login} is On Game`)
+                                toast(`${PLayer01?.login} is On ${PLayer01?.status} }`)
                             }
                         }}
                         className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-secondary hover:border">

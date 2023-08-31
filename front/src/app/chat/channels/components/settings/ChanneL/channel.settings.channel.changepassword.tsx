@@ -114,7 +114,6 @@ export default function ChanneLSettingsChanneLChangePassword(
     useEffect(() => {
 
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`, (data) => {
-            toast('RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD')
             if (!data) return
             if (data.OK) {
                 OnBack();

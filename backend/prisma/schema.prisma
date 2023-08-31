@@ -136,6 +136,7 @@ model Members {
   type       UserType @default(USER)
   userId     String
   roomsId    String?
+  timeout    String?
   isban      Boolean   @default(false)
   ismute     Boolean   @default(false)
   mute_at    DateTime?
