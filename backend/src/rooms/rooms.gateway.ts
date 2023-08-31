@@ -848,23 +848,28 @@ export class RoomGateway implements OnGatewayConnection {
       });
 
       if (UserTOSendTo) {
-        const ListSocket = clientOnLigne.get(UserTOSendTo.id);
-
-        if (ListSocket) {
-          ListSocket.forEach((socket) => {
-            socket.emit('GameNotificationResponse', {
-              message: `wants to play ${data.mode} mode game with you`,
-              sender: snderUser,
-              senderSocketId: client.id,
-              mode: data.mode,
+        if (UserTOSendTo.status !== "online")
+          client.emit('UserSendToStatus', UserTOSendTo);
+        else {
+          const ListSocket = clientOnLigne.get(UserTOSendTo.id);
+  
+          if (ListSocket) {
+            ListSocket.forEach((socket) => {
+              socket.emit('GameNotificationResponse', {
+                message: `wants to play ${data.mode} mode game with you`,
+                sender: snderUser,
+                senderSocketId: client.id,
+                mode: data.mode,
+              });
             });
-          });
+          }
         }
       }
     } catch (error) {
       console.log('Chat-sendGameNotification> error- +>', error);
     }
   }
+
 
   @SubscribeMessage('GameResponseToChat')
   async GameResponseToChat(

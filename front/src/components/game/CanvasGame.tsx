@@ -427,11 +427,21 @@ function pongFunc(divRef: RefObject<HTMLDivElement>, router: any) {
               setLeaveGame(true);
             }
         })
-        //ballObj: any, socket: Socket, Table_obj: any, canvasSize: any, setPlayer2: any, isReady: any, canvas: any
         ballSocket.on('setBall', (ball: any) => {
           if (!Status && isReady)
           setBallObj(ball);
         })
+      }
+      return () => {
+        socket && socket.off('joinRoomGame');
+        socket && socket.off('ready');
+        socket && socket.off('setPlayer1');
+        socket && socket.off('setPlayer2');
+        socket && socket.off('setStatus');
+        socket && socket.off('setScore1');
+        socket && socket.off('setScore2');
+        socket && socket.off('leaveGame');
+        ballSocket && ballSocket.off('joinRoomBall');
       }
     }, [isMounted, isReady, Status, Table_obj])
 
@@ -456,6 +466,11 @@ function pongFunc(divRef: RefObject<HTMLDivElement>, router: any) {
           else
             setYouLose(true);
         })
+      }
+      return () => {
+        socket && socket.off('timer');
+        socket && socket.off('GameOver');
+        ballSocket && ballSocket.off('timer');
       }
     }, [isReady, Status])
     
