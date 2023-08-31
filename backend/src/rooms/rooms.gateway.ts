@@ -128,6 +128,7 @@ export class RoomGateway implements OnGatewayConnection {
         // mute member :
         if (data.updateType === updatememberEnum.MUTEMEMBER) {
           const __isMute: boolean = __member.ismute === true ? false : true;
+          const TimeToMute = parseInt(process.env.TIME_TO_MUTE, 10) * 1000;
           const timeOnMute: any = new Date();
           timeOnMute.setMinutes(
             timeOnMute.getMinutes() + process.env.TIME_TO_MUTE,
@@ -145,16 +146,14 @@ export class RoomGateway implements OnGatewayConnection {
           //   clearTimeout(parseInt(member.timeout, 10));
           // }
           if (TimeOutList.has(data.member.id)) {
-            console.log('Chat-> TimeOutList- +>', TimeOutList);
             const tt = TimeOutList.get(data.member.id);
             clearTimeout(tt);
             TimeOutList.delete(data.member.id);
           }
           if (member.ismute) {
             time = setTimeout(async () => {
-              console.log('Chat-> time- +1>');
               // const member = (async () => {
-              const member = await this.prisma.members.update({
+              await this.prisma.members.update({
                 where: { id: data.member.id },
                 data: { ismute: false },
               });
@@ -163,8 +162,7 @@ export class RoomGateway implements OnGatewayConnection {
                 `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
                 { OK: true },
               );
-            }, 10000);
-            console.log('Chat-> time- +2> :', time);
+            }, TimeToMute);
             if (time) {
               TimeOutList.set(data.member.id, time);
               time = null;
@@ -177,7 +175,6 @@ export class RoomGateway implements OnGatewayConnection {
             // });
           }
           if (!member.ismute) {
-            console.log('Chat-> time- +3>');
             clearTimeout(time);
           }
         }

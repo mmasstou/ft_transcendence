@@ -65,7 +65,6 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             setMembers(channeLLMembers.filter((member: membersType) => member.userId !== __userId))
             const channeLLMember: membersType = __userId && await getMemberWithId(__userId, ChanneLinfo.id, token)
             if (!channeLLMember) return;
-            toast(channeLLMember.type)
             setLogedMember(channeLLMember)
 
         })();

@@ -19,19 +19,11 @@ export class AppService {
       payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      // console.log('Chat-> handleSocketConnection +> :', payload.login);
       return true;
       // console server socket id :
     } catch {
       console.log('Chat-handleSocketConnection> error- 2+>', error);
       return false;
     }
-    // Perform any necessary validation or authorization checks with the token
-    // ...
-
-    // Proceed with the connection handling
-    // ...
   }
 }

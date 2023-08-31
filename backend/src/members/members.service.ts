@@ -1,14 +1,10 @@
 import {
   BadRequestException,
-  HttpException,
-  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Members, Prisma, UserType } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-import { RoomsService } from 'src/rooms/rooms.service';
-import { UserService } from 'src/users/user.service';
 
 @Injectable()
 export class MembersService {
@@ -20,7 +16,6 @@ export class MembersService {
   }): Promise<Members | null> {
     try {
       const { userId, roomId } = params;
-      // console.log('++findOne||++>', id);
       const response = await this.prisma.members.findFirst({
         where: {
           userId,
@@ -39,8 +34,6 @@ export class MembersService {
   }
 
   async findALLForRoom(roomId: string): Promise<Members[]> {
-    // console.log('++findALLForRoom++>', roomId);
-
     return this.prisma.members.findMany({
       where: {
         RoomId: { id: roomId },
@@ -84,7 +77,6 @@ export class MembersService {
   }): Promise<Members | null> {
     try {
       const { id, type, isban, ismute } = params;
-      // console.log('++update++>', id);
 
       const oLdMember = await this.prisma.members.findUnique({
         where: { id },
@@ -103,8 +95,6 @@ export class MembersService {
   }
 
   async remove(id: string): Promise<Members> {
-    // console.log('++remove++>', id);
-
     return await this.prisma.members.delete({
       where: { id },
     });

@@ -55,7 +55,6 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
                 }
             }
             setUser(User);
-            toast(slug === undefined ? 'undefined' : slug)
             const channeL = await UpdateData();
             channeL && ChatSocket?.emit('accessToroom', channeL);
         })();
@@ -82,14 +81,12 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
             (data: { OK: true, message?: string }) => {
                 if (!data.OK) return
-                toast.success('member updated');
                 UpdateData();
             });
         ChatSocket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
             (data: { OK: true, message?: string }) => {
                 if (!data.OK) return
-                toast.success('member updated');
                 UpdateData();
             });
     }, [ChatSocket])

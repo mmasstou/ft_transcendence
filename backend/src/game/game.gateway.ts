@@ -11,7 +11,7 @@ import { error } from 'console';
 import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/users/user.service';
 import { v4 as uuidv4 } from 'uuid';
-import { TableObj, UniqueSet, UserMap, TableMap, random_obj} from './types';
+import { TableObj, UniqueSet, UserMap, TableMap, random_obj } from './types';
 import { JwtPayload } from '../auth/strategies/jwt.strategy';
 import { GameService } from './game.service';
 
@@ -670,7 +670,7 @@ class MyGateway implements OnGatewayConnection {
   }
   @SubscribeMessage('deletePlayer')
   async DeletePlayer(client: Socket) {
-    let type: string = '';
+    let type: string;
     if (UserMap.get(client.handshake.auth.UserId)) {
       const tableId = UserMap.get(client.handshake.auth.UserId).TableId;
       if (
