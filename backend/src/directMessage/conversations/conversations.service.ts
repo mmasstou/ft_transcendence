@@ -6,7 +6,11 @@ export class ConversationsService {
   constructor(private prismaService: PrismaService) {}
 
   async findAllConv() {
-    return await this.prismaService.conversation.findMany();
+    return await this.prismaService.conversation.findMany({
+      include: {
+        users: true,
+      }
+    });
   }
 
   async findConversation(criteria) {

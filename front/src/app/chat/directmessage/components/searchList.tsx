@@ -13,7 +13,7 @@ import CustumBtn from './custumBtn';
 const token = Cookies.get('token');
 const currentId = Cookies.get('_id');
 
-function SearchList({ setConvCreation, users }) {
+function SearchList({ setConversation, setConvCreation, users }) {
 
 	const [list, setList] = useState([]);
 	const [searchedLogin, setLogin] = useState<string>('');
@@ -56,9 +56,23 @@ function SearchList({ setConvCreation, users }) {
 		updateConvCreation();
 	}
 
-	const openConversation = (user) => {
+	async function openConversation (user) {
 		console.log(`Open Conversation between ${user.id} : ${currentId}`);
 		updateConvCreation();
+		const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations/single`,  {
+			method: 'POST',
+			headers: {
+			  'Content-Type': 'application/json',
+			  Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({usersId: [currentId, user.id]})
+		});
+
+		const res = await response.json();
+
+		setConversation(res);
+
+		console.log(res);
 	}
 
 	const invateToGame = (user) => {
@@ -66,25 +80,14 @@ function SearchList({ setConvCreation, users }) {
 		updateConvCreation();
 	}
 
-	async function getConversation (userLogin: string) {
-		console.log(`fetch User ${userLogin} Conversation`)
-		const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations`,  {
-			method: 'GET',
-			headers: {
-			  'Content-Type': 'application/json',
-			  Authorization: `Bearer ${token}`,
-			},
-		  });
-	}
-
 	function formatList () {
 		if (searchedLogin !== '')
 		{
-			setList(users.filter((user) => {
-				const partLogin = user.login.substring(0, searchedLogin.length);
-				return (partLogin !== '' && partLogin === searchedLogin);
-			}))
-			// setList([...users, ...users, ...users, ...users, ...users, ...users]);
+			// setList(users.filter((user) => {
+			// 	const partLogin = user.login.substring(0, searchedLogin.length);
+			// 	return (partLogin !== '' && partLogin === searchedLogin);
+			// }))
+			setList([...users]);
 		}
 		else
 			setList([])

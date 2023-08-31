@@ -22,16 +22,21 @@ export class ConversationsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':single')
+  @Post(':single')
   async findOne(@Body() reqBody: any) {
-    //? body : { users: [id1, id2] }
+    //? body : { usersId: [id1, id2] }
 
     const [fs, sc] = reqBody.usersId;
     const criteria = {
       where: {
         AND: [{ users: { some: { id: fs } } }, { users: { some: { id: sc } } }],
       },
+      include: {
+        users: true,
+      }
     };
+
+    console.log(`${fs} : ${sc}`);
 
     const response = await this.conversationService.findConversation(criteria);
     if (response != null) return response;
@@ -43,6 +48,9 @@ export class ConversationsController {
           connect: reqBody.usersId.map((id) => ({ id })),
         },
       },
+      include: {
+        users: true,
+      }
     });
   }
 

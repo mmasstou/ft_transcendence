@@ -23,6 +23,7 @@ export default function page() {
     const router = usePathname();
 	const [isOpen, setOpening] = useState<boolean>(false);
 	const [openFriendList, setFriendList] = useState(false);
+	const [createConversation, setConvCreation] = useState(false);
 
 
 	useEffect(() => {}, [isOpen, openFriendList])
@@ -84,8 +85,7 @@ export default function page() {
 				}
 			</div>
 		</div>
-		<PrivateConversation isOpen={isOpen} openFriendList={openFriendList} setFriendList={setFriendList}/>
-		<SearchModal open={createConversation}  onClose={() => setConvCreation(false)} users={users}/>
+		<PrivateConversation isOpen={isOpen} openFriendList={openFriendList} setFriendList={setFriendList} openSeachList={createConversation} setSeachOpening={setConvCreation}/>
 	</div>
     </Dashboard>
   )
