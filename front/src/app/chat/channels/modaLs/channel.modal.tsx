@@ -15,9 +15,9 @@ export default function ChanneLModal({ children, onClose, title, IsOpen, z_index
     const [IsMounted, setIsMounted] = React.useState<boolean>(false)
     React.useEffect(() => { setIsMounted(true) }, [])
     if (!IsOpen || !IsMounted) return null;
-    const zindex = z_index ? 'z-[' + z_index.toString() + ']' : 'z-50'
+    const zindex = z_index ? 'z-[' + z_index.toString() + ']' : 'z-[999]'
     return (
-        <div className={`absolute top-0 bg-[#2632389e] w-full h-full min-h-[40rem] flex justify-center items-center z-[121323]`}>
+        <div className={`absolute top-0 bg-[#2632389e] w-full h-full min-h-[40rem] flex justify-center items-center ${z_index}`}>
             <div className=" w-full max-w-xl bg-[#2B504B] m-3 rounded">
                 <div className="flex justify-between items-center p-2 w-full mb-2">
                     <h1 className=" text-white capitalize pl-6">{title}</h1>

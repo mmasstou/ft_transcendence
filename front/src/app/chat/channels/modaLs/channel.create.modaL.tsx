@@ -1,5 +1,5 @@
 'use client';
-import { userType } from '@/types/types';
+import { RoomsType, userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useState } from 'react';
@@ -43,7 +43,11 @@ const ChanneLCreateModaL = () => {
   }, []);
 
   React.useEffect(() => {
-    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, (room: any) => {
+    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, (room: {
+      OK: boolean,
+      message: string,
+      data: RoomsType
+    }) => {
       if (!room.OK) {
         toast(room.message)
         return

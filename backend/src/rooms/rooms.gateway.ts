@@ -533,34 +533,30 @@ export class RoomGateway implements OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: string },
   ) {
-    const ResponseEventData: responseEvent = {
-      status: responseEventStatusEnum.SUCCESS,
-      type: responseEventTypeEnum.LEAVEROOM,
-      data: null,
-    };
     try {
       // get User data from the token :
       const LogedUser = await this.usersService.getUserInClientSocket(client);
       // get room data :
       const room = await this.roomservice.findOne({ id: data.roomId });
       // get member data :
-      const LeavedChanneL = await this.roomservice.LeaveChanneL({
+      const LeavedMember = await this.roomservice.LeaveChanneL({
         userId: LogedUser.id,
         roomId: room.id,
       });
 
-      if (!LeavedChanneL) throw new Error();
+      if (!LeavedMember) throw new Error('cant leave room');
       // send response to client :
-      ResponseEventData.status = responseEventStatusEnum.SUCCESS;
-      ResponseEventData.data = LeavedChanneL;
       // leave room socket :
       client.leave(data.roomId);
       client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`, {
         Ok: true,
+        message: 'you are leaved room success',
+        member: LeavedMember,
       });
     } catch (error) {
       client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`, {
         Ok: false,
+        message: error.message,
       });
     }
     this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {

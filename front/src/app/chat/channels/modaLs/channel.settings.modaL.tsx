@@ -66,11 +66,11 @@ const ChanneLSettingsModaL = () => {
 
     React.useEffect(() => {
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
-            if (!data) return
+            if (!data.OK) return
             UpdateData();
         });
         socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
-            if (!data) return
+            if (!data.OK) return
             UpdateData();
         });
         socket?.on(
@@ -93,16 +93,18 @@ const ChanneLSettingsModaL = () => {
         );
         socket?.on(
             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`,
-            (data: { Ok: boolean }) => {
+            (data: { Ok: boolean, message: string, member: membersType }) => {
+
                 if (!data.Ok) {
                     channeLConfirmActionHook.onClose()
                     return toast.error("can't leave this channel")
                 }
-                // toast.success(data.message)
-                channeLConfirmActionHook.onClose()
-                channeLsettingsHook.onClose()
-                route.push(`/chat/channels`)
-                route.refresh();
+                if (data.member.userId === UserId) {
+                    channeLConfirmActionHook.onClose()
+                    channeLsettingsHook.onClose()
+                    route.push(`/chat/channels`)
+                    route.refresh();
+                }
             }
         );
         return () => {
@@ -111,7 +113,7 @@ const ChanneLSettingsModaL = () => {
             socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_DELETE}`)
             socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`)
         }
-    }, [])
+    }, [socket])
 
     useEffect(() => {
         (async () => {
@@ -122,8 +124,8 @@ const ChanneLSettingsModaL = () => {
             const aLLMembersList = await getChannelMembersWithId(channeLinfo.id, token)
             if (!aLLMembersList) return
             setaLLMembersList(aLLMembersList)
-            setUserInfo(userInfo)
-            setMemberInfo(memberInfo)
+            userInfo && setUserInfo(userInfo)
+            memberInfo && setMemberInfo(memberInfo)
             setChanneLInfo(channeLinfo)
         })();
         setMounted(true)
@@ -151,16 +153,19 @@ const ChanneLSettingsModaL = () => {
         __message && channeLConfirmActionHook.onOpen(
             <button
                 onClick={() => {
-                    data.updateType === updatememberEnum.LEAVECHANNEL
-                        && socket?.emit(
+                    if (data.updateType === updatememberEnum.LEAVECHANNEL) {
+                        console.log("data.updateType === updatememberEnum.LEAVECHANNEL", data.updateType === updatememberEnum.LEAVECHANNEL)
+                        socket?.emit(
                             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_LEAVE}`,
                             { roomId: ChanneLInfo?.id }
                         )
-                    data.updateType === updatememberEnum.DELETECHANNEL
-                        && socket?.emit(
+                    }
+                    if (data.updateType === updatememberEnum.DELETECHANNEL) {
+                        socket?.emit(
                             `${process.env.NEXT_PUBLIC_SOCKET_EVENT_DELETE_CHAT}`,
                             { roomId: ChanneLInfo?.id, userId: UserId }
                         )
+                    }
                 }}
                 className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
                 {data.updateType === updatememberEnum.LEAVECHANNEL && 'Leave Channel'}
@@ -195,7 +200,7 @@ const ChanneLSettingsModaL = () => {
 
             {!MemberInfo?.isban
                 ? <>
-                    <div className={`body flex flex-col gap-4 h-full w-full min-h-[32rem]`}>
+                    <div className={`body flex flex-col gap-4 h-full w-full min-h-[32rem] border border-secondary`}>
                         {
                             _channeLtype === "UserSettings"
                                 ? <ChanneLUserSettings

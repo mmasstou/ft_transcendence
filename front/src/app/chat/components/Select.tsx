@@ -14,7 +14,7 @@ const Select: FC<SelectProps> = ({ lable, value, onChange, options, isMulti, dis
             ...provided,
             color: 'white',
             padding: '0.5rem',
-            
+
 
         }),
         multiValueRemove: (provided: any, state: any) => ({
@@ -23,9 +23,9 @@ const Select: FC<SelectProps> = ({ lable, value, onChange, options, isMulti, dis
             color: 'red',
             borderRadius: '9999px',
             ':hover': {
-              backgroundColor: 'transparent'
+                backgroundColor: 'transparent'
             }
-          }),
+        }),
         control: (provided: any, state: any) => ({
             ...provided,
             backgroundColor: 'transparent',

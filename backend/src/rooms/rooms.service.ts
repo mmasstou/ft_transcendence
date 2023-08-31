@@ -603,7 +603,7 @@ export class RoomsService {
   async LeaveChanneL(params: {
     userId: string;
     roomId: string;
-  }): Promise<Rooms> {
+  }): Promise<Members> {
     try {
       const { userId, roomId } = params;
       // check if room is exist
@@ -647,10 +647,10 @@ export class RoomsService {
           },
         });
         // delete member
-        await prisma.members.delete({
+        const deletemember = await prisma.members.delete({
           where: { id: member.id },
         });
-        return room;
+        return deletemember;
       });
       return result;
     } catch (error) {
