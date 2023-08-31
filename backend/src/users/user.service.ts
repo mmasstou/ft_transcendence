@@ -99,6 +99,7 @@ export class UserService {
         where: {
           userId: senderId,
           friendId: receiverId,
+          status: 'PENDING' || 'ACCEPTED',
         },
       });
 
@@ -111,6 +112,76 @@ export class UserService {
           userId: senderId,
           friendId: receiverId,
           status: 'PENDING',
+        },
+      });
+      return;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  // accept friend request
+  // i should add both users to each other friends list
+  async acceptFriendRequest(
+    receiverId: string,
+    senderId: string,
+    id: string,
+  ): Promise<void> {
+    try {
+      const existingRequest = await this.prisma.friendship.findFirst({
+        where: {
+          userId: senderId,
+          friendId: receiverId,
+        },
+      });
+
+      if (!existingRequest) {
+        throw new BadRequestException('Friend request not found.');
+      }
+
+      await this.prisma.friendship.update({
+        where: {
+          id: id,
+        },
+        data: {
+          status: 'ACCEPTED',
+        },
+      });
+
+      await this.prisma.friendship.create({
+        data: {
+          userId: receiverId,
+          friendId: senderId,
+          status: 'ACCEPTED',
+        },
+      });
+      return;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  // reject friend request
+
+  async rejectFriendRequest(receiverId: string, senderId: string, id: string) {
+    try {
+      const existingRequest = await this.prisma.friendship.findFirst({
+        where: {
+          userId: senderId,
+          friendId: receiverId,
+        },
+      });
+
+      if (!existingRequest) {
+        throw new BadRequestException('Friend request not found.');
+      }
+
+      await this.prisma.friendship.update({
+        where: {
+          id: id,
+        },
+        data: {
+          status: 'DECLINED',
         },
       });
       return;
@@ -178,10 +249,10 @@ export class UserService {
       const friends = await this.prisma.friendship.findMany({
         where: {
           OR: [
-            {
-              userId: userId,
-              status: 'ACCEPTED',
-            },
+            // {
+            //   userId: userId,
+            //   status: 'ACCEPTED',
+            // },
             {
               friendId: userId,
               status: 'ACCEPTED',
@@ -192,7 +263,7 @@ export class UserService {
       if (!friends) throw new NotFoundException();
       return friends;
     } catch (error) {
-      console.log('++getFriends++error>', error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -204,7 +275,7 @@ export class UserService {
       if (!friend) throw new NotFoundException();
       return friend;
     } catch (error) {
-      console.log('++getFriend++error>', error.message);
+      console.log('++getFriend++error>>>>: ', error.message);
     }
   }
 

@@ -39,6 +39,14 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('friends/accepted')
+  async getAcceptedFriendRequests(@Req() request: Request) {
+    const User: any = request.user;
+    const id: any = User.id;
+    return await this.usersService.getFriends(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('friends/:id')
   async getFriend(@Param('id') id: string) {
     return await this.usersService.getFriend(id);
@@ -51,6 +59,8 @@ export class UserController {
     const id: any = User.id;
     return await this.usersService.getFriendRequests(id);
   }
+
+  // get all accepted friend requests
 
   @Get()
   findAll() {
@@ -111,22 +121,45 @@ export class UserController {
   }
 
   // accept friend request
-  // @UseGuards(JwtAuthGuard)
-  // @Post('friend-requests/accept')
-  // async acceptFriendRequest(
-  //   @Req() req,
-  //   @Body('senderId') senderId: string,
-  // ): Promise<void> {
-  //   const receiverId = req.user.id;
-  //   await this.usersService.acceptFriendRequest(senderId, receiverId);
 
-  //   // Notify the sender about the friend request
-  //   this.notificationsGateway.sendNotification(
-  //     senderId,
-  //     'Your friend request has been accepted.',
-  //   );
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post('friend-requests/accept/:id')
+  async acceptFriendRequest(
+    @Req() req,
+    @Body('senderId') senderId: string,
+    @Param('id') id: string,
+  ): Promise<void> {
+    console.log('senderId', senderId);
+    console.log('id', id);
+    const receiverId = req.user.id;
+    await this.usersService.acceptFriendRequest(receiverId, senderId, id);
 
+    // Notify the sender about the accepted friend request
+    this.notificationsGateway.sendNotification(
+      senderId,
+      'Your friend request has been accepted.',
+    );
+  }
+
+  // reject friend request
+  @UseGuards(JwtAuthGuard)
+  @Post('friend-requests/reject/:id')
+  async rejectFriendRequest(
+    @Req() req,
+    @Body('senderId') senderId: string,
+    @Param('id') id: string,
+  ): Promise<void> {
+    console.log('reject friend request');
+    const receiverId = req.user.id;
+    await this.usersService.rejectFriendRequest(receiverId, senderId, id);
+
+    // Notify the sender about the rejected friend request
+    this.notificationsGateway.sendNotification(
+      senderId,
+      'Your friend request has been rejected.',
+    );
+  }
+  // remover frinend request
   @UseGuards(JwtAuthGuard)
   @Delete('removefriend')
   async removeFriend(

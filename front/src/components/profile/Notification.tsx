@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import Image from 'next/image';
-import React, { FC } from 'react';
+import React, { FC, use } from 'react';
 import toast from 'react-hot-toast';
 import { Socket } from 'socket.io-client';
 
@@ -32,6 +32,9 @@ const Notification: FC<NotificationProps> = ({
   pendingRequests,
 }) => {
   const [friend, setfriend] = React.useState<any | null>(null);
+  const [shownotification, setshownotification] = React.useState<boolean>(true);
+  const [removeNotification, setremoveNotification] =
+    React.useState<boolean>(false);
 
   if (!token) {
     toast.error('You are not logged in');
@@ -51,7 +54,6 @@ const Notification: FC<NotificationProps> = ({
           },
         }
       );
-      console.log('res: ', res);
       if (res.ok) {
         const data = await res.json();
         setfriend(data);
@@ -62,9 +64,64 @@ const Notification: FC<NotificationProps> = ({
     })();
   }, []);
 
-  console.log('pendingRequest in notification: ', pendingRequests);
+  const handleAccept = async () => {
+    const PostData: any = {
+      senderId: friendshipData.userId,
+    };
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/friend-requests/accept/${friendshipData.id}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(PostData),
+        }
+      );
+      if (response.ok) {
+        setshownotification(false);
+      }
+    } catch (error) {
+      console.log('error in accept friend request: ', error);
+    }
+  };
 
-  if (pendingRequests.length > 0 || friend) {
+  const handleDeny = async () => {
+    const PostData: any = {
+      senderId: friendshipData.userId,
+    };
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/friend-requests/reject/${friendshipData.id}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(PostData),
+        }
+      );
+      if (response.ok) {
+        setshownotification(false);
+      }
+    } catch (error) {
+      console.log('error in deny friend request: ', error);
+    }
+  };
+
+  React.useEffect(() => {
+    if (!shownotification) {
+      setremoveNotification(true);
+    }
+  }, [shownotification]);
+
+  console.log('pendingRequest in notification: ', pendingRequests);
+  console.log('friendship data in notification: ', friendshipData);
+
+  if ((pendingRequests.length > 0 || friend) && !removeNotification) {
     return (
       <div className="bg-primary rounded-md p-2">
         <div className="flex flex-col gap-1 lg:gap-2">
@@ -98,12 +155,14 @@ const Notification: FC<NotificationProps> = ({
           </div>
           <div className="flex gap-2 xl:gap-3 self-end text-xs md:text-sm ">
             <button
+              onClick={handleAccept}
               className="bg-secondary py-1 px-2 border border-secondary rounded-md text-black 
             hover:bg-transparent hover:text-secondary transition-all duration-150"
             >
               {directMessage ? 'Reply' : 'Accept'}
             </button>
             <button
+              onClick={handleDeny}
               className="bg-red-500 py-1 px-2 border border-red-500 rounded-md text-white 
             hover:bg-transparent hover:text-red-500 transition-all duration-150"
             >

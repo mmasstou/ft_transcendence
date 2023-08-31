@@ -22,6 +22,12 @@ interface Props {
 
 const Header: React.FC<Props> = ({ socket, pendingRequests }): JSX.Element => {
   const [notifications, setnotifications] = React.useState<any[] | null>(null);
+  const [shownotification, setshownotification] =
+    React.useState<boolean>(false);
+  const handleNotificationClik = () => {
+    setshownotification(!shownotification);
+  };
+
   if (!token) {
     toast.error('You are not logged in');
     return <div></div>;
@@ -54,7 +60,7 @@ const Header: React.FC<Props> = ({ socket, pendingRequests }): JSX.Element => {
       }
       toast.error(res.statusText);
     })();
-  }, [pendingRequests]);
+  }, [pendingRequests, shownotification, socket]);
 
   console.log('pendingFriendRequest in Header: ', pendingRequests);
   console.log('notifications: ', notifications);
@@ -77,7 +83,7 @@ const Header: React.FC<Props> = ({ socket, pendingRequests }): JSX.Element => {
           <li>
             <Popover.Root>
               <Popover.Trigger asChild aria-controls="radix-:R1mcq:">
-                <button>
+                <button onClick={handleNotificationClik}>
                   <RiNotification2Fill size={32} color="#E0E0E0" />
                 </button>
               </Popover.Trigger>
