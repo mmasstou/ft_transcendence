@@ -75,7 +75,7 @@ export default function page() {
       <LefttsideModaL>
         {
           ChanneLs && ChanneLs.map((room: RoomsType, key) => (
-            <ChanneLSidebarItem key={key} room={room} viewd={8} active={room.slug === slug} />
+            <ChanneLSidebarItem key={key} room={room}  active={room.slug === slug} />
           ))
         }
       </LefttsideModaL>

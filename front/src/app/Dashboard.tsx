@@ -113,10 +113,10 @@ const Dashboard = ({ children }: Props) => {
       }
       if (data.response === 'Deny') {
         if (data.userId === userId) {
-          toast('You denied your friend invitation', { icon: '🤗' })
+          toast('You denied your friend invitation', { icon: '🏓' })
         }
         if (data.sender.id === userId) {
-          toast('Your friend denied your invitation', { icon: '🤗' })
+          toast('Your friend denied your invitation', { icon: '🏓' })
         }
       }
     })

@@ -10,7 +10,7 @@ import { Socket } from "socket.io-client";
 import { RoomsType, membersType, messagesType } from "@/types/types";
 import Cookies from "js-cookie";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { IoSend } from "react-icons/io5";
 import Button from "../../components/Button";
@@ -21,12 +21,13 @@ import ConversationsTitlebar from "./channel.conversations.titlebar";
 import Message from "./channel.message";
 import BanMember from "./channel.settings.banmember";
 import { CiVolumeMute } from "react-icons/ci";
-import { is, tr } from "date-fns/locale";
+import { is, ro, tr } from "date-fns/locale";
 import { ChanneLContext } from "../providers/channel.provider";
 import ChannelConversationsMute from "./channel.conversations.mute";
 
-export default function Conversations({ socket }: { socket: Socket | null }) {
-
+const token: string | undefined = Cookies.get('token')
+const UserId: string | undefined = Cookies.get('_id')
+export default function Conversations({ socket }: { socket: Socket | null, slug: string }) {
     const query = useParams();
     const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
     const chatContainerRef = React.useRef<HTMLDivElement | null>(null);
@@ -36,15 +37,15 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const [message, setMessage] = React.useState("")
     const [InputValue, setInputValue] = React.useState("")
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
-    const token = Cookies.get('token')
-    const __userId = Cookies.get('_id')
-    if (!token || !__userId) return
+
+    if (!token || !UserId) return
     const InputRef = React.useRef<HTMLInputElement | null>(null);
     const [LoadingMessages, setLoadingMessages] = React.useState<boolean>(true)
     const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
     const ChanneLContextee: any = React.useContext(ChanneLContext)
-    // if (!IsMounted) console.log('Conversations ChanneLContextee', ChanneLContextee.ChanneLdata.channeLInfo)
+    const router = useRouter()
+
     const UpdateData = () => {
         // get logged member :
         (async () => {
@@ -54,15 +55,18 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                 return
             }
             setChanneLinfo(channeL)
-            const member: membersType | null = await getMemberWithId(__userId, channeL?.id, token)
-            if (member) {
-                toast.success(`member updated ${member.id}`);
-                setLogedMember(member);
-            }
+            const member: membersType | null = await getMemberWithId(UserId, channeL?.id, token)
+            if (member) { setLogedMember(member); }
         })();
     }
+    const FocusedOnSendMessageInput = () => {
+        setTimeout(() => {
+            if (InputRef.current) {
+                InputRef.current.focus();
+            }
+        }, 100); // sleep .1s ; waiting search input to mounted in focus on it
+    }
     // show this last message in the screan :
-
     React.useEffect(() => {
         setTimeout(() => {
             if (chatContainerRef.current) {
@@ -72,13 +76,9 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     }, [messages, socket, InputValue, message])
 
     React.useEffect(() => {
-        if (LogedMember?.userId !== __userId) return
+        if (LogedMember?.userId !== UserId) return
         UpdateData()
-        setTimeout(() => {
-            if (InputRef.current) {
-                InputRef.current.focus();
-            }
-        }, 100); // sleep .1s ; waiting search input to mounted in focus on it
+        FocusedOnSendMessageInput()
     }, [slug])
 
     React.useEffect(() => {
@@ -92,7 +92,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             setIsMounted(true)
             // scroll to the buttom of the page :
             setChanneLinfo(_roomInfo)
-            const channeLLMembers = __userId && await getMemberWithId(__userId, _roomInfo.id, token)
+            const channeLLMembers = UserId && await getMemberWithId(UserId, _roomInfo.id, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                 setLogedMember(channeLLMembers)
             }
@@ -107,13 +107,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             }, 900);
         })();
 
-        socket?.on('sendMessageResponse', (res: { OK: boolean, message: string }) => {
-            if (!res.OK) {
-                toast.error(res.message)
-                setLoadingMessages(false);
-                return
-            }
-        })
+
     }, [])
     // // listen to message event and send the incomming message to client
     React.useEffect(() => {
@@ -123,33 +117,48 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             setMessages((prev) => [...prev, newMessage])
             FocusedOnSendMessageInput()
             setSendingMessage(false);
-            if (newMessage.senderId === Cookies.get('_id')) {
+            if (newMessage.senderId === UserId) {
                 setInputValue('')
                 setMessage('')
             }
         })
     }, [IsMounted])
 
+    // listen to message event and send the incomming message to client and update the member or channel info
     React.useEffect(() => {
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
-            if (!data.OK) return
-            toast.success('member updated 02');
-            UpdateData();
-            // (async () => {
-            //     if (!channeLinfo) return
-            //     const channeL: RoomsType | null = await FindOneBySLug(slug, token)
-            //     if (!channeL) return
-            //     setChanneLinfo(channeL)
-            //     const member: membersType | null = await getMemberWithId(__userId, channeLinfo?.id, token)
-            //     member && setLogedMember(member);
-            // })();
-        });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
-            if (!data.OK) return
-            toast.success('member updated 01');
-            UpdateData();
-        });
-    }, [socket])
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            (data) => { if (data.OK) { return UpdateData(); } });
+
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            (data) => { if (data.OK) { return UpdateData(); } });
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`,
+            (data: { OK: boolean, member: membersType }) => {
+                if (data.OK) {
+                    if (data.member.userId === UserId) {
+                        toast.error(`you are kicked from ${channeLinfo?.name}`)
+                        return router.push('/chat/channels')
+                    }
+                }
+            })
+        socket?.on('sendMessageResponse', (res: { OK: boolean, message: string }) => {
+            if (!res.OK) {
+                toast.error(res.message)
+                setLoadingMessages(false);
+                return
+            }
+        })
+
+        return () => {
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`)
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`)
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`)
+            socket?.off('sendMessageResponse')
+        }
+
+    }, [])
 
     const OnSubmit = () => {
         const sendMesage = message.trim()
@@ -174,13 +183,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         setSendingMessage(true)
 
     }
-    const FocusedOnSendMessageInput = () => {
-        setTimeout(() => {
-            if (InputRef.current) {
-                InputRef.current.focus();
-            }
-        }, 100); // sleep .1s ; waiting search input to mounted in focus on it
-    }
+
     const checkLimitCharacters = (input: string) => {
         if (input.length > 512) return toast.error("you can't send more than 512 characters")
         setInputValue(input);

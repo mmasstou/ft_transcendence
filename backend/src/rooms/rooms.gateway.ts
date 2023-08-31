@@ -129,7 +129,9 @@ export class RoomGateway implements OnGatewayConnection {
         if (data.updateType === updatememberEnum.MUTEMEMBER) {
           const __isMute: boolean = __member.ismute === true ? false : true;
           const timeOnMute: any = new Date();
-          timeOnMute.setMinutes(timeOnMute.getMinutes() + 5);
+          timeOnMute.setMinutes(
+            timeOnMute.getMinutes() + process.env.TIME_TO_MUTE,
+          );
 
           const member = await this.prisma.members.update({
             where: { id: data.member.id },
@@ -161,7 +163,7 @@ export class RoomGateway implements OnGatewayConnection {
                 `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
                 { OK: true },
               );
-            }, 20000);
+            }, 10000);
             console.log('Chat-> time- +2> :', time);
             if (time) {
               TimeOutList.set(data.member.id, time);
@@ -186,14 +188,14 @@ export class RoomGateway implements OnGatewayConnection {
               where: { id: data.member.roomsId },
               data: { members: { disconnect: { id: data.member.id } } },
             });
-            await prisma.members.delete({
+            const member = await prisma.members.delete({
               where: { id: data.member.id },
             });
-            return room;
+            return member;
           });
           this.server.emit(
             `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`,
-            { OK: true },
+            { OK: true, member: result },
           );
         }
         // set owner :
@@ -214,11 +216,6 @@ export class RoomGateway implements OnGatewayConnection {
       } catch (error) {
         console.log('Chat-updatemember> error- +>', error);
       }
-      const ResponseEventData: responseEvent = {
-        status: responseEventStatusEnum.SUCCESS,
-        message: responseEventMessageEnum.SUCCESS,
-        data: __member,
-      };
       this.server.emit(
         `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
         { OK: false },
@@ -626,36 +623,6 @@ export class RoomGateway implements OnGatewayConnection {
     }
   }
 
-  @SubscribeMessage(`leaveRoomSocket`)
-  async leaveRoomSocket(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: any,
-  ) {
-    try {
-      const room = await this.roomservice.findOne({ id: data.roomId });
-      const User = await this.usersService.getUserInClientSocket(client);
-      if (!User || !room) return;
-      // check if member is already in room database :
-      const _isMemberInRoom = await this.roomservice.isMemberInRoom(
-        room.id,
-        User.id,
-      );
-      if (_isMemberInRoom) {
-        await client.leave(data.roomId);
-        // send response to client :
-        client.emit('leaveRoomSocketResponse', {
-          OK: true,
-          message: 'you are leave the room',
-        });
-      } else throw new Error();
-    } catch (error) {
-      client.emit('leaveRoomSocketResponse', {
-        OK: false,
-        message: 'you are not member or not in the socket channel yet',
-      });
-    }
-  }
-
   @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_UPDATE}`)
   async updateChanneL(
     @ConnectedSocket() client: Socket,
@@ -909,8 +876,9 @@ export class RoomGateway implements OnGatewayConnection {
       });
 
       if (UserTOSendTo) {
+        this.server.emit('ref', { socketId: client.id });
+        throw new Error();
         const ListSocket = clientOnLigne.get(UserTOSendTo.id);
-
         if (ListSocket) {
           ListSocket.forEach((socket) => {
             socket.emit('GameNotificationResponse', {

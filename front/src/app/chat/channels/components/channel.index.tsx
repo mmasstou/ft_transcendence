@@ -107,7 +107,7 @@ const ChanneLIndex: FC<ChannelIndexProps> = ({socket}) => {
             </div>
 
             <ChanneLbody socket={socket}>
-                <Conversations socket={socket} />
+                <Conversations socket={socket} slug={""} />
             </ChanneLbody>
 
         </div>

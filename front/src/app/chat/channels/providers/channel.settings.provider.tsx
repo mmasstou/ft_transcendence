@@ -58,14 +58,14 @@ export default function SettingsProvider({ children }: { children: React.ReactNo
             if (!data) return
             UpdateData();
         });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
             if (!data) return
             UpdateData();
         });
     }, [socket])
 
     if (!IsMounted) return;
-    if (!ChanneLinfo || !LoggedMember || IsLoading) return <Loading />
+    if (!ChanneLinfo || !LoggedMember || IsLoading) return <Loading message="Loading settings ..." />
     return <div className="flex flex-col justify-between max-h-[32rem]">
         <ChanneLsettingsContext.Provider value={{ channeL: ChanneLinfo, member: LoggedMember, socket: socket }}>
             {children}

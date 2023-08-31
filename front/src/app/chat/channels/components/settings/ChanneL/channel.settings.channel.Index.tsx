@@ -50,7 +50,7 @@ export default function ChanneLsettingsIndex(props: props) {
             if (!data) return
             UpdateData();
         });
-        props.socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+        props.socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
             if (!data) return
             UpdateData();
         });
@@ -106,7 +106,7 @@ export default function ChanneLsettingsIndex(props: props) {
                         icon={IoBagRemove}
                         label={"remove access password"}
                     />} */}
-                    {/* {<ChanneLSettingsItem
+                {/* {<ChanneLSettingsItem
                     onClick={() => {
                         props.onClick({ to: SETTINGSTEPS.EDITACCESSPASSWORD })
                     }}

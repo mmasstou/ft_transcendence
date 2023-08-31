@@ -83,7 +83,7 @@ const ChanneLSettingsModaL = () => {
             if (!data) return
             UpdateData();
         });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
             if (!data) return
             UpdateData();
         });
@@ -178,9 +178,10 @@ const ChanneLSettingsModaL = () => {
         )
 
     }
+    if (!IsMounted) return null;
 
     let bodyContent = (
-        <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col min-h-[40rem] h-full">
+        <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col h-[43rem]">
             <div className="flex flex-row justify-start gap-3 items-center text-white">
                 <span className={` text-3xl `}>#</span>
                 <div className="flex flex-row items-center justify-between w-full">
@@ -213,14 +214,9 @@ const ChanneLSettingsModaL = () => {
                                 />
                                 : _channeLtype === "ChatSettings"
                                 && <ChanneLChatSettings socket={socket} />
-                            // : ChanneLInfo && <ChanneLSettingsInfo
-                            //     socket={socket}
-                            //     room={ChanneLInfo}
-                            //     User={UserInfo}
-                            //     member={MemberInfo}
-                            // />
+
                         }
-                    </div> 
+                    </div>
                     <div className=" w-full flex flex-row h-max justify-around items-center mb-5 text-white ">
                         <Button
                             icon={FaUsersCog}
@@ -246,11 +242,14 @@ const ChanneLSettingsModaL = () => {
 
         </div>
     )
-
-    return <ChanneLModal IsOpen={IsOpen} title={` ${ChanneLInfo?.name} settings`} children={bodyContent} onClose={() => {
-        onClose()
-        reset()
-    }} />
+    return <ChanneLModal
+        IsOpen={IsOpen}
+        title={` ${ChanneLInfo?.name} settings`}
+        children={bodyContent}
+        onClose={() => {
+            onClose()
+            reset()
+        }} />
 
 }
 export default ChanneLSettingsModaL

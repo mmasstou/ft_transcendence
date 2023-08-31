@@ -53,7 +53,7 @@ export default function SettingsProvider(props: props) {
             if (!data) return
             UpdateData();
         });
-        props.socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+        props.socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
             if (!data) return
             UpdateData();
         });

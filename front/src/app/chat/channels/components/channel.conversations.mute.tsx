@@ -9,7 +9,8 @@ export default function ChannelConversationsMute({IsActive}: {IsActive: boolean}
         <div className=" absolute w-full h-[83vh] md:h-[88vh] flex justify-center items-center z-[49] ">
         </div>
         <div className="flex flex-col">
-            <CiVolumeMute className=" text-secondary" size={120} />
+            <span className=" text-9xl">🤫</span>
+            {/* <CiVolumeMute className=" text-secondary" size={120} /> */}
             {/* <p className="text-white">you Are Muted</p> */}
         </div>
     </div>

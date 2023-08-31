@@ -3,7 +3,7 @@ import Dashboard from '@/app/Dashboard';
 import '@/app/globals.css';
 import Cookies from 'js-cookie';
 import { Changa } from 'next/font/google';
-import { useParams, usePathname, useSearchParams } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 import { AiOutlineUsergroupAdd } from 'react-icons/ai';
 import { BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs';
@@ -27,6 +27,8 @@ const changa = Changa({
   variable: '--font-changa',
 });
 
+const UserId: any = Cookies.get('_id');
+const token = Cookies.get('token');
 export default function RootLayout({
   children,
 }: {
@@ -38,15 +40,18 @@ export default function RootLayout({
   const pathname = usePathname()
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const UserId: any = Cookies.get('_id');
-  const token = Cookies.get('token');
+
   const leftSidebarHook = LeftSidebarHook();
   const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
   const rightsidebarHook = RightsidebarHook()
   const channeLFindRoommodaLHook = ChanneLFindRoommodaLHook()
   const query = useParams();
   const slug: string | undefined = typeof query.slug === 'string' ? query.slug : undefined
+  const router = useRouter();
+
+
   React.useEffect(() => {
+    if (!token || !UserId) return router.push('/');
     if (!pathname.includes('chat')) setIsLoading(true)
     setTimeout(() => {
       setIsLoading(false)

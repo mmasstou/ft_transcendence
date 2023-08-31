@@ -76,7 +76,7 @@ export default function ChanneLSettingsChanneLBanedMember(
             channeLConfirmActionHook.onClose()
             UpdateData();
         });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
             if (!data) return
             UpdateData();
         });
