@@ -261,7 +261,10 @@ export class UserService {
         },
       });
       if (!friends) throw new NotFoundException();
-      return friends;
+
+      // get only array of friends id
+      const friendsId = friends.map((friend) => friend.userId);
+      return friendsId;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

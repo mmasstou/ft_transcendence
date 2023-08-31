@@ -32,17 +32,8 @@ const Header: React.FC<Props> = ({ socket, pendingRequests }): JSX.Element => {
     toast.error('You are not logged in');
     return <div></div>;
   }
-  // socket?.on('GameNotificationResponse', (data) => {
-  //   console.log("GameNotificationResponse data :", data)
-  //   Notifications !== null
-  //   ? setNotifications([...Notifications, data])
-  //   : setNotifications([data])
-  //   setshownotification(true)
-  // })
   React.useEffect(() => {
     (async () => {
-      // get all friend request
-      console.log('get all friend request');
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/users/friendRequests`,
         {

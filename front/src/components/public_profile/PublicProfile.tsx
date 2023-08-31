@@ -7,6 +7,7 @@ import { BsSend } from 'react-icons/bs';
 import { BiUserPlus, BiUserX } from 'react-icons/bi';
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import Cookies from 'js-cookie';
 
 interface ProfileProps {
   user: userType | null;
@@ -15,10 +16,64 @@ interface ProfileProps {
 
 interface ButtonProps {
   text: string;
-  block?: boolean;
+  user?: userType | null;
+  isFriend?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({ text, block }) => {
+const Button: React.FC<ButtonProps> = ({ text, user, isFriend }) => {
+  const token = Cookies.get('token');
+  const sendFriendRequest = async () => {
+    const PostData = {
+      receiverId: user?.id,
+    };
+    if (PostData) {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/friend-requests/send`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(PostData),
+          }
+        );
+      } catch (err: any) {
+        console.log(err.message);
+      }
+    }
+  };
+
+  const removeFrined = async () => {
+    const PostData = {
+      friendId: user?.id,
+    };
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/removefriend`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(PostData),
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleFriendRequest = async () => {
+    if (!isFriend) {
+      sendFriendRequest();
+    } else {
+      removeFrined();
+    }
+  };
+
   return (
     <>
       {text === 'Message' ? (
@@ -31,10 +86,11 @@ const Button: React.FC<ButtonProps> = ({ text, block }) => {
         </button>
       ) : (
         <button
+          onClick={handleFriendRequest}
           className="flex justify-evenly items-center border-2 border-[#D9D9D9] rounded-full
      p-2 text-[#D9D9D9] hover:opacity-70 w-[10rem]"
         >
-          {block ? <BiUserX /> : <BiUserPlus />}
+          {isFriend ? <BiUserX /> : <BiUserPlus />}
           <span>{text}</span>
         </button>
       )}
@@ -46,6 +102,8 @@ const PublicProfile: React.FC<ProfileProps> = ({
   user,
   handlePublicProfile,
 }) => {
+  const [friends, setfriends] = useState<any>([]);
+  const [isFriend, setIsFriend] = useState<boolean>(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const handleOutsideClick = (event: any) => {
@@ -61,6 +119,43 @@ const PublicProfile: React.FC<ProfileProps> = ({
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, []);
+
+  useEffect(() => {
+    const token = Cookies.get('token');
+    try {
+      (async () => {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/friends/accepted`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setfriends(data);
+        }
+      })();
+    } catch (error) {
+      console.log('error in get friends: ', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (friends) {
+      const friend = friends.find((friend: any) => {
+        if (friend === user?.id) {
+          return true;
+        }
+      });
+      if (friend) {
+        setIsFriend(true);
+      }
+    }
+  }, [friends]);
 
   return (
     <>
@@ -109,8 +204,12 @@ const PublicProfile: React.FC<ProfileProps> = ({
           <UserStats user={user} />
 
           <div className="flex justify-around items-center">
-            <Button  text="Message" />
-            <Button text="Add Friend" block={false} />
+            <Button text="Message" user={user} />
+            {isFriend ? (
+              <Button text="Remove Friend" user={user} isFriend={isFriend} />
+            ) : (
+              <Button text="Add Friend" user={user} isFriend={isFriend} />
+            )}
           </div>
           <div className="mx-4 mt-10 h-1/4">
             <Statistics user_id={user?.id} />

@@ -99,7 +99,7 @@ const Dashboard = ({ children }: Props) => {
       setPendingRequests((prevRequests: any) => [...prevRequests, request]);
       setRequestBackUp((prevRequests: any) => [...prevRequests, request]);
       setnotifUpdate(true);
-      toast('You have a new friend request', { icon: '🤗' });
+      toast(request, { icon: '🤗' });
     });
 
     socket?.on('GameResponse', (data: any) => {
