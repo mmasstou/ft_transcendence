@@ -4,6 +4,8 @@ import { BiJoystick } from 'react-icons/bi';
 import { UserCardProps } from '@/types/UserCardTypes';
 import Image from 'next/image';
 import Cookies from 'js-cookie';
+import MyToast from '../ui/Toast/MyToast';
+import toast from 'react-hot-toast';
 
 const SenderId = Cookies.get('_id');
 const UserCard: FC<UserCardProps> = ({
@@ -16,6 +18,7 @@ const UserCard: FC<UserCardProps> = ({
   addRequest,
 }) => {
   const [invited, setInvited] = useState(false);
+  const [Status, setStatus] = useState(status);
   let timeout: NodeJS.Timeout;
   const handleInvite = () => {
     socket.emit('sendGameNotification', {
@@ -36,7 +39,21 @@ const UserCard: FC<UserCardProps> = ({
         clearTimeout(timeout);
       }
     });
-
+    socket && socket.on('UserSendToStatus', (data: any) => {
+      if (data.id === userId) {
+        setInvited(false);
+        clearTimeout(timeout);
+        setStatus(data.status)
+        if (data.status === 'inGame')
+          toast.error(data.login + ' is in Game');
+        else if (data.status === 'offline')
+          toast.error(data.login + ' is offline');
+      }
+    })
+    return () => {
+      socket && socket.off('GameResponseToChatToUser');
+      socket && socket.off('UserSendToStatus');
+    }
   },[])
 
 
@@ -63,7 +80,7 @@ const UserCard: FC<UserCardProps> = ({
             Add Friend
           </button>
         ) : (
-          status === 'online' && (
+          Status === 'online' && (
             <button
               disabled={invited}
               onClick={handleInvite}
@@ -77,7 +94,7 @@ const UserCard: FC<UserCardProps> = ({
                   size={16}
                 />
               ) : (
-                status === 'online' && (
+                Status === 'online' && (
                   <BiJoystick
                     className="mr-1 fill-sky-500 group-enabled:group-hover:fill-container"
                     size={16}
@@ -91,18 +108,18 @@ const UserCard: FC<UserCardProps> = ({
         {!addRequest && (
           <div
             className={`border flex gap-1 items-center p-1 px-2 xl:px-3 rounded-xl ${
-              status === 'inGame'
+              Status === 'inGame'
                 ? 'border-orange-500'
-                : status === 'online'
+                : Status === 'online'
                 ? 'border-green-500'
                 : 'border-yellow-500'
             }`}
           >
             <div
               className={`w-2 h-2 rounded-full ${
-                status === 'inGame'
+                Status === 'inGame'
                   ? 'bg-orange-500'
-                  : status === 'online'
+                  : Status === 'online'
                   ? 'bg-green-500'
                   : 'bg-yellow-500'
               }`}
@@ -110,17 +127,17 @@ const UserCard: FC<UserCardProps> = ({
             <span
               className={`
             ${
-              status === 'inGame'
+              Status === 'inGame'
                 ? 'text-orange-500'
-                : status === 'online'
+                : Status === 'online'
                 ? 'text-green-500'
                 : 'text-yellow-500'
             }
           `}
             >
-              {status === 'inGame'
+              {Status === 'inGame'
                 ? 'In Game'
-                : status === 'online'
+                : Status === 'online'
                 ? 'Online'
                 : 'Offline'}
             </span>

@@ -30,6 +30,9 @@ services:
       - APInetwork
     depends_on:
       - database
+    volumes:
+      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
+      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
     image: postgres:13
     container_name: database
