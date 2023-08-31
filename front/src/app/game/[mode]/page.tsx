@@ -9,17 +9,21 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import UserCard from '@/components/profile/FriendCard';
+import { Socket, io } from 'socket.io-client';
+import StartGame from '@/app/chat/channels/actions/startgame';
 
 interface User {
   id: string;
   login: string;
   avatar: string;
   Level: number;
+  status: 'inGame' | 'online' | 'offline';
 }
 
 const page = ({ params }: { params: { mode: string } }) => {
   const [users, setUsers] = useState<User[]>([]);
   const id = Cookies.get('_id');
+  const token = Cookies.get('token');
   const router = useRouter();
   if (params.mode !== 'time' && params.mode !== 'score') router.push('/404');
 
@@ -28,8 +32,9 @@ const page = ({ params }: { params: { mode: string } }) => {
     playerId: id,
     mode: params.mode,
   };
-  useEffect(() => {
-    axios
+  const [socket, setSocket] = useState<Socket>();
+  const getUsers = async () => {
+    await axios
       .get(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
         headers: {
           Authorization: `Bearer ${Cookies.get('token')}`,
@@ -38,7 +43,34 @@ const page = ({ params }: { params: { mode: string } }) => {
       .then((res) => {
         setUsers(res.data);
       });
-  }, [setUsers]);
+  };
+
+  useEffect(() => {
+    if (!token) return;
+    const Clientsocket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/chat`, {
+      auth: {
+        token,
+      },
+    });
+    setSocket(Clientsocket);
+    return () => {
+      Clientsocket.disconnect();
+    };
+  }, []);
+
+  socket &&
+    socket.on('GameResponse', async (data: any) => {
+      const body = {
+        player1Id: data.sender.id,
+        player2Id: data.userId,
+        mode: data.mode,
+      };
+      if (!token) return;
+      const g = await StartGame(body, token);
+      if (!g) return;
+      router.push(`/game/${data.mode}/friend`);
+    });
+
   return (
     <Dashboard>
       <div className="w-full flex flex-col gap-10 items-center p-4 text-left tracking-wide text-white">
@@ -104,7 +136,10 @@ const page = ({ params }: { params: { mode: string } }) => {
               </button>
               <Dialog.Root>
                 <Dialog.Trigger asChild>
-                  <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-orange-500 rounded-xl font-bold text-orange-500 focus:outline-none">
+                  <button
+                    onClick={getUsers}
+                    className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-orange-500 rounded-xl font-bold text-orange-500 focus:outline-none"
+                  >
                     Friend
                   </button>
                 </Dialog.Trigger>
@@ -124,8 +159,11 @@ const page = ({ params }: { params: { mode: string } }) => {
                           return (
                             <UserCard
                               username={user.login}
+                              userId={user.id}
                               avatar={user.avatar}
-                              online
+                              status={user.status}
+                              socket={socket}
+                              mode={params.mode}
                             />
                           );
                       })}
