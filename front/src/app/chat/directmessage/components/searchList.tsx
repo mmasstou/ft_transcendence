@@ -83,11 +83,11 @@ function SearchList({ setConversation, setConvCreation, users }) {
 	function formatList () {
 		if (searchedLogin !== '')
 		{
-			// setList(users.filter((user) => {
-			// 	const partLogin = user.login.substring(0, searchedLogin.length);
-			// 	return (partLogin !== '' && partLogin === searchedLogin);
-			// }))
-			setList([...users]);
+			setList(users.filter((user) => {
+				const partLogin = user.login.substring(0, searchedLogin.length);
+				return (partLogin !== '' && partLogin === searchedLogin);
+			}))
+			setList([...users, ...users, ...users, ...users]);
 		}
 		else
 			setList([])
@@ -100,7 +100,7 @@ function SearchList({ setConversation, setConvCreation, users }) {
 	}, [searchedLogin]);
 
   return (
-	<div className='flex flex-col  max-w-[500px] w-full max-h-[400px] h-[50%] border'>
+	<div className='flex flex-col  max-w-[500px] w-full max-h-[400px] h-[50%]'>
 		<input type='text' placeholder='login' ref={inputRef} value={searchedLogin} onChange={(e) => {setLogin(e.target.value);}} 
 			className='bg-[#3E504D] text-white rounded-lg py-[10px] px-[15px] border focus:border-[#1EF0AE] outline-none'/>
 		<ul className='mt-[10px] max-h-full overflow-auto'>

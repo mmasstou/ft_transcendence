@@ -3,7 +3,11 @@ import React from 'react'
 function ConversationMsg({ msgs }) {
 	
 	return (
-		<div className='border h-full'>{msgs}</div>
+		<div className='h-full p-4 '>
+			<section className='text-white h-full bg-[#3E504D] rounded-[10px] p-5'>
+				{msgs}
+			</section>
+		</div>
 	)
 }
 

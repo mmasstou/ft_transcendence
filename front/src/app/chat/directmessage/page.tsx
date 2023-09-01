@@ -30,63 +30,63 @@ export default function page() {
 
   return (
     <Dashboard>
-	<div className='border-4 border-[#24323044] h-full'>
-		<div className="channeLnavbar grid grid-flow-row-dense grid-cols-4 justify-between items-center text-white px-2 py-1">
-			<div>
-				{isOpen
-					? <Button
-						icon={BsReverseLayoutSidebarInsetReverse}
-						small
-						outline
-						onClick={() => {setOpening(false)}}
+		<div className='border-4 border-[#24323044] h-full'>
+			<div className="channeLnavbar grid grid-flow-row-dense grid-cols-4 justify-between items-center text-white px-2 py-1">
+				<div>
+					{isOpen
+						? <Button
+							icon={BsReverseLayoutSidebarInsetReverse}
+							small
+							outline
+							onClick={() => {setOpening(false)}}
+						/>
+						: <Button
+							icon={BsLayoutSidebarInset}
+							small
+							outline
+							onClick={() => {setOpening(true)}}
+						/>
+					}
+				</div>
+				<div className="channeLnavbarmenu col-span-2 flex justify-center  sm:justify-around gap-4 w-full ">
+					<ChatNavbarLink
+						to="/chat/directmessage"
+						label="direct Message"
+						icon={HiChatBubbleLeftRight}
+						active={router.includes('directmessage')}
 					/>
-					: <Button
-						icon={BsLayoutSidebarInset}
-						small
-						outline
-						onClick={() => {setOpening(true)}}
+					<ChatNavbarLink
+						to="/chat/channels"
+						label="channeL"
+						icon={FaUsers}
+						active={router.includes('channels')}
 					/>
-				}
-			</div>
-			<div className="channeLnavbarmenu col-span-2 flex justify-center  sm:justify-around gap-4 w-full ">
-				<ChatNavbarLink
-					to="/chat/directmessage"
-					label="direct Message"
-					icon={HiChatBubbleLeftRight}
-					active={router.includes('directmessage')}
-				/>
-				<ChatNavbarLink
-					to="/chat/channels"
-					label="channeL"
-					icon={FaUsers}
-					active={router.includes('channels')}
-				/>
-			</div>
-			<div className="flex justify-end items-center gap-2">
-				<Button
-					icon={BsPersonAdd}
-					small
-					outline
-					onClick={() => {setConvCreation(!createConversation)}}
-				/>
-				{openFriendList ? 
-					<Button 
-						icon={BsPeople}
+				</div>
+				<div className="flex justify-end items-center gap-2">
+					<Button
+						icon={BsPersonAdd}
 						small
 						outline
-						onClick={() => setFriendList(!openFriendList)}
-					/> 
-					: <Button 
-						icon={BsFillPeopleFill}
-						small
-						outline
-						onClick={() => setFriendList(!openFriendList)}
+						onClick={() => {setConvCreation(!createConversation)}}
 					/>
-				}
+					{openFriendList ? 
+						<Button 
+							icon={BsPeople}
+							small
+							outline
+							onClick={() => setFriendList(!openFriendList)}
+						/> 
+						: <Button 
+							icon={BsFillPeopleFill}
+							small
+							outline
+							onClick={() => setFriendList(!openFriendList)}
+						/>
+					}
+				</div>
 			</div>
+			<PrivateConversation isOpen={isOpen} openFriendList={openFriendList} setFriendList={setFriendList} openSeachList={createConversation} setSeachOpening={setConvCreation}/>
 		</div>
-		<PrivateConversation isOpen={isOpen} openFriendList={openFriendList} setFriendList={setFriendList} openSeachList={createConversation} setSeachOpening={setConvCreation}/>
-	</div>
     </Dashboard>
   )
 }
