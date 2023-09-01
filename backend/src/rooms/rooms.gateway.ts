@@ -269,7 +269,7 @@ export class RoomGateway implements OnGatewayConnection {
     });
   }
 
-  @SubscribeMessage(`SOCKET_EVENT_CHAT_CREATE`)
+  @SubscribeMessage(`SOCKET_EVENT_JOIN_MEMBER`)
   async joinmember(
     @ConnectedSocket() client: Socket,
     @MessageBody()
