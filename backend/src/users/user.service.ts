@@ -111,19 +111,6 @@ export class UserService {
       where: { id },
     });
   }
-<<<<<<< HEAD
-=======
-
-  async getUserDirectMessages(userId: string) {
-    // Add your logic to fetch the direct messages for the user from the database or any other source
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        directMessage: true,
-      },
-    });
-    return user;
-  }
 
   // get User in cluent socket
   async getUserInClientSocket(client: Socket) {
@@ -206,5 +193,4 @@ export class UserService {
     if (!login.match(/^[A-z][A-z0-9-_]{5,7}$/)) return false;
     return true;
   }
->>>>>>> debe4cf6152da912deeb3de1cb20380d05d7cbeb
 }
