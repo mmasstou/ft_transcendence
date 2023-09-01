@@ -122,7 +122,7 @@ const ChanneLCreateModaL = () => {
     }
     _friends.push(LoginUser)
     resetALL()
-    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_CREATE}`, {
+    socket?.emit(`SOCKET_EVENT_CHAT_CREATE`, {
       name: Data.channeLname,
       friends: _friends,
       type: Data.channeLtype,
@@ -156,7 +156,7 @@ const ChanneLCreateModaL = () => {
             disabled={false}
             className={` text-white peer w-full p-2 pt-6 text-xl bg-transparent text-[var(--white)] focus:bg-transparent font-light border rounded-md outline-none transition disabled:opacity-70 disabled:cursor-not-allowed ${errors['channeLname'] ? 'border-rose-500 focus:border-rose-500' : 'border-neutral-300 focus:border-secondary'}`}
           />
-          <label htmlFor="" className={`capitalize text-[var(--white)] absolute text-md duration-150 transform -translate-x-3 top-5 z-10 origin-[0] left-7 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 ${(channeLname.length !== 0 || !channeLname) ? 'scale-75 -translate-y-4' : ''} ${errors['channeLname'] ? 'text-rose-500' : 'text-zinc-500'}`}>channel name</label>
+          <label htmlFor="" className={`capitalize text-[var(--white)] absolute text-md duration-150 transform -translate-x-3 top-5 origin-[0] left-7 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 ${(channeLname.length !== 0 || !channeLname) ? 'scale-75 -translate-y-4' : ''} ${errors['channeLname'] ? 'text-rose-500' : 'text-zinc-500'}`}>channel name</label>
         </div>
         <div className="flex flex-col gap-3">
           <h1 className=" text-[#ffffffb9] text-xl font-bold capitalize">channel type </h1>
@@ -202,7 +202,7 @@ const ChanneLCreateModaL = () => {
               disabled={false}
               className={` text-white peer w-full p-2 pt-6 text-xl bg-transparent text-[var(--white)] focus:bg-transparent font-light border rounded-md outline-none transition disabled:opacity-70 disabled:cursor-not-allowed ${errors['channeLpassword'] ? 'border-rose-500 focus:border-rose-500' : 'border-neutral-300 focus:border-secondary'}`}
             />
-            <label htmlFor="" className={` capitalize text-[var(--white)] absolute text-md duration-150 transform -translate-x-3 top-5 z-10 origin-[0] left-7 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 ${(channeLpassword.length !== 0 || !channeLpassword) ? 'scale-75 -translate-y-4' : ''} ${errors['channeLpassword'] ? 'text-rose-500' : 'text-zinc-500'}`}>channel password</label>
+            <label htmlFor="" className={` capitalize text-[var(--white)] absolute text-md duration-150 transform -translate-x-3 top-5 origin-[0] left-7 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 ${(channeLpassword.length !== 0 || !channeLpassword) ? 'scale-75 -translate-y-4' : ''} ${errors['channeLpassword'] ? 'text-rose-500' : 'text-zinc-500'}`}>channel password</label>
           </div>
         }
         {aLLfriends !== null && <Select

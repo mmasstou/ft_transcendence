@@ -200,7 +200,7 @@ const ChanneLSettingsModaL = () => {
 
             {!MemberInfo?.isban
                 ? <>
-                    <div className={`body flex flex-col gap-4 h-full w-full min-h-[32rem] border border-secondary`}>
+                    <div className={`body flex flex-col gap-4 h-full w-full min-h-[32rem]`}>
                         {
                             _channeLtype === "UserSettings"
                                 ? <ChanneLUserSettings

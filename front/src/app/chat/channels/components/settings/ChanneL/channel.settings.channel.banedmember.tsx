@@ -37,7 +37,7 @@ export default function ChanneLSettingsChanneLBanedMember(
         __message && channeLConfirmActionHook.onOpen(
             <button
                 onClick={() => {
-                    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_UPDATE}`, data)
+                    socket?.emit(`SOCKET_EVENT_CHAT_MEMBER_UPDATE`, data)
                 }}
                 className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
                 UnBan

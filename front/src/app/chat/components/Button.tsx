@@ -70,7 +70,7 @@ const Button: React.FC<ButtonProps> = ({
         >
             {Icon && (<Icon size={size ? size : 24} />)}
             {showLabeL && <span className={` ${responsive ? 'hidden sm:flex' : ''}  ${_labelsise && _labelsise} `}>  {label && label}</span>}
-            {label && responsive&&<Tooltip opacity={1} className='z-[1111111111111111] bg-black' id={_id} place="left" />}
+            {label && responsive&&<Tooltip opacity={1} className='z-[37] bg-black' id={_id} place="left" />}
 
         </button>
 

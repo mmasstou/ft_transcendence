@@ -93,7 +93,7 @@ export class RoomGateway implements OnGatewayConnection {
     }
   }
 
-  @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_MEMBER_UPDATE}`)
+  @SubscribeMessage(`SOCKET_EVENT_CHAT_MEMBER_UPDATE`)
   async updatemember(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -141,10 +141,6 @@ export class RoomGateway implements OnGatewayConnection {
               mute_at: timeOnMute,
             },
           });
-          // if (member.timeout) {
-          //   console.log('Chat-> member.timeout- +>', member.timeout);
-          //   clearTimeout(parseInt(member.timeout, 10));
-          // }
           if (TimeOutList.has(data.member.id)) {
             const tt = TimeOutList.get(data.member.id);
             clearTimeout(tt);
@@ -152,12 +148,10 @@ export class RoomGateway implements OnGatewayConnection {
           }
           if (member.ismute) {
             time = setTimeout(async () => {
-              // const member = (async () => {
               await this.prisma.members.update({
                 where: { id: data.member.id },
                 data: { ismute: false },
               });
-              // })();
               this.server.emit(
                 `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
                 { OK: true },
@@ -167,12 +161,6 @@ export class RoomGateway implements OnGatewayConnection {
               TimeOutList.set(data.member.id, time);
               time = null;
             }
-            // await this.prisma.members.update({
-            //   where: { id: data.member.id },
-            //   data: {
-            //     timeout: time.toString(),
-            //   },
-            // });
           }
           if (!member.ismute) {
             clearTimeout(time);
@@ -222,7 +210,7 @@ export class RoomGateway implements OnGatewayConnection {
     }
   }
 
-  @SubscribeMessage(`${process.env.SOCKET_EVENT_ADD_MEMBER}`)
+  @SubscribeMessage(`SOCKET_EVENT_ADD_MEMBER`)
   async Addmember(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -281,7 +269,7 @@ export class RoomGateway implements OnGatewayConnection {
     });
   }
 
-  @SubscribeMessage(`${process.env.SOCKET_EVENT_JOIN_MEMBER}`)
+  @SubscribeMessage(`SOCKET_EVENT_CHAT_CREATE`)
   async joinmember(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -364,7 +352,7 @@ export class RoomGateway implements OnGatewayConnection {
       Ok: true,
     });
   }
-  @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_CREATE}`)
+  @SubscribeMessage(`SOCKET_EVENT_CHAT_CREATE`)
   async createRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -427,7 +415,7 @@ export class RoomGateway implements OnGatewayConnection {
     }
   }
 
-  @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_DELETE}`)
+  @SubscribeMessage(`SOCKET_EVENT_CHAT_DELETE`)
   async deleteRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody()

@@ -124,7 +124,7 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
         __message && channeLConfirmActionHook.onOpen(
             <button
                 onClick={() => {
-                    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_UPDATE}`, data)
+                    socket?.emit(`SOCKET_EVENT_CHAT_MEMBER_UPDATE`, data)
                 }}
                 className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
                 {data.updateType && getLable(data.updateType, data.member)}
@@ -134,7 +134,7 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
     }
 
     if (!IsMounted) return null;
-        
+
     let bodyContent = (
         <>
             <div className="flex flex-row justify-end items-center gap-2">
