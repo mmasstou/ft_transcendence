@@ -3,14 +3,16 @@ services:
   # frontend:
   #   build: front/
   #   container_name: frontend
+  #   env_file:
+  #     - front/.env
   #   ports:
   #     - 8080:8080
-  #     # - 5430:5430
-  #   # networks:
-  #   #   - APInetwork
-  #   # depends_on:
-  #   #   - backend
-  #   #   - database
+  #     - 5430:5430
+  #   networks:
+  #     - APInetwork
+  #   depends_on:
+  #     - backend
+  #     - database
   #   volumes:
   #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front:/frontend:rw
   #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
@@ -34,8 +36,6 @@ services:
     container_name: database
     env_file:
       - backend/.env
-    networks:
-      - APInetwork
     ports:
       - 5432:5432
     # volumes:

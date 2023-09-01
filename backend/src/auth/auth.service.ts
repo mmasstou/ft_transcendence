@@ -16,11 +16,29 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
 
+  async signInWithLogin(login: string, password: string) {
+    const userExists = await this.usersService.findOneLogin({
+      login,
+    });
+    if (!userExists) {
+      return null;
+    }
+    if (userExists.password === password) {
+      const token = await this.generateJwt({
+        login: userExists.login,
+        email: userExists.email,
+        avatar: userExists.avatar,
+        name: userExists.name,
+        banner: userExists.banner,
+        intraId: userExists.intraId,
+      });
+      return {
+        userId: userExists,
+        token: token.accessToken,
+      };
+    }
+  }
   async signIn(user: Prisma.UserUncheckedCreateInput) {
-    // if (!user) {
-    //   throw new BadRequestException('Unauthenticated');
-    // }
-
     const userExists = await this.usersService.findOneLogin({
       login: user.login,
     });
@@ -35,6 +53,7 @@ export class AuthService {
       avatar: userExists.avatar,
       name: userExists.name,
       banner: userExists.banner,
+      userId: userExists.id,
       intraId: userExists.intraId,
       logedFirstTime: userExists.logedFirstTime,
     });
@@ -57,6 +76,7 @@ export class AuthService {
         email: newUser.email,
         avatar: newUser.avatar,
         name: newUser.name,
+        userId: newUser.id,
         banner: newUser.banner,
         intraId: newUser.intraId,
         logedFirstTime: newUser.logedFirstTime,

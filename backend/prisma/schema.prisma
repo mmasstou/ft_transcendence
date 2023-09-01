@@ -2,141 +2,168 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // enums :
 enum UserType {
-    ADMIN
-    USER
-    OWNER
+  ADMIN
+  USER
+  OWNER
 }
 
 enum RoomType {
-    PRIVATE
-    PUBLIC
-    PROTECTED
+  PRIVATE
+  PUBLIC
+  PROTECTED
 }
 
 model UserSocket {
-    id         String   @id @default(uuid())
-    socketId   String
-    user       User     @relation(fields: [userId], references: [id])
-    userId     String   @unique
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id         String   @id @default(uuid())
+  socketId   String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 // models :
 model User {
-    id                            String         @id @default(uuid())
-    login                         String         @unique
-    email                         String         @unique
-    password                      String?
-    name                          String?
-    kind                          String?
-    avatar                        String?
-    bg_color                      String[]       @default(["#918CA9", "#211F2F"])
-    paddle_color                  String?        @default("#E0E0E0")
-    ball_color                    String?        @default("#E0E0E0")
-    MyScore                       Match[]        @relation("Player1")
-    Other                         Match[]        @relation("Player2")
-    status                        String         @default("online")
-    TotalWin                      Int            @default(0)
-    TotalLose                     Int            @default(0)
-    TotalDraw                     Int            @default(0)
-    cleanSheet                    Boolean        @default(false)
-    Machine                       Boolean        @default(false)
-    TotalMatch                    Int            @default(0)
-    Level                         Float          @default(0.0)
-    location                      String?
-    cursus_users                  Cursus?        @relation(fields: [cursusId], references: [id])
-    intraId                       Int?
-    banner                        String?
-    is_active                     Boolean        @default(false)
-    created_at                    DateTime       @default(now())
-    updated_at                    DateTime       @updatedAt
-    Members                       Members[]
-    Messages                      Messages[]
-    Rooms                         Rooms[]
-    UserSocket                    UserSocket[]
-    cursusId                      String?
-    twoFactorAuthenticationSecret String?
-    twoFA                         Boolean        @default(false)
-    conversations                 Conversation[]
-    logedFirstTime                Boolean        @default(false)
+  id                            String                 @id @default(uuid())
+  login                         String                 @unique
+  email                         String                 @unique
+  password                      String?
+  name                          String?
+  kind                          String?
+  avatar                        String?
+  bg_color                      String[]               @default(["#918CA9", "#211F2F"])
+  paddle_color                  String?                @default("#E0E0E0")
+  ball_color                    String?                @default("#E0E0E0")
+  MyScore                       Match[]                @relation("Player1")
+  Other                         Match[]                @relation("Player2")
+  status                        String                 @default("online")
+  TotalWin                      Int                    @default(0)
+  TotalLose                     Int                    @default(0)
+  TotalDraw                     Int                    @default(0)
+  cleanSheet                    Boolean                @default(false)
+  Machine                       Boolean                @default(false)
+  TotalMatch                    Int                    @default(0)
+  Level                         Float                  @default(0.0)
+  location                      String?
+  intraId                       Int?
+  banner                        String?
+  is_active                     Boolean                @default(false)
+  created_at                    DateTime               @default(now())
+  updated_at                    DateTime               @updatedAt
+  Members                       Members[]
+  Messages                      Messages[]
+  Rooms                         Rooms[]
+  directMessage                 DirectMessage[]
+  UserSocket                    UserSocket[]
+  Notification                  Notification[]
+  ChanneLNotifications          ChanneLNotifications[]
+  twoFactorAuthenticationSecret String?
+  twoFA                         Boolean                @default(false)
+  logedFirstTime                Boolean                @default(false)
+  conversations                 Conversation[]
 }
 
 model Match {
-    id           String   @id @default(uuid())
-    created_at   DateTime @default(now())
-    player1      User     @relation(name: "Player1", fields: [player1Id], references: [id])
-    player1Id    String
-    player1Score Int
-    player2      User     @relation(name: "Player2", fields: [player2Id], references: [id])
-    player2Id    String
-    player2Score Int
+  id           String   @id @default(uuid())
+  created_at   DateTime @default(now())
+  player1      User     @relation(name: "Player1", fields: [player1Id], references: [id], onDelete: Cascade)
+  player1Id    String
+  player1Score Int
+  player2      User     @relation(name: "Player2", fields: [player2Id], references: [id], onDelete: Cascade)
+  player2Id    String
+  player2Score Int
 }
 
-model Cursus {
-    id    String @id @default(uuid())
-    grade String
-    level Float
-    // blackholed_at String
-    User  User[]
+model Notification {
+  id         String   @id @default(uuid())
+  content    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  User       User     @relation(fields: [userId], references: [id])
+  userId     String
+}
+
+model ChanneLNotifications {
+  id         String   @id @default(uuid())
+  content    String
+  User       User     @relation(fields: [userId], references: [id])
+  channel    Rooms    @relation(fields: [channelId], references: [id])
+  channelId  String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  userId     String
 }
 
 model Rooms {
-    id             String     @id @default(uuid())
-    name           String     @unique
-    type           RoomType   @default(PUBLIC)
-    members        Members[]
-    messages       Messages[]
-    viewedmessage  Int        @default(0)
-    password       String?
-    accesspassword String?    @default("")
-    created_at     DateTime   @default(now())
-    updated_at     DateTime   @updatedAt
-    User           User[]
+  id                   String                 @id @default(uuid())
+  name                 String                 @unique
+  type                 RoomType               @default(PUBLIC)
+  members              Members[]
+  messages             Messages[]
+  viewedmessage        Int                    @default(0)
+  password             String?
+  hasAccess            Boolean                @default(false)
+  accesspassword       String?                @default("")
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @updatedAt
+  User                 User[]
+  slug                 String                 @unique @default(uuid())
+  ChanneLNotifications ChanneLNotifications[]
+}
+
+model DirectMessage {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  User       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String?
 }
 
 model Members {
-    id         String   @id @default(uuid())
-    user       User     @relation(fields: [userId], references: [id])
-    RoomId     Rooms?   @relation(fields: [roomsId], references: [id])
-    type       UserType @default(USER)
-    userId     String
-    roomsId    String?
-    isban      Boolean  @default(false)
-    ismute     Boolean  @default(false)
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id         String    @id @default(uuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  RoomId     Rooms?    @relation(fields: [roomsId], references: [id], onDelete: Cascade)
+  type       UserType  @default(USER)
+  userId     String
+  roomsId    String?
+  timeout    String?
+  isban      Boolean   @default(false)
+  ismute     Boolean   @default(false)
+  mute_at    DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
 }
 
 model Messages {
-    content        String
-    id             String        @id @default(uuid())
-    sender         User          @relation(fields: [senderId], references: [id])
-    roomId         Rooms?        @relation(fields: [roomsId], references: [id])
-    senderId       String
-    viewed         Int           @default(0)
-    roomsId        String?
-    created_at     DateTime      @default(now())
-    updated_at     DateTime      @updatedAt
-    Conversation   Conversation? @relation(fields: [conversationId], references: [id])
-    conversationId String?
+  content        String
+  id             String        @id @default(uuid())
+  sender         User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  roomId         Rooms?        @relation(fields: [roomsId], references: [id], onDelete: Cascade)
+  senderId       String
+  viewed         Int           @default(0)
+  roomsId        String?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  Conversation   Conversation? @relation(fields: [conversationId], references: [id])
+  conversationId String?
 }
 
 model Conversation {
-    id        String     @id @default(uuid())
-    content   String
-    messages  Messages[]
-    users     User[]
-    createdAt DateTime   @default(now())
-    updatedAt DateTime   @updatedAt
+  id        String     @id @default(uuid())
+  content   String
+  messages  Messages[]
+  users     User[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }

@@ -16,7 +16,7 @@ const Achpage = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:80/api/users/${id}`)
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`)
       .then((res) => {
         setUser(res.data);
       })
@@ -48,14 +48,14 @@ const Achpage = () => {
         icon="victory-van"
         description="Reach level 1."
         hasProgression
-        progression={user.Level! * 50}
+        progression={user.Level! > 1 ? 100 : user.Level! * 100}
       />
       <Achievement
         title="Advanced player"
         icon="speed-demon"
         description="Reach level 5."
         hasProgression
-        progression={user.Level! * 20}
+        progression={user.Level! > 5 ? 100 : user.Level! * 20}
       />
       <Achievement
         title="Fifty frenzy"

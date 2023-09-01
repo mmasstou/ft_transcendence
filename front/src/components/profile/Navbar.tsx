@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Statistics from './Statistics';
 import Friend from './Friend';
+import Cookies from 'js-cookie';
 
 interface Props {
   mobile: boolean;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export const Navbar: React.FC<Props> = (info): JSX.Element => {
+  const userId = Cookies.get('_id');
   let router = usePathname();
 
   const updateRouter = (url: string) => {
@@ -65,7 +67,7 @@ export const Navbar: React.FC<Props> = (info): JSX.Element => {
       </div>
       <div className="">
         {(router === '/profile' || router === '/profile/statistics') && (
-          <Statistics />
+          <Statistics user_id={userId} />
         )}
 
         {router === '/profile/history' && <Historique />}

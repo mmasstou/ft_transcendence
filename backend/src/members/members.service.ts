@@ -1,30 +1,31 @@
 import {
-  HttpException,
-  HttpStatus,
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Members, Prisma } from '@prisma/client';
+import { Members, Prisma, UserType } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class MembersService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(params: { userId: string; roomId: string }): Promise<Members> {
+  async findOne(params: {
+    userId: string;
+    roomId: string;
+  }): Promise<Members | null> {
     try {
       const { userId, roomId } = params;
-      // console.log('++findOne||++>', id);
-      const message = await this.prisma.members.findFirst({
+      const response = await this.prisma.members.findFirst({
         where: {
           userId,
           roomsId: roomId,
         },
       });
-      if (!message) throw new Error('');
-      return message;
+      if (!response) new NotFoundException();
+      return response;
     } catch (error) {
-      throw new NotFoundException();
+      throw new BadRequestException();
     }
   }
 
@@ -33,10 +34,13 @@ export class MembersService {
   }
 
   async findALLForRoom(roomId: string): Promise<Members[]> {
-    // console.log('++findALLForRoom++>', roomId);
-
     return this.prisma.members.findMany({
-      where: { RoomId: { id: roomId } },
+      where: {
+        RoomId: { id: roomId },
+      },
+      orderBy: {
+        created_at: 'asc', // or 'desc' for descending order
+      },
     });
   }
 
@@ -61,35 +65,36 @@ export class MembersService {
         },
       });
     } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.FORBIDDEN,
-          error: "CAN'T CREATE THIS MESSAGE",
-        },
-        HttpStatus.FORBIDDEN,
-        {
-          cause: error,
-        },
-      );
+      return null;
     }
   }
 
   async update(params: {
     id: string;
-    type: Prisma.EnumUserTypeFieldUpdateOperationsInput;
-  }): Promise<Members> {
-    const { id, type } = params;
-    // console.log('++update++>', id);
+    type?: UserType | Prisma.EnumUserTypeFieldUpdateOperationsInput;
+    isban?: boolean;
+    ismute?: boolean;
+  }): Promise<Members | null> {
+    try {
+      const { id, type, isban, ismute } = params;
 
-    return await this.prisma.members.update({
-      data: { type },
-      where: { id },
-    });
+      const oLdMember = await this.prisma.members.findUnique({
+        where: { id },
+      });
+      if (!oLdMember) throw new NotFoundException();
+      const __isBan = isban ? isban : oLdMember.isban;
+      const __isMute = ismute ? ismute : oLdMember.ismute;
+      const __type = type ? type : oLdMember.type;
+      return await this.prisma.members.update({
+        data: { type: __type, isban: __isBan, ismute: __isMute },
+        where: { id },
+      });
+    } catch (error) {
+      return null;
+    }
   }
 
   async remove(id: string): Promise<Members> {
-    // console.log('++remove++>', id);
-
     return await this.prisma.members.delete({
       where: { id },
     });

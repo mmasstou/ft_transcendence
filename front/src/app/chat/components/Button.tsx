@@ -1,7 +1,9 @@
 'use client';
-
+import { Tooltip } from 'react-tooltip'
 import { IconType } from "react-icons";
-
+// import { randomUUID } from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'react-hot-toast';
 interface ButtonProps {
     label?: string;
     onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -14,7 +16,9 @@ interface ButtonProps {
     size?: number;
     IsBan?: boolean;
     labelsize?: number;
-    responsive ?: boolean;
+    responsive?: boolean;
+    type?: boolean;
+    showLabeL?: boolean
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -27,15 +31,21 @@ const Button: React.FC<ButtonProps> = ({
     icon: Icon,
     border,
     IsActive,
+    type,
     size,
     IsBan,
-    responsive
+    responsive,
+    showLabeL
 }) => {
-    const _labelsise  :string | undefined = labelsize ? 'text-' + labelsize.toString() : undefined
+    const _labelsise: string | undefined = labelsize ? 'text-' + labelsize.toString() : undefined
+    const _id = uuidv4();
     return (
         <button
+            type={type ? 'submit' : 'button'}
             disabled={disabled}
             onClick={onClick}
+            data-tooltip-id={_id}
+            data-tooltip-content={label}
             className={`
         relative
         flex
@@ -48,7 +58,7 @@ const Button: React.FC<ButtonProps> = ({
         transition
         items-center
         w-max
-        px-2
+        px-2 z-10
         ${outline ? ' bg-transparent' : 'bg-rose-500'}
        ${border ? outline ? 'border-black' : 'border-rose-500' : ''}
        ${IsActive ? ' text-secondary' : IsBan ? ' text-isban' : 'text-white'}
@@ -59,8 +69,11 @@ const Button: React.FC<ButtonProps> = ({
       `}
         >
             {Icon && (<Icon size={size ? size : 24} />)}
-            <span className={` ${responsive ? 'hidden sm:flex' : ''}  ${_labelsise && _labelsise} `}>  {label && label}</span>
+            {showLabeL && <span className={` ${responsive ? 'hidden sm:flex' : ''}  ${_labelsise && _labelsise} `}>  {label && label}</span>}
+            {label && responsive&&<Tooltip opacity={1} className='z-[1111111111111111] bg-black' id={_id} place="left" />}
+
         </button>
+
     );
 }
 

@@ -26,8 +26,15 @@ export class MessagesService {
     }
   }
 
-  async findAll(): Promise<Messages[]> {
-    return this.prisma.messages.findMany();
+  async findALLForChanneL(channeLId: string): Promise<Messages[]> {
+    return this.prisma.messages.findMany({
+      where: {
+        roomsId: channeLId,
+      },
+      orderBy: {
+        created_at: 'asc', // or 'desc' for descending order
+      },
+    });
   }
 
   async create(data: {

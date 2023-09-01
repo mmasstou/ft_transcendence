@@ -6,6 +6,8 @@ import { HiChatBubbleLeftRight } from "react-icons/hi2";
 import { usePathname } from "next/navigation";
 import { FaUsers } from "react-icons/fa";
 
+import Cookies from 'js-cookie';
+import { Socket, io } from 'socket.io-client';
 
 const metadata = {
   title: 'Transcendence',

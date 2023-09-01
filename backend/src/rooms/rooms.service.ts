@@ -4,23 +4,56 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Messages, Rooms, UserType } from '@prisma/client';
+import {
+  ChanneLNotifications,
+  Members,
+  Messages,
+  RoomType,
+  Rooms,
+  User,
+  UserType,
+} from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateRoomDto } from './dtos/UpdateRoomDto';
 import { MembersService } from 'src/members/members.service';
 import { MessagesService } from 'src/messages/messages.service';
+import { UserTypeEnum, membersType } from 'src/users/user.type';
+import { UserService } from 'src/users/user.service';
 
-enum RoomType {
-  PUBLIC = 'PUBLIC',
-  PRIVATE = 'PRIVATE',
-}
 @Injectable()
 export class RoomsService {
   constructor(
     private prisma: PrismaService,
     private membersservice: MembersService,
     private messageservice: MessagesService,
+    private readonly userService: UserService,
   ) {}
+
+  async HasPermissionToAccess(params: { roomId: string; userId: string }) {
+    try {
+      const User = await this.userService.findOne({ id: params.userId });
+      const Room = await this.prisma.rooms.findUnique({
+        where: { id: params.roomId },
+        include: { members: true },
+      });
+      if (!User || !Room) throw new Error();
+
+      const _member = await this.membersservice.findOne({
+        userId: User.id,
+        roomId: Room.id,
+      });
+      if (!_member) throw new Error();
+      for (let index = 0; index < Room.members.length; index++) {
+        const element = Room.members[index];
+        if (element.userId === User.id) {
+          return true;
+        }
+      }
+      throw new NotFoundException();
+    } catch (error) {
+      return false;
+    }
+  }
   // check if member is in room
   async isMemberInRoom(roomId: string, userId: string) {
     const room = await this.prisma.rooms.findUnique({
@@ -38,16 +71,102 @@ export class RoomsService {
     }
     return member;
   }
-  async findOne(params: { name: string }): Promise<Rooms> {
+
+  async findOne(params: { id: string }): Promise<Rooms> {
+    const { id } = params;
     try {
-      const { name } = params;
-      // console.log('++findOne++>', name);
       const room = await this.prisma.rooms.findUnique({
-        where: { id: name },
+        where: { id },
+        include: { members: true },
       });
       if (!room) throw new Error('');
       return room;
     } catch (error) {
+      console.log('channeL with id %s not found', id);
+      return null;
+    }
+  }
+
+  async findOneBySLug(params: { slug: string }) {
+    const { slug } = params;
+    try {
+      const room = await this.prisma.rooms.findUnique({
+        where: { slug },
+        include: { members: true },
+      });
+      if (!room) throw new Error('');
+      return room;
+    } catch (error) {
+      console.log('channeL with slug %s not found', slug);
+      return new NotFoundException();
+    }
+  }
+
+  async findOneByName(params: { name: string }): Promise<Rooms | null> {
+    try {
+      const { name } = params;
+      const room = await this.prisma.rooms.findUnique({
+        where: { name },
+      });
+      if (!room) throw new Error('');
+      return room;
+    } catch (error) {
+      console.log('Rooms-findOne> error- +>', error);
+      return null;
+    }
+  }
+
+  async findNotifications(params: {
+    login: string;
+    channeLId: string;
+  }): Promise<ChanneLNotifications[]> {
+    try {
+      const { login, channeLId } = params;
+      const User = await this.userService.findOneLogin({ login });
+      const ChanneL = await this.prisma.rooms.findUnique({
+        where: {
+          id: channeLId,
+        },
+      });
+      if (!User || !ChanneL) return;
+      const notifications = await this.prisma.channeLNotifications.findMany({
+        where: {
+          channelId: ChanneL.id,
+        },
+      });
+      if (!notifications) throw new Error();
+      return notifications;
+    } catch (error) {
+      console.log('Rooms-findOne> error- +>', error);
+      throw new NotFoundException();
+    }
+  }
+
+  async findOwners(params: { channeLId: string }): Promise<User[]> {
+    try {
+      const { channeLId } = params;
+      const room = await this.prisma.rooms.findUnique({
+        where: { id: channeLId },
+        include: {
+          members: true,
+        },
+      });
+      // get Owners member :
+      const _members: User[] = [];
+
+      for (let index = 0; index < room.members.length; index++) {
+        const member = room.members[index];
+        if (member.type === UserTypeEnum.OWNER) {
+          const UserforMember = await this.userService.findOne({
+            id: member.userId,
+          });
+          UserforMember && _members.push(UserforMember);
+        }
+      }
+      if (!_members) throw new Error('');
+      return _members;
+    } catch (error) {
+      console.log('Rooms-findOne> error- +>', error);
       throw new NotFoundException();
     }
   }
@@ -84,25 +203,25 @@ export class RoomsService {
 
     return rooms;
   }
+
   // this is the function that create room and add members to it
-  async create(
-    _data: {
-      name: string;
-      type: RoomType;
-      friends: UserType[];
-      channeLpassword?: string;
-    },
-    userId: string,
-  ) {
+  async create(_data: {
+    name: string;
+    type: RoomType;
+    friends: UserType[];
+    channeLpassword?: string;
+  }) {
     try {
       // console.log('++create+data+>', _data);
       // console.log('++create+userId+>', userId);
       return await this.prisma.$transaction(async (prisma) => {
         // console.log('++data : ', _data);
+        const slug = this.createSlug(_data.name);
         const room = await prisma.rooms.create({
           data: {
             name: _data.name,
             type: _data.type,
+            slug,
             password: _data.channeLpassword,
             members: {
               create: _data.friends.map((friend: any) => ({
@@ -112,6 +231,10 @@ export class RoomsService {
                 type: friend.role,
               })),
             },
+          },
+          include: {
+            members: true,
+            ChanneLNotifications: true,
           },
         });
         // console.log('***** +> _data.friends.length :', _data.friends.length);
@@ -153,7 +276,7 @@ export class RoomsService {
     });
   }
 
-  async remove(id: string): Promise<Rooms> {
+  async remove(id: string): Promise<Rooms | null> {
     // console.log('++remove++>', id);
 
     try {
@@ -165,34 +288,27 @@ export class RoomsService {
       if (!room) {
         throw new NotFoundException(`Room with ID ${id} not found`);
       }
+      const result = await this.prisma.$transaction(async (prisma) => {
+        // Delete all associated Members entities first
+        await prisma.members.deleteMany({
+          where: { roomsId: id },
+        });
+        // console.log('mmrs :', mmrs);
 
-      // Delete all associated Members entities first
-      const mmrs = await this.prisma.members.deleteMany({
-        where: { roomsId: id },
-      });
-      // console.log('mmrs :', mmrs);
+        // Delete all associated Members entities first
+        await prisma.messages.deleteMany({
+          where: { roomsId: id },
+        });
+        // console.log('rms :', rms);
 
-      // Delete all associated Members entities first
-      const rms = await this.prisma.messages.deleteMany({
-        where: { roomsId: id },
+        return await prisma.rooms.delete({
+          where: { id },
+        });
       });
-      // console.log('rms :', rms);
-
-      return await this.prisma.rooms.delete({
-        where: { id },
-      });
+      return result;
     } catch (error) {
-      // console.log('+++> error :', error);
-      throw new HttpException(
-        {
-          status: HttpStatus.FORBIDDEN,
-          error: `CAN'T ROMOVE ROOM ${id}`,
-        },
-        HttpStatus.FORBIDDEN,
-        {
-          cause: error,
-        },
-      );
+      console.log('+++> error :', error);
+      return null;
     }
   }
 
@@ -292,6 +408,7 @@ export class RoomsService {
       );
     }
   }
+
   async UpdateMessage(params: {
     messageId: string;
     content: string;
@@ -337,6 +454,7 @@ export class RoomsService {
       );
     }
   }
+
   async getaLLmessages(messageId: string) {
     try {
       const message = await this.prisma.rooms.findUnique({
@@ -375,5 +493,179 @@ export class RoomsService {
     });
 
     return newMember;
+  }
+
+  async findPublicAndProtected(login: string) {
+    // git user :
+    const User = await this.userService.findOneLogin({ login });
+    // check if user is member
+    const rooms = await this.prisma.rooms.findMany({
+      where: {
+        type: {
+          in: ['PUBLIC', 'PROTECTED'],
+        },
+      },
+      include: {
+        members: true,
+      },
+    });
+    const _filterRooms: Rooms[] = [];
+    rooms.forEach((room) => {
+      let IsMember = false;
+      room.members.forEach((member) => {
+        if (member.userId === User.id) {
+          IsMember = true;
+        }
+      });
+      !IsMember && _filterRooms.push(room);
+    });
+    if (!rooms) null;
+    // rooms = rooms.filter((room: Rooms) => {
+    //   const member : Members = room.members.
+
+    // });
+
+    // const _filterRooms = rooms.filter((room: Rooms) => {
+    //   const member = room.members.find(
+    //     (member: Members) => member.userId === User.id,
+    //   );
+    //   if (member) return true;
+    //   return false;
+    // });
+    return _filterRooms;
+  }
+
+  // git all owner roomsÍ
+  async findOwnerRooms(roomId: string): Promise<Members[] | null> {
+    const rooms = await this.membersservice.findALLForRoom(roomId);
+    if (rooms) {
+      const ownerRooms = rooms.filter(
+        (member: Members) => member.type === 'OWNER',
+      );
+      if (!ownerRooms) {
+        return null;
+      }
+      return ownerRooms;
+    }
+    return null;
+  }
+
+  // join to room
+  async joinToRoom(
+    userId: string,
+    memberId: string,
+    roomId: string,
+  ): Promise<Rooms | null> {
+    try {
+      const room = await this.prisma.rooms.findUnique({
+        where: { id: roomId },
+        include: { members: true },
+      });
+      const User = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+      const member = await this.prisma.members.findUnique({
+        where: { id: memberId },
+      });
+      if (!room || !User || !member) {
+        if (!room)
+          throw new NotFoundException(`Room with ID ${roomId} not found`);
+        if (!User)
+          throw new NotFoundException(`User with ID ${userId} not found`);
+        if (!member)
+          throw new NotFoundException(`Member with ID ${memberId} not found`);
+      }
+      // console.log('Chat -- joinToRoom +> :', room, User, member);
+      const result = await this.prisma.$transaction(async (prisma) => {
+        const room = await prisma.rooms.update({
+          where: { id: roomId },
+          data: {
+            members: { connect: { id: memberId } },
+          },
+        });
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            Rooms: { connect: { id: roomId } },
+          },
+        });
+        return room;
+      });
+      // console.log('Chat -- joinToRoom +> :', result);
+      return result;
+    } catch (error) {
+      console.log('Chat - error -> joinToRoom', error);
+      return null;
+    }
+  }
+
+  // sockets functions :
+  async LeaveChanneL(params: {
+    userId: string;
+    roomId: string;
+  }): Promise<Rooms> {
+    try {
+      const { userId, roomId } = params;
+      // check if room is exist
+      const room = await this.prisma.rooms.findUnique({
+        where: { id: roomId },
+        include: { members: true },
+      });
+      // check if user is exist
+      const User = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (!room || !User) {
+        if (!room)
+          throw new NotFoundException(`Room with ID ${roomId} not found`);
+        if (!User)
+          throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+      // check if user is member in room
+      const member = await this.membersservice.findOne({
+        userId: User.id,
+        roomId: room.id,
+      });
+      if (!member) throw new Error();
+
+      const memberOwners = await this.findOwners({ channeLId: room.id });
+      if (memberOwners.length === 1 && memberOwners[0].id === member.userId)
+        throw new Error();
+      const result = await this.prisma.$transaction(async (prisma) => {
+        // disconnect member from room
+        const room = await prisma.rooms.update({
+          where: { id: roomId },
+          data: {
+            members: { disconnect: { id: userId } },
+          },
+        });
+        // disconnect room from user
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            Rooms: { disconnect: { id: roomId } },
+          },
+        });
+        // delete member
+        await prisma.members.delete({
+          where: { id: member.id },
+        });
+        return room;
+      });
+      return result;
+    } catch (error) {
+      console.log('Chat - error -> LeaveChanneL');
+      return null;
+    }
+  }
+
+  createSlug(name: string) {
+    return name
+      .toLowerCase() // Convert to lowercase
+      .replace(/\s+/g, '-') // Replace spaces with dashes
+      .replace(/[^\w\-]+/g, '') // Remove non-word characters except dashes
+      .replace(/\-\-+/g, '-') // Replace consecutive dashes with a single dash
+      .replace(/^\-+/, '') // Remove leading dashes
+      .replace(/\-+$/, ''); // Remove trailing dashes
   }
 }

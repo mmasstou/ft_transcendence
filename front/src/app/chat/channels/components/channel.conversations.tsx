@@ -1,175 +1,269 @@
 "use client"
 // imports :
-import { FormEvent, use, useEffect, useState } from "react";
+import React from "react";
 
 // components :
-import ConversationsInput from "./channel.conversations.input";
-import ConversationsMessages from "./channel.conversations.messages";
 
 // hooks :
 import { Socket } from "socket.io-client";
 
-import { useSearchParams } from "next/navigation";
-import Image from "next/image";
-import Message from "./channel.message";
-import LeftSidebarHook from "../hooks/LeftSidebarHook";
-import ConversationsTitlebar from "./channel.conversations.titlebar";
-import getChanneLMessages from "../actions/getChanneLMessages";
+import { RoomsType, membersType, messagesType } from "@/types/types";
 import Cookies from "js-cookie";
+import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
+import { IoSend } from "react-icons/io5";
+import Button from "../../components/Button";
+import FindOneBySLug from "../actions/Channel/findOneBySlug";
+import getChanneLMessages from "../actions/getChanneLMessages";
 import getMemberWithId from "../actions/getMemberWithId";
-import { membersType } from "@/types/types";
-import ChanneLsettingsHook from "../hooks/channel.settings";
+import ConversationsTitlebar from "./channel.conversations.titlebar";
+import Message from "./channel.message";
+import BanMember from "./channel.settings.banmember";
+import { CiVolumeMute } from "react-icons/ci";
+import { is, ro, tr } from "date-fns/locale";
+import { ChanneLContext } from "../providers/channel.provider";
+import ChannelConversationsMute from "./channel.conversations.mute";
 
+const token: string | undefined = Cookies.get('token')
+const UserId: string | undefined = Cookies.get('_id')
+export default function Conversations({ socket, slug }: { socket: Socket | null, slug: string }) {
+    // const query = useParams();
+    // const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
+    const chatContainerRef = React.useRef<HTMLDivElement | null>(null);
+    const [IsMounted, setIsMounted] = React.useState(false)
+    const [messages, setMessages] = React.useState<messagesType[]>([])
+    const [channeLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
+    const [message, setMessage] = React.useState("")
+    const [InputValue, setInputValue] = React.useState("")
+    const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
 
-export default function Conversations({ socket }: { socket: Socket | null }) {
+    if (!token || !UserId) return
+    const InputRef = React.useRef<HTMLInputElement | null>(null);
+    const [LoadingMessages, setLoadingMessages] = React.useState<boolean>(true)
+    const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
+    const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
+    const ChanneLContextee: any = React.useContext(ChanneLContext)
+    const router = useRouter()
 
-    const leftSidebar = LeftSidebarHook()
-    const [IsMounted, setIsMounted] = useState(false)
-    const [IsLoading, setIsLoading] = useState(false)
-    const [messages, setMessages] = useState<any[]>([])
-    const [hasparam, sethasparam] = useState(false)
-    const [channeLinfo, setChanneLinfo] = useState<any>(null)
-    const [message, setMessage] = useState("")
-    const [InputValue, setInputValue] = useState("")
-    const [viewed, setviewed] = useState<number>(0)
-    const [LogedMember, setLogedMember] = useState<membersType | null>(null)
-    const params = useSearchParams()
-    const room = params.get('r')
-    const __userId = Cookies.get('_id')
-    const channeLsettingsHook = ChanneLsettingsHook()
-
-    // console.log("Conversations socket :", socket?.id)
-    useEffect(() => { setIsMounted(true) }, [])
-    useEffect(() => {
-        room ? sethasparam(true) : sethasparam(false)
-        const token: any = room && Cookies.get('token');
-        room && (async () => {
-            const response = await getChanneLMessages(room, token)
-            if (response && response.ok) {
-                const data = await response.json()
-                setMessages(data.messages)
-            }
-
-            // get room data :
-            const response2 = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/${room}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            if (!response2.ok) {
+    const UpdateData = () => {
+        // get logged member :
+        (async () => {
+            const channeL: RoomsType | null = await FindOneBySLug(slug, token)
+            if (!channeL) {
+                toast.error('no channeL')
                 return
             }
-            const _roomInfo = await response2.json()
-            setChanneLinfo(_roomInfo)
+            setChanneLinfo(channeL)
+            const member: membersType | null = await getMemberWithId(UserId, channeL?.id, token)
+            if (member) { setLogedMember(member); }
         })();
+    }
+    const FocusedOnSendMessageInput = () => {
+        setTimeout(() => {
+            if (InputRef.current) {
+                InputRef.current.focus();
+            }
+        }, 100); // sleep .1s ; waiting search input to mounted in focus on it
+    }
+    // show this last message in the screan :
+    React.useEffect(() => {
+        setTimeout(() => {
+            if (chatContainerRef.current) {
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            }
+        }, 700); // sleep .7s waiting all old messages to show and scroll to the last one
+    }, [messages, socket, InputValue, message])
 
+    React.useEffect(() => {
+        if (LogedMember?.userId !== UserId) return
+        UpdateData()
+        FocusedOnSendMessageInput()
+    }, [slug])
 
-    }, [room])
-
-    useEffect(() => {
-        setInputValue("")
-    }, [hasparam, room])
-    useEffect(() => {
-        socket?.on('message', (message: any) => {
-
-            setMessages([...messages, message])
-        })
-    }, [messages, InputValue])
-
-
-    useEffect(() => {
-        (async () => {
-            const token: any = Cookies.get('token');
-            const channeLLid = params.get('r')
-            if (!channeLLid)
+    React.useEffect(() => {
+        slug && (async () => {
+            const _roomInfo: RoomsType = await FindOneBySLug(slug, token)
+            if (!_roomInfo) {
                 return;
-
-            const channeLLMembers = __userId && await getMemberWithId(__userId, channeLLid, token)
+            }
+            // make sure that the user connected to room socket
+            socket?.emit('accessToroom', _roomInfo)
+            setIsMounted(true)
+            // scroll to the buttom of the page :
+            setChanneLinfo(_roomInfo)
+            const channeLLMembers = UserId && await getMemberWithId(UserId, _roomInfo.id, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                 setLogedMember(channeLLMembers)
             }
+
+            // get messages :
+            const response = await getChanneLMessages(_roomInfo.id, token)
+            if (!response) return
+            setMessages(response)
+            setTimeout(() => {
+                setLoadingMessages(false);
+                FocusedOnSendMessageInput()
+            }, 900);
         })();
 
-    }, [socket, channeLsettingsHook])
 
-    const content = (
-        <div className="flex flex-col gap-3">
-
-            {/* <Message content={"We're GitHub, the company behind the npm Registry and npm CLI. We offer those to the community for free, but our day job is building and selling useful tools for developers like you."} id={'dcae3d31-948a-49de-bad4-de35875bda7b'} senderId={"dcae3d31-948a-49de-bad4-de35875bda7b"} roomsId={""} created_at={"2023-07-11T08:57:44.492Z"} updated_at={"2023-07-11T08:57:44.492Z"} /> */}
-            {
-                messages.length ?
-                    messages.map((message, index) => (
-                        <Message
-                            key={index}
-                            message={message}
-                            isForOwner={message.senderId === Cookies.get('_id')}
-                            userid={message.sender}
-                        />
-                    ))
-                    : <div>no messages</div>
+    }, [])
+    // // listen to message event and send the incomming message to client
+    React.useEffect(() => {
+        if (!IsMounted || !channeLinfo) return
+        socket?.on('newmessage', (newMessage: messagesType) => {
+            if (newMessage.roomsId !== channeLinfo?.id) return
+            setMessages((prev) => [...prev, newMessage])
+            FocusedOnSendMessageInput()
+            setSendingMessage(false);
+            if (newMessage.senderId === UserId) {
+                setInputValue('')
+                setMessage('')
             }
-        </div>
-    )
+        })
+    }, [IsMounted])
 
-    const onClickHandler = (event: FormEvent<HTMLInputElement>) => {
+    // listen to message event and send the incomming message to client and update the member or channel info
+    React.useEffect(() => {
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            (data) => { if (data.OK) { return UpdateData(); } });
 
-    }
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            (data) => { if (data.OK) { return UpdateData(); } });
+        socket?.on(
+            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`,
+            (data: { OK: boolean, member: membersType }) => {
+                if (data.OK) {
+                    if (data.member.userId === UserId) {
+                        toast.error(`you are kicked from ${channeLinfo?.name}`)
+                        return router.push('/chat/channels')
+                    }
+                }
+            })
+        socket?.on('sendMessageResponse', (res: { OK: boolean, message: string }) => {
+            if (!res.OK) {
+                toast.error(res.message)
+                setLoadingMessages(false);
+                return
+            }
+        })
 
-    const OnSubmit = (event: FormEvent<HTMLInputElement>) => {
-        setInputValue("")
+        return () => {
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`)
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`)
+            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`)
+            socket?.off('sendMessageResponse')
+        }
 
+    }, [])
+
+    const OnSubmit = () => {
+        const sendMesage = message.trim()
+        if (!sendMesage) {
+            toast.error("prompt message empty")
+            setInputValue('')
+            return
+        }
+        if (!channeLinfo) {
+            setInputValue('')
+            toast.error("no channeLinfo")
+            return
+        }
         // send message to server using socket :
         socket?.emit('sendMessage', {
             content: message,
             senderId: Cookies.get('_id'),
-            roomsId: room
-        }, (response: any) => {
+            roomsId: channeLinfo.id
         })
+        setInputValue('')
+        setMessage('')
+        setSendingMessage(true)
+
     }
 
+    const checkLimitCharacters = (input: string) => {
+        if (input.length > 512) return toast.error("you can't send more than 512 characters")
+        setInputValue(input);
+    }
 
     if (!IsMounted) return null
 
-    return <>
+    return <div className=" relative flex flex-col items-center w-full">
+        <ChannelConversationsMute IsActive={LogedMember?.ismute ? true : false} />
+        {channeLinfo
+            ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col sm:flex`}>
+                <ConversationsTitlebar
+                    LogedMember={LogedMember}
+                    socket={socket}
+                    channeLId={channeLinfo.id}
+                    messageTo={channeLinfo.name}
+                    OnSubmit={function (event: React.FormEvent<HTMLInputElement>): void { }}
+                />
+                {!LogedMember?.isban ?
 
-        {(hasparam && channeLinfo) ? <div className={`
-    Conversations 
-    relative 
-    w-full 
-    h-full
-    flex flex-col
-    border-orange-300
-    sm:flex`}>
-            <ConversationsTitlebar LogedMember={LogedMember} socket={socket} channeLId={room} messageTo={channeLinfo.name} OnSubmit={function (event: FormEvent<HTMLInputElement>): void { }} />
-            <ConversationsMessages Content={content} />
-            <div className="w-full absolute bottom-4 left-0">
-                <input
-                    className="ConversationsInput w-full h-[54px] text-white text-base  font-semibold px-2 outline bg-[#243230] border-transparent focus:border-transparent rounded"
-                    onSubmit={(event: any) => {
-                        setMessage(event.target.value);
-                        OnSubmit(event)
-                        // onClickHandler(event)
-                    }
-                    }
-                    onKeyDown={(event) =>
-                        event.key === "Enter" ? OnSubmit(event) : null
-                    }
-                    onChange={(event) => {
-                        setInputValue(event.target.value);
-                        setMessage(event.target.value);
-                    }}
-                    value={InputValue}
-                    placeholder={`Message to @'${channeLinfo.name}'`}
-                    type="search"
-                    name=""
-                    id="" />
-            </div>
-        </div>
+                    <div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5 ">
+                        <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll flex flex-col gap-3" >
+                            {
+                                !LoadingMessages ? messages && messages.length ?
+                                    messages.map((message, index) => (
+                                        <Message
+                                            key={index}
+                                            message={message}
+                                            isForOwner={message.senderId === Cookies.get('_id')}
+                                            userid={message.senderId}
+                                        />
+                                    ))
+                                    : <div>no messages</div>
+                                    : <div>Loading geting OLd messages ...</div>
+                            }
+                        </div>
+                        {<div className="w-full relative px-6">
+
+                            {SendingMessage && <div className=" text-secondary text-[10px] capitalize absolute -top-4 left-4 bg-[#161F1E] ">sending ....</div>}
+                            <div className="ConversationsInput w-full h-[54px] bg-[#24323044] text-[#ffffff]  text-[16px]  rounded-[12px] flex justify-end items-center">
+                                <input
+                                    ref={InputRef}
+                                    onFocus={() => setIsInputFocused(true)}
+                                    onBlur={() => setIsInputFocused(false)}
+                                    disabled={SendingMessage || LogedMember?.ismute}
+                                    className="focus:outline-none placeholder:text-[#b6b6b6e3] placeholder:text-base placeholder:font-thin w-full py-1 px-4 bg-transparent"
+                                    onSubmit={(event: any) => {
+                                        setMessage(event.target.value);
+                                        OnSubmit()
+                                        // onClickHandler(event)
+                                    }
+                                    }
+                                    onKeyDown={(event) =>
+                                        event.key === "Enter" ? OnSubmit() : null
+                                    }
+                                    onChange={(event) => {
+                                        checkLimitCharacters(event.target.value)
+
+                                        setMessage(event.target.value);
+                                    }}
+                                    value={InputValue}
+                                    placeholder={`${!LogedMember?.ismute ? `Message to @${channeLinfo.name}` : 'you  dont have permission to send message in this channel'}`}
+                                    type="search"
+                                    name=""
+                                    id="" />
+                                {InputValue.length !== 0 && <div className="flex gap-1">
+                                    <span className=" text-[8px] text-center max-w-max flex w-full">{InputValue.length} / 512</span>
+                                    <Button icon={IoSend} disabled={SendingMessage} outline small onClick={OnSubmit} />
+                                </div>}
+                            </div>
+                        </div>
+
+                        }
+                    </div>
+                    : <BanMember LogedMember={LogedMember} User={undefined} room={channeLinfo} />
+                }
+            </div >
             : <div className="flex flex-col justify-center items-center h-full w-full">
                 <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
             </div>
         }
-    </>
+    </div >
 }
