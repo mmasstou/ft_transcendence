@@ -82,7 +82,6 @@ export class UserService {
       where: { kind },
       include: {
         Rooms: true,
-        cursus_users: true,
         conversations: true,
       },
     });
