@@ -98,7 +98,7 @@ export default function ChanneLSettingsChanneLChangePassword(
         __message && channeLConfirmActionHook.onOpen(
             <button
                 onClick={() => {
-                    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+                    socket?.emit(`SOCKET_EVENT_CHAT_UPDATE`, data)
                 }}
                 className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
                 change password
@@ -106,16 +106,14 @@ export default function ChanneLSettingsChanneLChangePassword(
             , __message
         )
         // send data to server
-        // socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+        // socket?.emit(`SOCKET_EVENT_CHAT_UPDATE`, data)
         //   reset data for password
         reset()
     }
 
     useEffect(() => {
 
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`, (data) => {
-            toast('RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD')
-            if (!data) return
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD`, (data) => {
             if (data.OK) {
                 OnBack();
                 channeLConfirmActionHook.onClose()
@@ -132,7 +130,7 @@ export default function ChanneLSettingsChanneLChangePassword(
                 return toast.error(data.message)
             }
         });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
             setChanneLpasswordInput('')
             setnewChanneLpasswordInput('')
             setconfirmChanneLpasswordInput('')

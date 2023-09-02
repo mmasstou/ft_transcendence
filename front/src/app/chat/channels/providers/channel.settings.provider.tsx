@@ -1,34 +1,34 @@
 'use client'
-import Button from "@/app/chat/components/Button";
-import { RoomsType, UserTypeEnum, membersType } from "@/types/types";
-import React from "react";
-import { IoChevronBackOutline } from "react-icons/io5";
-import { Socket } from "socket.io-client";
+import { RoomsType, membersType } from "@/types/types";
 import Cookies from "js-cookie";
 import { useParams } from "next/navigation";
-import { toast } from "react-hot-toast";
-import { tr } from "date-fns/locale";
-import PermissionDenied from "../channel.settings.permissiondenied";
-import FindOneBySLug from "../../actions/Channel/findOneBySlug";
-import getMemberWithId from "../../actions/getMemberWithId";
-import Loading from "../loading";
-
+import React, { createContext } from "react";
+import { Socket } from "socket.io-client";
+import FindOneBySLug from "../actions/Channel/findOneBySlug";
+import getMemberWithId from "../actions/getMemberWithId";
+import Loading from "../components/loading";
+import { ChanneLContext } from "./channel.provider";
+export const ChanneLsettingsContext = createContext({});
 interface props {
     children: React.ReactNode;
-    socket: Socket | null;
+    socket?: Socket | null;
     OnBack?: () => void;
     label?: string;
+    channeLId?: string;
 }
 const UserId: string | undefined = Cookies.get('_id')
 const token: string | undefined = Cookies.get('token')
 
-export default function SettingsProvider(props: props) {
+export default function SettingsProvider({ children }: { children: React.ReactNode }) {
     const [IsMounted, setMounted] = React.useState<boolean>(false)
     const [LoggedMember, setLoggedMember] = React.useState<membersType | null>(null)
+    const [socket, setSocket] = React.useState<Socket | null>(null)
     const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)
     const [IsLoading, setLoading] = React.useState<boolean>(true)
     const query = useParams();
-    const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
+    const slug: string | undefined = typeof query.slug === 'string' ? query.slug : undefined;
+    // create channel conetxt :
+    const ChanneLContextee: any = React.useContext(ChanneLContext)
 
     const UpdateData = async () => {
         if (!UserId || !slug || !token) return;
@@ -42,10 +42,11 @@ export default function SettingsProvider(props: props) {
             setLoading(false)
         }, 400);
     }
-    React.useEffect(() => {
 
+    React.useEffect(() => {
         setMounted(true)
         UpdateData();
+        setSocket(ChanneLContextee.socket)
         setTimeout(() => {
             setLoading(false)
         }, 400)
@@ -53,18 +54,21 @@ export default function SettingsProvider(props: props) {
     }, [])
 
     React.useEffect(() => {
-        props.socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`, (data) => {
             if (!data) return
             UpdateData();
         });
-        props.socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
             if (!data) return
             UpdateData();
         });
-    }, [props.socket])
+    }, [socket])
 
     if (!IsMounted) return;
+    if (!ChanneLinfo || !LoggedMember || IsLoading) return <Loading message="Loading settings ..." />
     return <div className="flex flex-col justify-between max-h-[32rem]">
-        {IsLoading ? < Loading  /> : props.children}
+        <ChanneLsettingsContext.Provider value={{ channeL: ChanneLinfo, member: LoggedMember, socket: socket }}>
+            {children}
+        </ChanneLsettingsContext.Provider>
     </div>
 }

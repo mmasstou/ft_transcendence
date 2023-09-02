@@ -1,43 +1,25 @@
 
 "use client"
-import React from 'react';
-import { BsArrowRightShort, BsSaveFill } from 'react-icons/bs';
-import { CgEditFlipH } from 'react-icons/cg';
-import { TbEdit, TbPassword } from 'react-icons/tb';
-import { VscGroupByRefType } from "react-icons/vsc";
-import { Channel } from 'diagnostics_channel';
-import Input from '@/components/Input';
-import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, set } from 'react-hook-form';
-import Button from '../../../../components/Button';
-import { IoBagRemove, IoChevronBackOutline, IoInformation, IoLogOut } from 'react-icons/io5';
-import { GoEyeClosed } from 'react-icons/go';
-import { HiLockClosed, HiLockOpen } from 'react-icons/hi';
-import { TfiTimer } from 'react-icons/tfi';
-import { FaChessQueen, FaUserTimes } from 'react-icons/fa';
-import { useParams, useSearchParams } from 'next/navigation';
+import { RoomsType, UpdateChanneLSendData, UpdateChanneLSendEnum, membersType } from '@/types/types';
 import Cookies from 'js-cookie';
-import getChannelMembersWithId from '../../../actions/getChannelmembers';
-import { RoomTypeEnum, RoomsType, UpdateChanneLSendData, UpdateChanneLSendEnum, UserTypeEnum, membersType } from '@/types/types';
-import getMemberWithId from '../../../actions/getMemberWithId';
-import { Socket } from 'socket.io-client';
-import Image from 'next/image';
-import ChanneLSettingsChanneLBanedMember from './channel.settings.channel.banedmember';
-import ChanneLsettingsChanneLsetOwner from './channel.settings.channel.setOwner';
-import ChanneLSettingsChanneLAccessPassword from '../../channel.settings.channel.accesspassword';
-import ChanneLaccessDeniedModaL from '../../../modaLs/channel.access.denied.modaL';
-import ChanneLSettingsChanneLChangeType from './channel.settings.channel.changetype';
-import getChannelWithId from '../../../actions/getChannelWithId';
-import ChanneLSettingsOptionItem from './channel.settings.channel.Item';
-import { AiOutlineDelete } from 'react-icons/ai';
-import ChanneLSettingsChanneLDeleteChannel from '../../channel.settings.channel.deletechannel';
-import PermissionDenied from '../../channel.settings.permissiondenied';
-import ChanneLSettingsChanneLChangePassword from './channel.settings.channel.changepassword';
-import ChanneLConfirmActionHook from '../../../hooks/channel.confirm.action';
-import { PiPasswordBold } from 'react-icons/pi';
+import { useParams, useSearchParams } from 'next/navigation';
+import React from 'react';
+import { FieldValues, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { Socket } from 'socket.io-client';
 import FindOneBySLug from '../../../actions/Channel/findOneBySlug';
+import getChannelMembersWithId from '../../../actions/getChannelmembers';
+import getMemberWithId from '../../../actions/getMemberWithId';
+import ChanneLConfirmActionHook from '../../../hooks/channel.confirm.action';
+import ChanneLaccessDeniedModaL from '../../../modaLs/channel.access.denied.modaL';
+import SettingsProvider from '../../../providers/channel.settings.provider';
+import ChanneLSettingsChanneLAccessPassword from '../../channel.settings.channel.accesspassword';
+import ChanneLSettingsChanneLDeleteChannel from '../../channel.settings.channel.deletechannel';
 import ChanneLsettingsIndex from './channel.settings.channel.Index';
-import SettingsProvider from '../channel.settings.provider';
+import ChanneLSettingsChanneLBanedMember from './channel.settings.channel.banedmember';
+import ChanneLSettingsChanneLChangePassword from './channel.settings.channel.changepassword';
+import ChanneLSettingsChanneLChangeType from './channel.settings.channel.changetype';
+import ChanneLsettingsChanneLsetOwner from './channel.settings.channel.setOwner';
 interface ChanneLChatSettingsProps {
     socket: Socket | null
 }
@@ -83,7 +65,6 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             setMembers(channeLLMembers.filter((member: membersType) => member.userId !== __userId))
             const channeLLMember: membersType = __userId && await getMemberWithId(__userId, ChanneLinfo.id, token)
             if (!channeLLMember) return;
-            toast(channeLLMember.type)
             setLogedMember(channeLLMember)
 
         })();
@@ -101,7 +82,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         __message && channeLConfirmActionHook.onOpen(
             <button
                 onClick={() => {
-                    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+                    socket?.emit(`SOCKET_EVENT_CHAT_UPDATE`, data)
                 }}
                 className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
                 remove Access password
@@ -109,7 +90,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             , __message
         )
         // send data to server
-        // socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+        // socket?.emit(`SOCKET_EVENT_CHAT_UPDATE`, data)
         //   reset data for password
         // reset()
     }
@@ -131,26 +112,26 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         // listen to channels actions response events :
 
         // change channel password :
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD`, (data) => {
 
         })
         // change type :
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE`, (data) => {
 
         })
         // set access password :
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_SET_ACCESS_PASSWORD}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_SET_ACCESS_PASSWORD`, (data) => {
 
         })
         // remove access password :
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD`, (data) => {
             if (!data) return
             channeLConfirmActionHook.onClose()
             setChanneLinfo(data);
             OnBack()
         })
 
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
 
         })
     }, [socket])
@@ -278,7 +259,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     }
     if (step === SETTINGSTEPS.ACCESSPASSWORD && !ChanneLinfo?.hasAccess) {
         _body = <ChanneLSettingsChanneLAccessPassword
-        
+
             setUpdate={setUpdate}
             socket={socket}
             OnBack={OnBack}
@@ -318,7 +299,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     if (step === SETTINGSTEPS.DELETECHANNEL) {
         _body = <ChanneLSettingsChanneLDeleteChannel room={ChanneLinfo} OnBack={OnBack} socket={socket} />
     }
-    return <SettingsProvider socket={socket} >
+    return <SettingsProvider >
         {_body}
     </SettingsProvider>
 }

@@ -48,14 +48,14 @@ const Achpage = () => {
         icon="victory-van"
         description="Reach level 1."
         hasProgression
-        progression={user.Level! * 50}
+        progression={user.Level! > 1 ? 100 : user.Level! * 100}
       />
       <Achievement
         title="Advanced player"
         icon="speed-demon"
         description="Reach level 5."
         hasProgression
-        progression={user.Level! * 20}
+        progression={user.Level! > 5 ? 100 : user.Level! * 20}
       />
       <Achievement
         title="Fifty frenzy"

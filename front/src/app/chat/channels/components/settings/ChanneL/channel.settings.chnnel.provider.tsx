@@ -12,7 +12,7 @@ import PermissionDenied from "../../channel.settings.permissiondenied";
 import { toast } from "react-hot-toast";
 import { tr } from "date-fns/locale";
 import Settings from "@/components/Dashboard/Header/Settings";
-import SettingsProvider from "../channel.settings.provider";
+import SettingsProvider from "../../../providers/channel.settings.provider";
 import Loading from "../../loading";
 
 interface props {
@@ -52,18 +52,18 @@ export default function ChanneLsettingsProvider(props: props) {
     }, [])
 
     React.useEffect(() => {
-        props.socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+        props.socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`, (data) => {
             if (!data) return
             UpdateData();
         });
-        props.socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
+        props.socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
             if (!data) return
             UpdateData();
         });
     }, [props.socket])
 
     if (!IsMounted) return;
-    return <SettingsProvider socket={null}>
+    return <SettingsProvider>
         {LoggedMember?.type === UserTypeEnum.OWNER
             ? <div className="flex flex-col justify-start">
                 <div className=" flex flex-row items-center justify-start gap-3">

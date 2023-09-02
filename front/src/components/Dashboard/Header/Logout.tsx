@@ -1,16 +1,16 @@
 'use client';
-import { RiLogoutBoxFill } from 'react-icons/ri';
-import * as Popover from '@radix-ui/react-popover';
-import Cookies from 'js-cookie';
 import MyAvatar from '@/components/profile/MyAvatar';
-import { useRouter } from 'next/navigation';
-import { use, useEffect, useState } from 'react';
-import axios from 'axios';
 import { userType } from '@/types/types';
+import * as Popover from '@radix-ui/react-popover';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { RiLogoutBoxFill } from 'react-icons/ri';
 
-export interface User {
-  login?: string;
-}
+// export interface User {
+//   login?: string;
+// }
 
 export const Logout: React.FC = (): JSX.Element => {
   const [IsMounted, setIsMounted] = useState(false);
@@ -23,7 +23,7 @@ export const Logout: React.FC = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    if(!IsMounted) return;
+    if (!IsMounted) return;
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`).then((res) => {
       setUser(res.data);
     });

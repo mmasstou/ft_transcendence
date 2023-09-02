@@ -10,7 +10,7 @@ import { Socket } from "socket.io-client";
 import { RoomsType, membersType, messagesType } from "@/types/types";
 import Cookies from "js-cookie";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { IoSend } from "react-icons/io5";
 import Button from "../../components/Button";
@@ -20,12 +20,17 @@ import getMemberWithId from "../actions/getMemberWithId";
 import ConversationsTitlebar from "./channel.conversations.titlebar";
 import Message from "./channel.message";
 import BanMember from "./channel.settings.banmember";
+import { CiVolumeMute } from "react-icons/ci";
+import { is, ro, tr } from "date-fns/locale";
+import { ChanneLContext } from "../providers/channel.provider";
+import ChannelConversationsMute from "./channel.conversations.mute";
+import ChanneLsettingsHook from "../hooks/channel.settings";
 
-
-export default function Conversations({ socket }: { socket: Socket | null }) {
-
-    const query = useParams();
-    const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
+const token: string | undefined = Cookies.get('token')
+const UserId: string | undefined = Cookies.get('_id')
+export default function Conversations({ socket, slug }: { socket: Socket | null, slug: string }) {
+    // const query = useParams();
+    // const slug: string = typeof query.slug === 'string' ? query.slug : query.slug[0];
     const chatContainerRef = React.useRef<HTMLDivElement | null>(null);
     const [IsMounted, setIsMounted] = React.useState(false)
     const [messages, setMessages] = React.useState<messagesType[]>([])
@@ -33,25 +38,37 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     const [message, setMessage] = React.useState("")
     const [InputValue, setInputValue] = React.useState("")
     const [LogedMember, setLogedMember] = React.useState<membersType | null>(null)
-    const token = Cookies.get('token')
-    const __userId = Cookies.get('_id')
-    if (!token || !__userId) return
+
+    if (!token || !UserId) return
     const InputRef = React.useRef<HTMLInputElement | null>(null);
-    const [LoadingMessages, setLoadingMessages] = React.useState<boolean>(false)
+    const [LoadingMessages, setLoadingMessages] = React.useState<boolean>(true)
     const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
+    const ChanneLContextee: any = React.useContext(ChanneLContext)
+    const channeLsettingsHook = ChanneLsettingsHook()
+    const router = useRouter()
 
-    const UpdateData = async () => {
+    const UpdateData = () => {
         // get logged member :
-        if (!channeLinfo) return
-        const channeL: RoomsType | null = await FindOneBySLug(slug, token)
-        if (!channeL) return
-        setChanneLinfo(channeL)
-        const member: membersType | null = await getMemberWithId(__userId, channeLinfo?.id, token)
-        setLogedMember(member);
+        (async () => {
+            const channeL: RoomsType | null = await FindOneBySLug(slug, token)
+            if (!channeL) {
+                toast.error('no channeL')
+                return
+            }
+            setChanneLinfo(channeL)
+            const member: membersType | null = await getMemberWithId(UserId, channeL?.id, token)
+            if (member) { setLogedMember(member); }
+        })();
+    }
+    const FocusedOnSendMessageInput = () => {
+        setTimeout(() => {
+            if (InputRef.current) {
+                InputRef.current.focus();
+            }
+        }, 100); // sleep .1s ; waiting search input to mounted in focus on it
     }
     // show this last message in the screan :
-
     React.useEffect(() => {
         setTimeout(() => {
             if (chatContainerRef.current) {
@@ -61,11 +78,9 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
     }, [messages, socket, InputValue, message])
 
     React.useEffect(() => {
-        setTimeout(() => {
-            if (InputRef.current) {
-                InputRef.current.focus();
-            }
-        }, 100); // sleep .1s ; waiting search input to mounted in focus on it
+        if (LogedMember?.userId !== UserId) return
+        UpdateData()
+        FocusedOnSendMessageInput()
     }, [slug])
 
     React.useEffect(() => {
@@ -79,7 +94,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             setIsMounted(true)
             // scroll to the buttom of the page :
             setChanneLinfo(_roomInfo)
-            const channeLLMembers = __userId && await getMemberWithId(__userId, _roomInfo.id, token)
+            const channeLLMembers = UserId && await getMemberWithId(UserId, _roomInfo.id, token)
             if (channeLLMembers && channeLLMembers.statusCode !== 200) {
                 setLogedMember(channeLLMembers)
             }
@@ -91,32 +106,63 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
             setTimeout(() => {
                 setLoadingMessages(false);
                 FocusedOnSendMessageInput()
-            }, 500);
+            }, 900);
         })();
+
+
     }, [])
     // // listen to message event and send the incomming message to client
     React.useEffect(() => {
+        if (!IsMounted || !channeLinfo) return
         socket?.on('newmessage', (newMessage: messagesType) => {
+            if (newMessage.roomsId !== channeLinfo?.id) return
             setMessages((prev) => [...prev, newMessage])
             FocusedOnSendMessageInput()
             setSendingMessage(false);
-            if (newMessage.senderId === Cookies.get('_id')) {
+            if (newMessage.senderId === UserId) {
                 setInputValue('')
                 setMessage('')
             }
         })
+    }, [IsMounted])
+
+    // listen to message event and send the incomming message to client and update the member or channel info
+    React.useEffect(() => {
+        socket?.on(
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`,
+            (data) => { if (data.OK) { return UpdateData(); } });
+
+        socket?.on(
+            `SOCKET_EVENT_RESPONSE_CHAT_UPDATE`,
+            (data) => { if (data.OK) { return UpdateData(); } });
+        socket?.on(
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK`,
+            (data: { OK: boolean, member: membersType }) => {
+                if (data.OK) {
+                    if (data.member.userId === UserId) {
+                        channeLsettingsHook.onClose()
+                        toast.error(`you are kicked from this channel`)
+                        return router.push('/chat/channels')
+                    }
+                }
+            })
+        socket?.on('sendMessageResponse', (res: { OK: boolean, message: string }) => {
+            if (!res.OK) {
+                toast.error(res.message)
+                setLoadingMessages(false);
+                return
+            }
+        })
+
+        return () => {
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK`)
+            socket?.off('sendMessageResponse')
+        }
+
     }, [])
 
-    React.useEffect(() => {
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
-            if (!data) return
-            UpdateData();
-        });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
-            if (!data) return
-            UpdateData();
-        });
-    }, [socket])
     const OnSubmit = () => {
         const sendMesage = message.trim()
         if (!sendMesage) {
@@ -140,13 +186,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
         setSendingMessage(true)
 
     }
-    const FocusedOnSendMessageInput = () => {
-        setTimeout(() => {
-            if (InputRef.current) {
-                InputRef.current.focus();
-            }
-        }, 100); // sleep .1s ; waiting search input to mounted in focus on it
-    }
+
     const checkLimitCharacters = (input: string) => {
         if (input.length > 512) return toast.error("you can't send more than 512 characters")
         setInputValue(input);
@@ -154,7 +194,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
 
     if (!IsMounted) return null
 
-    return <div className="flex flex-col items-center w-full">
+    return <div className=" relative flex flex-col items-center w-full">
+        <ChannelConversationsMute IsActive={LogedMember?.ismute ? true : false} />
         {channeLinfo
             ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col sm:flex`}>
                 <ConversationsTitlebar
@@ -165,7 +206,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                     OnSubmit={function (event: React.FormEvent<HTMLInputElement>): void { }}
                 />
                 {!LogedMember?.isban ?
-                    <div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5">
+
+                    <div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5 ">
                         <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll flex flex-col gap-3" >
                             {
                                 !LoadingMessages ? messages && messages.length ?
@@ -181,7 +223,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                     : <div>Loading geting OLd messages ...</div>
                             }
                         </div>
-                        <div className="w-full relative px-6">
+                        {<div className="w-full relative px-6">
 
                             {SendingMessage && <div className=" text-secondary text-[10px] capitalize absolute -top-4 left-4 bg-[#161F1E] ">sending ....</div>}
                             <div className="ConversationsInput w-full h-[54px] bg-[#24323044] text-[#ffffff]  text-[16px]  rounded-[12px] flex justify-end items-center">
@@ -189,7 +231,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                     ref={InputRef}
                                     onFocus={() => setIsInputFocused(true)}
                                     onBlur={() => setIsInputFocused(false)}
-                                    disabled={SendingMessage}
+                                    disabled={SendingMessage || LogedMember?.ismute}
                                     className="focus:outline-none placeholder:text-[#b6b6b6e3] placeholder:text-base placeholder:font-thin w-full py-1 px-4 bg-transparent"
                                     onSubmit={(event: any) => {
                                         setMessage(event.target.value);
@@ -206,7 +248,7 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                         setMessage(event.target.value);
                                     }}
                                     value={InputValue}
-                                    placeholder={`Message to @${channeLinfo.name}`}
+                                    placeholder={`${!LogedMember?.ismute ? `Message to @${channeLinfo.name}` : 'you  dont have permission to send message in this channel'}`}
                                     type="search"
                                     name=""
                                     id="" />
@@ -216,6 +258,8 @@ export default function Conversations({ socket }: { socket: Socket | null }) {
                                 </div>}
                             </div>
                         </div>
+
+                        }
                     </div>
                     : <BanMember LogedMember={LogedMember} User={undefined} room={channeLinfo} />
                 }

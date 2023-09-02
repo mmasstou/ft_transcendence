@@ -31,8 +31,6 @@ export class AuthController {
     @Param('username') username: string,
     @Param('password') password: string,
   ) {
-    // console.log('Login Data username:', username);
-    // console.log('Login Data password:', password);
     const result = await this.authService.signInWithLogin(username, password);
     if (!result) throw new BadRequestException('Unauthenticated');
     const { token, userId } = result;
@@ -44,7 +42,6 @@ export class AuthController {
       httpOnly: false,
       sameSite: false,
     });
-    // console.log('result :', result);
     return res.redirect(`${process.env.AUTH_REDIRECT_URI}`);
   }
 

@@ -50,7 +50,7 @@ const page = () => {
             <div className="flex gap-10 my-4 w-full justify-center">
               <Dialog.Root>
                 <Dialog.Trigger asChild>
-                  <button onClick={() => { }} className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-sky-500 rounded-xl font-bold text-sky-500 focus:outline-none">
+                  <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-sky-500 rounded-xl font-bold text-sky-500 focus:outline-none">
                     Settings
                   </button>
                 </Dialog.Trigger>
@@ -96,7 +96,10 @@ const page = () => {
                         </button>
                       </Dialog.Close>
                       <Dialog.Close asChild>
-                        <button onClick={() => { }} className=" px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-red-500 rounded-xl font-bold text-red-500 focus:outline-none">
+                        <button
+                          onClick={() => {}}
+                          className=" px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-red-500 rounded-xl font-bold text-red-500 focus:outline-none"
+                        >
                           Cancel
                         </button>
                       </Dialog.Close>

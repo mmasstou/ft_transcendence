@@ -57,7 +57,7 @@ const Message: FC<Imessage> = ({ message, userid, isForOwner }) => {
             <div className={`flex ${!isForOwner ? 'flex-row' : ' flex-row-reverse '} justify-between`}>
                 <div className={`MessagesenderInfo flex ${!isForOwner ? 'flex-row' : ' flex-row-reverse '} items-center p-1 gap-2`}>
                     <UserAvatar size={32} image={senderInfo?.avatar} User={senderInfo} />
-                    <h3 className="text-base font-light text-[#FFFFFF]">{senderInfo?.login}</h3>
+                    <h3 className="text-base font-light text-secondary">{senderInfo?.login}</h3>
                 </div>
                 <div className={`flex ${!isForOwner ? 'flex-row' : ' flex-row-reverse '} gap-2 justify-center items-center`}>
                     <span className="text-[.5rem] text-end text-[#D9D9D9] min-w-max flex flex-row items-center justify-center gap-1">
@@ -70,7 +70,7 @@ const Message: FC<Imessage> = ({ message, userid, isForOwner }) => {
             <div className={`flex flex-col gap-1 bg-[#24323044]  p-2  mb-1 ${!isForOwner ? 'rounded-bl-[21px] rounded-r-[21px]' : 'rounded-br-[21px] rounded-l-[21px]'}`}>
                 <div className="message-body flex flex-row items-center gap-4">
                     <div className="message-box flex flex-col gap-1 w-full">
-                        <p className="body p-1 text-base text-[#65656B]  ">{message.content}</p>
+                        <p className="body p-1 text-base text-white  ">{message.content}</p>
                     </div>
                 </div>
             </div>

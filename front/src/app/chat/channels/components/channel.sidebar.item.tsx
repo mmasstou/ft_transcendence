@@ -1,42 +1,23 @@
-import { RoomTypeEnum, RoomsType } from "@/types/types"
+import { RoomsType } from "@/types/types"
 import Cookies from "js-cookie"
-import { useRouter, useSearchParams } from "next/navigation"
-import { use, useCallback, useEffect, useState } from "react"
-import { Socket } from "socket.io-client"
-import LeftSidebarHook from "../hooks/LeftSidebarHook"
-import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
 import Link from "next/link"
-import { ro } from "date-fns/locale"
-import React from "react"
-import getChannelWithId from "../actions/getChannelWithId"
+import LeftSidebarHook from "../hooks/LeftSidebarHook"
 
 interface ChanneLSidebarItemProps {
   room: RoomsType,
   active?: boolean,
-  onClick?: () => void,
-  viewd?: number
 }
-const ChanneLSidebarItem = ({ room, active, onClick, viewd }: ChanneLSidebarItemProps) => {
-  const [isMobile, setIsMobile] = useState(false);
-  const [selectedchanneL, setSelectedchanneL] = useState<RoomsType | null>(null)
+
+const ChanneLSidebarItem = ({ room, active }: ChanneLSidebarItemProps) => {
   const leftSidebar = LeftSidebarHook()
-  const router = useRouter()
-  const params = useSearchParams()
   const userId = Cookies.get('_id')
   const token = Cookies.get('token')
   if (!token || !userId) return;
 
-  const channeLPasswordAccessHook = ChanneLPasswordAccessHook()
-  let JoinData: any = room
-  if (userId) {
-    JoinData.loginUser = userId
-  }
-
-
-
-
   return <Link href={`/chat/channels/${room.slug}`}
-    onClick={() => setSelectedchanneL(room)}
+    onClick={() => {
+      leftSidebar.onClose()
+    }}
     className={`flex flex-row gap-3 justify-between px-1 items-center w-full  ${active ? ' text-secondary' : 'text-white'}`}>
     <div className="flex flex-row justify-start gap-3 items-center">
       <span className={` text-2xl `}>#</span>

@@ -1,40 +1,26 @@
 "use client"
-import ContactHook from "@/hooks/contactHook"
-import { TiArrowMinimise } from "react-icons/ti"
-import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler, useFieldArray, set } from "react-hook-form"
-import React, { MouseEvent, useEffect, useState } from "react"
-import { RoomsType, UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types"
+import { RoomsType, membersType, updatememberEnum, userType } from "@/types/types"
 import Cookies from "js-cookie"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
+import React, { useEffect, useState } from "react"
+import { FieldValues, useForm } from "react-hook-form"
 
 
-import ChanneLModal from "./channel.modal"
-import Select from "../../components/Select"
-import ChanneLcreatemodaLHook from "../hooks/channel.create.hook"
-import ChanneLmodaLheader from "../components/channel.modal.header"
-import Input from "@/components/Input"
-import getUserWithId from "../actions/getUserWithId"
 import Button from "../../components/Button"
+import getUserWithId from "../actions/getUserWithId"
+import ChanneLModal from "./channel.modal"
 
-import ChanneLsettingsHook from "../hooks/channel.settings"
-import getMemberWithId from "../actions/getMemberWithId"
-import { GoEyeClosed } from "react-icons/go"
-import { HiLockClosed, HiLockOpen } from "react-icons/hi"
-import { GrUserSettings } from "react-icons/gr"
-import { RiChatSettingsLine } from "react-icons/ri"
+import toast from "react-hot-toast"
 import { FaUsersCog } from "react-icons/fa"
-import Image from "next/image"
-import { TbInfoSquareRoundedFilled, TbUserPlus } from "react-icons/tb"
-import getChannelWithId from "../actions/getChannelWithId"
-import ChanneLChatSettings from "../components/settings/ChanneL/channel.settings.channel"
-import ChanneLSettingsInfo from "../components/settings/channel.settings.info"
+import { RiChatSettingsLine } from "react-icons/ri"
 import FindOneBySLug from "../actions/Channel/findOneBySlug"
+import getChannelMembersWithId from "../actions/getChannelmembers"
+import getMemberWithId from "../actions/getMemberWithId"
+import ChanneLChatSettings from "../components/settings/ChanneL/channel.settings.channel"
 import ChanneLUserSettings from "../components/settings/User/channel.settings.user"
 import ChannelSettingsUserMemberItem from "../components/settings/User/channel.settings.user.memberItem"
-import SettingsProvider from "../components/settings/channel.settings.provider"
-import getChannelMembersWithId from "../actions/getChannelmembers"
 import ChanneLConfirmActionHook from "../hooks/channel.confirm.action"
-import toast from "react-hot-toast"
+import ChanneLsettingsHook from "../hooks/channel.settings"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',
@@ -79,16 +65,16 @@ const ChanneLSettingsModaL = () => {
     }, [])
 
     React.useEffect(() => {
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
-            if (!data) return
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`, (data) => {
+            if (!data.OK) return
             UpdateData();
         });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANNEL_UPDATE}`, (data) => {
-            if (!data) return
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
+            if (!data.OK) return
             UpdateData();
         });
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_DELETE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_DELETE`,
             (data: { Ok: boolean }) => {
 
                 if (data.Ok) {
@@ -106,19 +92,27 @@ const ChanneLSettingsModaL = () => {
             }
         );
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`,
-            (data: { Ok: boolean }) => {
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE`,
+            (data: { Ok: boolean, message: string, member: membersType }) => {
+
                 if (!data.Ok) {
                     channeLConfirmActionHook.onClose()
                     return toast.error("can't leave this channel")
                 }
-                // toast.success(data.message)
-                channeLConfirmActionHook.onClose()
-                channeLsettingsHook.onClose()
-                route.push(`/chat/channels`)
-                route.refresh();
+                if (data.member.userId === UserId) {
+                    channeLConfirmActionHook.onClose()
+                    channeLsettingsHook.onClose()
+                    route.push(`/chat/channels`)
+                    route.refresh();
+                }
             }
         );
+        return () => {
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_DELETE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE`)
+        }
     }, [socket])
 
     useEffect(() => {
@@ -130,8 +124,8 @@ const ChanneLSettingsModaL = () => {
             const aLLMembersList = await getChannelMembersWithId(channeLinfo.id, token)
             if (!aLLMembersList) return
             setaLLMembersList(aLLMembersList)
-            setUserInfo(userInfo)
-            setMemberInfo(memberInfo)
+            userInfo && setUserInfo(userInfo)
+            memberInfo && setMemberInfo(memberInfo)
             setChanneLInfo(channeLinfo)
         })();
         setMounted(true)
@@ -159,16 +153,19 @@ const ChanneLSettingsModaL = () => {
         __message && channeLConfirmActionHook.onOpen(
             <button
                 onClick={() => {
-                    data.updateType === updatememberEnum.LEAVECHANNEL
-                        && socket?.emit(
-                            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_LEAVE}`,
+                    if (data.updateType === updatememberEnum.LEAVECHANNEL) {
+                        console.log("data.updateType === updatememberEnum.LEAVECHANNEL", data.updateType === updatememberEnum.LEAVECHANNEL)
+                        socket?.emit(
+                            `SOCKET_EVENT_CHAT_MEMBER_LEAVE`,
                             { roomId: ChanneLInfo?.id }
                         )
-                    data.updateType === updatememberEnum.DELETECHANNEL
-                        && socket?.emit(
-                            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_DELETE_CHAT}`,
+                    }
+                    if (data.updateType === updatememberEnum.DELETECHANNEL) {
+                        socket?.emit(
+                            `SOCKET_EVENT_CHAT_DELETE`,
                             { roomId: ChanneLInfo?.id, userId: UserId }
                         )
+                    }
                 }}
                 className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
                 {data.updateType === updatememberEnum.LEAVECHANNEL && 'Leave Channel'}
@@ -178,9 +175,10 @@ const ChanneLSettingsModaL = () => {
         )
 
     }
+    if (!IsMounted) return null;
 
     let bodyContent = (
-        <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col min-h-[40rem] h-full">
+        <div className=" w-full p-2 md:p-6 pt-0 md:pt-0 flex flex-col h-[43rem]">
             <div className="flex flex-row justify-start gap-3 items-center text-white">
                 <span className={` text-3xl `}>#</span>
                 <div className="flex flex-row items-center justify-between w-full">
@@ -213,23 +211,10 @@ const ChanneLSettingsModaL = () => {
                                 />
                                 : _channeLtype === "ChatSettings"
                                 && <ChanneLChatSettings socket={socket} />
-                            // : ChanneLInfo && <ChanneLSettingsInfo
-                            //     socket={socket}
-                            //     room={ChanneLInfo}
-                            //     User={UserInfo}
-                            //     member={MemberInfo}
-                            // />
+
                         }
-                    </div> <div className=" w-full flex flex-row h-max justify-around items-center mb-5 text-white ">
-                        {/* <Button
-                    icon={TbInfoSquareRoundedFilled}
-                    label={"ChanneL Info"}
-                    outline
-                    responsive
-                    showLabeL
-                    IsActive={_channeLtype === "ChatInfo"}
-                    onClick={() => { setcustomvalue("channeLtype", "ChatInfo") }}
-                /> */}
+                    </div>
+                    <div className=" w-full flex flex-row h-max justify-around items-center mb-5 text-white ">
                         <Button
                             icon={FaUsersCog}
                             label={"User Settings"}
@@ -254,11 +239,14 @@ const ChanneLSettingsModaL = () => {
 
         </div>
     )
-
-    return <ChanneLModal IsOpen={IsOpen} title={` ${ChanneLInfo?.name} settings`} children={bodyContent} onClose={() => {
-        onClose()
-        reset()
-    }} />
+    return <ChanneLModal
+        IsOpen={IsOpen}
+        title={` ${ChanneLInfo?.name} settings`}
+        children={bodyContent}
+        onClose={() => {
+            onClose()
+            reset()
+        }} />
 
 }
 export default ChanneLSettingsModaL
