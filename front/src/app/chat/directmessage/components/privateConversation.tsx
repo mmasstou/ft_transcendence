@@ -4,6 +4,7 @@ import ConversationList from './conversationList';
 import FriendList from './friendList';
 import SearchModal from './searchModal';
 import ConversationBody from './conversationBody';
+import { io } from 'socket.io-client';
 
 
 
@@ -56,6 +57,19 @@ function PrivateConversation({ isOpen, openFriendList, setFriendList, openSeachL
 		getUsers();
 		getAllConversations();
 		console.log('-----ues', currentUser);
+		// Create a Socket.IO client instance and connect to the server
+		const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`); // Replace with your server URL
+
+		// Handle events from the server
+		socket.on('message', (data) => {
+		  console.log('Received message from server:', data);
+		  // You can update your component's state or UI here
+		});
+	
+		// Clean up the socket connection when the component unmounts
+		return () => {
+		  socket.disconnect();
+		};
 	}, [convBody])
 
   return (
