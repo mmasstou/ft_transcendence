@@ -24,7 +24,7 @@ const Showcase = () => {
     <div>
       <section
         className={`${styles.paddingY} ${styles.flexCenter} flex-1  flex-col lg:flex-row  
-              sm:py-16  p-5 sm:mt-4 md:mt-4  mt-10`}
+              sm:py-16  p-5 `}
       >
         <motion.div
           initial={{ opacity: 0 }}

@@ -48,4 +48,3 @@ services:
 networks:
   APInetwork:
     driver: bridge
-

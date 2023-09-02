@@ -129,8 +129,6 @@ export class UserController {
     @Body('senderId') senderId: string,
     @Param('id') id: string,
   ): Promise<void> {
-    console.log('senderId', senderId);
-    console.log('id', id);
     const receiverId = req.user.id;
     await this.usersService.acceptFriendRequest(receiverId, senderId, id);
 
@@ -149,7 +147,6 @@ export class UserController {
     @Body('senderId') senderId: string,
     @Param('id') id: string,
   ): Promise<void> {
-    console.log('reject friend request');
     const receiverId = req.user.id;
     await this.usersService.rejectFriendRequest(receiverId, senderId, id);
 

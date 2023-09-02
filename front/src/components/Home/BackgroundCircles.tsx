@@ -20,10 +20,10 @@ const BackgroundCircles = () => {
       }}
       className="relative flex justify-center items-center md:flex-col sm:flex-col  sm:mt-50"
     >
-      <div
+      {/* <div
         className=" absolute border border-[#c3c3c3] rounded-full h-[170px] w-[170px] lg:h-[200px] lg:w-[200px] 
             xl:h-[200px] xl:w-[200px] lg:ml-[750px] xl:ml-[900px] md:mt-[500px]  mt-[600px] lg:mt-[500px]  xl:mb-[450px] lg:mb-[450px]"
-      />
+      /> */}
 
       <div
         className="absolute border border-[#c3c3c3] rounded-full h-[220px] w-[220px] lg:h-[300px] lg:w-[300px] 

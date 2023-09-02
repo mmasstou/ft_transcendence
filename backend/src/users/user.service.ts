@@ -74,7 +74,6 @@ export class UserService {
   }
   async findOneLogin(params: { login: string }): Promise<User> {
     const { login } = params;
-    // console.log('+USER+findOne++>', login);
     return await this.prisma.user.findUnique({
       where: { login },
     });
@@ -209,7 +208,7 @@ export class UserService {
       if (deletedFriendships.count === 0) throw new NotFoundException();
       return deletedFriendships;
     } catch (error) {
-      console.error('Error removing friend:', error);
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -236,10 +235,9 @@ export class UserService {
         },
       });
       if (!friendRequests) throw new NotFoundException();
-      console.log('++getFriendRequests++>:\n', friendRequests);
       return friendRequests;
     } catch (error) {
-      console.log('++getFriendRequests++error>', error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -358,7 +356,6 @@ export class UserService {
       });
       return user;
     } catch (error) {
-      console.log('Socket %s Disconnected', client.id);
       client.emit('removeToken', null);
       client.disconnect();
     }
@@ -384,8 +381,7 @@ export class UserService {
       });
       return userSocket;
     } catch (error) {
-      console.log('++createUserSocket++error>', error);
-      return null;
+      throw new BadRequestException(error.message);
     }
   }
 
