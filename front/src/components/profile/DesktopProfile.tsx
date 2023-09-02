@@ -42,6 +42,7 @@ function getUserData(): userType | null {
 
 export const DesktopProfile = (): JSX.Element => {
   const userData = getUserData();
+
   return (
     <div className="flex flex-col gap-10 mx-[20px]">
       <div className="bg-[#243230] relative rounded-[20px] max-h-[333px]">

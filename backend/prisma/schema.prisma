@@ -41,19 +41,19 @@ model User {
   name                          String?
   kind                          String?
   avatar                        String?
-  bg_color                      String[]        @default(["#918CA9", "#211F2F"])
-  paddle_color                  String?         @default("#E0E0E0")
-  ball_color                    String?         @default("#E0E0E0")
-  MyScore                       Match[]         @relation("Player1")
-  Other                         Match[]         @relation("Player2")
-  status                        String          @default("online")
-  TotalWin                      Int             @default(0)
-  TotalLose                     Int             @default(0)
-  TotalDraw                     Int             @default(0)
-  cleanSheet                    Boolean         @default(false)
-  Machine                       Boolean         @default(false)
-  TotalMatch                    Int             @default(0)
-  Level                         Float           @default(0.0)
+  bg_color                      String[]               @default(["#918CA9", "#211F2F"])
+  paddle_color                  String?                @default("#E0E0E0")
+  ball_color                    String?                @default("#E0E0E0")
+  MyScore                       Match[]                @relation("Player1")
+  Other                         Match[]                @relation("Player2")
+  status                        String                 @default("online")
+  TotalWin                      Int                    @default(0)
+  TotalLose                     Int                    @default(0)
+  TotalDraw                     Int                    @default(0)
+  cleanSheet                    Boolean                @default(false)
+  Machine                       Boolean                @default(false)
+  TotalMatch                    Int                    @default(0)
+  Level                         Float                  @default(0.0)
   location                      String?
   intraId                       Int?
   banner                        String?
@@ -68,8 +68,23 @@ model User {
   Notification                  Notification[]
   ChanneLNotifications          ChanneLNotifications[]
   twoFactorAuthenticationSecret String?
-  twoFA                         Boolean         @default(false)
-  logedFirstTime                Boolean         @default(false)
+  twoFA                         Boolean                @default(false)
+  logedFirstTime                Boolean                @default(false)
+  friends                       Friendship[]
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Friendship {
+  id       String           @id @default(uuid())
+  status   FriendshipStatus @default(PENDING)
+  userId   String
+  friendId String
+  User     User             @relation(fields: [userId], references: [id])
 }
 
 model Match {
@@ -130,10 +145,10 @@ model DirectMessage {
 }
 
 model Members {
-  id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  RoomId     Rooms?   @relation(fields: [roomsId], references: [id], onDelete: Cascade)
-  type       UserType @default(USER)
+  id         String    @id @default(uuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  RoomId     Rooms?    @relation(fields: [roomsId], references: [id], onDelete: Cascade)
+  type       UserType  @default(USER)
   userId     String
   roomsId    String?
   timeout    String?

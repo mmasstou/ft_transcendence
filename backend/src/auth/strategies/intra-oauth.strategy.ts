@@ -26,37 +26,31 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     refreshToken: string,
     profile: any,
   ): Promise<any> {
-    let _UserExist: User | null = null;
-    try {
-      _UserExist = await this.prisma.user.findUnique({
-        where: { email: profile._json.email },
-      });
-      if (!_UserExist) {
-        const loginExist = await this.userService.findOneLogin({
-          login: profile._json.login,
-        });
+    const _UserExist = await this.prisma.user.findUnique({
+      where: { email: profile._json.email },
+    });
 
-        if (loginExist) {
-          while (true) {
-            const newLogin: string = generateRandomUsername(
-              profile._json.first_name,
-              profile._json.last_name,
-            );
-            const loginExist = await this.userService.findOneLogin({
-              login: newLogin,
-            });
-            if (newLogin !== loginExist?.login) {
-              profile._json.login = newLogin;
-              break;
-            }
+    if (!_UserExist) {
+      const loginExist = await this.userService.findOneLogin({
+        login: profile._json.login,
+      });
+
+      if (loginExist) {
+        while (true) {
+          const newLogin: string = generateRandomUsername(
+            profile._json.first_name,
+            profile._json.last_name,
+          );
+          const loginExist = await this.userService.findOneLogin({
+            login: newLogin,
+          });
+          if (newLogin !== loginExist?.login) {
+            profile._json.login = newLogin;
+            break;
           }
         }
       }
-    } catch (error) {
-      console.log(error.message);
-      _UserExist = null;
-    }
-    if (!_UserExist) {
+
       const _User = await this.prisma.user.create({
         data: {
           login: profile._json.login,
