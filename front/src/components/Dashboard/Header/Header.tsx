@@ -53,9 +53,6 @@ const Header: React.FC<Props> = ({ socket, pendingRequests }): JSX.Element => {
     })();
   }, [pendingRequests, shownotification, socket]);
 
-  console.log('pendingFriendRequest in Header: ', pendingRequests);
-  console.log('notifications: ', notifications);
-
   return (
     <>
       <div className="flex justify-center items-center">
@@ -94,9 +91,7 @@ const Header: React.FC<Props> = ({ socket, pendingRequests }): JSX.Element => {
                           <Notification
                             friendshipData={friendshipData}
                             key={index}
-                            message="send a friend request."
                             isFriend
-                            socket={socket}
                             pendingRequests={pendingRequests}
                           />
                         )

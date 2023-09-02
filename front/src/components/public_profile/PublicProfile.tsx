@@ -3,164 +3,22 @@ import Image from 'next/image';
 import { UserInfo } from '../profile/UserInfo';
 import { UserStats } from '../profile/UserStats';
 import Statistics from '../profile/Statistics';
-import { BsSend } from 'react-icons/bs';
-import { BiUserPlus, BiUserX } from 'react-icons/bi';
 import { motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
-import { MdPendingActions } from 'react-icons/md';
+import Button from './Button';
+import { socketContext } from '@/app/Dashboard';
 
 interface ProfileProps {
   user: userType | null;
   handlePublicProfile: () => void;
 }
 
-interface ButtonProps {
-  text: string;
-  user?: userType | null;
-  isFriend?: boolean;
-}
-
-const Button: React.FC<ButtonProps> = ({ text, user, isFriend }) => {
-  const token = Cookies.get('token');
-  const [isPending, setIsPending] = useState<boolean>(false);
-  const [isSent, setIsSent] = useState<boolean>(false);
-  const [pending, setPending] = useState<any>([]);
-  const [isRemoved, setIsRemoved] = useState<boolean>(false);
-
-  useEffect(() => {
-    const token = Cookies.get('token');
-    try {
-      (async () => {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/sendingrequests/all`,
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setPending(data);
-        }
-      })();
-    } catch (error) {
-      console.log('error in get pending request: ', error);
-    }
-  }, [isSent]);
-
-  const sendFriendRequest = async () => {
-    const PostData = {
-      receiverId: user?.id,
-    };
-    if (PostData) {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/friend-requests/send`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(PostData),
-          }
-        );
-        if (response.ok) {
-          setIsSent(true);
-        }
-      } catch (err: any) {
-        console.log(err.message);
-      }
-    }
-  };
-
-  const removeFrined = async () => {
-    const PostData = {
-      friendId: user?.id,
-    };
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/removefriend`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(PostData),
-        }
-      );
-      if (response.ok) {
-        setIsRemoved(true);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleFriendRequest = async () => {
-    if (!isFriend) {
-      sendFriendRequest();
-    } else {
-      removeFrined();
-    }
-  };
-
-  useEffect(() => {
-    if (pending.length > 0) {
-      setIsPending(true);
-    }
-  }, [pending]);
-
-  console.log('pending: ', pending);
-
-  return (
-    <>
-      {text === 'Message' ? (
-        <button
-          className="flex justify-evenly items-center border-2 border-[#D9D9D9] rounded-full
-     p-2 text-[#D9D9D9] hover:opacity-70 w-[10rem]"
-        >
-          <BsSend />
-          <span>{text}</span>
-        </button>
-      ) : (
-        <button
-          onClick={handleFriendRequest}
-          disabled={isPending}
-          className="flex justify-evenly items-center border-2 border-[#D9D9D9] rounded-full
-     p-2 text-[#D9D9D9] hover:opacity-70 w-[10rem]"
-        >
-          {isPending ? (
-            <>
-              <MdPendingActions />
-              <span>Pending Request</span>
-            </>
-          ) : isFriend && !isRemoved ? (
-            <>
-              <BiUserX />
-              <span>Remove Friend</span>
-            </>
-          ) : (
-            <>
-              <BiUserPlus />
-              <span>Add Friend</span>
-            </>
-          )}
-        </button>
-      )}
-    </>
-  );
-};
-
 const PublicProfile: React.FC<ProfileProps> = ({
   user,
   handlePublicProfile,
 }) => {
+  const contextValue = useContext(socketContext);
   const [friends, setfriends] = useState<any>([]);
   const [isFriend, setIsFriend] = useState<boolean>(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -201,7 +59,7 @@ const PublicProfile: React.FC<ProfileProps> = ({
     } catch (error) {
       console.log('error in get friends: ', error);
     }
-  }, []);
+  }, [contextValue]);
 
   useEffect(() => {
     if (friends) {
@@ -215,6 +73,19 @@ const PublicProfile: React.FC<ProfileProps> = ({
       }
     }
   }, [friends]);
+
+  useEffect(() => {
+    if (contextValue?.message === 'Your friend request has been accepted.') {
+      setIsFriend(false);
+    }
+  }, [contextValue]);
+
+  const updateFriendState = (newState: boolean) => {
+    setIsFriend(newState);
+  };
+
+  console.log('in public isfrins: ', isFriend);
+  console.log('contextValue: ', contextValue);
 
   return (
     <>
@@ -230,7 +101,7 @@ const PublicProfile: React.FC<ProfileProps> = ({
           scale: 1,
         }}
         transition={{
-          duration: 1,
+          duration: 0.6,
         }}
         ref={profileRef}
         onClick={(event) => handleOutsideClick}
@@ -263,12 +134,17 @@ const PublicProfile: React.FC<ProfileProps> = ({
           <UserStats user={user} />
 
           <div className="flex justify-around items-center">
-            <Button text="Message" user={user} />
-            {isFriend ? (
-              <Button text="Remove Friend" user={user} isFriend={isFriend} />
-            ) : (
-              <Button text="Add Friend" user={user} isFriend={isFriend} />
-            )}
+            <Button
+              text="Message"
+              user={user}
+              updateFriendState={updateFriendState}
+            />
+            <Button
+              text="add friend"
+              isFriend={isFriend}
+              updateFriendState={updateFriendState}
+              user={user}
+            />
           </div>
           <div className="mx-4 mt-10 h-1/4">
             <Statistics user_id={user?.id} />

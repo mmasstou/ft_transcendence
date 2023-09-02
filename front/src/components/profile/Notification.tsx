@@ -1,14 +1,10 @@
 import Cookies from 'js-cookie';
 import Image from 'next/image';
-import React, { FC, use } from 'react';
+import React, { FC } from 'react';
 import toast from 'react-hot-toast';
-import { Socket } from 'socket.io-client';
 
 type NotificationProps = {
-  message: string;
   friendshipData: any;
-  directMessage?: boolean;
-  socket: Socket | null;
   pendingRequests: any;
 } & (
   | {
@@ -25,10 +21,7 @@ const token = Cookies.get('token');
 const Notification: FC<NotificationProps> = ({
   isFriend,
   isOnline,
-  message,
   friendshipData,
-  directMessage,
-  socket,
   pendingRequests,
 }) => {
   const [friend, setfriend] = React.useState<any | null>(null);
@@ -118,9 +111,6 @@ const Notification: FC<NotificationProps> = ({
     }
   }, [shownotification]);
 
-  console.log('pendingRequest in notification: ', pendingRequests);
-  console.log('friendship data in notification: ', friendshipData);
-
   if ((pendingRequests.length > 0 || friend) && !removeNotification) {
     return (
       <div className="bg-primary rounded-md p-2">
@@ -150,7 +140,7 @@ const Notification: FC<NotificationProps> = ({
               <strong className="text-secondary text-sm lg:text-base capitalize">
                 {friend && friend.login}
               </strong>{' '}
-              {isFriend && directMessage === true ? `: ${message}` : message}
+              send a friend request.
             </h3>
           </div>
           <div className="flex gap-2 xl:gap-3 self-end text-xs md:text-sm ">
@@ -159,7 +149,7 @@ const Notification: FC<NotificationProps> = ({
               className="bg-secondary py-1 px-2 border border-secondary rounded-md text-black 
             hover:bg-transparent hover:text-secondary transition-all duration-150"
             >
-              {directMessage ? 'Reply' : 'Accept'}
+              Accept
             </button>
             <button
               onClick={handleDeny}

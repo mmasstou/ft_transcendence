@@ -6,7 +6,7 @@ import MyToast from '@/components/ui/Toast/MyToast';
 import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { use, useEffect } from 'react';
+import React, { createContext, useEffect, useContext, ReactNode } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { Socket, io } from 'socket.io-client';
 import StartGame from './chat/channels/actions/startgame';
@@ -18,9 +18,27 @@ import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
 import ChanneLFindRoommodaL from './chat/channels/modaLs/channel.find.room.modaL';
 import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
 import './dashboard.css';
+
 interface Props {
   children: React.ReactNode;
 }
+
+interface SocketContextType {
+  message: string;
+  children: ReactNode;
+}
+
+export const socketContext = createContext<SocketContextType | undefined>(
+  undefined
+);
+
+const SocketProvider: React.FC<SocketContextType> = ({ message, children }) => {
+  return (
+    <socketContext.Provider value={{ message, children }}>
+      {children}
+    </socketContext.Provider>
+  );
+};
 
 const Dashboard = ({ children }: Props) => {
   const router = useRouter();
@@ -35,6 +53,7 @@ const Dashboard = ({ children }: Props) => {
 
   const [pendingRequests, setPendingRequests] = React.useState<any>([]);
   const [requestBackUp, setRequestBackUp] = React.useState<any>([]);
+  const [message, setMessage] = React.useState<string>('');
 
   if (!token || !userId) return;
 
@@ -99,6 +118,7 @@ const Dashboard = ({ children }: Props) => {
       setPendingRequests((prevRequests: any) => [...prevRequests, request]);
       setRequestBackUp((prevRequests: any) => [...prevRequests, request]);
       setnotifUpdate(true);
+      setMessage(request);
       toast(request, { icon: '🤗' });
     });
 
@@ -133,6 +153,9 @@ const Dashboard = ({ children }: Props) => {
       }
     });
   }, [socket]);
+
+  console.log('pendingRequests: ', pendingRequests);
+  console.log('Message: ', message);
 
   return (
     <>
@@ -180,17 +203,19 @@ const Dashboard = ({ children }: Props) => {
           message={Notifications.message}
         />
       )}
-      <div className="dashboard bg-primary overflow-y-auto">
-        <header className="bg-transparent flex items-center justify-between px-5 ">
-          <Header socket={socket} pendingRequests={pendingRequests} />
-        </header>
+      <SocketProvider message={message}>
+        <div className="dashboard bg-primary overflow-y-auto">
+          <header className="bg-transparent flex items-center justify-between px-5 ">
+            <Header socket={socket} pendingRequests={pendingRequests} />
+          </header>
 
-        <main className="">{children}</main>
+          <main className="">{children}</main>
 
-        <div id="Sidebar" className="">
-          <Sidebar />
+          <div id="Sidebar" className="">
+            <Sidebar />
+          </div>
         </div>
-      </div>
+      </SocketProvider>
       <Toaster />
     </>
   );
