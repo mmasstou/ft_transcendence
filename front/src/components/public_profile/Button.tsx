@@ -11,6 +11,8 @@ interface ButtonProps {
   user?: userType | null;
   isFriend?: boolean;
   updateFriendState: (newState: boolean) => void;
+  updatePendingState: (newState: boolean) => void;
+  isPending?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -18,11 +20,12 @@ const Button: React.FC<ButtonProps> = ({
   user,
   isFriend,
   updateFriendState,
+  updatePendingState,
+  isPending,
 }) => {
   const contextValue = useContext(socketContext);
 
   const token = Cookies.get('token');
-  const [isPending, setIsPending] = useState<boolean>(false);
 
   const sendFriendRequest = async () => {
     const PostData = {
@@ -42,7 +45,7 @@ const Button: React.FC<ButtonProps> = ({
           }
         );
         if (response.ok) {
-          setIsPending(true);
+          updatePendingState(true);
         }
       } catch (err: any) {
         console.log(err.message);
@@ -86,17 +89,14 @@ const Button: React.FC<ButtonProps> = ({
     console.log('message: ', contextValue?.message);
     if (contextValue?.message === 'Your friend request has been accepted.') {
       updateFriendState(true);
-      setIsPending(false);
+      updatePendingState(false);
     } else if (
       contextValue?.message === 'Your friend request has been rejected.'
     ) {
       updateFriendState(false);
-      setIsPending(false);
+      updatePendingState(false);
     }
   }, [contextValue]);
-
-  console.log('isPending: ', isPending);
-  console.log('isFriend: ', isFriend);
 
   return (
     <>

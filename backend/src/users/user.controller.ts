@@ -60,7 +60,14 @@ export class UserController {
     return await this.usersService.getFriendRequests(id);
   }
 
-  // get all accepted friend requests
+  // get all non friend users
+  @UseGuards(JwtAuthGuard)
+  @Get('nonfriends')
+  async getNonFriends(@Req() request: Request) {
+    const User: any = request.user;
+    const id: any = User.id;
+    return await this.usersService.getNonFriends(id);
+  }
 
   @Get()
   findAll() {

@@ -260,9 +260,19 @@ export class UserService {
       });
       if (!friends) throw new NotFoundException();
 
+      // get array of objects of eah friend with his data
+      const friendsData = await Promise.all(
+        friends.map(async (friend) => {
+          const user = await this.prisma.user.findUnique({
+            where: { id: friend.userId },
+          });
+          return user;
+        }),
+      );
+      return friendsData;
       // get only array of friends id
-      const friendsId = friends.map((friend) => friend.userId);
-      return friendsId;
+      // const friendsId = friends.map((friend) => friend.userId);
+      // return friendsId;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -290,6 +300,54 @@ export class UserService {
       });
       if (!friend) throw new NotFoundException();
       return friend;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  // get all non friend users and non pending users
+  async getNonFriends(userId: string) {
+    try {
+      const friends = await this.prisma.friendship.findMany({
+        where: {
+          OR: [
+            {
+              userId: userId,
+              status: 'ACCEPTED',
+            },
+            {
+              friendId: userId,
+              status: 'ACCEPTED',
+            },
+          ],
+        },
+      });
+      if (!friends) throw new NotFoundException();
+      const friendsId = friends.map((friend) => friend.userId);
+      const users = await this.prisma.user.findMany({
+        where: {
+          id: {
+            notIn: friendsId,
+          },
+        },
+      });
+      if (!users) throw new NotFoundException();
+      // remove pending requests
+      const pendingRequests = await this.prisma.friendship.findMany({
+        where: {
+          userId: userId,
+          status: 'PENDING',
+        },
+      });
+      users.forEach((user) => {
+        pendingRequests.forEach((request) => {
+          if (user.id === request.friendId) {
+            const index = users.indexOf(user);
+            users.splice(index, 1);
+          }
+        });
+      });
+      return users;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
