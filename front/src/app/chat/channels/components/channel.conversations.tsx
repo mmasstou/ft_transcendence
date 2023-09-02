@@ -24,6 +24,7 @@ import { CiVolumeMute } from "react-icons/ci";
 import { is, ro, tr } from "date-fns/locale";
 import { ChanneLContext } from "../providers/channel.provider";
 import ChannelConversationsMute from "./channel.conversations.mute";
+import ChanneLsettingsHook from "../hooks/channel.settings";
 
 const token: string | undefined = Cookies.get('token')
 const UserId: string | undefined = Cookies.get('_id')
@@ -44,6 +45,7 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
     const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
     const ChanneLContextee: any = React.useContext(ChanneLContext)
+    const channeLsettingsHook = ChanneLsettingsHook()
     const router = useRouter()
 
     const UpdateData = () => {
@@ -127,18 +129,19 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
     // listen to message event and send the incomming message to client and update the member or channel info
     React.useEffect(() => {
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`,
             (data) => { if (data.OK) { return UpdateData(); } });
 
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_UPDATE`,
             (data) => { if (data.OK) { return UpdateData(); } });
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK`,
             (data: { OK: boolean, member: membersType }) => {
                 if (data.OK) {
                     if (data.member.userId === UserId) {
-                        toast.error(`you are kicked from ${channeLinfo?.name}`)
+                        channeLsettingsHook.onClose()
+                        toast.error(`you are kicked from this channel`)
                         return router.push('/chat/channels')
                     }
                 }
@@ -152,9 +155,9 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
         })
 
         return () => {
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK`)
             socket?.off('sendMessageResponse')
         }
 

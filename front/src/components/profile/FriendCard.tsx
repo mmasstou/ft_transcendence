@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 
 const SenderId = Cookies.get('_id');
 const UserCard: FC<UserCardProps> = ({
-  username,
+  login,
   userId,
   status,
   avatar,
@@ -33,29 +33,29 @@ const UserCard: FC<UserCardProps> = ({
   };
 
   useEffect(() => {
-    socket && socket.on('GameResponseToChatToUser', (data: any) => {
-      if (data.User.id === userId) {
-        setInvited(false);
-        clearTimeout(timeout);
-      }
-    });
-    socket && socket.on('UserSendToStatus', (data: any) => {
-      if (data.id === userId) {
-        setInvited(false);
-        clearTimeout(timeout);
-        setStatus(data.status)
-        if (data.status === 'inGame')
-          toast.error(data.login + ' is in Game');
-        else if (data.status === 'offline')
-          toast.error(data.login + ' is offline');
-      }
-    })
+    socket &&
+      socket.on('GameResponseToChatToUser', (data: any) => {
+        if (data.User.id === userId) {
+          setInvited(false);
+          clearTimeout(timeout);
+        }
+      });
+    socket &&
+      socket.on('UserSendToStatus', (data: any) => {
+        if (data.id === userId) {
+          setInvited(false);
+          clearTimeout(timeout);
+          setStatus(data.status);
+          if (data.status === 'inGame') toast.error(data.login + ' is in Game');
+          else if (data.status === 'offline')
+            toast.error(data.login + ' is offline');
+        }
+      });
     return () => {
       socket && socket.off('GameResponseToChatToUser');
       socket && socket.off('UserSendToStatus');
-    }
-  },[])
-
+    };
+  }, []);
 
   return (
     <div className=" bg-container rounded-xl my-3 p-2 xl:p-3 flex items-center justify-between">
@@ -65,10 +65,10 @@ const UserCard: FC<UserCardProps> = ({
           height={50}
           width={50}
           priority
-          alt={username}
+          alt={login}
           className="rounded-full border border-secondary"
         />
-        <h3 className="xl:text-lg">{username}</h3>
+        <h3 className="xl:text-lg">{login}</h3>
       </div>
       <div className="flex items-center text-xs xl:text-sm gap-2">
         {addRequest ? (

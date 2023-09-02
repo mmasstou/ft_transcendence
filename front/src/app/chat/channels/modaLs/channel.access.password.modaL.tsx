@@ -50,7 +50,7 @@ const ChanneLPasswordAccessModaL = () => {
         // create private room : createroom
         // check if passaword is room password
         const evenData = {
-            password : InputValue,
+            password: InputValue,
             ...data
         }
         console.log("the password is match you can acces now!")
@@ -61,7 +61,7 @@ const ChanneLPasswordAccessModaL = () => {
 
     // useEffect(() => {
     //     socket?.on(
-    //         `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+    //         `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`,
     //         (data: {
     //             message: string,
     //             status: any,

@@ -14,7 +14,7 @@ const Select: FC<SelectProps> = ({ lable, value, onChange, options, isMulti, dis
             ...provided,
             color: 'white',
             padding: '0.5rem',
-            
+
 
         }),
         multiValueRemove: (provided: any, state: any) => ({
@@ -23,9 +23,9 @@ const Select: FC<SelectProps> = ({ lable, value, onChange, options, isMulti, dis
             color: 'red',
             borderRadius: '9999px',
             ':hover': {
-              backgroundColor: 'transparent'
+                backgroundColor: 'transparent'
             }
-          }),
+        }),
         control: (provided: any, state: any) => ({
             ...provided,
             backgroundColor: 'transparent',
@@ -33,10 +33,10 @@ const Select: FC<SelectProps> = ({ lable, value, onChange, options, isMulti, dis
             border: '1px solid #E0E0E0',
 
         }),
-        menuPortal: (base: any) => ({ ...base, zIndex: 9999 })
+        menuPortal: (base: any) => ({ ...base, zIndex: 52 })
     };
     return (
-        <div className="z-[100]">
+        <div className="z-[51]">
             <h1 className="text-[#ffffffb9] text-xl font-bold capitalize">{lable}</h1>
             <div className="mt-2 h-max overflow-y-scroll">
                 <ReactSelect
