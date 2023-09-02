@@ -88,7 +88,7 @@ export class RoomGateway implements OnGatewayConnection {
   async handleConnection(socket: Socket) {
     const User = await this.usersService.getUserInClientSocket(socket);
     if (User) {
-      console.log('Chat-> %s connected with socketId :', User.login, socket.id);
+      // console.log('Chat-> %s connected with socketId :', User.login, socket.id);
       this.server.emit('ref', { socketId: socket.id });
     }
   }

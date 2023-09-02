@@ -82,7 +82,7 @@ export class RoomsService {
       if (!room) throw new Error('');
       return room;
     } catch (error) {
-      console.log('channeL with id %s not found', id);
+      // console.log('channeL with id %s not found', id);
       return null;
     }
   }
@@ -97,7 +97,7 @@ export class RoomsService {
       if (!room) throw new Error('');
       return room;
     } catch (error) {
-      console.log('channeL with slug %s not found', slug);
+      // console.log('channeL with slug %s not found', slug);
       return new NotFoundException();
     }
   }

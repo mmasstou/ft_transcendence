@@ -11,3 +11,9 @@
 		- User block
 	+ Friend List
 	+ Invite to game.
+// TODO:
+	+ When someone create new conversation should be updated for both users.
+// TODO:
+	+ Theme of direct chat
+	+ Dynamic routes for every conversation.
+	+ socket for eacht conversation

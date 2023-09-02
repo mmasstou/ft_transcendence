@@ -6,23 +6,27 @@ import { VscSend } from 'react-icons/vsc';
 import Cookies from 'js-cookie';
 import Image from "next/image";
 import { SlOptionsVertical } from 'react-icons/sl';
+import { Socket, io } from 'socket.io-client';
+
 
 
 const token = Cookies.get('token');
 const currentId = Cookies.get('_id');
 
-function ConversationBody({ convBody }: { convBody: conversationData | null}) {
+function ConversationBody({ socket, convBody }: { socket: Socket | null, convBody: conversationData | null}) {
 
 	const [msgContent, setMsgContent] = useState<string>('');
 	let user;
 
-	const handleEnterClick = (e) => {
+	const handleEnterClick = (e: any) => {
 		if (e.key === 'Enter')
 			console.log(`Message : ${msgContent}`);
 	}
 
 	const handleSendMsg = () => {
 		console.log(`Message : ${msgContent}`);
+		const obj = {convId: convBody?.id ,userId: currentId, msg: msgContent};
+		socket?.emit('message', obj);
 		setMsgContent('');
 	}
 
@@ -41,7 +45,7 @@ function ConversationBody({ convBody }: { convBody: conversationData | null}) {
 						<CustumBtn icon={SlOptionsVertical} onClick={() => console.log("Option Modal ...")} size={15} />
 					</section>
 				</div>
-				<ConversationMsg msgs={convBody.content}/>
+				<ConversationMsg msgs={convBody.id}/>
 				<div className='text-[#1EF0AE] flex gap-4 justify-center w-full py-2 bg-[#3E504D]'>
 					<input type='text' placeholder='  Type a message' value={msgContent} onChange={(e) => setMsgContent(e.target.value)} onFocus={(e) => handleEnterClick(e)} className='max-h-[100px] h-[50px] overflow-auto w-[75%] py-2 px-5 bg-primary rounded-[25px] focus:border-[#1EF0AE] focus:outline-none text-sm'/>
 					<section className='w-[50px] h-[50px] bg-primary flex justify-center items-center rounded-[50%]'>
@@ -50,7 +54,9 @@ function ConversationBody({ convBody }: { convBody: conversationData | null}) {
 				</div>
 			</section>
 			:
-			<section>No Content</section>}
+			<div className="flex flex-col justify-center items-center h-full w-full">
+        		<Image src="/no_conversations.svg" width={600} height={600} alt={""} />
+        	</div>}
 		</div>
 	)
 }

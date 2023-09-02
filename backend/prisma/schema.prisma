@@ -63,7 +63,6 @@ model User {
   Members                       Members[]
   Messages                      Messages[]
   Rooms                         Rooms[]
-  directMessage                 DirectMessage[]
   UserSocket                    UserSocket[]
   Notification                  Notification[]
   ChanneLNotifications          ChanneLNotifications[]
@@ -119,15 +118,6 @@ model Rooms {
   User                 User[]
   slug                 String                 @unique @default(uuid())
   ChanneLNotifications ChanneLNotifications[]
-}
-
-model DirectMessage {
-  id         String   @id @default(uuid())
-  name       String   @unique
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  User       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String?
 }
 
 model Members {

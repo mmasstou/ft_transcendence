@@ -22,8 +22,8 @@ const currentId = Cookies.get('_id');
 export default function page() {
     const router = usePathname();
 	const [isOpen, setOpening] = useState<boolean>(false);
-	const [openFriendList, setFriendList] = useState(false);
-	const [createConversation, setConvCreation] = useState(false);
+	const [openFriendList, setFriendList] = useState<boolean>(false);
+	const [createConversation, setConvCreation] = useState<boolean>(false);
 
 
 	useEffect(() => {}, [isOpen, openFriendList])

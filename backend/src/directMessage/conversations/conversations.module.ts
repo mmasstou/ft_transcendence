@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 import { DmGateway } from './dm.gateway';
 
 @Module({
-  providers: [ConversationsService, PrismaService],
-  controllers: [ConversationsController, DmGateway],
+  providers: [ConversationsService, PrismaService, DmGateway],
+  controllers: [ConversationsController],
 })
 export class ConversationsModule {}

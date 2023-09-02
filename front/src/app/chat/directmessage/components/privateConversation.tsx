@@ -4,7 +4,7 @@ import ConversationList from './conversationList';
 import FriendList from './friendList';
 import SearchModal from './searchModal';
 import ConversationBody from './conversationBody';
-import { io } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 
 
 
@@ -19,7 +19,7 @@ export interface conversationData {
 	users: any[],
 }
 
-function PrivateConversation({ isOpen, openFriendList, setFriendList, openSeachList, setSeachOpening }: {isOpen: boolean}) {
+function PrivateConversation({ isOpen, openFriendList, setFriendList, openSeachList, setSeachOpening }: {isOpen: boolean, openFriendList: boolean, setFriendList: React.Dispatch<React.SetStateAction<boolean>>, openSeachList: boolean, setSeachOpening: React.Dispatch<React.SetStateAction<boolean>>}) {
 
 	const [convBody, setConvBody] = useState<conversationData | null>(null);
 	const [convList, setConvList] = useState<conversationData[] | null>(null);
@@ -27,6 +27,9 @@ function PrivateConversation({ isOpen, openFriendList, setFriendList, openSeachL
 	const [currentUser, setCurrent] = useState(null);
 	
 	const [users, setUsers] = useState([]);
+	const [socket, setSocket] = useState<Socket | null>(null);
+
+
 
 	async function getUsers() {
 		const res = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
@@ -36,9 +39,9 @@ function PrivateConversation({ isOpen, openFriendList, setFriendList, openSeachL
 			  Authorization: `Bearer ${token}`,
 			},
 		  })).json();
-		const filtredUsers = res.filter((user) => user.id != currentId)
+		const filtredUsers = res.filter((user: any) => user.id != currentId)
 		setUsers(filtredUsers);
-		setCurrent(res.filter((us) => us.id === currentId)[0]);
+		setCurrent(res.filter((us: any) => us.id === currentId)[0]);
 	}
 
 	async function getAllConversations() {
@@ -54,22 +57,23 @@ function PrivateConversation({ isOpen, openFriendList, setFriendList, openSeachL
 	}
 
 	useEffect(() => {
+		const socket: Socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`);
+		setSocket(socket);
+		
+		return () => {
+			socket.disconnect();
+		}
+	}, [])
+
+	useEffect(() => {
 		getUsers();
 		getAllConversations();
 		console.log('-----ues', currentUser);
-		// Create a Socket.IO client instance and connect to the server
-		const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`); // Replace with your server URL
 
-		// Handle events from the server
-		socket.on('message', (data) => {
+		
+		socket?.on('message', (data) => {
 		  console.log('Received message from server:', data);
-		  // You can update your component's state or UI here
 		});
-	
-		// Clean up the socket connection when the component unmounts
-		return () => {
-		  socket.disconnect();
-		};
 	}, [convBody])
 
   return (
@@ -78,7 +82,7 @@ function PrivateConversation({ isOpen, openFriendList, setFriendList, openSeachL
 			<ConversationList user={currentUser} convList={convList} setConvBody={setConvBody} />
 		</div> : <></>}
 		<div className='flex justify-center min-w-2/3 w-full'>
-			<ConversationBody convBody={convBody} />
+			<ConversationBody socket={socket} convBody={convBody} />
 		</div>
 		{openFriendList ? <div className=' bg-[#243230] h-full w-[20%] min-w-[200px] max-w-[350px] '>
 			<FriendList />

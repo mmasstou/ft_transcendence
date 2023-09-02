@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -11,20 +12,23 @@ export class DmGateway implements OnGatewayInit {
   @WebSocketServer()
   server: Server;
 
+  private readonly logger = new Logger(DmGateway.name);
+
   afterInit(server: Server) {
-    console.log('WebSocket server initialized');
+    this.logger.debug('marbenMB : DmGateway server initialized');
   }
 
   handleConnection(client: Socket) {
-    console.log(`Client ${client.id} connected`);
+    this.logger.debug(`marbenMB : Client ${client.id} connected`);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client ${client.id} disconnected`);
+    this.logger.debug(`marbenMB : Client ${client.id} disconnected`);
   }
 
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): void {
     this.server.emit('message', payload);
+    this.logger.log(client.id, payload);
   }
 }
