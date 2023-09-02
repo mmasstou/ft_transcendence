@@ -63,7 +63,7 @@ export default function page() {
     // check for channels :
     // leave the channeLs :
     socket?.on(
-      `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+      `SOCKET_EVENT_RESPONSE_CHAT_UPDATE`,
       (data: any) => GetData())
   }, [socket])
 
@@ -75,7 +75,7 @@ export default function page() {
       <LefttsideModaL>
         {
           ChanneLs && ChanneLs.map((room: RoomsType, key) => (
-            <ChanneLSidebarItem key={key} room={room}  active={room.slug === slug} />
+            <ChanneLSidebarItem key={key} room={room} active={room.slug === slug} />
           ))
         }
       </LefttsideModaL>

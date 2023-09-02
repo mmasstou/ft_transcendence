@@ -65,16 +65,16 @@ const ChanneLSettingsModaL = () => {
     }, [])
 
     React.useEffect(() => {
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`, (data) => {
             if (!data.OK) return
             UpdateData();
         });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
             if (!data.OK) return
             UpdateData();
         });
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_DELETE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_DELETE`,
             (data: { Ok: boolean }) => {
 
                 if (data.Ok) {
@@ -92,7 +92,7 @@ const ChanneLSettingsModaL = () => {
             }
         );
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE`,
             (data: { Ok: boolean, message: string, member: membersType }) => {
 
                 if (!data.Ok) {
@@ -108,10 +108,10 @@ const ChanneLSettingsModaL = () => {
             }
         );
         return () => {
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_DELETE}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_DELETE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE`)
         }
     }, [socket])
 
@@ -156,13 +156,13 @@ const ChanneLSettingsModaL = () => {
                     if (data.updateType === updatememberEnum.LEAVECHANNEL) {
                         console.log("data.updateType === updatememberEnum.LEAVECHANNEL", data.updateType === updatememberEnum.LEAVECHANNEL)
                         socket?.emit(
-                            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_LEAVE}`,
+                            `SOCKET_EVENT_CHAT_MEMBER_LEAVE`,
                             { roomId: ChanneLInfo?.id }
                         )
                     }
                     if (data.updateType === updatememberEnum.DELETECHANNEL) {
                         socket?.emit(
-                            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_DELETE_CHAT}`,
+                            `SOCKET_EVENT_CHAT_DELETE`,
                             { roomId: ChanneLInfo?.id, userId: UserId }
                         )
                     }

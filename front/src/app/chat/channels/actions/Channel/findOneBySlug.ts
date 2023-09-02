@@ -1,5 +1,3 @@
-// ${process.env.NEXT_PUBLIC_API_URL}/rooms/a6602f3c-676d-492e-9292-c4eec04fdf35
-
 const FindOneBySLug = async (slug: string, token: string) => {
     try {
       const response = await fetch(

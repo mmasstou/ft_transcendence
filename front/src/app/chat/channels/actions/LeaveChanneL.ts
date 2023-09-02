@@ -7,7 +7,7 @@ export default async function LeaveChanneL(
   token: string,
   event: string
 ) {
-  if (event === process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_LEAVE) {
+  if (event === `SOCKET_EVENT_CHAT_MEMBER_LEAVE`) {
     if (!slug) return false;
     const channeLInfo = await FindOneBySLug(slug, token);
     if (!channeLInfo) return false;

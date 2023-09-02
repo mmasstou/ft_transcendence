@@ -1,6 +1,7 @@
 import React, { MouseEvent } from "react";
 import Button from "../../components/Button";
 import { AiFillCloseCircle } from "react-icons/ai";
+import LeftSidebarHook from "../hooks/LeftSidebarHook";
 
 interface props {
     children: React.ReactNode;
@@ -13,7 +14,9 @@ interface props {
 export default function ChanneLModal({ children, onClose, title, IsOpen, z_index }: props) {
 
     const [IsMounted, setIsMounted] = React.useState<boolean>(false)
+    const leftSidebarHook = LeftSidebarHook()
     React.useEffect(() => { setIsMounted(true) }, [])
+    if (IsOpen) leftSidebarHook.IsOpen && leftSidebarHook.onClose()
     if (!IsOpen || !IsMounted) return null;
     const zindex = z_index ? 'z-[' + z_index.toString() + ']' : 'z-[36]'
     return (

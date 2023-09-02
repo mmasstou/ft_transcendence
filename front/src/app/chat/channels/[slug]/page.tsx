@@ -73,7 +73,7 @@ export default function page({ params }: { params: { slug: string } }) {
 
         ChanneLContextee.socket?.emit('accessToroom', ChanneLInfo);
         ChanneLContextee.socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_UPDATE`,
             (data: any) => {
                 (async () => {
                     if (!params.slug) return;
@@ -97,7 +97,7 @@ export default function page({ params }: { params: { slug: string } }) {
             })
         setIsMounted(true);
         return () => {
-            ChanneLContextee.socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`);
+            ChanneLContextee.socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`);
         }
     }, [])
 

@@ -81,13 +81,13 @@ export default function ChanneLSettingsChanneLChangeType(
             return
         }
         // send data to server
-        // socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+        // socket?.emit(`SOCKET_EVENT_CHAT_UPDATE`, data)
         // change channel type :
         const __message = `are you sure you whon to change channel type to ${data.roomtype}`;
         __message && channeLConfirmActionHook.onOpen(
             <button
                 onClick={() => {
-                    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+                    socket?.emit(`SOCKET_EVENT_CHAT_UPDATE`, data)
                 }}
                 className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
                 save
@@ -138,7 +138,7 @@ export default function ChanneLSettingsChanneLChangeType(
 
     useEffect(() => {
 
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, (res) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE`, (res) => {
             if (!slug || !res) return;
             if (res.OK) {
                 OnBack();
@@ -155,7 +155,7 @@ export default function ChanneLSettingsChanneLChangeType(
             })();
             channeLConfirmActionHook.onClose()
         })
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
             if (!slug) return;
             (async () => {
                 const ChanneLinfo = await FindOneBySLug(slug, token)

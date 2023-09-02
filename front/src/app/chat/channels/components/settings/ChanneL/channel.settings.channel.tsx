@@ -82,7 +82,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         __message && channeLConfirmActionHook.onOpen(
             <button
                 onClick={() => {
-                    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+                    socket?.emit(`SOCKET_EVENT_CHAT_UPDATE`, data)
                 }}
                 className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
                 remove Access password
@@ -90,7 +90,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             , __message
         )
         // send data to server
-        // socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_UPDATE}`, data)
+        // socket?.emit(`SOCKET_EVENT_CHAT_UPDATE`, data)
         //   reset data for password
         // reset()
     }
@@ -112,26 +112,26 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         // listen to channels actions response events :
 
         // change channel password :
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD`, (data) => {
 
         })
         // change type :
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE`, (data) => {
 
         })
         // set access password :
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_SET_ACCESS_PASSWORD}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_SET_ACCESS_PASSWORD`, (data) => {
 
         })
         // remove access password :
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD`, (data) => {
             if (!data) return
             channeLConfirmActionHook.onClose()
             setChanneLinfo(data);
             OnBack()
         })
 
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
 
         })
     }, [socket])

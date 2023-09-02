@@ -43,7 +43,7 @@ const ChanneLCreateModaL = () => {
   }, []);
 
   React.useEffect(() => {
-    socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, (room: {
+    socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_CREATE`, (room: {
       OK: boolean,
       message: string,
       data: RoomsType
@@ -56,7 +56,7 @@ const ChanneLCreateModaL = () => {
       onClose()
     })
     return () => {
-      socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_CREATE}`)
+      socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_CREATE`)
     }
   }, []);
 

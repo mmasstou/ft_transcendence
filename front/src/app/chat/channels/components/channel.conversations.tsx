@@ -127,14 +127,14 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
     // listen to message event and send the incomming message to client and update the member or channel info
     React.useEffect(() => {
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`,
             (data) => { if (data.OK) { return UpdateData(); } });
 
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_UPDATE`,
             (data) => { if (data.OK) { return UpdateData(); } });
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK`,
             (data: { OK: boolean, member: membersType }) => {
                 if (data.OK) {
                     if (data.member.userId === UserId) {
@@ -152,9 +152,9 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
         })
 
         return () => {
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK`)
             socket?.off('sendMessageResponse')
         }
 

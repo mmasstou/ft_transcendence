@@ -61,11 +61,11 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
     // check for rooms socket events :
     React.useEffect(() => {
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER`,
             (data: any) => {
                 UpdateData()
             });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`,
             (response: { OK: boolean }) => {
                 channeLConfirmActionHook.onClose()
                 if (response.OK) {
@@ -76,7 +76,7 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
 
             })
 
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
             (async () => {
                 const channeLLMembers = await getMemberWithId(UserId, room.id, token)
                 if (!channeLLMembers) return;
@@ -100,9 +100,9 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
         })
 
         return () => {
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`)
             socket?.off('GameNotificationResponse')
         }
 
