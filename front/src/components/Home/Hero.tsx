@@ -5,8 +5,10 @@ import table from '../../../public/table.svg';
 import BackgroundCircles from './BackgroundCircles';
 import Button from './CTA';
 import styles from './style';
+import { useRouter } from 'next/navigation';
 
 const Hero = () => {
+  const router = useRouter();
   const AnimatedImage = motion(Image);
 
   return (
@@ -31,7 +33,9 @@ const Hero = () => {
           to become a champion.
         </p>
         <Button
-          OnClick={() => { }}
+          OnClick={() => {
+            router.push(`${process.env.NEXT_PUBLIC_API_URL}/auth/callback`);
+          }}
           login={false}
           style="text-btn hover:text-white bg-secondary "
           title="Get Started Now"
@@ -50,7 +54,7 @@ const Hero = () => {
           alt="ping pong tabe image"
           width={500}
           height={500}
-          priority={false}
+          priority
         />
         <div className="absolute z-[1] w-[80%] h-[80%] rounded-full bottom-30 white__gradient overfolw-hidden" />
         <div className="absolute z-[0] w-[50%] h-[50%] right-20 bottom-20 blue__gradient overfolw-hidden" />

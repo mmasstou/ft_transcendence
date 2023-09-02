@@ -16,6 +16,7 @@ import { MessagesService } from './messages/messages.service';
 import { TwoFactorAuthenticationService } from './auth/2fa/twoFactorAuthentication.service';
 import { TwoFactorAuthenticationModule } from './auth/2fa/twoFactorAuthentication.module';
 import { FileUploadModule } from './Uploads/file-upload.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import * as cookieParser from 'cookie-parser';
 
 @Module({
@@ -29,6 +30,7 @@ import * as cookieParser from 'cookie-parser';
     GameModule,
     TwoFactorAuthenticationModule,
     FileUploadModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [
