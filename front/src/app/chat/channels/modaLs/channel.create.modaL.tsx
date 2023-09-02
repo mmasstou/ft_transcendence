@@ -49,16 +49,19 @@ const ChanneLCreateModaL = () => {
       data: RoomsType
     }) => {
       if (!room.OK) {
-        toast(room.message)
+        toast.error(room.message)
         return
       }
-      route.push(`/chat/channels/${room.data.slug}`)
-      onClose()
+      if (room.OK) {
+        toast.success(room.message)
+        route.push(`/chat/channels/${room.data.slug}`)
+        onClose()
+      }
     })
     return () => {
       socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_CREATE`)
     }
-  }, []);
+  }, [socket]);
 
   type formValues = {
     channel_name: string;

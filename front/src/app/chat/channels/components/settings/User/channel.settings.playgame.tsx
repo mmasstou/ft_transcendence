@@ -125,7 +125,7 @@ export default function ChanneLsettingsPlayGame(
                                 })();
                             }
                             else {
-                                toast(`${PLayer01?.login} is On ${PLayer01?.status} }`)
+                                toast(`${PLayer01?.login} is  ${PLayer01?.status}`)
                             }
                         }}
                         className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-[#FFCC00] hover:border">
@@ -153,7 +153,7 @@ export default function ChanneLsettingsPlayGame(
                                 })();
                             }
                             else {
-                                toast(`${PLayer01?.login} is On ${PLayer01?.status} }`)
+                                toast(`${PLayer01?.login} is ${PLayer01?.status}`)
                             }
                         }}
                         className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-secondary hover:border">

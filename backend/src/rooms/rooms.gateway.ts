@@ -7,14 +7,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import {
-  Members,
-  Messages,
-  RoomType,
-  Rooms,
-  User,
-  UserType,
-} from '@prisma/client';
+import { Messages, RoomType, Rooms, User, UserType } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { MembersService } from 'src/members/members.service';
 import { MessagesService } from 'src/messages/messages.service';
@@ -37,38 +30,7 @@ enum updatememberEnum {
   SETOWNER = 'SETOWNER',
   ACCESSPASSWORD = 'ACCESSPASSWORD',
 }
-export enum responseEventStatusEnum {
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR',
-}
 
-export enum responseEventTypeEnum {
-  LEAVEROOM = 'LEAVEROOM',
-}
-export enum responseEventMessageEnum {
-  ERROR = 'error',
-  SUCCESS = 'success',
-  WELLCOMEBACK = 'Wellcom back to room',
-  WELLCOME = 'Wellcome to room',
-  BAN = 'you are ban from this room',
-  MUTED = 'you are muted from this room',
-  KIKED = 'you are kiked from this room',
-  SETADMIN = 'you are admin now',
-  SETOWNER = 'you are owner now',
-  PLAYGAME = 'playing game now',
-  CANTJOIN = 'you cant join to this room',
-  CANTDELETE = 'you cant delete this room',
-  DELETESUCCESS = 'room deleted',
-  CHANNELEXIST = 'the channel name exist',
-  CHANNELCREATED = 'Channel created success',
-  LEAVEROOMSUCCESS = 'leaved room success',
-}
-export type responseEvent = {
-  status: responseEventStatusEnum;
-  message?: responseEventMessageEnum;
-  type?: responseEventTypeEnum;
-  data: Rooms | Members | User | null;
-};
 let time: any;
 export const TimeOutList = new Map<string, NodeJS.Timeout>();
 
@@ -88,7 +50,7 @@ export class RoomGateway implements OnGatewayConnection {
   async handleConnection(socket: Socket) {
     const User = await this.usersService.getUserInClientSocket(socket);
     if (User) {
-      console.log('Chat-> %s connected with socketId :', User.login, socket.id);
+      // console.log('Chat-> %s connected with socketId :', User.login, socket.id);
       this.server.emit('ref', { socketId: socket.id });
     }
   }
@@ -364,7 +326,7 @@ export class RoomGateway implements OnGatewayConnection {
     try {
       const { name, type, friends, channeLpassword } = data;
       const LogedUser = await this.usersService.getUserInClientSocket(client);
-      if (!LogedUser) throw new Error();
+      if (!LogedUser) throw new Error('user not exist');
       // check if name is empty :
       const isNameEmpty = !name.trim();
       if (isNameEmpty) throw new Error('name is empty');
@@ -393,7 +355,7 @@ export class RoomGateway implements OnGatewayConnection {
           friends,
           channeLpassword: hashPassword,
         });
-        if (!newRoom) throw new Error();
+        if (!newRoom) throw new Error('cant create room');
 
         // send response to the client that the name exist
         client.emit(`SOCKET_EVENT_RESPONSE_CHAT_CREATE`, {
@@ -428,11 +390,6 @@ export class RoomGateway implements OnGatewayConnection {
       roomId: string;
     },
   ) {
-    const ResponseEventData: responseEvent = {
-      status: responseEventStatusEnum.SUCCESS,
-      message: responseEventMessageEnum.DELETESUCCESS,
-      data: null,
-    };
     try {
       // check if member is already in room database and is owner :
       const User = await this.usersService.findOne({ id: data.userId });
@@ -448,20 +405,16 @@ export class RoomGateway implements OnGatewayConnection {
         throw new UnauthorizedException();
 
       // delete room :
-      const deleteRoom = await this.roomservice.remove(room.id);
-      ResponseEventData.data = deleteRoom;
+      await this.roomservice.remove(room.id);
       client.emit(`SOCKET_EVENT_RESPONSE_CHAT_DELETE`, {
         Ok: true,
       });
     } catch (error) {
-      ResponseEventData.data = null;
-      ResponseEventData.status = responseEventStatusEnum.ERROR;
-      ResponseEventData.message = responseEventMessageEnum.ERROR;
       client.emit(`SOCKET_EVENT_RESPONSE_CHAT_DELETE`, {
         Ok: false,
       });
     }
-    this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, ResponseEventData);
+    this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, null);
     // send event to all client  that owner delete room :
   }
 
