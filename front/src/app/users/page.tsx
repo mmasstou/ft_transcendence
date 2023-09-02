@@ -1,12 +1,13 @@
-import React from 'react'
-import Dashboard from '../Dashboard'
+import React from 'react';
+import Dashboard from '../Dashboard';
+import UsersPage from '@/components/users/UsersPage';
 
 const page = () => {
   return (
     <Dashboard>
-        users page
-   </Dashboard>
-  )
-}
+      <UsersPage />
+    </Dashboard>
+  );
+};
 
-export default page
+export default page;

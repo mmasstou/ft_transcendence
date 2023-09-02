@@ -50,7 +50,7 @@ const Button = ({ login, style, title, OnClick }: Btn) => {
       </div>
       <Modal isVisible={isOpen} onClose={() => setIsOpen(false)}>
         <div className={`flex justify-around items-center flex-col h-full min-h-[720px]`}>
-          <LoginButton OnClick={OnClick} label="Login kj With 42" />
+          <LoginButton OnClick={OnClick} label="Login With 42" />
         </div>
       </Modal>
     </>

@@ -84,8 +84,33 @@ export default function ChanneLsettingsPlayGame(
             })();
         }
         )
-
+        socket?.on('UserSendToStatus', (data: any) => {
+            console.log('PLayer01', data);
+            if (data.id === player1Id) {
+                setPLayer01(data)
+            }
+            if (data.id === player2Id) {
+                setPLayer02(data)
+            }
+        })
+        return () => {
+            socket?.off('GameResponseToChatToUser')
+            socket?.off('GameResponse')
+            socket?.off('UserSendToStatus')
+        }
     }, [socket]);
+
+    React.useEffect(() => {
+
+        (async () => {
+            const p1 = player1Id && await getUserWithId(player1Id, token)
+            // const p2 = player2Id && await getUserWithId(player2Id, token)
+            // if (!p1 || !p2) return;
+            // setPLayer01(p1)
+            // setPLayer02(p2)
+
+        })();
+    }, [PLayer01, PLayer02]);
 
     return <SettingsProvider
     >
@@ -114,19 +139,21 @@ export default function ChanneLsettingsPlayGame(
                 <div className="flex flex-col gap-3  w-full">
                     <button
                         onClick={() => {
-                            if (PLayer01?.status === 'online') {
-                                onClick('time')
-                                setLoadingGame(true);
-                                setgamemode('time');
-                                (async () => {
-                                    setTimeout(() => {
-                                        setLoadingGame(false)
-                                    }, 8100);
-                                })();
-                            }
-                            else {
-                                toast(`${PLayer01?.login} is  ${PLayer01?.status}`)
-                            }
+                            setTimeout(() => {
+                                if (PLayer01?.status === 'online') {
+                                    onClick('time')
+                                    setLoadingGame(true);
+                                    setgamemode('time');
+                                    (async () => {
+                                        setTimeout(() => {
+                                            setLoadingGame(false)
+                                        }, 8100);
+                                    })();
+                                }
+                                else {
+                                    toast(`${PLayer01?.login} is  ${PLayer01?.status}`)
+                                }
+                            }, 100);
                         }}
                         className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-[#FFCC00] hover:border">
                         <div className='flex justify-center items-center p-3 rounded bg-[#FFCC00] text-white'>
@@ -142,7 +169,6 @@ export default function ChanneLsettingsPlayGame(
                     <button
                         onClick={() => {
                             if (PLayer01?.status === 'online') {
-
                                 onClick('score')
                                 setLoadingGame(true);
                                 setgamemode('score');

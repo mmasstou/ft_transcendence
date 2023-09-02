@@ -1,5 +1,5 @@
 export type UserCardProps =  {
-  username: string;
+  login: string;
   userId: string;
   avatar: string;
   status : 'online' | 'offline' | 'inGame';
@@ -8,7 +8,7 @@ export type UserCardProps =  {
 } & (
   | {
       addRequest?: true;
-      status: never;
+      addFriendFunc: (userId: string) => void;
     }
   | {
       addRequest?: false;

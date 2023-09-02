@@ -12,7 +12,7 @@ import UserCard from '@/components/profile/FriendCard';
 import { Socket, io } from 'socket.io-client';
 import StartGame from '@/app/chat/channels/actions/startgame';
 
-interface User {
+export interface User {
   id: string;
   login: string;
   avatar: string;
@@ -158,7 +158,7 @@ const page = ({ params }: { params: { mode: string } }) => {
                         if (user.id !== id)
                           return (
                             <UserCard
-                              username={user.login}
+                              login={user.login}
                               userId={user.id}
                               avatar={user.avatar}
                               status={user.status}
