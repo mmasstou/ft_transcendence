@@ -54,11 +54,11 @@ export default function SettingsProvider({ children }: { children: React.ReactNo
     }, [])
 
     React.useEffect(() => {
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`, (data) => {
             if (!data) return
             UpdateData();
         });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
             if (!data) return
             UpdateData();
         });

@@ -47,12 +47,12 @@ export default function
                         channeLPasswordAccessHook.onOpen(
                             room,
                             socket,
-                            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
+                            `SOCKET_EVENT_JOIN_MEMBER`,
                             { userid: UserId, roomid: room.id },
                             "JOIN")
                     } else {
                         socket?.emit(
-                            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_JOIN_MEMBER}`,
+                            `SOCKET_EVENT_JOIN_MEMBER`,
                             { userid: UserId, roomid: room.id }
                         )
                     }

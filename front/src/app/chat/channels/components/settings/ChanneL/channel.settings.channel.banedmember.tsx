@@ -37,7 +37,7 @@ export default function ChanneLSettingsChanneLBanedMember(
         __message && channeLConfirmActionHook.onOpen(
             <button
                 onClick={() => {
-                    socket?.emit(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_CHAT_MEMBER_UPDATE}`, data)
+                    socket?.emit(`SOCKET_EVENT_CHAT_MEMBER_UPDATE`, data)
                 }}
                 className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
                 UnBan
@@ -66,17 +66,16 @@ export default function ChanneLSettingsChanneLBanedMember(
 
     React.useEffect(() => {
         if (!Members) return
-        toast.success(`you have ${Members?.length} baned members`)
         if (Members && Members.length === 0) OnBack();
     }, [Members])
 
     React.useEffect(() => {
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`, (data) => {
             if (!data) return
             channeLConfirmActionHook.onClose()
             UpdateData();
         });
-        socket?.on(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, (data) => {
+        socket?.on(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, (data) => {
             if (!data) return
             UpdateData();
         });

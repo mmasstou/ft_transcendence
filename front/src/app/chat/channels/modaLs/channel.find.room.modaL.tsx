@@ -49,23 +49,24 @@ export default function ChanneLFindRoommodaL() {
 
     React.useEffect(() => {
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_UPDATE`,
             (data: { Ok: boolean, room: RoomsType }) => { UpdateData(); }
         )
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`,
-             (data) => {
+            `SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER`,
+            (data) => {
                 if (!data) return
                 const { Ok, message } = data
                 if (!Ok) {
                     channeLPasswordAccessHook.onClose()
-                    return toast.error(message)}
+                    return toast.error(message)
+                }
                 if (Ok) {
                     channeLPasswordAccessHook.onClose()
                     return toast.success(message)
                 }
-                
-             });
+
+            });
     }, [socket])
 
     // get data from backend :
