@@ -24,6 +24,7 @@ import { CiVolumeMute } from "react-icons/ci";
 import { is, ro, tr } from "date-fns/locale";
 import { ChanneLContext } from "../providers/channel.provider";
 import ChannelConversationsMute from "./channel.conversations.mute";
+import ChanneLsettingsHook from "../hooks/channel.settings";
 
 const token: string | undefined = Cookies.get('token')
 const UserId: string | undefined = Cookies.get('_id')
@@ -44,6 +45,7 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
     const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
     const ChanneLContextee: any = React.useContext(ChanneLContext)
+    const channeLsettingsHook = ChanneLsettingsHook()
     const router = useRouter()
 
     const UpdateData = () => {
@@ -138,6 +140,7 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
             (data: { OK: boolean, member: membersType }) => {
                 if (data.OK) {
                     if (data.member.userId === UserId) {
+                        channeLsettingsHook.onClose()
                         toast.error(`you are kicked from this channel`)
                         return router.push('/chat/channels')
                     }

@@ -66,7 +66,6 @@ export default function ChanneLSettingsChanneLBanedMember(
 
     React.useEffect(() => {
         if (!Members) return
-        toast.success(`you have ${Members?.length} baned members`)
         if (Members && Members.length === 0) OnBack();
     }, [Members])
 

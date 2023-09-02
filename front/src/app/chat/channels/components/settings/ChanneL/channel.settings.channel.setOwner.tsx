@@ -58,7 +58,7 @@ export default function ChanneLsettingsChanneLsetOwner(
                 }}
                 className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
                 {data.updateType === updatememberEnum.SETOWNER
-                    && data.member.type === UserTypeEnum.OWNER ? 'remove as Owner' : 'set as admin'
+                    && data.member.type === UserTypeEnum.OWNER ? 'remove as Owner' : 'set as Owner'
                 }
             </button>
             , __message

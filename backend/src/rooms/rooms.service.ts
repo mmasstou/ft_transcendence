@@ -108,10 +108,10 @@ export class RoomsService {
       const room = await this.prisma.rooms.findUnique({
         where: { name },
       });
-      if (!room) throw new Error('');
+      if (!room) throw new NotFoundException();
       return room;
     } catch (error) {
-      console.log('Rooms-findOne> error- +>', error);
+      console.log('Rooms-findOneByName> error- +>', error.message);
       return null;
     }
   }
@@ -137,7 +137,7 @@ export class RoomsService {
       if (!notifications) throw new Error();
       return notifications;
     } catch (error) {
-      console.log('Rooms-findOne> error- +>', error);
+      console.log('Rooms-findOne> error- +>', error.message);
       throw new NotFoundException();
     }
   }
@@ -166,7 +166,7 @@ export class RoomsService {
       if (!_members) throw new Error('');
       return _members;
     } catch (error) {
-      console.log('Rooms-findOne> error- +>', error);
+      console.log('Rooms-findOne> error- +>', error.message);
       throw new NotFoundException();
     }
   }

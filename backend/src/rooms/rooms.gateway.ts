@@ -119,9 +119,10 @@ export class RoomGateway implements OnGatewayConnection {
         // ban member :
         if (data.updateType === updatememberEnum.BANMEMBER) {
           const __isBan: boolean = __member.isban === true ? false : true;
+          const __isMute: boolean = __member.ismute === true && false;
           const member = await this.prisma.members.update({
             where: { id: data.member.id },
-            data: { isban: __isBan },
+            data: { isban: __isBan, ismute: __isMute },
           });
           // client.emit('updatememberResponseEvent', member);
         }
@@ -152,10 +153,9 @@ export class RoomGateway implements OnGatewayConnection {
                 where: { id: data.member.id },
                 data: { ismute: false },
               });
-              this.server.emit(
-                `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-                { OK: true },
-              );
+              this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`, {
+                OK: true,
+              });
             }, TimeToMute);
             if (time) {
               TimeOutList.set(data.member.id, time);
@@ -178,10 +178,10 @@ export class RoomGateway implements OnGatewayConnection {
             });
             return member;
           });
-          this.server.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`,
-            { OK: true, member: result },
-          );
+          this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK`, {
+            OK: true,
+            member: result,
+          });
         }
         // set owner :
         if (data.updateType === updatememberEnum.SETOWNER) {
@@ -193,18 +193,16 @@ export class RoomGateway implements OnGatewayConnection {
           });
         }
 
-        this.server.emit(
-          `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-          { OK: true },
-        );
+        this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`, {
+          OK: true,
+        });
         // create room :
       } catch (error) {
         console.log('Chat-updatemember> error- +>', error);
       }
-      this.server.emit(
-        `${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
-        { OK: false },
-      );
+      this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`, {
+        OK: false,
+      });
     } catch (error) {
       console.log('error f server ...');
     }
@@ -224,7 +222,7 @@ export class RoomGateway implements OnGatewayConnection {
     // check if user exist :
     const user = await this.usersService.findOne({ id: data.userid });
     if (!room || !user) {
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`, {
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER`, {
         Ok: false,
         message: 'room or user not exist',
       });
@@ -237,7 +235,7 @@ export class RoomGateway implements OnGatewayConnection {
       roomId: data.roomid,
     });
     if (!memberId) {
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`, {
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER`, {
         Ok: false,
         message: `you cant Add ${user.login} to this room`,
       });
@@ -252,19 +250,19 @@ export class RoomGateway implements OnGatewayConnection {
     );
 
     if (!JoinRoom) {
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`, {
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER`, {
         Ok: false,
         message: `you are add ${user.login} to this room`,
       });
       return;
     }
     // send response to client :
-    client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER}`, {
+    client.emit(`SOCKET_EVENT_RESPONSE_CHAT_ADD_MEMBER`, {
       Ok: true,
       message: 'you are join to this room',
     });
     // send event to all client that user join to room :
-    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+    this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, {
       Ok: true,
     });
   }
@@ -284,7 +282,7 @@ export class RoomGateway implements OnGatewayConnection {
     // check if user exist :
     const user = await this.usersService.findOne({ id: data.userid });
     if (!room || !user) {
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER`, {
         Ok: false,
         message: 'room or user not exist',
       });
@@ -295,7 +293,7 @@ export class RoomGateway implements OnGatewayConnection {
       // check if password is empty :
       const isPasswordEmpty = !data.password.trim();
       if (isPasswordEmpty) {
-        client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+        client.emit(`SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER`, {
           Ok: false,
           message: 'password is empty',
         });
@@ -307,7 +305,7 @@ export class RoomGateway implements OnGatewayConnection {
         room.password,
       );
       if (!isPasswordCorrect) {
-        client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+        client.emit(`SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER`, {
           Ok: false,
           message: 'password is not correct',
         });
@@ -321,7 +319,7 @@ export class RoomGateway implements OnGatewayConnection {
       roomId: data.roomid,
     });
     if (!memberId) {
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER`, {
         Ok: false,
         message: 'you cant join to this room',
       });
@@ -336,19 +334,19 @@ export class RoomGateway implements OnGatewayConnection {
     );
 
     if (!JoinRoom) {
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER`, {
         Ok: false,
         message: 'you cant join to this room',
       });
       return;
     }
     // send response to client :
-    client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER}`, {
+    client.emit(`SOCKET_EVENT_RESPONSE_CHAT_JOIN_MEMBER`, {
       Ok: true,
       message: 'you are join to this room',
     });
     // send event to all client that user join to room :
-    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+    this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, {
       Ok: true,
     });
   }
@@ -370,11 +368,16 @@ export class RoomGateway implements OnGatewayConnection {
       // check if name is empty :
       const isNameEmpty = !name.trim();
       if (isNameEmpty) throw new Error('name is empty');
+      if (type === RoomType.PROTECTED) {
+        // chech if password is empty :
+        const isPasswordEmpty = !channeLpassword.trim();
+        if (isPasswordEmpty) throw new Error('password is empty');
+      }
       // check if the room name exist :
       const existChanneLname = await this.roomservice.findOneByName({ name });
       if (existChanneLname) {
         // send response to the client that the name exist
-        client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, {
+        client.emit(`SOCKET_EVENT_RESPONSE_CHAT_CREATE`, {
           OK: false,
           message: 'the channel name exist',
         });
@@ -393,23 +396,24 @@ export class RoomGateway implements OnGatewayConnection {
         if (!newRoom) throw new Error();
 
         // send response to the client that the name exist
-        client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, {
+        client.emit(`SOCKET_EVENT_RESPONSE_CHAT_CREATE`, {
           OK: true,
           message: 'Channel created success',
           data: newRoom,
         });
       }
       // send message that room is created :
-      this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+      this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, {
         OK: true,
       });
     } catch (error) {
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_CREATE}`, {
+      console.log('Chat-createRoom> error- +>', error.message);
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_CREATE`, {
         OK: false,
         message: error.message,
         data: null,
       });
-      this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+      this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, {
         OK: false,
       });
     }
@@ -446,21 +450,18 @@ export class RoomGateway implements OnGatewayConnection {
       // delete room :
       const deleteRoom = await this.roomservice.remove(room.id);
       ResponseEventData.data = deleteRoom;
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_DELETE}`, {
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_DELETE`, {
         Ok: true,
       });
     } catch (error) {
       ResponseEventData.data = null;
       ResponseEventData.status = responseEventStatusEnum.ERROR;
       ResponseEventData.message = responseEventMessageEnum.ERROR;
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_DELETE}`, {
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_DELETE`, {
         Ok: false,
       });
     }
-    this.server.emit(
-      `${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
-      ResponseEventData,
-    );
+    this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, ResponseEventData);
     // send event to all client  that owner delete room :
   }
 
@@ -516,7 +517,7 @@ export class RoomGateway implements OnGatewayConnection {
   }
 
   // Leave ChanneL :
-  @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_MEMBER_LEAVE}`)
+  @SubscribeMessage(`SOCKET_EVENT_CHAT_MEMBER_LEAVE`)
   async LeaveRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: string },
@@ -536,18 +537,18 @@ export class RoomGateway implements OnGatewayConnection {
       // send response to client :
       // leave room socket :
       client.leave(data.roomId);
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`, {
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE`, {
         Ok: true,
         message: 'you are leaved room success',
         member: LeavedMember,
       });
     } catch (error) {
-      client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE}`, {
+      client.emit(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_LEAVE`, {
         Ok: false,
         message: error.message,
       });
     }
-    this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+    this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, {
       Ok: false,
     });
   }
@@ -604,16 +605,11 @@ export class RoomGateway implements OnGatewayConnection {
     }
   }
 
-  @SubscribeMessage(`${process.env.SOCKET_EVENT_CHAT_UPDATE}`)
+  @SubscribeMessage(`SOCKET_EVENT_CHAT_UPDATE`)
   async updateChanneL(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: UpdateChanneLSendData,
   ) {
-    const ResponseEventData: responseEvent = {
-      status: responseEventStatusEnum.SUCCESS,
-      message: responseEventMessageEnum.SUCCESS,
-      data: null,
-    };
     const room = await this.roomservice.findOne({ id: data.room.id });
     try {
       const LogedUser = await this.usersService.getUserInClientSocket(client);
@@ -694,13 +690,13 @@ export class RoomGateway implements OnGatewayConnection {
               },
             });
             client.emit(
-              `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`,
+              `SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD`,
               { OK: true, message },
             );
             return;
           } catch (error) {
             client.emit(
-              `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`,
+              `SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD`,
               { OK: false, message },
             );
             return;
@@ -720,7 +716,7 @@ export class RoomGateway implements OnGatewayConnection {
           // });
           // console.log('Chat-> updateChanneL +> updateRoom :', data);
           // client.emit(
-          //   `${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD}`,
+          //   `SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD`,
           //   { OK: true },
           // );
         }
@@ -790,7 +786,7 @@ export class RoomGateway implements OnGatewayConnection {
               ...dataRoom,
             },
           });
-          client.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE}`, {
+          client.emit(`SOCKET_EVENT_RESPONSE_CHAT_CHANGE_TYPE`, {
             OK: true,
             message,
           });
@@ -808,7 +804,7 @@ export class RoomGateway implements OnGatewayConnection {
             },
           });
           client.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_SET_ACCESS_PASSWORD}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_SET_ACCESS_PASSWORD`,
             updateRoom,
           );
         }
@@ -825,17 +821,17 @@ export class RoomGateway implements OnGatewayConnection {
             },
           });
           client.emit(
-            `${process.env.SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_REMOVE_ACCESS_PASSWORD`,
             updateRoom,
           );
         }
-        this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+        this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, {
           OK: true,
         });
       } else throw new UnauthorizedException();
     } catch (error) {
       console.log('Chat-updateChanneL> error- +>');
-      this.server.emit(`${process.env.SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`, {
+      this.server.emit(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`, {
         OK: false,
       });
       return;
