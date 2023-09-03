@@ -50,8 +50,33 @@ export class RoomGateway implements OnGatewayConnection {
   async handleConnection(socket: Socket) {
     const User = await this.usersService.getUserInClientSocket(socket);
     if (User) {
-      // console.log('Chat-> %s connected with socketId :', User.login, socket.id);
+      console.log('Chat-> %s connected with socketId :', User.login, socket.id);
       this.server.emit('ref', { socketId: socket.id });
+      socket.emit('offline-connection');
+    }
+  }
+
+  @SubscribeMessage('disconnect')
+  async handleDisconnect(socket: Socket) {
+    console.log('Chat-> %s disconnected', socket.id);
+    socket.disconnect();
+  }
+
+  @SubscribeMessage(`offline-connection`)
+  async offlineConnection(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    console.log('Chat-> offlineConnection +> data :', data);
+    try {
+      const room = await this.prisma.rooms.findUnique({
+        where: { slug: data },
+        include: { members: true },
+      });
+      if (!room) throw new Error('room not exist');
+      client.join(room.id);
+    } catch (error) {
+      console.log('Chat-offlineConnection> error- +>', error);
     }
   }
 

@@ -249,24 +249,24 @@ const _data: kskjsd[] = [
     directMessage: [],
   },
 ];
-for (let index = 0; index < 5; index++) {
-  const user: kskjsd = {
-    login: 'mmasstou' + index,
-    email: 'mmasstou' + index + '@student.1337.ma',
-    password: 'password' + index,
-    name: 'user id:' + index,
-    avatar:
-      'https://cdn.intra.42.fr/users/5f10eb429fc9ed4eb28c5850095a14cb/mmjasstou.jpg',
-    location: 'e3r3p3',
-    intraId: 902213 + index,
-    banner: '',
-    kind: 'student',
-    is_active: false,
-    Rooms: [],
-    directMessage: [],
-  };
-  _data.push(user);
-}
+// for (let index = 0; index < 5; index++) {
+//   const user: kskjsd = {
+//     login: 'mmasstou' + index,
+//     email: 'mmasstou' + index + '@student.1337.ma',
+//     password: 'password' + index,
+//     name: 'user id:' + index,
+//     avatar:
+//       'https://cdn.intra.42.fr/users/5f10eb429fc9ed4eb28c5850095a14cb/mmjasstou.jpg',
+//     location: 'e3r3p3',
+//     intraId: 902213 + index,
+//     banner: '',
+//     kind: 'student',
+//     is_active: false,
+//     Rooms: [],
+//     directMessage: [],
+//   };
+//   _data.push(user);
+// }
 
 async function createUsers(users: any[]) {
   for (const user of users) {
