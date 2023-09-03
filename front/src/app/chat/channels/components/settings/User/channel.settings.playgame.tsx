@@ -104,10 +104,10 @@ export default function ChanneLsettingsPlayGame(
 
         (async () => {
             const p1 = player1Id && await getUserWithId(player1Id, token)
-            // const p2 = player2Id && await getUserWithId(player2Id, token)
-            // if (!p1 || !p2) return;
-            // setPLayer01(p1)
-            // setPLayer02(p2)
+            const p2 = player2Id && await getUserWithId(player2Id, token)
+            if (!p1 || !p2) return;
+            setPLayer01(p1)
+            setPLayer02(p2)
 
         })();
     }, [PLayer01, PLayer02]);
@@ -139,21 +139,18 @@ export default function ChanneLsettingsPlayGame(
                 <div className="flex flex-col gap-3  w-full">
                     <button
                         onClick={() => {
-                            setTimeout(() => {
-                                if (PLayer01?.status === 'online') {
-                                    onClick('time')
-                                    setLoadingGame(true);
-                                    setgamemode('time');
-                                    (async () => {
-                                        setTimeout(() => {
-                                            setLoadingGame(false)
-                                        }, 8100);
-                                    })();
-                                }
-                                else {
-                                    toast(`${PLayer01?.login} is  ${PLayer01?.status}`)
-                                }
-                            }, 100);
+                            onClick('time')
+                            setLoadingGame(true);
+                            setgamemode('time');
+                            (async () => {
+                                setTimeout(() => {
+                                    setLoadingGame(false)
+                                }, 8100);
+                            })();
+                            if (PLayer01?.status !== 'online') {
+                                setLoadingGame(false)
+                                toast(`${PLayer01?.login} is ${PLayer01?.status}`)
+                            }
                         }}
                         className="flex flex-row justify-between items-center shadow p-2 rounded hover:border-[#FFCC00] hover:border">
                         <div className='flex justify-center items-center p-3 rounded bg-[#FFCC00] text-white'>
