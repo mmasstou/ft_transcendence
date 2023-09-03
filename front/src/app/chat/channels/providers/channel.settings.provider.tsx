@@ -62,7 +62,15 @@ export default function SettingsProvider({ children }: { children: React.ReactNo
             if (!data) return
             UpdateData();
         });
-    }, [socket])
+        socket?.on(`offline-connection`, (data) => {
+            UpdateData();
+        });
+        return () => {
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`);
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`);
+            socket?.off(`offline-connection`);
+        }
+    }, [])
 
     if (!IsMounted) return;
     if (!ChanneLinfo || !LoggedMember || IsLoading) return <Loading message="Loading settings ..." />
