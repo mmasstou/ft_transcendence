@@ -154,9 +154,6 @@ const Dashboard = ({ children }: Props) => {
     });
   }, [socket]);
 
-  console.log('pendingRequests: ', pendingRequests);
-  console.log('Message: ', message);
-
   return (
     <>
       <Login />

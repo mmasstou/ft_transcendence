@@ -86,7 +86,6 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   useEffect(() => {
-    console.log('message: ', contextValue?.message);
     if (contextValue?.message === 'Your friend request has been accepted.') {
       updateFriendState(true);
       updatePendingState(false);

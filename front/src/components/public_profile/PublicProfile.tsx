@@ -98,7 +98,16 @@ const PublicProfile: React.FC<ProfileProps> = ({
         if (response.ok) {
           const data = await response.json();
           if (data.length > 0) {
-            setIsPending(true);
+            const userExits = data.some(
+              (friend: { friendId: string | undefined }) => {
+                if (friend.friendId === user?.id) {
+                  return true;
+                }
+              }
+            );
+            if (userExits) {
+              setIsPending(true);
+            }
           }
         }
       })();
