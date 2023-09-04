@@ -1,21 +1,21 @@
 version: '3'
 services:
-  # frontend:
-  #   build: front/
-  #   container_name: frontend
-  #   env_file:
-  #     - front/.env
-  #   ports:
-  #     - 8080:8080
-  #     - 5430:5430
-  #   networks:
-  #     - APInetwork
-  #   depends_on:
-  #     - backend
-  #     - database
-  #   volumes:
-  #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front:/frontend:rw
-  #    # - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
+  frontend:
+    build: front/
+    container_name: frontend
+    env_file:
+      - front/.env
+    ports:
+      - 8080:8080
+      - 5430:5430
+    networks:
+      - APInetwork
+    depends_on:
+      - backend
+      - database
+    volumes:
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/front:/frontend:rw
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
   backend:
     build: backend/
     container_name: backend
@@ -24,15 +24,13 @@ services:
     ports:
       - 80:80
       - 5555:5555
-      - 5556:5556
-      - 5550:5550
     networks:
       - APInetwork
     depends_on:
       - database
     volumes:
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
+      - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
     image: postgres:13
     container_name: database
@@ -44,7 +42,6 @@ services:
       - APInetwork
     volumes:
       - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
-  
 networks:
   APInetwork:
     driver: bridge
