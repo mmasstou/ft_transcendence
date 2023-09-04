@@ -1,6 +1,7 @@
+import { socketContext } from '@/app/Dashboard';
 import Cookies from 'js-cookie';
 import Image from 'next/image';
-import React, { FC } from 'react';
+import React, { FC, useContext } from 'react';
 import toast from 'react-hot-toast';
 
 type NotificationProps = {
@@ -24,6 +25,7 @@ const Notification: FC<NotificationProps> = ({
   friendshipData,
   pendingRequests,
 }) => {
+  const contextValue = useContext(socketContext);
   const [friend, setfriend] = React.useState<any | null>(null);
   const [shownotification, setshownotification] = React.useState<boolean>(true);
   const [removeNotification, setremoveNotification] =
@@ -55,7 +57,7 @@ const Notification: FC<NotificationProps> = ({
         console.log('error in friend data: ', res.statusText);
       }
     })();
-  }, []);
+  }, [contextValue, shownotification, pendingRequests]);
 
   const handleAccept = async () => {
     const PostData: any = {

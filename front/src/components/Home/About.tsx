@@ -20,7 +20,7 @@ const About = () => {
   return (
     <section
       className={` ${styles.paddingY} ${styles.flexCenter}  flex-col md:p-5 
-                        lg:flex-row-reverse xl:flex-row-reverse  mt-10 z-10`}
+                        lg:flex-row-reverse xl:flex-row-reverse  mt-10 md:mt-1 z-10`}
     >
       <motion.div
         initial={{ opacity: 0 }}
@@ -45,7 +45,7 @@ const About = () => {
         />
       </motion.div>
 
-      <div className={`${styles.flexStart} mr-10 relative`}>
+      <div className={`${styles.flexStart} relative`}>
         <motion.div
           initial={{
             x: -200,

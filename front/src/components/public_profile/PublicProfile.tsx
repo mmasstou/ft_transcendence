@@ -21,6 +21,7 @@ const PublicProfile: React.FC<ProfileProps> = ({
   const contextValue = useContext(socketContext);
   const [friends, setfriends] = useState<any>([]);
   const [isFriend, setIsFriend] = useState<boolean>(false);
+  const [isPending, setIsPending] = useState<boolean>(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const handleOutsideClick = (event: any) => {
@@ -64,7 +65,7 @@ const PublicProfile: React.FC<ProfileProps> = ({
   useEffect(() => {
     if (friends) {
       const friend = friends.find((friend: any) => {
-        if (friend === user?.id) {
+        if (friend.id === user?.id) {
           return true;
         }
       });
@@ -80,12 +81,48 @@ const PublicProfile: React.FC<ProfileProps> = ({
     }
   }, [contextValue]);
 
+  useEffect(() => {
+    const token = Cookies.get('token');
+    try {
+      (async () => {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/sendingrequests/all`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.length > 0) {
+            const userExits = data.some(
+              (friend: { friendId: string | undefined }) => {
+                if (friend.friendId === user?.id) {
+                  return true;
+                }
+              }
+            );
+            if (userExits) {
+              setIsPending(true);
+            }
+          }
+        }
+      })();
+    } catch (error) {
+      console.log('error in get friends: ', error);
+    }
+  }, [contextValue?.message]);
+
   const updateFriendState = (newState: boolean) => {
     setIsFriend(newState);
   };
 
-  console.log('in public isfrins: ', isFriend);
-  console.log('contextValue: ', contextValue);
+  const updatePendingState = (newState: boolean) => {
+    setIsPending(newState);
+  };
 
   return (
     <>
@@ -138,11 +175,14 @@ const PublicProfile: React.FC<ProfileProps> = ({
               text="Message"
               user={user}
               updateFriendState={updateFriendState}
+              updatePendingState={updatePendingState}
             />
             <Button
               text="add friend"
               isFriend={isFriend}
               updateFriendState={updateFriendState}
+              updatePendingState={updatePendingState}
+              isPending={isPending}
               user={user}
             />
           </div>

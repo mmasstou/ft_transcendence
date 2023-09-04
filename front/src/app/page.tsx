@@ -9,10 +9,10 @@ import Lottie from 'react-lottie';
 import data from '@/../public/lotties/pong.json';
 import { Metadata } from 'next';
 
-// export const metadata: Metadata = {
-//   title: 'Transcendence',
-//   description: 'Online Pong Game',
-// };
+const metadata: Metadata = {
+  title: 'Transcendence',
+  description: 'Online Pong Game',
+};
 
 export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -41,7 +41,7 @@ export default function Home() {
         </div>
       )}
       {!loading && (
-        <div className="bg-[#161F1E] h-screen overflow-scroll">
+        <div className="bg-[#161F1E] h-screen overflow-scroll flex flex-col gap-4">
           <Home_Header />
           <Hero />
           <About />

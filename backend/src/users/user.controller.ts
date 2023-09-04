@@ -60,7 +60,14 @@ export class UserController {
     return await this.usersService.getFriendRequests(id);
   }
 
-  // get all accepted friend requests
+  // get all non friend users
+  @UseGuards(JwtAuthGuard)
+  @Get('nonfriends')
+  async getNonFriends(@Req() request: Request) {
+    const User: any = request.user;
+    const id: any = User.id;
+    return await this.usersService.getNonFriends(id);
+  }
 
   @Get()
   findAll() {
@@ -129,8 +136,6 @@ export class UserController {
     @Body('senderId') senderId: string,
     @Param('id') id: string,
   ): Promise<void> {
-    console.log('senderId', senderId);
-    console.log('id', id);
     const receiverId = req.user.id;
     await this.usersService.acceptFriendRequest(receiverId, senderId, id);
 
@@ -149,7 +154,6 @@ export class UserController {
     @Body('senderId') senderId: string,
     @Param('id') id: string,
   ): Promise<void> {
-    console.log('reject friend request');
     const receiverId = req.user.id;
     await this.usersService.rejectFriendRequest(receiverId, senderId, id);
 

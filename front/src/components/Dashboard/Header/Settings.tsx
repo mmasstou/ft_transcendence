@@ -40,7 +40,7 @@ function getAllUsers(): userType[] | null {
   return users;
 }
 
-function getUserData(): userType | null {
+export function getUserData(): userType | null {
   const [user, setUser] = useState<userType | null>(null);
   useEffect(() => {
     const jwtToken = Cookies.get('token');

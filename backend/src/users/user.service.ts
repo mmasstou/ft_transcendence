@@ -74,7 +74,6 @@ export class UserService {
   }
   async findOneLogin(params: { login: string }): Promise<User> {
     const { login } = params;
-    // console.log('+USER+findOne++>', login);
     return await this.prisma.user.findUnique({
       where: { login },
     });
@@ -209,7 +208,7 @@ export class UserService {
       if (deletedFriendships.count === 0) throw new NotFoundException();
       return deletedFriendships;
     } catch (error) {
-      console.error('Error removing friend:', error);
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -236,10 +235,9 @@ export class UserService {
         },
       });
       if (!friendRequests) throw new NotFoundException();
-      console.log('++getFriendRequests++>:\n', friendRequests);
       return friendRequests;
     } catch (error) {
-      console.log('++getFriendRequests++error>', error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -262,9 +260,19 @@ export class UserService {
       });
       if (!friends) throw new NotFoundException();
 
+      // get array of objects of eah friend with his data
+      const friendsData = await Promise.all(
+        friends.map(async (friend) => {
+          const user = await this.prisma.user.findUnique({
+            where: { id: friend.userId },
+          });
+          return user;
+        }),
+      );
+      return friendsData;
       // get only array of friends id
-      const friendsId = friends.map((friend) => friend.userId);
-      return friendsId;
+      // const friendsId = friends.map((friend) => friend.userId);
+      // return friendsId;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -292,6 +300,54 @@ export class UserService {
       });
       if (!friend) throw new NotFoundException();
       return friend;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  // get all non friend users and non pending users
+  async getNonFriends(userId: string) {
+    try {
+      const friends = await this.prisma.friendship.findMany({
+        where: {
+          OR: [
+            {
+              userId: userId,
+              status: 'ACCEPTED',
+            },
+            {
+              friendId: userId,
+              status: 'ACCEPTED',
+            },
+          ],
+        },
+      });
+      if (!friends) throw new NotFoundException();
+      const friendsId = friends.map((friend) => friend.userId);
+      const users = await this.prisma.user.findMany({
+        where: {
+          id: {
+            notIn: friendsId,
+          },
+        },
+      });
+      if (!users) throw new NotFoundException();
+      // remove pending requests
+      const pendingRequests = await this.prisma.friendship.findMany({
+        where: {
+          userId: userId,
+          status: 'PENDING',
+        },
+      });
+      users.forEach((user) => {
+        pendingRequests.forEach((request) => {
+          if (user.id === request.friendId) {
+            const index = users.indexOf(user);
+            users.splice(index, 1);
+          }
+        });
+      });
+      return users;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -358,7 +414,6 @@ export class UserService {
       });
       return user;
     } catch (error) {
-      console.log('Socket %s Disconnected', client.id);
       client.emit('removeToken', null);
       client.disconnect();
     }
@@ -384,8 +439,7 @@ export class UserService {
       });
       return userSocket;
     } catch (error) {
-      console.log('++createUserSocket++error>', error);
-      return null;
+      throw new BadRequestException(error.message);
     }
   }
 
