@@ -22,10 +22,10 @@ import ChanneLcreatemodaLHook from './hooks/channel.create.hook';
 import ChanneLFindRoommodaLHook from './hooks/channel.find.room.hook';
 import { ChanneLProvider } from './providers/channel.provider';
 const changa = Changa({
-  weight: ['400', '700'],
+weight: ['400', '700'],
   subsets: ['latin'],
   variable: '--font-changa',
-});
+});  
 
 const UserId: any = Cookies.get('_id');
 const token = Cookies.get('token');

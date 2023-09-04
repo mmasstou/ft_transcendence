@@ -3,7 +3,7 @@ import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class ConversationsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService) { }
 
   async findAllConv() {
     return await this.prismaService.conversation.findMany({
@@ -17,7 +17,7 @@ export class ConversationsService {
     return await this.prismaService.conversation.findFirst(criteria);
   }
 
-  async  createNewConversation(criteria) {
+  async createNewConversation(criteria) {
     return this.prismaService.conversation.create(criteria);
   }
 
@@ -28,4 +28,15 @@ export class ConversationsService {
       }
     })
   }
+
+
+  async findOnlyOne(id: string) {
+    return this.prismaService.conversation.findUnique(
+      { 
+        where: {id},
+        include: {users: true}
+      }
+      )
 }
+}
+

@@ -27,7 +27,6 @@ function PrivateConversation({ isOpen, openFriendList, setFriendList, openSeachL
 	const [currentUser, setCurrent] = useState(null);
 	
 	const [users, setUsers] = useState([]);
-	const [socket, setSocket] = useState<Socket | null>(null);
 
 
 
@@ -53,36 +52,26 @@ function PrivateConversation({ isOpen, openFriendList, setFriendList, openSeachL
 			},
 		  })).json();
 		  setConvList(res);
+		  console.log(res);
 		//   setConvList([...res, ...res, ...res, ...res, ...res, ...res]);
 	}
 
-	useEffect(() => {
-		const socket: Socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`);
-		setSocket(socket);
-		
-		return () => {
-			socket.disconnect();
-		}
-	}, [])
+	
 
 	useEffect(() => {
 		getUsers();
 		getAllConversations();
 		console.log('-----ues', currentUser);
-
 		
-		socket?.on('message', (data) => {
-		  console.log('Received message from server:', data);
-		});
 	}, [convBody])
 
   return (
 	<div className='flex h-[95.5%] w-full border-[1px] border-[#243230]'>
-		{isOpen ? <div className=' bg-[#243230] h-full w-[320px] min-w-[320px] max-w-[320px] relative'>
-			<ConversationList user={currentUser} convList={convList} setConvBody={setConvBody} />
+		{isOpen ? <div className={`bg-[#243230] h-full overflow-y-auto w-full min-w-[320px] absolute sm:w-[320px] lg:relative `}>
+			<ConversationList />
 		</div> : <></>}
 		<div className='flex justify-center min-w-2/3 w-full'>
-			<ConversationBody socket={socket} convBody={convBody} />
+			<ConversationBody convBody={convBody} />
 		</div>
 		{openFriendList ? <div className=' bg-[#243230] h-full w-[20%] min-w-[200px] max-w-[350px] '>
 			<FriendList />

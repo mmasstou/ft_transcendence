@@ -22,6 +22,12 @@ export class ConversationsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  findOneConv(@Param('id') id: string) {
+    return this.conversationService.findOnlyOne(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post(':single')
   async findOne(@Body() reqBody: any) {
     //? body : { usersId: [id1, id2] }

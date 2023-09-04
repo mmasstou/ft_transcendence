@@ -130,7 +130,6 @@ export class UserService {
         where: { login },
         include: {
           Rooms: true,
-          directMessage: true,
         },
       });
       return user;
