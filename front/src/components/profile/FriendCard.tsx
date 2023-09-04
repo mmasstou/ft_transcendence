@@ -1,11 +1,10 @@
-import React, { FC, use, useState, useEffect } from 'react';
-import { TiUserAdd } from 'react-icons/ti';
-import { BiJoystick } from 'react-icons/bi';
 import { UserCardProps } from '@/types/UserCardTypes';
-import Image from 'next/image';
 import Cookies from 'js-cookie';
+import Image from 'next/image';
+import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { add } from 'date-fns';
+import { BiJoystick } from 'react-icons/bi';
+import { TiUserAdd } from 'react-icons/ti';
 
 const SenderId = Cookies.get('_id');
 const UserCard: FC<UserCardProps> = ({
@@ -18,6 +17,7 @@ const UserCard: FC<UserCardProps> = ({
   addRequest,
   addFriendFunc,
 }) => {
+  const [pending, setPending] = useState(false);
   const [invited, setInvited] = useState(false);
   const [Status, setStatus] = useState(status);
   let timeout: NodeJS.Timeout;
@@ -57,7 +57,6 @@ const UserCard: FC<UserCardProps> = ({
       socket && socket.off('UserSendToStatus');
     };
   }, []);
-  const [pending, setPending] = useState(false);
 
   const addFriend = async () => {
     addFriendFunc && addFriendFunc(userId);
@@ -78,11 +77,8 @@ const UserCard: FC<UserCardProps> = ({
       <div className="flex items-center text-xs xl:text-sm gap-2">
         {addRequest ? (
           <button
-            disabled={pending}
             onClick={() => addFriend().then(() => setPending(true))}
-            className={`${
-              pending && 'opacity-50 cursor-not-allowed'
-            } flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors`}
+            className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors"
           >
             {!pending && (
               <TiUserAdd
