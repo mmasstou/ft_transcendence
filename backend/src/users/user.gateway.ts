@@ -103,11 +103,6 @@ export class UserGateway implements OnGatewayConnection {
     this.server.emit('GameResponse', Response);
   }
 
-  // sendMessageToSocket(socket: Socket, message: any) {
-  //   // send GameNotificationResponse to user
-  //   socket.emit('GameNotificationResponse', message);
-  // }
-
   @SubscribeMessage('FriendToAddToChanneL')
   async FriendToAddToChanneL(
     @MessageBody() data: { searchquery?: string; channeL: Rooms },

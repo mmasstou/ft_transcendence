@@ -1,7 +1,6 @@
 'use client';
 import Header from '@/components/Dashboard/Header/Header';
 import Sidebar from '@/components/Dashboard/sidebar/Sidebar';
-import Login from '@/components/auth/modaLs/Login';
 import MyToast from '@/components/ui/Toast/MyToast';
 import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
@@ -55,7 +54,10 @@ const Dashboard = ({ children }: Props) => {
   const [requestBackUp, setRequestBackUp] = React.useState<any>([]);
   const [message, setMessage] = React.useState<string>('');
 
-  if (!token || !userId) return;
+  if (!token || !userId) {
+    toast.error('You are not logged in');
+    router.replace('/');
+  }
 
   React.useEffect(() => {
     socket?.on(
@@ -100,7 +102,7 @@ const Dashboard = ({ children }: Props) => {
     });
     setSocket(socket);
     setchatSocket(chatSocket);
-    socket && socket.on('connected', (data) => {});
+    socket && socket.on('connected', (data) => { });
     return () => {
       socket && socket.disconnect();
       chatSocket && chatSocket.disconnect();
@@ -154,20 +156,21 @@ const Dashboard = ({ children }: Props) => {
     });
   }, [socket]);
 
-  console.log('pendingRequests: ', pendingRequests);
-  console.log('Message: ', message);
+  // console.log('pendingRequests: ', pendingRequests);
+  // console.log('Message: ', message);
 
   return (
     <>
-      <Login />
-      {/* <ChanneLModal /> */}
-      <ChanneLConfirmActionModaL />
-      <ChanneLPasswordAccessModaL />
-      <ChanneLCreateModaL />
-      <ChanneLSettingsModaL />
-      <ChanneLFindRoommodaL />
-      <ChanneLaccessDeniedModaL />
-      <ChanneLPasswordAccessModaL />
+      {token && <>
+        <ChanneLConfirmActionModaL />
+        <ChanneLPasswordAccessModaL />
+        <ChanneLCreateModaL />
+        <ChanneLSettingsModaL />
+        <ChanneLFindRoommodaL />
+        <ChanneLaccessDeniedModaL />
+        <ChanneLPasswordAccessModaL />
+
+      </>}
       {Notifications && (
         <MyToast
           OnAccept={() => {

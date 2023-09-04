@@ -40,10 +40,6 @@ const ChanneLSettingsModaL = () => {
     const route = useRouter()
     const token: any = Cookies.get('token');
     const UserId: any = Cookies.get('_id');
-    if (!token || !UserId)
-        return;
-
-
 
     const UpdateData = async () => {
         if (!UserId || !slug || !token) return;
@@ -57,6 +53,7 @@ const ChanneLSettingsModaL = () => {
             setLoading(false)
         }, 400);
     }
+
     React.useEffect(() => {
 
         setMounted(true)

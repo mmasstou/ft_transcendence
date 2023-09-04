@@ -38,15 +38,22 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 # front :
-front/.env
+front/next-env.d.ts
+# next.js
+front/.next/
+front/out/
+
+# production
+front/build
+
+*/.env
 # backend :
 backend/prisma/migrations
 backend/uploads
-backend/.env
 # database:
 databases/data/
 
-
+.env
 */package-lock.json
 
 ToDo

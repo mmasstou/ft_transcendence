@@ -14,13 +14,13 @@ export const ChanneLContext = createContext({});
 
 // const useDashboardState = () => useContext(DashboardStateContext);
 
-const userId = Cookies.get('_id')
-const token: any = Cookies.get('token');
 export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => {
     const [UserSocket, setUserSocket] = useState<Socket | null>(null);
     const [ChanneLdata, setChanneLdata] = useState<{ channeLInfo: RoomsType | null, member: membersType | null }>({ channeLInfo: null, member: null })
     const [ChatSocket, setChatSocket] = useState<Socket | null>(null);
     const [User, setUser] = useState<userType | null>(null);
+    const userId = Cookies.get('_id')
+    const token: any = Cookies.get('token');
     const query = useParams();
     const slug: string | undefined = typeof query.slug === 'string' ? query.slug : undefined;
     const router = useRouter();

@@ -236,7 +236,7 @@ export class UserService {
         },
       });
       if (!friendRequests) throw new NotFoundException();
-      console.log('++getFriendRequests++>:\n', friendRequests);
+      // console.log('++getFriendRequests++>:\n', friendRequests);
       return friendRequests;
     } catch (error) {
       console.log('++getFriendRequests++error>', error.message);
@@ -342,9 +342,12 @@ export class UserService {
       if (!token) {
         throw new UnauthorizedException();
       }
+      // console.log('token exist');
       payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
+      // console.log('payload exist :', payload);
+
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       const login: string = payload.login;
@@ -356,11 +359,12 @@ export class UserService {
           directMessage: true,
         },
       });
+      if (!user) throw new NotFoundException();
       return user;
     } catch (error) {
-      console.log('Socket %s Disconnected', client.id);
-      client.emit('removeToken', null);
-      client.disconnect();
+      // console.log('Socket %s Disconnected', client.id);
+      console.log('catch connection error :', error.message);
+      return null;
     }
   }
 

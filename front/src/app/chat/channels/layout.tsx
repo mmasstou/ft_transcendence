@@ -8,7 +8,6 @@ import React from 'react';
 import { AiOutlineUsergroupAdd } from 'react-icons/ai';
 import { BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs';
 import { FaUsers } from 'react-icons/fa';
-import { FiUsers } from 'react-icons/fi';
 import { HiChatBubbleLeftRight } from 'react-icons/hi2';
 import { RiSearchLine } from 'react-icons/ri';
 import 'react-tooltip/dist/react-tooltip.css';
@@ -21,6 +20,7 @@ import RightsidebarHook from './hooks/RightSidebarHook';
 import ChanneLcreatemodaLHook from './hooks/channel.create.hook';
 import ChanneLFindRoommodaLHook from './hooks/channel.find.room.hook';
 import { ChanneLProvider } from './providers/channel.provider';
+import { Toaster } from 'react-hot-toast';
 const changa = Changa({
   weight: ['400', '700'],
   subsets: ['latin'],
@@ -36,22 +36,18 @@ export default function RootLayout({
 }) {
   const [IsMounted, setIsMounted] = React.useState(false)
   const [createRoomSocket, setcreateRoomSocket] = React.useState<Socket | null>(null)
-  const params = useSearchParams()
   const pathname = usePathname()
   const [isLoading, setIsLoading] = React.useState(true);
 
 
   const leftSidebarHook = LeftSidebarHook();
   const channeLcreatemodaLHook = ChanneLcreatemodaLHook()
-  const rightsidebarHook = RightsidebarHook()
   const channeLFindRoommodaLHook = ChanneLFindRoommodaLHook()
-  const query = useParams();
-  const slug: string | undefined = typeof query.slug === 'string' ? query.slug : undefined
   const router = useRouter();
 
 
   React.useEffect(() => {
-    if (!token || !UserId) return router.push('/');
+    // if (!token || !UserId) return router.push('/');
     if (!pathname.includes('chat')) setIsLoading(true)
     setTimeout(() => {
       setIsLoading(false)
@@ -64,7 +60,10 @@ export default function RootLayout({
     });
     setcreateRoomSocket(Clientsocket)
     setIsMounted(true)
-    return () => { Clientsocket.disconnect() }
+    return () => {
+      // Clientsocket.off('removeToken')
+      Clientsocket.disconnect()
+    }
   }, [])
 
   if (!IsMounted) return

@@ -21,6 +21,7 @@ import {
   UpdateChanneLSendData,
   UpdateChanneLSendEnum,
 } from './types/upatecahnnel';
+
 enum updatememberEnum {
   SETADMIN = 'SETADMIN',
   BANMEMBER = 'BANMEMBER',
@@ -48,9 +49,14 @@ export class RoomGateway implements OnGatewayConnection {
   server: Server;
 
   async handleConnection(socket: Socket) {
+    // console.log('+> handleConnection');
     const User = await this.usersService.getUserInClientSocket(socket);
+    if (!User) {
+      console.log('+++++++++++++++handleConnection -> User not exist');
+      socket.emit('removeToken', null);
+    }
     if (User) {
-      console.log('Chat-> %s connected with socketId :', User.login, socket.id);
+      // console.log('handleConnection for %s , socket %s', User.login, socket.id);
       this.server.emit('ref', { socketId: socket.id });
       socket.emit('offline-connection');
     }
@@ -821,6 +827,7 @@ export class RoomGateway implements OnGatewayConnection {
     @MessageBody() data: { userId: string; senderId: string; mode: string },
   ) {
     try {
+      console.log('Chat-> sendGameNotification +> data :', data);
       const snderUser: User | null = await this.usersService.findOne({
         id: data.senderId,
       });

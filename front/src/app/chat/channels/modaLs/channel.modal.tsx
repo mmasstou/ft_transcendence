@@ -2,6 +2,8 @@ import React, { MouseEvent } from "react";
 import Button from "../../components/Button";
 import { AiFillCloseCircle } from "react-icons/ai";
 import LeftSidebarHook from "../hooks/LeftSidebarHook";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 interface props {
     children: React.ReactNode;
@@ -13,10 +15,15 @@ interface props {
 }
 export default function ChanneLModal({ children, onClose, title, IsOpen, z_index }: props) {
 
+    const router = useRouter();
+
+    const token: string | undefined = Cookies.get('token')
+    const UserId: string | undefined = Cookies.get('_id')
     const [IsMounted, setIsMounted] = React.useState<boolean>(false)
     const leftSidebarHook = LeftSidebarHook()
     React.useEffect(() => { setIsMounted(true) }, [])
     if (IsOpen) leftSidebarHook.IsOpen && leftSidebarHook.onClose()
+
     if (!IsOpen || !IsMounted) return null;
     const zindex = z_index ? 'z-[' + z_index.toString() + ']' : 'z-[36]'
     return (
