@@ -8,16 +8,19 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import Button from './Button';
 import { socketContext } from '@/app/Dashboard';
+import { getUserData } from '../Dashboard/Header/Settings';
 
 interface ProfileProps {
-  user: userType | null;
+  userId: string | undefined;
   handlePublicProfile: () => void;
 }
 
 const PublicProfile: React.FC<ProfileProps> = ({
-  user,
+  userId,
   handlePublicProfile,
 }) => {
+  const user: userType | null = getUserData(userId);
+
   const contextValue = useContext(socketContext);
   const [friends, setfriends] = useState<any>([]);
   const [isFriend, setIsFriend] = useState<boolean>(false);
@@ -114,7 +117,7 @@ const PublicProfile: React.FC<ProfileProps> = ({
     } catch (error) {
       console.log('error in get friends: ', error);
     }
-  }, [contextValue?.message]);
+  }, [contextValue?.message, user]);
 
   const updateFriendState = (newState: boolean) => {
     setIsFriend(newState);
@@ -158,7 +161,7 @@ const PublicProfile: React.FC<ProfileProps> = ({
           )}
           <div className="absolute -bottom-10 left-10">
             <Image
-              className="rounded-full border-2 border-secondary w-[120px] h-[120px]"
+              className="rounded-full border border-secondary w-[120px] h-[120px]"
               src={user?.avatar ? user.avatar : ''}
               width={120}
               height={120}
