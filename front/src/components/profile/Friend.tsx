@@ -1,9 +1,9 @@
 'use client';
+import { userType } from '@/types/types';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
 import FriendCard from './FriendCard';
-import { userType } from '@/types/types';
-import Cookies from 'js-cookie';
-import axios from 'axios';
 
 export function getFriendList(): userType[] {
   const [friendList, setFriendList] = React.useState<userType[]>([]);
@@ -36,10 +36,12 @@ const Friend = () => {
       {friends &&
         friends.map((friend) => (
           <FriendCard
+            key={friend.id}
             login={friend.login}
             userId={friend.id}
             avatar={friend.avatar}
-            userStatus={friend.status}
+            status={friend.status}
+            socket={undefined}
           />
         ))}
       {(!friends || friends.length === 0) && (
