@@ -58,18 +58,23 @@ const page = ({ params }: { params: { mode: string } }) => {
     };
   }, []);
 
-  socket &&
-    socket.on('GameResponse', async (data: any) => {
-      const body = {
-        player1Id: data.sender.id,
-        player2Id: data.userId,
+  useEffect (() => {
+    socket?.on('GameResponse', (data: any) => {
+      (async () => {
+        if (!token) return;
+        const body = {
+        player2Id: data.sender.id,
+        player1Id: data.userId,
         mode: data.mode,
       };
-      if (!token) return;
       const g = await StartGame(body, token);
       if (!g) return;
-      router.push(`/game/${data.mode}/friend`);
+      router.push(`/game/${data.mode}/friend`);})();
     });
+    return () => {
+      socket?.off('GameResponse');
+    }
+  }, [socket])
 
   return (
     <Dashboard>

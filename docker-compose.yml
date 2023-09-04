@@ -31,8 +31,8 @@ services:
     depends_on:
       - database
     volumes:
-      - /Users/aouhadou/Desktop/ft_transcendence/backend/src:/app/src:rw
-      - /Users/aouhadou/Desktop/ft_transcendence/backend/prisma:/app/prisma:rw
+      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
+      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
     image: postgres:13
     container_name: database
@@ -43,7 +43,7 @@ services:
     networks:
       - APInetwork
     volumes:
-      - /Users/aouhadou/Desktop/ft_transcendence/databases/data:/var/lib/postgresql/data
+      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
   
 networks:
   APInetwork:
