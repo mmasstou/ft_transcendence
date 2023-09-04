@@ -3,10 +3,10 @@ FROM node:buster
 WORKDIR /frontend
 
 RUN npm install -g next
-COPY ./package*.json .
+COPY ./package.json .
 
 
-RUN npm i
+RUN npm i -f
 
 COPY . .
 
@@ -15,4 +15,4 @@ EXPOSE 8080
 
 ENTRYPOINT [ "sh" , "/frontend/tools/init.sh" ]
 # Start the Next.js application in dev mode
-CMD ["npm", "run", "dev"]
+CMD [""]

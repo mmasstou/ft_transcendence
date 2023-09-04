@@ -4,10 +4,9 @@ services:
     build: front/
     container_name: frontend
     env_file:
-      - front/.env
+      - .env
     ports:
       - 8080:8080
-      - 5430:5430
     networks:
       - APInetwork
     depends_on:
@@ -20,7 +19,7 @@ services:
     build: backend/
     container_name: backend
     env_file:
-      - backend/.env
+      - .env
     ports:
       - 80:80
       - 5555:5555
@@ -35,13 +34,11 @@ services:
     image: postgres:13
     container_name: database
     env_file:
-      - backend/.env
+      - .env
     ports:
       - 5432:5432
     networks:
       - APInetwork
-    volumes:
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
 networks:
   APInetwork:
     driver: bridge

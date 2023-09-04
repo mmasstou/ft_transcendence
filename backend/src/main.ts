@@ -4,7 +4,7 @@ import SocketAdapter from './Socket.Adapter';
 import { ValidationPipe } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
 
-const _PORT = process.env.PORT || 80;
+const _PORT = process.env.BACKEND_PORT || 80;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({

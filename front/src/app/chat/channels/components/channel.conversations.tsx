@@ -238,7 +238,7 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
                                             />
                                         ))
                                         : <div className="w-full  flex justify-center items-center  h-[78vh] md:h-[83vh]">
-                                            <TbMessageX className=" text-secondary" size={120} />
+                                            <TbMessageX className=" text-[#F5F5F5]" size={120} />
                                         </div>
                                     : <div>Loading geting OLd messages ...</div>
                             }
