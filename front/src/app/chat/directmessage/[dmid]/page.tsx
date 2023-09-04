@@ -8,7 +8,7 @@ import { SlOptionsVertical } from 'react-icons/sl';
 import { Socket, io } from 'socket.io-client';
 import CustumBtn from '../components/custumBtn';
 import ConversationMsg from '../components/conversationMsg';
-import { conversationData } from '../components/privateConversation';
+import { conversationData } from '../page';
 
 
 

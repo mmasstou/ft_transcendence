@@ -14,8 +14,6 @@
 // TODO:
 	+ When someone create new conversation should be updated for both users.
 // TODO:
-	+ Theme of direct chat
-	+ Dynamic routes for every conversation.
-	+ socket for eacht conversation
-	+ Return the PrivateConversation component the main route page.
 	+ work on /chat route not on /chat/directmessage
+	+ when create new conversation in search modal the conversation list component is not updated until reRendred
+	+ responsive height !!!!

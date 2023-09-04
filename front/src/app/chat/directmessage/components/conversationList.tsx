@@ -1,14 +1,14 @@
-import React, { useState } from 'react'
-import { conversationData } from './privateConversation'
+import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie';
 import Image from "next/image";
 import Link from 'next/link';
+import { conversationData } from '../page';
 
 
 const token = Cookies.get('token');
 const currentId = Cookies.get('_id');
 
-function ConversationList() {
+function ConversationList({ user }) {
 
 	const [convList, setConvList] = useState<conversationData[] | null>(null);
 
@@ -25,11 +25,15 @@ function ConversationList() {
 		//   setConvList([...res, ...res, ...res, ...res, ...res, ...res]);
 	}
 
+	useEffect(() => {
+		getAllConversations();
+	}, [])
+
 	return (
 		<div className='flex flex-col h-full max-h-full overflow-y-auto border-r border-primary'>
 			<div className='bg-[#243230]'>
-				<div className='flex items-center gap-4 bg-[#3E504D] py-2 px-5'>
-					{/* <Image src={user.avatar} alt='userAvatar' width={55} height={55} className='rounded-[50%]'/> */}
+				<div className='flex items-center gap-4 border-b border-primary py-2 px-5'>
+					<Image src={user.avatar} alt='userAvatar' width={55} height={55} className='rounded-[50%]'/>
 					<h2 className='text-white'>Conversations :</h2>
 				</div>
 			</div>

@@ -7,11 +7,12 @@ import { FaUsers } from "react-icons/fa";
 import ChatNavbarLink from '../components/chat.navbar.link';
 import Button from '../components/Button';
 import { BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse, BsPersonAdd, BsFillPeopleFill, BsPeople } from "react-icons/bs";
-import PrivateConversation from './components/privateConversation';
 import Cookies from 'js-cookie';
 import { Changa } from 'next/font/google';
 import Loading from '../channels/components/loading';
 import ConversationList from './components/conversationList';
+import FriendList from './components/friendList';
+import SearchModal from './components/searchModal';
 
 const metadata = {
     title: 'Transcendence',
@@ -27,24 +28,37 @@ const changa = Changa({
 const token = Cookies.get('token');
 const UserId = Cookies.get('_id');
 
-export default function RootLayout({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+
     const router = usePathname();
     const rt = useRouter();
     const [isOpen, setOpening] = useState<boolean>(false);
     const [openFriendList, setFriendList] = useState<boolean>(false);
     const [createConversation, setConvCreation] = useState<boolean>(false);
     const [isLoading, setIsLoading] = React.useState(true);
+    const [currentUser, setCurrentUser] = useState(null);
+
+    async function getCurrentUser() { 
+        const response = await(await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${UserId}`, {
+			method: 'GET',
+			headers: {
+			  'Content-Type': 'application/json',
+			  Authorization: `Bearer ${token}`,
+			},
+		  })).json();
+        setCurrentUser(response);
+    }
 
     React.useEffect(() => {
         if (!token || !UserId) return rt.push('/');
         if (!router.includes('chat')) setIsLoading(true)
+        getCurrentUser();
         setTimeout(() => {
           setIsLoading(false)
         }, 2000)
+
+
+
       }, [])
 
     useEffect(() => { }, [isOpen, openFriendList])
@@ -111,12 +125,19 @@ export default function RootLayout({
                                     }
                                 </div>
                             </div>
-                            {/* <PrivateConversation isOpen={isOpen} openFriendList={openFriendList} setFriendList={setFriendList} openSeachList={createConversation} setSeachOpening={setConvCreation} /> */}
-                            {/* {isOpen ? <div className=' bg-[#243230] h-[90.75%] border-r border-black overflow-y-scroll w-[320px] max-w-full md:max-w-[320px] absolute'>
-                                <ConversationList  />
-                            </div> : <></>} */}
-                            <PrivateConversation isOpen={isOpen} openFriendList={openFriendList} setFriendList={setFriendList} openSeachList={createConversation} setSeachOpening={setConvCreation} />
-                            {children}
+
+                            <div className='flex h-[95.5%] w-full'>
+                                {isOpen ? <div className={`bg-[#243230] h-full overflow-y-auto w-full min-w-[320px] absolute sm:w-[320px] lg:relative z-[10]`}>
+                                    <ConversationList user={currentUser}/>
+                                </div> : <></>}
+                                <div className='flex justify-center min-w-2/3 w-full'>
+                                    {children}
+                                </div>
+                                {openFriendList ? <div className=' bg-[#243230] h-full w-[20%] min-w-[200px] max-w-[350px] '>
+                                    <FriendList />
+                                </div> : <></> }
+                                <SearchModal open={createConversation} onClose={() => setConvCreation(false)}/>
+                            </div>
                         </div>
                     </Dashboard>
                 }

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image';
 import Cookies from 'js-cookie';
@@ -8,13 +10,15 @@ import { AiOutlineMessage } from 'react-icons/ai';
 import { RiPingPongFill, RiPingPongLine } from 'react-icons/ri';
 import { TbPingPong } from 'react-icons/tb';
 import CustumBtn from './custumBtn';
+import { useRouter } from 'next/navigation'
 
 
 const token = Cookies.get('token');
 const currentId = Cookies.get('_id');
 
-function SearchList({ setConversation, setConvCreation, users }) {
+function SearchList({ setConvCreation, users }) {
 
+	const router = useRouter();
 	const [list, setList] = useState([]);
 	const [searchedLogin, setLogin] = useState<string>('');
 	const inputRef = useRef(null);
@@ -70,7 +74,7 @@ function SearchList({ setConversation, setConvCreation, users }) {
 
 		const res = await response.json();
 
-		setConversation(res);
+		router.push(`/chat/directmessage/${res.id}`);
 
 		console.log(res);
 	}
