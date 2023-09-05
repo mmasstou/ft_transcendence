@@ -33,6 +33,8 @@ export type messagesType = {
   viewed: number;
   content: string;
   id: string;
+  dm: any;
+  dmId: string;
   senderId: string;
   roomsId: string;
   created_at: string;

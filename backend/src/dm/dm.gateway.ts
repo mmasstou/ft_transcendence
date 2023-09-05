@@ -27,6 +27,7 @@ export class DmGateway implements OnGatewayConnection {
       socket.emit('removeToken', null);
     }
     if (User) {
+      console.log('handleConnection -> socket.id', socket.id);
       if (!this.dmService.connectToALLDm(User, socket)) {
         console.log('+++++++++++++++handleConnection -> error');
       }
@@ -47,6 +48,7 @@ export class DmGateway implements OnGatewayConnection {
   ) {
     try {
       const md = await this.dmService.findOne(payload.dmId);
+
       if (!md) throw new Error('Dm not found');
       const User = await this.usersService.findOne({ id: payload.senderId });
       if (!User) throw new Error('User not found');
@@ -55,6 +57,13 @@ export class DmGateway implements OnGatewayConnection {
         content: payload.content,
         userId: User.id,
       });
+      console.log('DmGateway -> handleMessage -> message', message);
+
+      const isInroomSocket = client.rooms.has(md.id) || false;
+      console.log(
+        'DmGateway -> handleMessage -> isInroomSocket',
+        isInroomSocket,
+      );
 
       this.server.to(md.id).emit('message', message);
     } catch (error) {

@@ -12,8 +12,23 @@ export class DmService {
     private messageservice: MessagesService,
     private readonly userService: UserService,
   ) {}
-  async findAll() {
-    return await this.prisma.directMessage.findMany();
+  async findAll(login: string) {
+    const user = await this.userService.findOneLogin({ login });
+    // find all dms that the user is in :
+    return await this.prisma.directMessage.findMany({
+      where: {
+        User: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+      include: {
+        User: true,
+        Messages: true,
+      },
+    });
+    // return await this.prisma.directMessage.findMany();
   }
   async findOne(id: string) {
     try {
@@ -47,16 +62,21 @@ export class DmService {
 
   async connectToALLDm(User: User, socket: Socket): Promise<boolean> {
     try {
-      const dms: any = await this.prisma.user.findUnique({
+      const Userdata: any = await this.prisma.user.findUnique({
         where: {
           id: User.id,
         },
         include: {
           dms: true,
         },
-      }).dms;
-      if (!dms) throw new Error('Dm not found');
-      dms.forEach((dm: DirectMessage) => {
+      });
+      if (!Userdata) throw new Error('Dm not found');
+      Userdata.dms.forEach((dm: DirectMessage) => {
+        console.log(
+          'DmService -> connectToALLDm -> dms %s socket ',
+          dm.id,
+          socket.id,
+        );
         socket.join(dm.id);
       });
       return true;
