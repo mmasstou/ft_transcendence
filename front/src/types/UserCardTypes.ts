@@ -3,13 +3,13 @@ export type UserCardProps =  {
   userId: string;
   avatar: string;
   status? : 'online' | 'offline' | 'inGame';
-  userStatus: string;
   socket?:any;
   mode?: string;
+  pending?: boolean;
+  addFriendFunc?: (userId: string) => void;
 } & (
   | {
-      addRequest?: true;
-      addFriendFunc?: (userId: string) => void;
+    addRequest?: true;
     }
   | {
       addRequest?: false;

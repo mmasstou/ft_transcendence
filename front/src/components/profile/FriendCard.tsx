@@ -1,12 +1,10 @@
-import React, { FC, use, useState, useEffect } from 'react';
-import { TiUserAdd } from 'react-icons/ti';
-import { BiJoystick } from 'react-icons/bi';
 import { UserCardProps } from '@/types/UserCardTypes';
-import Image from 'next/image';
 import Cookies from 'js-cookie';
-import MyToast from '../ui/Toast/MyToast';
+import Image from 'next/image';
+import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import PublicProfile from '../public_profile/PublicProfile';
+import { BiJoystick } from 'react-icons/bi';
+import { TiUserAdd } from 'react-icons/ti';
 
 const SenderId = Cookies.get('_id');
 const UserCard: FC<UserCardProps> = ({
@@ -17,15 +15,11 @@ const UserCard: FC<UserCardProps> = ({
   socket,
   mode,
   addRequest,
+  addFriendFunc,
 }) => {
+  const [pending, setPending] = useState(false);
   const [invited, setInvited] = useState(false);
   const [Status, setStatus] = useState(status);
-  const [showPublicProfile, setPublicProfile] = useState<boolean>(false);
-
-  const handlePublicProfile = () => {
-    setPublicProfile(!showPublicProfile);
-  };
-
   let timeout: NodeJS.Timeout;
   const handleInvite = () => {
     socket.emit('sendGameNotification', {
@@ -64,87 +58,84 @@ const UserCard: FC<UserCardProps> = ({
     };
   }, []);
 
+  const addFriend = async () => {
+    addFriendFunc && addFriendFunc(userId);
+  };
   return (
-    <>
-      {showPublicProfile && (
-        <PublicProfile
-          userId={userId}
-          handlePublicProfile={handlePublicProfile}
+    <div className=" bg-container rounded-xl my-3 p-2 xl:p-3 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <Image
+          src={avatar}
+          height={50}
+          width={50}
+          priority
+          alt={login}
+          className="rounded-full border border-secondary"
         />
-      )}
-      {showPublicProfile && (
-        <div className="w-[100%] h-[100%] bg-black/60 absolute top-0 left-0" />
-      )}
-      <div className=" bg-container rounded-xl my-3 p-2 xl:p-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Image
-            src={avatar}
-            height={50}
-            width={50}
-            priority
-            alt={login}
-            className="rounded-full border border-secondary"
-            onClick={handlePublicProfile}
-            objectFit="cover"
-          />
-          <h3 className="xl:text-lg">{login}</h3>
-        </div>
-        <div className="flex items-center text-xs xl:text-sm gap-2">
-          {addRequest ? (
-            <button className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors">
+        <h3 className="xl:text-lg">{login}</h3>
+      </div>
+      <div className="flex items-center text-xs xl:text-sm gap-2">
+        {addRequest ? (
+          <button
+            onClick={() => addFriend().then(() => setPending(true))}
+            className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors"
+          >
+            {!pending && (
               <TiUserAdd
                 className="mr-1 fill-sky-500 group-hover:fill-container"
                 size={16}
               />
-              Add Friend
-            </button>
-          ) : (
-            Status === 'online' && (
-              <button
-                disabled={invited}
-                onClick={handleInvite}
-                className={`flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 enabled:hover:bg-sky-600 enabled:hover:text-container enabled:hover:border-container group transition-colors
+            )}
+            {pending ? 'Pending...' : 'Add Friend'}
+          </button>
+        ) : (
+          Status === 'online' &&
+          socket !== undefined && (
+            <button
+              disabled={invited}
+              onClick={handleInvite}
+              className={`flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 enabled:hover:bg-sky-600 enabled:hover:text-container enabled:hover:border-container group transition-colors
               ${invited && 'opacity-50 cursor-not-allowed '}
               `}
-              >
-                {addRequest ? (
-                  <TiUserAdd
-                    className="mr-1 fill-sky-500 group-hover:fill-container"
+            >
+              {addRequest ? (
+                <TiUserAdd
+                  className="mr-1 fill-sky-500 group-hover:fill-container"
+                  size={16}
+                />
+              ) : (
+                Status === 'online' && (
+                  <BiJoystick
+                    className="mr-1 fill-sky-500 group-enabled:group-hover:fill-container"
                     size={16}
                   />
-                ) : (
-                  Status === 'online' && (
-                    <BiJoystick
-                      className="mr-1 fill-sky-500 group-enabled:group-hover:fill-container"
-                      size={16}
-                    />
-                  )
-                )}
-                Invite
-              </button>
-            )
-          )}
-          {!addRequest && (
+                )
+              )}
+              Invite
+            </button>
+          )
+        )}
+        {!addRequest && (
+          <div
+            className={`border flex gap-1 items-center p-1 px-2 xl:px-3 rounded-xl ${
+              Status === 'inGame'
+                ? 'border-orange-500'
+                : Status === 'online'
+                ? 'border-green-500'
+                : 'border-yellow-500'
+            }`}
+          >
             <div
-              className={`border flex gap-1 items-center p-1 px-2 xl:px-3 rounded-xl ${
+              className={`w-2 h-2 rounded-full ${
                 Status === 'inGame'
-                  ? 'border-orange-500'
+                  ? 'bg-orange-500'
                   : Status === 'online'
-                  ? 'border-green-500'
-                  : 'border-yellow-500'
+                  ? 'bg-green-500'
+                  : 'bg-yellow-500'
               }`}
-            >
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  Status === 'inGame'
-                    ? 'bg-orange-500'
-                    : Status === 'online'
-                    ? 'bg-green-500'
-                    : 'bg-yellow-500'
-                }`}
-              ></div>
-              <span
-                className={`
+            ></div>
+            <span
+              className={`
             ${
               Status === 'inGame'
                 ? 'text-orange-500'
@@ -153,18 +144,17 @@ const UserCard: FC<UserCardProps> = ({
                 : 'text-yellow-500'
             }
           `}
-              >
-                {Status === 'inGame'
-                  ? 'In Game'
-                  : Status === 'online'
-                  ? 'Online'
-                  : 'Offline'}
-              </span>
-            </div>
-          )}
-        </div>
+            >
+              {Status === 'inGame'
+                ? 'In Game'
+                : Status === 'online'
+                ? 'Online'
+                : 'Offline'}
+            </span>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

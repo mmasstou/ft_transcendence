@@ -8,9 +8,10 @@ import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import UserCard from '@/components/profile/FriendCard';
+import FriendCard from '@/components/profile/FriendCard';
 import { Socket, io } from 'socket.io-client';
 import StartGame from '@/app/chat/channels/actions/startgame';
+import { getFriendList } from '@/components/profile/Friend';
 
 export interface User {
   id: string;
@@ -18,13 +19,15 @@ export interface User {
   avatar: string;
   Level: number;
   status: 'inGame' | 'online' | 'offline';
+  addFriendFunc?: (id: string) => void;
+  socket?: Socket;
 }
 
 const page = ({ params }: { params: { mode: string } }) => {
-  const [users, setUsers] = useState<User[]>([]);
   const id = Cookies.get('_id');
   const token = Cookies.get('token');
   const router = useRouter();
+  const friends = getFriendList();
   if (params.mode !== 'time' && params.mode !== 'score') router.push('/404');
 
   // body resquest example
@@ -33,18 +36,6 @@ const page = ({ params }: { params: { mode: string } }) => {
     mode: params.mode,
   };
   const [socket, setSocket] = useState<Socket>();
-  const getUsers = async () => {
-    await axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get('token')}`,
-        },
-      })
-      .then((res) => {
-        setUsers(res.data);
-      });
-  };
-
   useEffect(() => {
     if (!token) return;
     const Clientsocket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/chat`, {
@@ -58,23 +49,24 @@ const page = ({ params }: { params: { mode: string } }) => {
     };
   }, []);
 
-  useEffect (() => {
+  useEffect(() => {
     socket?.on('GameResponse', (data: any) => {
       (async () => {
         if (!token) return;
         const body = {
-        player2Id: data.sender.id,
-        player1Id: data.userId,
-        mode: data.mode,
-      };
-      const g = await StartGame(body, token);
-      if (!g) return;
-      router.push(`/game/${data.mode}/friend`);})();
+          player2Id: data.sender.id,
+          player1Id: data.userId,
+          mode: data.mode,
+        };
+        const g = await StartGame(body, token);
+        if (!g) return;
+        router.push(`/game/${data.mode}/friend`);
+      })();
     });
     return () => {
       socket?.off('GameResponse');
-    }
-  }, [socket])
+    };
+  }, [socket]);
 
   return (
     <Dashboard>
@@ -141,10 +133,7 @@ const page = ({ params }: { params: { mode: string } }) => {
               </button>
               <Dialog.Root>
                 <Dialog.Trigger asChild>
-                  <button
-                    onClick={getUsers}
-                    className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-orange-500 rounded-xl font-bold text-orange-500 focus:outline-none"
-                  >
+                  <button className="px-4 py-1 xl:px-6 xl:py-2 border xl:border-2  border-orange-500 rounded-xl font-bold text-orange-500 focus:outline-none">
                     Friend
                   </button>
                 </Dialog.Trigger>
@@ -159,19 +148,25 @@ const page = ({ params }: { params: { mode: string } }) => {
                       Invite a friend !
                     </Dialog.Title>
                     <div className="w-full flex flex-col">
-                      {users.map((user) => {
-                        if (user.id !== id)
+                      {friends.map((friend) => {
+                        if (friend.id !== id)
                           return (
-                            <UserCard
-                              login={user.login}
-                              userId={user.id}
-                              avatar={user.avatar}
-                              status={user.status}
+                            <FriendCard
+                              login={friend.login}
+                              userId={friend.id}
+                              avatar={friend.avatar}
+                              status={friend.status}
                               socket={socket}
                               mode={params.mode}
                             />
                           );
                       })}
+                      {!friends ||
+                        (friends.length === 0 && (
+                          <span className="text-center text-gray-400 my-4 text-lg lg:text-xl">
+                            You have no friends yet
+                          </span>
+                        ))}
                     </div>
                     <Dialog.Close asChild>
                       <button className="text-white top-5 right-5 absolute">
