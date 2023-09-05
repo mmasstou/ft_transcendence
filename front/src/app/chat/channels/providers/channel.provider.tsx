@@ -15,6 +15,7 @@ export const ChanneLContext = createContext({});
 // const useDashboardState = () => useContext(DashboardStateContext);
 
 export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => {
+    const [DmSocket, setDmSocket] = useState<Socket | null>(null);
     const [UserSocket, setUserSocket] = useState<Socket | null>(null);
     const [ChanneLdata, setChanneLdata] = useState<{ channeLInfo: RoomsType | null, member: membersType | null }>({ channeLInfo: null, member: null })
     const [ChatSocket, setChatSocket] = useState<Socket | null>(null);
@@ -35,12 +36,18 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
         setChanneLdata({ channeLInfo: channeL, member: member })
         return channeL;
     }
+
     React.useEffect(() => {
         if (!token || !userId || userId === undefined) {
             toast.error('Please login first > channeL provider');
             router.push('/');
         }
         const Clientsocket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/chat`, {
+            auth: {
+                token, // Pass the token as an authentication parameter
+            },
+        });
+        const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}/dm`, {
             auth: {
                 token, // Pass the token as an authentication parameter
             },
@@ -58,8 +65,13 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
             const channeL = await UpdateData();
             channeL && ChatSocket?.emit('accessToroom', channeL);
         })();
+        setDmSocket(socket);
         setChatSocket(Clientsocket);
-        return () => { Clientsocket.disconnect() }
+        return () => {
+
+            Clientsocket.disconnect()
+            socket.disconnect()
+        }
     }, [])
 
     React.useEffect(() => {
@@ -109,7 +121,7 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
 
     return (
         <ChanneLContext.Provider
-            value={{ User: User, UserSocket: UserSocket, socket: ChatSocket, ChanneLdata: ChanneLdata, setChanneLdata: setChanneLdata }}>
+            value={{ User: User, UserSocket: UserSocket, socket: ChatSocket, ChanneLdata: ChanneLdata, setChanneLdata: setChanneLdata, DmSocket: DmSocket }}>
             {children}
         </ChanneLContext.Provider>
     );

@@ -3,8 +3,9 @@ import Dashboard from '@/app/Dashboard';
 import '@/app/globals.css';
 import Cookies from 'js-cookie';
 import { Changa } from 'next/font/google';
-import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
+import toast from 'react-hot-toast';
 import { AiOutlineUsergroupAdd } from 'react-icons/ai';
 import { BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs';
 import { FaUsers } from 'react-icons/fa';
@@ -12,15 +13,13 @@ import { HiChatBubbleLeftRight } from 'react-icons/hi2';
 import { RiSearchLine } from 'react-icons/ri';
 import 'react-tooltip/dist/react-tooltip.css';
 import { Socket, io } from 'socket.io-client';
-import Button from '../components/Button';
-import ChatNavbarLink from '../components/chat.navbar.link';
-import Loading from './components/loading';
-import LeftSidebarHook from './hooks/LeftSidebarHook';
-import RightsidebarHook from './hooks/RightSidebarHook';
-import ChanneLcreatemodaLHook from './hooks/channel.create.hook';
-import ChanneLFindRoommodaLHook from './hooks/channel.find.room.hook';
-import { ChanneLProvider } from './providers/channel.provider';
-import { Toaster } from 'react-hot-toast';
+import Loading from './channels/components/loading';
+import LeftSidebarHook from './channels/hooks/LeftSidebarHook';
+import ChanneLcreatemodaLHook from './channels/hooks/channel.create.hook';
+import ChanneLFindRoommodaLHook from './channels/hooks/channel.find.room.hook';
+import { ChanneLProvider } from './channels/providers/channel.provider';
+import Button from './components/Button';
+import ChatNavbarLink from './components/chat.navbar.link';
 const changa = Changa({
   weight: ['400', '700'],
   subsets: ['latin'],
@@ -45,7 +44,10 @@ export default function RootLayout({
   const channeLFindRoommodaLHook = ChanneLFindRoommodaLHook()
   const router = useRouter();
 
-
+  // if (!token || !UserId) {
+  //   toast.error('You are not logged in');
+  //   router.replace('/');
+  // }
   React.useEffect(() => {
     // if (!token || !UserId) return router.push('/');
     if (!pathname.includes('chat')) setIsLoading(true)
@@ -98,10 +100,10 @@ export default function RootLayout({
                 </div>
                 <div className="channeLnavbarmenu col-span-2 flex justify-center  sm:justify-around gap-4 w-full ">
                   <ChatNavbarLink
-                    to="/chat/directmessage"
+                    to="/chat/"
                     label="direct Message"
                     icon={HiChatBubbleLeftRight}
-                    active={pathname.includes('directmessage')}
+                    active={!pathname.includes('channels')}
                   />
                   <ChatNavbarLink
                     to="/chat/channels"
