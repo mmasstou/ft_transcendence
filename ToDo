@@ -32,3 +32,8 @@ channeLModal ->  ChanneLSettingsModaL -> ChanneLUserSettings  +> 36
 channeLModal ->  ChanneLSettingsModaL -> ChanneLChatSettings  +> 36
 
  Warning: For production Image Optimization with Next.js, the optional 'sharp' package is strongly recommended. Run 'npm i sharp', and Next.js will use it automatically for Image Optimization.
+// test non friends users endpoint
+// check if there is any pending user showed in the list
+// if there is any pending user, remove it from the list
+// return the list of non friends users
+// fix settin issues

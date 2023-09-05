@@ -1,11 +1,11 @@
-import React, { FC, use, useState, useEffect } from 'react';
-import { TiUserAdd } from 'react-icons/ti';
-import { BiJoystick } from 'react-icons/bi';
+import { socketContext } from '@/app/Dashboard';
 import { UserCardProps } from '@/types/UserCardTypes';
-import Image from 'next/image';
 import Cookies from 'js-cookie';
-import MyToast from '../ui/Toast/MyToast';
+import Image from 'next/image';
+import { FC, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { BiJoystick } from 'react-icons/bi';
+import { TiUserAdd } from 'react-icons/ti';
 
 const SenderId = Cookies.get('_id');
 const UserCard: FC<UserCardProps> = ({
@@ -16,7 +16,10 @@ const UserCard: FC<UserCardProps> = ({
   socket,
   mode,
   addRequest,
+  addFriendFunc,
 }) => {
+  const contextValue = useContext(socketContext);
+  const [pending, setPending] = useState(false);
   const [invited, setInvited] = useState(false);
   const [Status, setStatus] = useState(status);
   let timeout: NodeJS.Timeout;
@@ -57,6 +60,16 @@ const UserCard: FC<UserCardProps> = ({
     };
   }, []);
 
+  const addFriend = async () => {
+    addFriendFunc && addFriendFunc(userId);
+  };
+
+  useEffect(() => {
+    if (addRequest) {
+      setPending(false);
+    }
+  }, [contextValue]);
+
   return (
     <div className=" bg-container rounded-xl my-3 p-2 xl:p-3 flex items-center justify-between">
       <div className="flex items-center gap-2">
@@ -72,15 +85,21 @@ const UserCard: FC<UserCardProps> = ({
       </div>
       <div className="flex items-center text-xs xl:text-sm gap-2">
         {addRequest ? (
-          <button className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors">
-            <TiUserAdd
-              className="mr-1 fill-sky-500 group-hover:fill-container"
-              size={16}
-            />
-            Add Friend
+          <button
+            onClick={() => addFriend().then(() => setPending(true))}
+            className="flex items-center border p-1 px-2 xl:px-3 rounded-xl border-sky-500 text-sky-500 hover:bg-sky-600 hover:text-container hover:border-container group transition-colors"
+          >
+            {!pending && (
+              <TiUserAdd
+                className="mr-1 fill-sky-500 group-hover:fill-container"
+                size={16}
+              />
+            )}
+            {pending ? 'Pending...' : 'Add Friend'}
           </button>
         ) : (
-          Status === 'online' && (
+          Status === 'online' &&
+          socket !== undefined && (
             <button
               disabled={invited}
               onClick={handleInvite}

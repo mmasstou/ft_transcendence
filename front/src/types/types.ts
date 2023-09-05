@@ -86,7 +86,7 @@ export type userType = {
   location: string;
   twoFactorAuthenticationSecret: string;
   twoFA: boolean;
-  status: string;
+  status: 'online' | 'offline' | 'inGame';
   TotalWin: number;
   TotalLose: number;
   TotalMatch: number;

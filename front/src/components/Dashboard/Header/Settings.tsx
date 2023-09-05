@@ -40,21 +40,19 @@ function getAllUsers(): userType[] | null {
   return users;
 }
 
-function getUserData(): userType | null {
+export function getUserData(): userType | null {
   const [user, setUser] = useState<userType | null>(null);
+
   useEffect(() => {
     const jwtToken = Cookies.get('token');
-    const userId = Cookies.get('_id');
+    const id = Cookies.get('_id');
     axios
-      .get<userType | null>(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      .get<userType | null>(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`, {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
       .then((response) => {
         if (response.status === 200) {
           setUser(response.data);
@@ -149,7 +147,7 @@ const Settings: React.FC<Props> = ({ login }) => {
         toast.error("Couldn't save informations!");
       }
       if (login) {
-        router.push('/profile');
+        router.replace('/profile');
         toast.success('Account created successfully!');
       }
       return;
@@ -174,6 +172,7 @@ const Settings: React.FC<Props> = ({ login }) => {
         }
 
         const userData = { login: user };
+
         const postLogin = await axios.patch(
           `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
           userData,

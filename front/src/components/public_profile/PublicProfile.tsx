@@ -1,26 +1,53 @@
+import { socketContext } from '@/app/Dashboard';
 import { userType } from '@/types/types';
+import axios from 'axios';
+import { motion } from 'framer-motion';
+import Cookies from 'js-cookie';
 import Image from 'next/image';
+import { useContext, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
+import Statistics from '../profile/Statistics';
 import { UserInfo } from '../profile/UserInfo';
 import { UserStats } from '../profile/UserStats';
-import Statistics from '../profile/Statistics';
-import { motion } from 'framer-motion';
-import { useContext, useEffect, useRef, useState } from 'react';
-import Cookies from 'js-cookie';
 import Button from './Button';
-import { socketContext } from '@/app/Dashboard';
 
 interface ProfileProps {
-  user: userType | null;
+  userId: string | undefined;
   handlePublicProfile: () => void;
 }
 
 const PublicProfile: React.FC<ProfileProps> = ({
-  user,
+  userId,
   handlePublicProfile,
 }) => {
+  const [user, setUser] = useState<userType | null>(null);
+
+  useEffect(() => {
+    const jwtToken = Cookies.get('token');
+    axios
+      .get<userType | null>(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+      .then((response) => {
+        if (response.status === 200) {
+          setUser(response.data);
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  }, []);
+
   const contextValue = useContext(socketContext);
   const [friends, setfriends] = useState<any>([]);
   const [isFriend, setIsFriend] = useState<boolean>(false);
+  const [isPending, setIsPending] = useState<boolean>(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const handleOutsideClick = (event: any) => {
@@ -64,7 +91,7 @@ const PublicProfile: React.FC<ProfileProps> = ({
   useEffect(() => {
     if (friends) {
       const friend = friends.find((friend: any) => {
-        if (friend === user?.id) {
+        if (friend.id === user?.id) {
           return true;
         }
       });
@@ -80,12 +107,48 @@ const PublicProfile: React.FC<ProfileProps> = ({
     }
   }, [contextValue]);
 
+  useEffect(() => {
+    const token = Cookies.get('token');
+    try {
+      (async () => {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/sendingrequests/all`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.length > 0) {
+            const userExits = data.some(
+              (friend: { friendId: string | undefined }) => {
+                if (friend.friendId === user?.id) {
+                  return true;
+                }
+              }
+            );
+            if (userExits) {
+              setIsPending(true);
+            }
+          }
+        }
+      })();
+    } catch (error) {
+      console.log('error in get friends: ', error);
+    }
+  }, [contextValue?.message, user]);
+
   const updateFriendState = (newState: boolean) => {
     setIsFriend(newState);
   };
 
-  console.log('in public isfrins: ', isFriend);
-  console.log('contextValue: ', contextValue);
+  const updatePendingState = (newState: boolean) => {
+    setIsPending(newState);
+  };
 
   return (
     <>
@@ -121,7 +184,7 @@ const PublicProfile: React.FC<ProfileProps> = ({
           )}
           <div className="absolute -bottom-10 left-10">
             <Image
-              className="rounded-full border-2 border-secondary w-[120px] h-[120px]"
+              className="rounded-full border border-secondary w-[120px] h-[120px]"
               src={user?.avatar ? user.avatar : ''}
               width={120}
               height={120}
@@ -138,11 +201,14 @@ const PublicProfile: React.FC<ProfileProps> = ({
               text="Message"
               user={user}
               updateFriendState={updateFriendState}
+              updatePendingState={updatePendingState}
             />
             <Button
               text="add friend"
               isFriend={isFriend}
               updateFriendState={updateFriendState}
+              updatePendingState={updatePendingState}
+              isPending={isPending}
               user={user}
             />
           </div>

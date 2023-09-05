@@ -24,7 +24,10 @@ const CardRank: React.FC<Props> = ({ user, rank }) => {
   return (
     <>
       {showPublicProfile && (
-        <PublicProfile user={user} handlePublicProfile={handlePublicProfile} />
+        <PublicProfile
+          userId={user?.id}
+          handlePublicProfile={handlePublicProfile}
+        />
       )}
       {showPublicProfile && (
         <div className="w-[100%] h-[100%] bg-black/60 absolute top-0 left-0" />
@@ -40,7 +43,9 @@ const CardRank: React.FC<Props> = ({ user, rank }) => {
             <div className="flex flex-row items-center gap-1 md:gap-2">
               <Image
                 onClick={handlePublicProfile}
-                className="w-[35px] h-[35px] rounded-full sm:w-[45px] sm:h-[45px] md:w-[60px] md:h-[60px] cursor-pointer"
+                className={`w-[35px] h-[35px] rounded-full sm:w-[45px] sm:h-[45px] md:w-[60px] md:h-[60px] ${
+                  user?.id === userId ? 'cursor-not-allowed' : 'cursor-pointer'
+                } border border-secondary`}
                 src={user?.avatar ? user.avatar : ''}
                 width={35}
                 height={35}

@@ -7,11 +7,10 @@ import Settings from './Settings';
 import * as Popover from '@radix-ui/react-popover';
 import Notification from '@/components/profile/Notification';
 import { Socket } from 'socket.io-client';
-import React from 'react';
-import { membersType, userType } from '@/types/types';
-import MyToast from '@/components/ui/Toast/MyToast';
+import React, { useContext } from 'react';
 import Cookies from 'js-cookie';
 import { toast } from 'react-hot-toast';
+import { socketContext } from '@/app/Dashboard';
 
 const token = Cookies.get('token');
 
