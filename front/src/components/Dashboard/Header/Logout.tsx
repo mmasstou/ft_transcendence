@@ -23,7 +23,7 @@ export const Logout: React.FC = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    if (!IsMounted) return;
+    //if (!IsMounted) return;
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`).then((res) => {
       setUser(res.data);
     });
@@ -68,7 +68,7 @@ export const Logout: React.FC = (): JSX.Element => {
             <p className="text-sm xl:text-lg">{user && user?.login} 👋</p>
             <div className="w-3/4 border-b-[0.1vh] border-white opacity-50"></div>
             <a
-              onClick={() => {}}
+              onClick={logoutHandle}
               href="/"
               className="flex justify-between items-center my-1 hover:text-red-500"
             >

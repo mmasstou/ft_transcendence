@@ -2,10 +2,12 @@
 import { User } from '@/app/game/[mode]/page';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import UserCard from '../profile/FriendCard';
+import { socketContext } from '@/app/Dashboard';
 
 const UsersPage = () => {
+  const contextValue = useContext(socketContext);
   const id = Cookies.get('_id');
   const token = Cookies.get('token');
   const [users, setUsers] = useState<User[]>([]);
@@ -32,7 +34,7 @@ const UsersPage = () => {
         console.log(err);
       }
     })();
-  }, []);
+  }, [contextValue]);
 
   const handleAddfriend = async (id: string) => {
     const PostData = {
@@ -80,6 +82,11 @@ const UsersPage = () => {
               />
             );
         })}
+        {users.length === 0 && (
+          <h1 className="text-2xl lg:text-3xl 2xl:text-4xl text-gray-400 text-center py-6 lg:py-12">
+            No users found
+          </h1>
+        )}
       </div>
     </div>
   );

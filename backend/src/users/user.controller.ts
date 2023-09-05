@@ -103,7 +103,7 @@ export class UserController {
     // check if login user already exist
     const user = await this.usersService.findOneLogin({ login: data.login });
     if (user) {
-      throw new BadRequestException('Login already exist');
+      return;
     }
     return await this.usersService.update({ id, data });
   }

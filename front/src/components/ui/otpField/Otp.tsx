@@ -60,7 +60,7 @@ const Otp: React.FC<Props> = () => {
       })
       .then((response) => {
         if (response.status === 200) {
-          router.push('/profile');
+          router.replace('/profile');
           toast.success('Your profile is verified');
         }
       })

@@ -1,7 +1,8 @@
+import { socketContext } from '@/app/Dashboard';
 import { UserCardProps } from '@/types/UserCardTypes';
 import Cookies from 'js-cookie';
 import Image from 'next/image';
-import { FC, useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { BiJoystick } from 'react-icons/bi';
 import { TiUserAdd } from 'react-icons/ti';
@@ -17,6 +18,7 @@ const UserCard: FC<UserCardProps> = ({
   addRequest,
   addFriendFunc,
 }) => {
+  const contextValue = useContext(socketContext);
   const [pending, setPending] = useState(false);
   const [invited, setInvited] = useState(false);
   const [Status, setStatus] = useState(status);
@@ -61,6 +63,13 @@ const UserCard: FC<UserCardProps> = ({
   const addFriend = async () => {
     addFriendFunc && addFriendFunc(userId);
   };
+
+  useEffect(() => {
+    if (addRequest) {
+      setPending(false);
+    }
+  }, [contextValue]);
+
   return (
     <div className=" bg-container rounded-xl my-3 p-2 xl:p-3 flex items-center justify-between">
       <div className="flex items-center gap-2">
