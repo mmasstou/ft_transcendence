@@ -70,7 +70,7 @@ model User {
   twoFA                         Boolean                @default(false)
   logedFirstTime                Boolean                @default(false)
   friends                       Friendship[]
-  mds                           DirectMessage[]
+  dms                           DirectMessage[]
 }
 
 enum FriendshipStatus {

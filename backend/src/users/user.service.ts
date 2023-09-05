@@ -112,13 +112,6 @@ export class UserService {
           },
           friendId: receiverId,
           status: 'PENDING',
-          dm: {
-            create: {
-              User: {
-                connect: [{ id: receiverId }, { id: senderId }],
-              },
-            },
-          },
         },
       });
       return;
@@ -372,6 +365,7 @@ export class UserService {
         where: { login },
         include: {
           Rooms: true,
+          dms: true,
         },
       });
       if (!user) throw new NotFoundException();
