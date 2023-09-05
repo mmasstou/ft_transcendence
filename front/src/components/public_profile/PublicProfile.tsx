@@ -1,14 +1,15 @@
+import { socketContext } from '@/app/Dashboard';
 import { userType } from '@/types/types';
+import axios from 'axios';
+import { motion } from 'framer-motion';
+import Cookies from 'js-cookie';
 import Image from 'next/image';
+import { useContext, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
+import Statistics from '../profile/Statistics';
 import { UserInfo } from '../profile/UserInfo';
 import { UserStats } from '../profile/UserStats';
-import Statistics from '../profile/Statistics';
-import { motion } from 'framer-motion';
-import { useContext, useEffect, useRef, useState } from 'react';
-import Cookies from 'js-cookie';
 import Button from './Button';
-import { socketContext } from '@/app/Dashboard';
-import { getUserData } from '../Dashboard/Header/Settings';
 
 interface ProfileProps {
   userId: string | undefined;
@@ -19,7 +20,29 @@ const PublicProfile: React.FC<ProfileProps> = ({
   userId,
   handlePublicProfile,
 }) => {
-  const user: userType | null = getUserData(userId);
+  const [user, setUser] = useState<userType | null>(null);
+
+  useEffect(() => {
+    const jwtToken = Cookies.get('token');
+    axios
+      .get<userType | null>(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+      .then((response) => {
+        if (response.status === 200) {
+          setUser(response.data);
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  }, []);
 
   const contextValue = useContext(socketContext);
   const [friends, setfriends] = useState<any>([]);

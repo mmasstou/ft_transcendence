@@ -64,7 +64,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('nonfriends')
   async getNonFriends(@Req() request: Request) {
-    console.log('non friends');
     const User: any = request.user;
     const id: any = User.id;
     return await this.usersService.getNonFriends(id);

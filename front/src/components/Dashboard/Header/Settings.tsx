@@ -40,15 +40,12 @@ function getAllUsers(): userType[] | null {
   return users;
 }
 
-export function getUserData(userId?: string): userType | null {
+export function getUserData(): userType | null {
   const [user, setUser] = useState<userType | null>(null);
-  const [id, setId] = useState<string | undefined>(userId);
-  if (!id || id === undefined) {
-    setId(Cookies.get('_id'));
-  }
 
   useEffect(() => {
     const jwtToken = Cookies.get('token');
+    const id = Cookies.get('_id');
     axios
       .get<userType | null>(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`, {
         headers: {
