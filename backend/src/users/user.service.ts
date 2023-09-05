@@ -307,6 +307,7 @@ export class UserService {
 
   // get all non friend users and non pending users
   async getNonFriends(userId: string) {
+    console.log('userId: ', userId);
     try {
       const friends = await this.prisma.friendship.findMany({
         where: {
@@ -332,17 +333,18 @@ export class UserService {
         },
       });
       if (!users) throw new NotFoundException();
-      // remove pending requests
+      //get all pending requests
       const pendingRequests = await this.prisma.friendship.findMany({
         where: {
           userId: userId,
           status: 'PENDING',
         },
       });
-      users.forEach((user) => {
-        pendingRequests.forEach((request) => {
-          if (user.id === request.friendId) {
-            const index = users.indexOf(user);
+
+      // remove all users that have pending requests
+      pendingRequests.forEach((pending) => {
+        users.forEach((user, index) => {
+          if (user.id === pending.friendId) {
             users.splice(index, 1);
           }
         });
