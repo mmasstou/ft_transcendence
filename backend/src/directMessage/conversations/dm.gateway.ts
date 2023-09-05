@@ -50,7 +50,7 @@ export class DmGateway implements OnGatewayInit {
     const msg = await this.messageService.newMessage(payload.senderId, payload.content, payload.conversationId);
     this.logger.log(client.id, payload);
     this.logger.log(msg);
-    this.server.emit('message', msg);
+    this.server.to(payload.conversationId).emit('message', msg);
 
   }
 }
