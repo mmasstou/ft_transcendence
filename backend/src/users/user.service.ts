@@ -1,17 +1,16 @@
 import {
   BadRequestException,
   Injectable,
-  UnauthorizedException,
   NotFoundException,
-  Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 // import { PrismaService } from 'src/prisma.service';
-import { User, Prisma, UserSocket } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
+import { FriendshipStatus, Prisma, User, UserSocket } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateUserDto } from './dtos/UpdateUserDto';
-import { Socket } from 'socket.io';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -85,7 +84,6 @@ export class UserService {
       where: { kind },
       include: {
         Rooms: true,
-        directMessage: true,
       },
     });
   }
@@ -109,9 +107,18 @@ export class UserService {
 
       await this.prisma.friendship.create({
         data: {
-          userId: senderId,
+          User: {
+            connect: { id: senderId },
+          },
           friendId: receiverId,
           status: 'PENDING',
+          dm: {
+            create: {
+              User: {
+                connect: [{ id: receiverId }, { id: senderId }],
+              },
+            },
+          },
         },
       });
       return;
@@ -139,20 +146,40 @@ export class UserService {
         throw new BadRequestException('Friend request not found.');
       }
 
+      const dm = await this.prisma.directMessage.create({
+        data: {
+          User: {
+            connect: [{ id: receiverId }, { id: senderId }],
+          },
+        },
+      });
+
       await this.prisma.friendship.update({
         where: {
           id: id,
         },
         data: {
           status: 'ACCEPTED',
+          dm: {
+            connect: {
+              id: dm.id,
+            },
+          },
         },
       });
 
       await this.prisma.friendship.create({
         data: {
-          userId: receiverId,
+          User: {
+            connect: { id: receiverId },
+          },
           friendId: senderId,
-          status: 'ACCEPTED',
+          status: FriendshipStatus.ACCEPTED,
+          dm: {
+            connect: {
+              id: dm.id,
+            },
+          },
         },
       });
       return;
@@ -323,17 +350,6 @@ export class UserService {
     });
   }
 
-  async getUserDirectMessages(userId: string) {
-    // Add your logic to fetch the direct messages for the user from the database or any other source
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        directMessage: true,
-      },
-    });
-    return user;
-  }
-
   // get User in cluent socket
   async getUserInClientSocket(client: Socket) {
     const { token } = client.handshake.auth; // Extract the token from the auth object
@@ -356,7 +372,6 @@ export class UserService {
         where: { login },
         include: {
           Rooms: true,
-          directMessage: true,
         },
       });
       if (!user) throw new NotFoundException();
