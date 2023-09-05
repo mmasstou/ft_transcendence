@@ -147,7 +147,7 @@ const Settings: React.FC<Props> = ({ login }) => {
         toast.error("Couldn't save informations!");
       }
       if (login) {
-        router.push('/profile');
+        router.replace('/profile');
         toast.success('Account created successfully!');
       }
       return;
@@ -172,6 +172,7 @@ const Settings: React.FC<Props> = ({ login }) => {
         }
 
         const userData = { login: user };
+
         const postLogin = await axios.patch(
           `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
           userData,

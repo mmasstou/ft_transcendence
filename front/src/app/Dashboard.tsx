@@ -6,7 +6,7 @@ import MyToast from '@/components/ui/Toast/MyToast';
 import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { createContext, useEffect, useContext, ReactNode } from 'react';
+import React, { createContext, useEffect, ReactNode } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { Socket, io } from 'socket.io-client';
 import StartGame from './chat/channels/actions/startgame';
@@ -55,7 +55,10 @@ const Dashboard = ({ children }: Props) => {
   const [requestBackUp, setRequestBackUp] = React.useState<any>([]);
   const [message, setMessage] = React.useState<string>('');
 
-  if (!token || !userId) return;
+  if (!token || !userId) {
+    router.replace('/');
+    return null;
+  }
 
   React.useEffect(() => {
     socket?.on(
