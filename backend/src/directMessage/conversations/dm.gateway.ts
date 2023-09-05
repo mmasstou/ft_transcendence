@@ -6,9 +6,19 @@ import {
   OnGatewayInit,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { MessagesService } from './messages/messages.service';
+
+interface frontMsg {
+  conversationId: string,
+  senderId: string,
+  content: string,
+}
 
 @WebSocketGateway()
 export class DmGateway implements OnGatewayInit {
+  
+  constructor(private readonly messageService: MessagesService) {}
+
   @WebSocketServer()
   server: Server;
 
@@ -19,7 +29,9 @@ export class DmGateway implements OnGatewayInit {
   }
 
   handleConnection(client: Socket) {
+    const { id: userId } = client.handshake.auth;
     this.logger.debug(`marbenMB : Client ${client.id} connected`);
+    this.logger.debug(`marbenMB : ConvId : ${userId}`)
   }
 
   handleDisconnect(client: Socket) {
@@ -27,8 +39,11 @@ export class DmGateway implements OnGatewayInit {
   }
 
   @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): void {
-    this.server.emit('message', payload);
+  async handleMessage(client: any, payload: frontMsg): Promise<void> {
+    const msg = await this.messageService.newMessage(payload.senderId, payload.content, payload.conversationId);
     this.logger.log(client.id, payload);
+    this.logger.log(msg);
+    this.server.emit('message', msg);
+
   }
 }

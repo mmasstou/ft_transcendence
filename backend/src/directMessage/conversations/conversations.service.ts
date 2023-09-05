@@ -9,6 +9,7 @@ export class ConversationsService {
     return await this.prismaService.conversation.findMany({
       include: {
         users: true,
+        messages: true
       }
     });
   }
@@ -34,7 +35,10 @@ export class ConversationsService {
     return this.prismaService.conversation.findUnique(
       { 
         where: {id},
-        include: {users: true}
+        include: {
+          users: true,
+          messages: true,
+        }
       }
       )
 }

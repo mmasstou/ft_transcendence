@@ -39,6 +39,7 @@ export class ConversationsController {
       },
       include: {
         users: true,
+        messages: true,
       }
     };
 
@@ -56,6 +57,7 @@ export class ConversationsController {
       },
       include: {
         users: true,
+        messages: true,
       }
     });
   }
@@ -76,6 +78,10 @@ export class ConversationsController {
         users: {
           connect: usersId.map((id) => ({ id })),
         },
+        include: {
+          users: true,
+          messages: true,
+        }
       },
     };
     return this.conversationService.createNewConversation(criteria);

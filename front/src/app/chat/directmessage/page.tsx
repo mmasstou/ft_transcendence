@@ -9,12 +9,25 @@ const metadata = {
   description: 'Online Pong Game',
 };
 
+export interface messageData {
+  content: string,
+  id: string,
+  sender: any,
+  senderId: string,
+  viewed: number,
+  created_at: Date,
+  updated_at: Date,
+  conversation: conversationData,
+  conversationId: string,
+}
+
 export interface conversationData {
 	id: string,
 	content: string,
 	createdAt: Date,
 	updatedAt: Date,
 	users: any[],
+  messages: messageData[]
 }
 
 

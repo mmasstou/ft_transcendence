@@ -20,6 +20,7 @@ function ConversationBody({ params }: { params: { dmid: string } }) {
     const [msgContent, setMsgContent] = useState<string>('');
     const [socket, setSocket] = useState<Socket | null>(null);
     const [convBody, setConvBody] = useState<conversationData | null>(null);
+    const [messages, setMsgs] = useState<any>([]);
     
 
     const handleEnterClick = (e: any) => {
@@ -29,7 +30,7 @@ function ConversationBody({ params }: { params: { dmid: string } }) {
 
     const handleSendMsg = () => {
         console.log(`Message : ${msgContent}`);
-        const obj = {convId: convBody?.id ,userId: currentId, msg: msgContent};
+        const obj = {conversationId: convBody?.id ,senderId: currentId, content: msgContent};
         socket?.emit('message', obj);
         setMsgContent('');
     }
@@ -38,12 +39,14 @@ function ConversationBody({ params }: { params: { dmid: string } }) {
 
         socket?.on('message', (data) => {
             console.log('Received message from server:', data);
-            });
+            setMsgs([...messages, data])
+        });
         
         console.log(convBody);
+        console.log(convBody?.messages);
 
 
-    }, [convBody])
+    }, [convBody, messages])
 
     async function getConversation() {
         const response = await(await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations/${params.dmid}`, {
@@ -55,15 +58,19 @@ function ConversationBody({ params }: { params: { dmid: string } }) {
 		  })).json();
 
           setConvBody(response);
+          setMsgs(response.messages);
     }
 
     useEffect(() => {
         
         getConversation();
-        const socket: Socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`);
+        const socket: Socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`, {
+            auth : {
+                id: convBody?.id,
+            }
+    });
         setSocket(socket);
         // console.log("first time" , convBody);
-
         
         return () => {
             socket.disconnect();
@@ -81,7 +88,7 @@ function ConversationBody({ params }: { params: { dmid: string } }) {
                         <CustumBtn icon={SlOptionsVertical} onClick={() => console.log("Option Modal ...")} size={15} />
                     </section>
                 </div>
-                <ConversationMsg msgs={convBody.id}/>
+                <ConversationMsg msgs={messages}/>
                 <div className='text-[#1EF0AE] flex gap-4 justify-center w-full py-2 bg-[#243230]'>
                     <input type='text' placeholder='  Type a message' value={msgContent} onChange={(e) => setMsgContent(e.target.value)} onFocus={(e) => handleEnterClick(e)} className='max-h-[100px] h-[50px] overflow-auto w-[75%] py-2 px-5 bg-primary rounded-[25px] focus:border-[#1EF0AE] focus:outline-none text-sm'/>
                     <section className='w-[50px] h-[50px] bg-primary flex justify-center items-center rounded-[50%]'>

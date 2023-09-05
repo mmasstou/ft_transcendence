@@ -17,3 +17,4 @@
 	+ work on /chat route not on /chat/directmessage
 	+ when create new conversation in search modal the conversation list component is not updated until reRendred
 	+ responsive height !!!!
+	+ work with rooms in sockets for each conversation.
