@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DirectMessage, User } from '@prisma/client';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import { MessagesService } from 'src/messages/messages.service';
 import { PrismaService } from 'src/prisma.service';
 import { UserService } from 'src/users/user.service';
