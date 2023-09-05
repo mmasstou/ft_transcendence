@@ -17,6 +17,7 @@ import { TwoFactorAuthenticationService } from './auth/2fa/twoFactorAuthenticati
 import { TwoFactorAuthenticationModule } from './auth/2fa/twoFactorAuthentication.module';
 import { ConversationsModule } from './directMessage/conversations/conversations.module';
 import { FileUploadModule } from './Uploads/file-upload.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import * as cookieParser from 'cookie-parser';
 
 @Module({
@@ -31,6 +32,7 @@ import * as cookieParser from 'cookie-parser';
     TwoFactorAuthenticationModule,
     ConversationsModule,
     FileUploadModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

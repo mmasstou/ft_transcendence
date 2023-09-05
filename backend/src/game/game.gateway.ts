@@ -166,24 +166,21 @@ class BallGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
-  async CreateFriendTable(
-    data: { player1Id: string; player2Id: string },
-    id: string,
-  ) {
+  async CreateFriendTable(Tableobj: TableObj) {
     if (
-      UserMap.get(data.player1Id) &&
-      UserMap.get(data.player1Id).SocketId &&
-      UserMap.get(data.player1Id).BallSocketId &&
-      UserMap.get(data.player2Id) &&
-      UserMap.get(data.player2Id).SocketId &&
-      UserMap.get(data.player2Id).BallSocketId
+      UserMap.get(Tableobj.player1.UserId) &&
+      UserMap.get(Tableobj.player1.UserId).SocketId &&
+      UserMap.get(Tableobj.player1.UserId).BallSocketId &&
+      UserMap.get(Tableobj.player2.UserId) &&
+      UserMap.get(Tableobj.player2.UserId).SocketId &&
+      UserMap.get(Tableobj.player2.UserId).BallSocketId
     ) {
       this.server
-        .to(UserMap.get(data.player1Id).BallSocketId)
-        .emit('joinRoomBall', id);
+        .to(UserMap.get(Tableobj.player1.UserId).BallSocketId)
+        .emit('joinRoomBall', Tableobj.tableId);
       this.server
-        .to(UserMap.get(data.player2Id).BallSocketId)
-        .emit('joinRoomBall', id);
+        .to(UserMap.get(Tableobj.player2.UserId).BallSocketId)
+        .emit('joinRoomBall', Tableobj.tableId);
     }
   }
 
@@ -332,6 +329,7 @@ class MyGateway implements OnGatewayConnection {
       return new Error('User already in game');
     } else {
       table_obj.tableId = uuidv4();
+      table_obj.GameType = 'friend';
 
       if (
         UserMap.get(data.player1Id) &&
@@ -355,7 +353,6 @@ class MyGateway implements OnGatewayConnection {
         const user1 = UserMap.get(data.player1Id).User;
         const user2 = UserMap.get(data.player2Id).User;
         table_obj.GameMode = data.mode;
-        table_obj.GameType = 'friend';
         table_obj.player1.setUserId(data.player1Id);
         table_obj.player2.setUserId(data.player2Id);
         table_obj.player1.GameSetting.setData(
@@ -377,7 +374,7 @@ class MyGateway implements OnGatewayConnection {
           .to(UserMap.get(data.player2Id).SocketId)
           .emit('joinRoomGame', table_obj);
         TableMap.set(table_obj.tableId, table_obj);
-        this.BallGateway.CreateFriendTable(data, table_obj.tableId);
+        this.BallGateway.CreateFriendTable(table_obj);
         table_obj = new TableObj(currents);
       } else {
         setTimeout(() => {
@@ -590,7 +587,20 @@ class MyGateway implements OnGatewayConnection {
       UserMap.get(_User.id).timeOut = null;
     }
     if (socket.handshake.auth.tableId) {
+      setTimeout(async () => {
+        this.GameService.updateStatus({
+          id: socket.handshake.auth.UserId,
+          status: 'inGame',
+        })
+      }, 50);
+      UserMap.get(socket.handshake.auth.UserId).Status = 'inGame';
       socket.emit('joinRoomGame', TableMap.get(socket.handshake.auth.tableId));
+    }
+    else {
+      await this.GameService.updateStatus({
+        id: socket.handshake.auth.UserId,
+        status: 'online',
+      });
     }
   }
 

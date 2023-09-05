@@ -40,21 +40,22 @@ function getAllUsers(): userType[] | null {
   return users;
 }
 
-function getUserData(): userType | null {
+export function getUserData(userId?: string): userType | null {
   const [user, setUser] = useState<userType | null>(null);
+  const [id, setId] = useState<string | undefined>(userId);
+  if (!id || id === undefined) {
+    setId(Cookies.get('_id'));
+  }
+
   useEffect(() => {
     const jwtToken = Cookies.get('token');
-    const userId = Cookies.get('_id');
     axios
-      .get<userType | null>(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      .get<userType | null>(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`, {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
       .then((response) => {
         if (response.status === 200) {
           setUser(response.data);
@@ -74,9 +75,9 @@ interface Props {
 const Settings: React.FC<Props> = ({ login }) => {
   const userData: userType | null = getUserData();
   const users: userType[] | null = getAllUsers();
-  useEffect(() => {
-    console.log(users);
-  }, [users]);
+  // useEffect(() => {
+  //   console.log(users);
+  // }, [users]);
 
   const router = useRouter();
 
@@ -197,8 +198,12 @@ const Settings: React.FC<Props> = ({ login }) => {
           }
         }
       } catch (error: any) {
-        toast.error(error.message);
-        console.clear();
+        if (error.response.status === 400) {
+          return;
+        } else {
+          toast.error(error.message);
+          console.clear();
+        }
       }
     }
     router.push('/profile');

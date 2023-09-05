@@ -8,7 +8,7 @@ import { Socket, io } from 'socket.io-client';
 import FindOneBySLug from '../actions/Channel/findOneBySlug';
 import getMemberWithId from '../actions/getMemberWithId';
 import getUserWithId from '../actions/getUserWithId';
-import { sl } from 'date-fns/locale';
+import { de, sl } from 'date-fns/locale';
 
 export const ChanneLContext = createContext({});
 
@@ -78,17 +78,31 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
 
     React.useEffect(() => {
         ChatSocket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`,
             (data: { OK: true, message?: string }) => {
                 if (!data.OK) return
                 UpdateData();
             });
         ChatSocket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_UPDATE`,
             (data: { OK: true, message?: string }) => {
                 if (!data.OK) return
                 UpdateData();
             });
+        ChatSocket?.on('offline-connection', () => {
+            let desiredString = window.location.href.match(/\/chat\/channels\/(.+)/);
+            let channelName;
+            if (desiredString)
+                channelName = desiredString[1];
+            if (channelName) {
+                ChatSocket?.emit('offline-connection', channelName);
+            }
+        });
+        return () => {
+            ChatSocket?.off('offline-connection');
+            ChatSocket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`);
+            ChatSocket?.off(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`);
+        }
     }, [ChatSocket])
 
     if (!ChatSocket) return null

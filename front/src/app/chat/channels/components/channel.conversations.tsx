@@ -24,6 +24,9 @@ import { CiVolumeMute } from "react-icons/ci";
 import { is, ro, tr } from "date-fns/locale";
 import { ChanneLContext } from "../providers/channel.provider";
 import ChannelConversationsMute from "./channel.conversations.mute";
+import ChanneLsettingsHook from "../hooks/channel.settings";
+import ConversationsOffLine from "./channel.conversations.offLine";
+import { TbMessageX } from "react-icons/tb";
 
 const token: string | undefined = Cookies.get('token')
 const UserId: string | undefined = Cookies.get('_id')
@@ -42,8 +45,10 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
     const InputRef = React.useRef<HTMLInputElement | null>(null);
     const [LoadingMessages, setLoadingMessages] = React.useState<boolean>(true)
     const [SendingMessage, setSendingMessage] = React.useState<boolean>(false)
+    const [IsOffLine, setOffLine] = React.useState<boolean>(false)
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
     const ChanneLContextee: any = React.useContext(ChanneLContext)
+    const channeLsettingsHook = ChanneLsettingsHook()
     const router = useRouter()
 
     const UpdateData = () => {
@@ -59,6 +64,7 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
             if (member) { setLogedMember(member); }
         })();
     }
+
     const FocusedOnSendMessageInput = () => {
         setTimeout(() => {
             if (InputRef.current) {
@@ -66,6 +72,7 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
             }
         }, 100); // sleep .1s ; waiting search input to mounted in focus on it
     }
+
     // show this last message in the screan :
     React.useEffect(() => {
         setTimeout(() => {
@@ -127,18 +134,19 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
     // listen to message event and send the incomming message to client and update the member or channel info
     React.useEffect(() => {
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`,
             (data) => { if (data.OK) { return UpdateData(); } });
 
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_UPDATE`,
             (data) => { if (data.OK) { return UpdateData(); } });
         socket?.on(
-            `${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`,
+            `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK`,
             (data: { OK: boolean, member: membersType }) => {
                 if (data.OK) {
                     if (data.member.userId === UserId) {
-                        toast.error(`you are kicked from ${channeLinfo?.name}`)
+                        channeLsettingsHook.onClose()
+                        toast.error(`you are kicked from this channel`)
                         return router.push('/chat/channels')
                     }
                 }
@@ -150,12 +158,18 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
                 return
             }
         })
+        socket?.on('offline-connection', () => {
+            setOffLine(false)
+            toast('you are online now', { icon: '🟢' })
+            UpdateData();
+        })
 
         return () => {
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_UPDATE}`)
-            socket?.off(`${process.env.NEXT_PUBLIC_SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK}`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_UPDATE`)
+            socket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_KICK`)
             socket?.off('sendMessageResponse')
+            socket?.off('offline-connection')
         }
 
     }, [])
@@ -173,6 +187,11 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
             return
         }
         // send message to server using socket :
+        if (!socket?.connected) {
+            toast("you are offline", { icon: '🟠' })
+            setOffLine(true)
+            return
+        }
         socket?.emit('sendMessage', {
             content: message,
             senderId: Cookies.get('_id'),
@@ -193,6 +212,7 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
 
     return <div className=" relative flex flex-col items-center w-full">
         <ChannelConversationsMute IsActive={LogedMember?.ismute ? true : false} />
+        <ConversationsOffLine IsOffLine={IsOffLine} />
         {channeLinfo
             ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col sm:flex`}>
                 <ConversationsTitlebar
@@ -207,16 +227,19 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
                     <div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5 ">
                         <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll flex flex-col gap-3" >
                             {
-                                !LoadingMessages ? messages && messages.length ?
-                                    messages.map((message, index) => (
-                                        <Message
-                                            key={index}
-                                            message={message}
-                                            isForOwner={message.senderId === Cookies.get('_id')}
-                                            userid={message.senderId}
-                                        />
-                                    ))
-                                    : <div>no messages</div>
+                                !LoadingMessages
+                                    ? messages && messages.length
+                                        ? messages.map((message, index) => (
+                                            <Message
+                                                key={index}
+                                                message={message}
+                                                isForOwner={message.senderId === Cookies.get('_id')}
+                                                userid={message.senderId}
+                                            />
+                                        ))
+                                        : <div className="w-full  flex justify-center items-center  h-[78vh] md:h-[83vh]">
+                                            <TbMessageX className=" text-secondary" size={120} />
+                                        </div>
                                     : <div>Loading geting OLd messages ...</div>
                             }
                         </div>
@@ -254,9 +277,7 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
                                     <Button icon={IoSend} disabled={SendingMessage} outline small onClick={OnSubmit} />
                                 </div>}
                             </div>
-                        </div>
-
-                        }
+                        </div>}
                     </div>
                     : <BanMember LogedMember={LogedMember} User={undefined} room={channeLinfo} />
                 }

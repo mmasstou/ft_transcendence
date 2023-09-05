@@ -19,7 +19,7 @@ const ChanneLConfirmActionModaL = () => {
     useEffect(() => { setIsMounted(true) }, [])
     if (!IsMounted || !channeLConfirmActionHook.IsOpen) return
 
-    return <div className={`absolute top-0 bg-[#2632389e] w-full h-full  flex justify-center items-center z-[121324]`}>
+    return <div className={`absolute top-0 bg-[#2632389e] w-full h-full  flex justify-center items-center z-[47]`}>
     <div className=" w-full max-w-xl bg-[#2B504B] m-3 rounded">
         <div className="flex justify-end items-center p-2 w-full mb-2">
             {/* <h1 className=" text-white capitalize pl-6">Delete modal</h1> */}

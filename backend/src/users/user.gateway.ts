@@ -27,7 +27,6 @@ export class UserGateway implements OnGatewayConnection {
   async handleConnection(socket: Socket) {
     const User = await this.usersService.getUserInClientSocket(socket);
     if (User) {
-      // console.log('User-> %s connected with socketId :', User.login, socket.id);
       // check if user is already connected
       if (clientOnLigne.has(User.id)) {
         const ListSocket = clientOnLigne.get(User.id);
@@ -36,10 +35,6 @@ export class UserGateway implements OnGatewayConnection {
       } else clientOnLigne.set(User.id, [socket]);
       // update user status to online
       await this.usersService.updateUserStatus(User.id, 'online');
-      //   console.log('++handleConnection++clientOnLigne> : %s ->', User.login);
-      //   clientOnLigne.get(User.id).forEach((socket) => {
-      //     console.log(socket.id);
-      //   });
       return User;
     }
   }
@@ -57,9 +52,10 @@ export class UserGateway implements OnGatewayConnection {
           ListSocket.splice(index, 1);
           clientOnLigne.set(User.id, ListSocket);
         }
-        // console.log('--handleDisconnect--clientOnLigne> : %s ->', User.login);
-        console.table(clientOnLigne.get(User.id));
-        await this.usersService.updateUserStatus(User.id, 'offline');
+        if (ListSocket.length === 0) {
+          clientOnLigne.delete(User.id);
+          await this.usersService.updateUserStatus(User.id, 'offline');
+        }
       }
       return User;
     }

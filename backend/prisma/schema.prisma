@@ -70,6 +70,21 @@ model User {
   twoFA                         Boolean                @default(false)
   logedFirstTime                Boolean                @default(false)
   conversations                 Conversation[]
+  friends                       Friendship[]
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Friendship {
+  id       String           @id @default(uuid())
+  status   FriendshipStatus @default(PENDING)
+  userId   String
+  friendId String
+  User     User             @relation(fields: [userId], references: [id])
 }
 
 model Match {

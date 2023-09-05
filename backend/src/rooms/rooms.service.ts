@@ -108,10 +108,10 @@ export class RoomsService {
       const room = await this.prisma.rooms.findUnique({
         where: { name },
       });
-      if (!room) throw new Error('');
+      if (!room) throw new NotFoundException();
       return room;
     } catch (error) {
-      console.log('Rooms-findOne> error- +>', error);
+      console.log('Rooms-findOneByName> error- +>', error.message);
       return null;
     }
   }
@@ -137,7 +137,7 @@ export class RoomsService {
       if (!notifications) throw new Error();
       return notifications;
     } catch (error) {
-      console.log('Rooms-findOne> error- +>', error);
+      console.log('Rooms-findOne> error- +>', error.message);
       throw new NotFoundException();
     }
   }
@@ -166,7 +166,7 @@ export class RoomsService {
       if (!_members) throw new Error('');
       return _members;
     } catch (error) {
-      console.log('Rooms-findOne> error- +>', error);
+      console.log('Rooms-findOne> error- +>', error.message);
       throw new NotFoundException();
     }
   }
@@ -603,7 +603,7 @@ export class RoomsService {
   async LeaveChanneL(params: {
     userId: string;
     roomId: string;
-  }): Promise<Rooms> {
+  }): Promise<Members> {
     try {
       const { userId, roomId } = params;
       // check if room is exist
@@ -647,10 +647,10 @@ export class RoomsService {
           },
         });
         // delete member
-        await prisma.members.delete({
+        const deletemember = await prisma.members.delete({
           where: { id: member.id },
         });
-        return room;
+        return deletemember;
       });
       return result;
     } catch (error) {

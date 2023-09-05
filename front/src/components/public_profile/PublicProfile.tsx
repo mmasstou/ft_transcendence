@@ -3,49 +3,28 @@ import Image from 'next/image';
 import { UserInfo } from '../profile/UserInfo';
 import { UserStats } from '../profile/UserStats';
 import Statistics from '../profile/Statistics';
-import { BsSend } from 'react-icons/bs';
-import { BiUserPlus, BiUserX } from 'react-icons/bi';
 import { motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
+import Cookies from 'js-cookie';
+import Button from './Button';
+import { socketContext } from '@/app/Dashboard';
+import { getUserData } from '../Dashboard/Header/Settings';
 
 interface ProfileProps {
-  user: userType | null;
+  userId: string | undefined;
   handlePublicProfile: () => void;
 }
 
-interface ButtonProps {
-  text: string;
-  block?: boolean;
-}
-
-const Button: React.FC<ButtonProps> = ({ text, block }) => {
-  return (
-    <>
-      {text === 'Message' ? (
-        <button
-          className="flex justify-evenly items-center border-2 border-[#D9D9D9] rounded-full
-     p-2 text-[#D9D9D9] hover:opacity-70 w-[10rem]"
-        >
-          <BsSend />
-          <span>{text}</span>
-        </button>
-      ) : (
-        <button
-          className="flex justify-evenly items-center border-2 border-[#D9D9D9] rounded-full
-     p-2 text-[#D9D9D9] hover:opacity-70 w-[10rem]"
-        >
-          {block ? <BiUserX /> : <BiUserPlus />}
-          <span>{text}</span>
-        </button>
-      )}
-    </>
-  );
-};
-
 const PublicProfile: React.FC<ProfileProps> = ({
-  user,
+  userId,
   handlePublicProfile,
 }) => {
+  const user: userType | null = getUserData(userId);
+
+  const contextValue = useContext(socketContext);
+  const [friends, setfriends] = useState<any>([]);
+  const [isFriend, setIsFriend] = useState<boolean>(false);
+  const [isPending, setIsPending] = useState<boolean>(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const handleOutsideClick = (event: any) => {
@@ -62,6 +41,92 @@ const PublicProfile: React.FC<ProfileProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    const token = Cookies.get('token');
+    try {
+      (async () => {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/friends/accepted`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setfriends(data);
+        }
+      })();
+    } catch (error) {
+      console.log('error in get friends: ', error);
+    }
+  }, [contextValue]);
+
+  useEffect(() => {
+    if (friends) {
+      const friend = friends.find((friend: any) => {
+        if (friend.id === user?.id) {
+          return true;
+        }
+      });
+      if (friend) {
+        setIsFriend(true);
+      }
+    }
+  }, [friends]);
+
+  useEffect(() => {
+    if (contextValue?.message === 'Your friend request has been accepted.') {
+      setIsFriend(false);
+    }
+  }, [contextValue]);
+
+  useEffect(() => {
+    const token = Cookies.get('token');
+    try {
+      (async () => {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/sendingrequests/all`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.length > 0) {
+            const userExits = data.some(
+              (friend: { friendId: string | undefined }) => {
+                if (friend.friendId === user?.id) {
+                  return true;
+                }
+              }
+            );
+            if (userExits) {
+              setIsPending(true);
+            }
+          }
+        }
+      })();
+    } catch (error) {
+      console.log('error in get friends: ', error);
+    }
+  }, [contextValue?.message, user]);
+
+  const updateFriendState = (newState: boolean) => {
+    setIsFriend(newState);
+  };
+
+  const updatePendingState = (newState: boolean) => {
+    setIsPending(newState);
+  };
+
   return (
     <>
       <motion.div
@@ -76,7 +141,7 @@ const PublicProfile: React.FC<ProfileProps> = ({
           scale: 1,
         }}
         transition={{
-          duration: 1,
+          duration: 0.6,
         }}
         ref={profileRef}
         onClick={(event) => handleOutsideClick}
@@ -84,19 +149,23 @@ const PublicProfile: React.FC<ProfileProps> = ({
       flex flex-col justify-start items-center gap-6 z-[999]"
       >
         <div className="text-white w-full h-1/5  relative">
-          <Image
-            src={user?.banner ? user.banner : ''}
-            objectFit="cover"
-            layout="fill"
-            alt="Banner Image"
-          />
+          {user?.banner ? (
+            <Image
+              src={user?.banner ? user.banner : ''}
+              objectFit="cover"
+              layout="fill"
+              alt="Banner Image"
+            />
+          ) : (
+            <div className="bg-[#243230] w-full h-full" />
+          )}
           <div className="absolute -bottom-10 left-10">
             <Image
-              className="rounded-full border-2 border-secondary w-[120px] h-[120px]"
+              className="rounded-full border border-secondary w-[120px] h-[120px]"
               src={user?.avatar ? user.avatar : ''}
               width={120}
               height={120}
-              alt="leaderboard icon"
+              alt="avatar"
             />
           </div>
         </div>
@@ -105,8 +174,20 @@ const PublicProfile: React.FC<ProfileProps> = ({
           <UserStats user={user} />
 
           <div className="flex justify-around items-center">
-            <Button  text="Message" />
-            <Button text="Add Friend" block={false} />
+            <Button
+              text="Message"
+              user={user}
+              updateFriendState={updateFriendState}
+              updatePendingState={updatePendingState}
+            />
+            <Button
+              text="add friend"
+              isFriend={isFriend}
+              updateFriendState={updateFriendState}
+              updatePendingState={updatePendingState}
+              isPending={isPending}
+              user={user}
+            />
           </div>
           <div className="mx-4 mt-10 h-1/4">
             <Statistics user_id={user?.id} />

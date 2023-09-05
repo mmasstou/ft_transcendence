@@ -1,6 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+('react-hook-form');
 import toast from 'react-hot-toast';
 import Modal from '../modals/Modal';
 import LoginButton from './LoginButton';
@@ -9,20 +10,19 @@ interface Btn {
   login: boolean;
   style: string;
   title: string;
-  OnClick: () => void
+  OnClick: () => void;
 }
 
 const Button = ({ login, style, title, OnClick }: Btn) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [IsMounted, setMounted] = React.useState<boolean>(false)
+  const [IsMounted, setMounted] = React.useState<boolean>(false);
 
-
-  const router = useRouter()
+  const router = useRouter();
 
   React.useEffect(() => {
-    setMounted(true)
-    toast('open login')
-  }, [])
+    setMounted(true);
+    toast('open login');
+  }, []);
 
   if (!IsMounted) return;
   return (
@@ -49,8 +49,10 @@ const Button = ({ login, style, title, OnClick }: Btn) => {
         )}
       </div>
       <Modal isVisible={isOpen} onClose={() => setIsOpen(false)}>
-        <div className={`flex justify-around items-center flex-col h-full min-h-[720px]`}>
-          <LoginButton OnClick={OnClick} label="Login kj With 42" />
+        <div
+          className={`flex justify-around items-center flex-col h-full min-h-[720px]`}
+        >
+          <LoginButton OnClick={OnClick} label="Login With 42" />
         </div>
       </Modal>
     </>

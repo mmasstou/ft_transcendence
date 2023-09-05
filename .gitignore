@@ -37,7 +37,8 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-
+# front :
+front/.env
 # backend :
 backend/prisma/migrations
 backend/uploads

@@ -7,21 +7,50 @@ import Settings from './Settings';
 import * as Popover from '@radix-ui/react-popover';
 import Notification from '@/components/profile/Notification';
 import { Socket } from 'socket.io-client';
-import React from 'react';
-import { membersType, userType } from '@/types/types';
-import MyToast from '@/components/ui/Toast/MyToast';
+import React, { useContext } from 'react';
+import Cookies from 'js-cookie';
+import { toast } from 'react-hot-toast';
+import { socketContext } from '@/app/Dashboard';
 
+const token = Cookies.get('token');
 
-const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
-  const [Notifications, setNotifications] = React.useState<any[] | null>(null)
+interface Props {
+  socket: Socket | null;
+  pendingRequests: any;
+}
 
-  // socket?.on('GameNotificationResponse', (data) => {
-  //   console.log("GameNotificationResponse data :", data)
-  //   Notifications !== null
-  //   ? setNotifications([...Notifications, data])
-  //   : setNotifications([data])
-  //   setshownotification(true)
-  // })
+const Header: React.FC<Props> = ({ socket, pendingRequests }): JSX.Element => {
+  const [notifications, setnotifications] = React.useState<any[] | null>(null);
+  const [shownotification, setshownotification] =
+    React.useState<boolean>(false);
+  const handleNotificationClik = () => {
+    setshownotification(!shownotification);
+  };
+
+  if (!token) {
+    toast.error('You are not logged in');
+    return <div></div>;
+  }
+  React.useEffect(() => {
+    (async () => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/friendRequests`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setnotifications(data);
+        return;
+      }
+      toast.error(res.statusText);
+    })();
+  }, [pendingRequests, shownotification, socket]);
 
   return (
     <>
@@ -41,7 +70,7 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
           <li>
             <Popover.Root>
               <Popover.Trigger asChild aria-controls="radix-:R1mcq:">
-                <button>
+                <button onClick={handleNotificationClik}>
                   <RiNotification2Fill size={32} color="#E0E0E0" />
                 </button>
               </Popover.Trigger>
@@ -54,26 +83,18 @@ const Header = ({ socket }: { socket: Socket | null }): JSX.Element => {
                     <h1 className="tracking-wide ml-2 font-bold sm:text-lg 2xl:text-xl">
                       Notifications
                     </h1>
-                    <Notification
-                      avatar="/avatar.png"
-                      name="mehdi"
-                      message="send a friend request."
-                      isFriend
-                      isOnline
-                    />
-                    <Notification
-                      avatar="/avatar.png"
-                      name="mehdi"
-                      message="send a friend request."
-                      isFriend
-                    />
-                    <Notification
-                      isFriend
-                      directMessage
-                      avatar="/avatar.png"
-                      name="mehdi"
-                      message="send a friend request."
-                    />
+
+                    {notifications &&
+                      notifications?.map(
+                        (friendshipData: any, index: number) => (
+                          <Notification
+                            friendshipData={friendshipData}
+                            key={index}
+                            isFriend
+                            pendingRequests={pendingRequests}
+                          />
+                        )
+                      )}
                   </div>
                   <Popover.Arrow className="fill-[#2B504B]" />
                 </Popover.Content>

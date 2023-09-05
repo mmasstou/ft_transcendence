@@ -1,18 +1,29 @@
 'use client';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import table from '../../../public/table.svg';
 import BackgroundCircles from './BackgroundCircles';
 import Button from './CTA';
 import styles from './style';
+import { useRouter } from 'next/navigation';
+import Lottie from 'react-lottie';
+import data from '../../../public/lotties/hero.json';
 
 const Hero = () => {
-  const AnimatedImage = motion(Image);
+  const router = useRouter();
+
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: data,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice',
+    },
+  };
 
   return (
     <section
       className={`${styles.paddingY} ${styles.flexCenter} flex-col lg:flex-row  
-              md:p-5 sm:mt-10 mt-10 lg:mt-0 z-10`}
+              md:p-5 0 z-10`}
     >
       <motion.div
         initial={{ opacity: 0 }}
@@ -31,27 +42,30 @@ const Hero = () => {
           to become a champion.
         </p>
         <Button
-          OnClick={() => { }}
+          OnClick={() => {
+            router.push(`${process.env.NEXT_PUBLIC_API_URL}/auth/callback`);
+          }}
           login={false}
           style="text-btn hover:text-white bg-secondary "
           title="Get Started Now"
         />
       </motion.div>
-      <div className="flex justify-center items-center ">
+      <div className="flex flex-col md:flex-row justify-center items-center">
         <BackgroundCircles />
       </div>
-      <div className="relative lg:m-[100px] xl:m-[120px] flex items-center justify-center">
-        <AnimatedImage
-          className="object-fit z-[5]"
-          src={table}
-          initial={{ opacity: 0, x: 1 }}
-          animate={{ opacity: 1, x: 0, x1: -50, x2: 0 }}
-          transition={{ duration: 1.5 }}
-          alt="ping pong tabe image"
-          width={500}
-          height={500}
-          priority={false}
-        />
+      <div className="relative flex items-center justify-center">
+        <motion.div
+          className="z-[5] h-[500px] xl:h-[600px]"
+          initial={{
+            x: -200,
+            opacity: 0,
+          }}
+          transition={{ duration: 1.2 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+        >
+          <Lottie options={defaultOptions} />
+        </motion.div>
         <div className="absolute z-[1] w-[80%] h-[80%] rounded-full bottom-30 white__gradient overfolw-hidden" />
         <div className="absolute z-[0] w-[50%] h-[50%] right-20 bottom-20 blue__gradient overfolw-hidden" />
       </div>

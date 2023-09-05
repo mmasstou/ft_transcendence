@@ -29,7 +29,7 @@ const Home_Header = () => {
           width={100}
           height={100}
           alt="pong game logo"
-          priority={false}
+          priority
         />
       </motion.div>
       <motion.div
