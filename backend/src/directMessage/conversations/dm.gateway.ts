@@ -38,6 +38,13 @@ export class DmGateway implements OnGatewayInit {
     this.logger.debug(`marbenMB : Client ${client.id} disconnected`);
   }
 
+  @SubscribeMessage('handshake')
+  socketHandShake(client: Socket, room: string): void {
+    client.join(room);
+    console.log("Join ROOOM----------");
+    client.emit('acknowledge', `Join Romm: ${room}`);
+  }
+
   @SubscribeMessage('message')
   async handleMessage(client: any, payload: frontMsg): Promise<void> {
     const msg = await this.messageService.newMessage(payload.senderId, payload.content, payload.conversationId);

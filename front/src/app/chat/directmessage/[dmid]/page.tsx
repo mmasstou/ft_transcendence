@@ -68,10 +68,15 @@ function ConversationBody({ params }: { params: { dmid: string } }) {
             auth : {
                 id: convBody?.id,
             }
-    });
+        });
+
         setSocket(socket);
-        // console.log("first time" , convBody);
-        
+        socket.emit('handshake', params.dmid);
+
+        socket.on('acknowledge', (data) => {
+            console.log("Recieved from server: ", data);
+        });
+
         return () => {
             socket.disconnect();
         }

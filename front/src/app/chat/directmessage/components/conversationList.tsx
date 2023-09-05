@@ -13,14 +13,14 @@ function ConversationList({ user }) {
 	const [convList, setConvList] = useState<conversationData[] | null>(null);
 
 	async function getAllConversations() {
-		const res = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations`, {
+		const res = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${currentId}`, {
 			method: 'GET',
 			headers: {
 			  'Content-Type': 'application/json',
 			  Authorization: `Bearer ${token}`,
 			},
 		  })).json();
-		  setConvList(res);
+		  setConvList(res.conversations);
 		  console.log(res);
 		//   setConvList([...res, ...res, ...res, ...res, ...res, ...res]);
 	}
