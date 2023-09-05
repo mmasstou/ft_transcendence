@@ -4,11 +4,11 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { Messages, User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { MessagesService } from 'src/messages/messages.service';
 import { UserService } from 'src/users/user.service';
 import { DmService } from './dm.service';
-import { Messages, User } from '@prisma/client';
 
 @WebSocketGateway({ namespace: 'dm' })
 export class DmGateway implements OnGatewayConnection {
@@ -23,13 +23,11 @@ export class DmGateway implements OnGatewayConnection {
     // console.log('+> handleConnection');
     const User: User = await this.usersService.getUserInClientSocket(socket);
     if (!User) {
-      console.log('+++++++++++++++handleConnection -> User not exist');
       socket.emit('removeToken', null);
     }
     if (User) {
-      console.log('handleConnection -> socket.id', socket.id);
       if (!this.dmService.connectToALLDm(User, socket)) {
-        console.log('+++++++++++++++handleConnection -> error');
+        console.log('error in join to all dm');
       }
       // console.log('handleConnection for %s , socket %s', User.login, socket.id);
       this.server.emit('ref', { socketId: socket.id });
@@ -57,13 +55,8 @@ export class DmGateway implements OnGatewayConnection {
         content: payload.content,
         userId: User.id,
       });
-      console.log('DmGateway -> handleMessage -> message', message);
 
-      const isInroomSocket = client.rooms.has(md.id) || false;
-      console.log(
-        'DmGateway -> handleMessage -> isInroomSocket',
-        isInroomSocket,
-      );
+      // const isInroomSocket = client.rooms.has(md.id) || false;
 
       this.server.to(md.id).emit('message', message);
     } catch (error) {

@@ -70,7 +70,6 @@ export default function page({ params }: { params: { dmId: string } }) {
         const dm = await FindDm(params.dmId, token)
         if (!dm) return;
         setConversationInfo(dm)
-        console.table('setConversationInfo :', dm)
         setMessages(dm.Messages)
         setTimeout(() => {
             setLoadingMessages(false);
@@ -79,14 +78,9 @@ export default function page({ params }: { params: { dmId: string } }) {
     }
 
     React.useEffect(() => {
-
-        console.log('ConversationInfo :', ConversationInfo);
         if (!IsMounted || !ConversationInfo) return
-        console.log('ConversationInfo++++++ :', ConversationInfo);
         socket?.on('message', (newMessage: messagesType) => {
-            console.log('newMessage------ :', newMessage);
             if (newMessage.dmId !== ConversationInfo?.id) return
-            console.log('newMessage :', newMessage);
             setMessages((prev) => [...prev, newMessage])
             FocusedOnSendMessageInput()
             setSendingMessage(false);

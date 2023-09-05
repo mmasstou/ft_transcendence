@@ -72,11 +72,6 @@ export class DmService {
       });
       if (!Userdata) throw new Error('Dm not found');
       Userdata.dms.forEach((dm: DirectMessage) => {
-        console.log(
-          'DmService -> connectToALLDm -> dms %s socket ',
-          dm.id,
-          socket.id,
-        );
         socket.join(dm.id);
       });
       return true;
