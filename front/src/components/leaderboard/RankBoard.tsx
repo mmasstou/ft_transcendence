@@ -62,9 +62,11 @@ const RankBoard = () => {
           </h1>
         </div>
       </div>
-      {users?.map((user, index) => {
-        return <CardRank key={user.id} user={user} rank={index + 1} />;
-      })}
+      <div className="h-[100%]">
+        {users?.map((user, index) => {
+          return <CardRank key={user.id} user={user} rank={index + 1} />;
+        })}
+      </div>
     </div>
   );
 };

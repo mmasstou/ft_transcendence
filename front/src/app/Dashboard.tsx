@@ -18,7 +18,8 @@ import ChanneLCreateModaL from './chat/channels/modaLs/channel.create.modaL';
 import ChanneLFindRoommodaL from './chat/channels/modaLs/channel.find.room.modaL';
 import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL';
 import './dashboard.css';
-import { verify } from 'jsonwebtoken';
+import Lottie from 'react-lottie-player';
+import data from '@/../public/lotties/pong.json';
 
 interface Props {
   children: React.ReactNode;
@@ -257,7 +258,12 @@ const Dashboard = ({ children }: Props) => {
       ) : (
         <div className="bg-primary h-screen w-full overflow-y-scrol flex justify-center items-center">
           <h1 className="text-[#D9D9D9] text-2xl font-bold">
-            Check login ....
+            <Lottie
+              loop
+              animationData={data}
+              play
+              style={{ height: 300, width: 300 }}
+            />{' '}
           </h1>
         </div>
       )}

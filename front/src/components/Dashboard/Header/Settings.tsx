@@ -187,7 +187,11 @@ const Settings: React.FC<Props> = ({ login }) => {
           postAvatar,
           postLogin,
         ]);
-        if (avatarResponse?.status === 200 || loginResponse?.status === 200) {
+        if (
+          avatarResponse?.status === 200 ||
+          loginResponse?.status === 200 ||
+          (avatarResponse?.status === 200 && loginResponse?.status === 200)
+        ) {
           if (login) {
             router.push('/profile');
             toast.success('Account created successfully!');

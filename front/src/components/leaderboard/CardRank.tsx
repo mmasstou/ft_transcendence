@@ -33,24 +33,29 @@ const CardRank: React.FC<Props> = ({ user, rank }) => {
         <div className="w-[100%] h-[100%] bg-black/60 absolute top-0 left-0" />
       )}
       <div
-        className={`flex flex-col justify-center h-[7vh] md:h-[9vh] bg-[#3E504D] rounded-md mx-2 my-3 md:mx-9`}
+        className={`flex flex-col justify-center h-[100%] bg-[#3E504D] rounded-md mx-2 my-3 md:mx-9`}
       >
         <div className="flex flex-row justify-between items-center mx-2">
           <div className="flex flex-row justify-between items-center gap-5 mx-5">
             <span className="text-[1em] font-semibold sm:text-[1.3em] sm:font-bold">
               {rank}
             </span>
-            <div className="flex flex-row items-center gap-1 md:gap-2">
-              <Image
-                onClick={handlePublicProfile}
-                className={`w-[30px] h-[30px] rounded-full sm:w-[45px] sm:h-[45px] md:w-[60px] md:h-[60px] ${
-                  user?.id === userId ? 'cursor-not-allowed' : 'cursor-pointer'
-                } border border-secondary`}
-                src={user?.avatar ? user.avatar : ''}
-                width={35}
-                height={35}
-                alt="leaderboard icon"
-              />
+            <div className="flex flex-row items-center gap-1 md:gap-2 h-full w-full">
+              <div className="relative w-12 h-12">
+                <Image
+                  onClick={handlePublicProfile}
+                  className={` rounded-full  ${
+                    user?.id === userId
+                      ? 'cursor-not-allowed'
+                      : 'cursor-pointer'
+                  } border border-secondary`}
+                  src={user?.avatar ? user.avatar : ''}
+                  sizes="100%"
+                  fill={true}
+                  alt="leaderboard icon"
+                  priority
+                />
+              </div>
               <h3 className="text-[0.7em] font-semibold sm:text-[1.2em] sm:font-bold md:text-[1.2em] md:font-bold">
                 {user?.login}
               </h3>
