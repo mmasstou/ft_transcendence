@@ -170,13 +170,9 @@ export default function page({ params }: { params: { dmId: string } }) {
 
             {ConversationInfo
                 ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col sm:flex`}>
-                    {/* <ConversationsTitlebar
-                    LogedMember={LogedMember}
-                    socket={socket}
-                    channeLId={ConversationInfo.id}
-                    messageTo={ConversationInfo.name}
-                    OnSubmit={function (event: React.FormEvent<HTMLInputElement>): void { }}
-                /> */}
+                    {/* // **************************************** */}
+                    {/* // ** Header of the conversation */}
+                    {/* // **************************************** */}
                     {<div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5 ">
                         <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll flex flex-col gap-3" >
                             {
