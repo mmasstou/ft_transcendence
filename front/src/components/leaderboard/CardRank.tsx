@@ -36,14 +36,14 @@ const CardRank: React.FC<Props> = ({ user, rank }) => {
         className={`flex flex-col justify-center h-[7vh] md:h-[9vh] bg-[#3E504D] rounded-md mx-2 my-3 md:mx-9`}
       >
         <div className="flex flex-row justify-between items-center mx-2">
-          <div className="flex flex-row justify-between items-center gap-6 mx-6">
+          <div className="flex flex-row justify-between items-center gap-5 mx-5">
             <span className="text-[1em] font-semibold sm:text-[1.3em] sm:font-bold">
               {rank}
             </span>
             <div className="flex flex-row items-center gap-1 md:gap-2">
               <Image
                 onClick={handlePublicProfile}
-                className={`w-[35px] h-[35px] rounded-full sm:w-[45px] sm:h-[45px] md:w-[60px] md:h-[60px] ${
+                className={`w-[30px] h-[30px] rounded-full sm:w-[45px] sm:h-[45px] md:w-[60px] md:h-[60px] ${
                   user?.id === userId ? 'cursor-not-allowed' : 'cursor-pointer'
                 } border border-secondary`}
                 src={user?.avatar ? user.avatar : ''}

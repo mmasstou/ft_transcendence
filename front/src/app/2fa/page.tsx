@@ -2,16 +2,21 @@
 import Otp from '@/components/ui/otpField/Otp';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 
 const page = () => {
-  // const router = useRouter();
-  // const userId = Cookies.get('_id');
-  // const token = Cookies.get('token');
-  // if (!token || !userId) {
-  //   router.replace('/');
-  //   return null;
-  // }
+  const router = useRouter();
+  const userId = Cookies.get('_id');
+  const token = Cookies.get('token');
+  useEffect(() => {
+    if (!token || !userId) {
+      console.log('token or userId not found');
+      router.replace('/');
+      return;
+    }
+  }, []);
+
   return (
     <>
       <div className="bg-primary h-screen w-full overflow-y-scrol flex justify-center items-center">
