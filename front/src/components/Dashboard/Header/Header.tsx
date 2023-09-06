@@ -76,7 +76,7 @@ const Header: React.FC<Props> = ({ socket, pendingRequests }): JSX.Element => {
               </Popover.Trigger>
               <Popover.Portal>
                 <Popover.Content
-                  className="text-white rounded p-2 md:p-3 w-[90vw] sm:w-[60vw] md:w-[55vw] lg:w-[40vw] xl:w-[35vw] 2xl:w-[25vw] bg-[#2B504B]"
+                  className="text-white rounded p-2 md:p-3 w-[90vw] sm:w-[60vw] md:w-[55vw] lg:w-[40vw] xl:w-[35vw] 2xl:w-[25vw] bg-[#2B504B] z-[60]"
                   sideOffset={5}
                 >
                   <div className="flex flex-col gap-2.5">

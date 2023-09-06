@@ -85,7 +85,7 @@ model Friendship {
   userId   String
   friendId String
   dm       DirectMessage?   @relation(fields: [dmId], references: [id], onDelete: Cascade)
-  dmId     String
+  dmId     String?
   User     User             @relation(fields: [userId], references: [id])
 }
 

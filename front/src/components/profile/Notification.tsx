@@ -8,15 +8,15 @@ type NotificationProps = {
   friendshipData: any;
   pendingRequests: any;
 } & (
-  | {
+    | {
       isFriend?: true;
       isOnline?: boolean;
     }
-  | {
+    | {
       isFriend?: false;
       isOnline: never;
     }
-);
+  );
 
 const token = Cookies.get('token');
 const Notification: FC<NotificationProps> = ({
@@ -115,19 +115,17 @@ const Notification: FC<NotificationProps> = ({
 
   if ((pendingRequests.length > 0 || friend) && !removeNotification) {
     return (
-      <div className="bg-primary rounded-md p-2">
+      <div className="bg-primary rounded-md p-2 z-[60]">
         <div className="flex flex-col gap-1 lg:gap-2">
           <div className="flex items-center">
             <div
-              className={`h-10 w-10 2xl:h-12 2xl:w-12 rounded-full border ${
-                isOnline ? 'border-green-500' : 'border-gray-500'
-              } relative p-4 mx-2 2xl:mx-4`}
+              className={`h-10 w-10 2xl:h-12 2xl:w-12 rounded-full border ${isOnline ? 'border-green-500' : 'border-gray-500'
+                } relative p-4 mx-2 2xl:mx-4`}
             >
               {isFriend && (
                 <div
-                  className={`w-3 h-3 rounded-full ${
-                    friend?.status === 'online' ? 'bg-green-500' : 'bg-gray-500'
-                  } absolute right-0 2xl:right-1 bottom-0 z-10`}
+                  className={`w-3 h-3 rounded-full ${friend?.status === 'online' ? 'bg-green-500' : 'bg-gray-500'
+                    } absolute right-0 2xl:right-1 bottom-0 z-10`}
                 ></div>
               )}
               <Image

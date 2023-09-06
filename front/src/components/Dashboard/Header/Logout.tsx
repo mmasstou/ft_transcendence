@@ -61,7 +61,7 @@ export const Logout: React.FC = (): JSX.Element => {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
-          className="text-white py-6 px-2 xl:px-6 rounded w-[200px] mr-3 bg-[#2B504B] shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)] "
+          className="text-white py-6 px-2 xl:px-6 rounded w-[200px] mr-3 bg-[#2B504B] shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)] z-[60]"
           sideOffset={5}
         >
           <div className="flex flex-col items-center gap-2">
