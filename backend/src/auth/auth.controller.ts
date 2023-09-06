@@ -93,6 +93,12 @@ export class AuthController {
     res.sendStatus(200);
   }
 
+  @Get('verifyUser')
+  @UseGuards(JwtAuthGuard)
+  async verifyUser(@Req() req: any, @Res() res: Response): Promise<any> {
+    res.sendStatus(200);
+  }
+
   @Get('status')
   @UseGuards(JwtAuthGuard)
   async status(@Req() req: any) {
