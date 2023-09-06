@@ -72,17 +72,60 @@ export class DmService {
       });
       if (!Userdata) throw new Error('Dm not found');
       Userdata.dms.forEach((dm: DirectMessage) => {
-        console.log(
-          'DmService -> connectToALLDm -> dms %s socket ',
-          dm.id,
-          socket.id,
-        );
         socket.join(dm.id);
       });
       return true;
     } catch (error) {
       console.log('DmService -> connectToALLDm -> error', error.message);
       return false;
+    }
+  }
+
+  // find dm between senderid and receiverid
+  async findDmBetweenTwoUsers(
+    senderId: string,
+    receiverId: string,
+  ): Promise<DirectMessage | null> {
+    try {
+      const dm = await this.prisma.directMessage.findFirst({
+        where: {
+          AND: [
+            {
+              User: {
+                some: {
+                  id: senderId,
+                },
+              },
+            },
+            {
+              User: {
+                some: {
+                  id: receiverId,
+                },
+              },
+            },
+          ],
+        },
+      });
+      if (!dm) return null;
+      return dm;
+    } catch (error) {
+      console.log('DmService -> findDmBetweenTwoUsers -> error', error.message);
+      return null;
+    }
+  }
+
+  async delete(id: string) {
+    try {
+      const dm = await this.prisma.directMessage.delete({
+        where: {
+          id: id,
+        },
+      });
+      return dm;
+    } catch (error) {
+      console.log('DmService -> delete -> error', error.message);
+      return null;
     }
   }
 }

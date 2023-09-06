@@ -225,6 +225,34 @@ export class UserService {
           ],
         },
       });
+      // find dm and delete it
+      // const dm = await this.prisma.directMessage.findFirst({
+      //   where: {
+      //     AND: [
+      //       {
+      //         User: {
+      //           some: {
+      //             id: friendId,
+      //           },
+      //         },
+      //       },
+      //       {
+      //         User: {
+      //           some: {
+      //             id: userId,
+      //           },
+      //         },
+      //       },
+      //     ],
+      //   },
+      // });
+      // if (dm) {
+      //   await this.prisma.directMessage.delete({
+      //     where: {
+      //       id: dm.id,
+      //     },
+      //   });
+      // }
       if (deletedFriendships.count === 0) throw new NotFoundException();
       return deletedFriendships;
     } catch (error) {

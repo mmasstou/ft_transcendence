@@ -1,28 +1,30 @@
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
+  Controller,
+  Delete,
+  Get,
   Param,
   Patch,
-  Delete,
-  UseGuards,
+  Post,
   Req,
-  BadRequestException,
   Res,
+  UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dtos/CreateUserDto';
-import { UpdateUserDto } from './dtos/UpdateUserDto';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
 import { NotificationsGateway } from 'src/notifications/notifications.gateway';
+import { CreateUserDto } from './dtos/CreateUserDto';
+import { UpdateUserDto } from './dtos/UpdateUserDto';
+import { UserService } from './user.service';
+import { DmGateway } from 'src/dm/dm.gateway';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly usersService: UserService,
     private notificationsGateway: NotificationsGateway,
+    private readonly dmGateway: DmGateway,
   ) {}
 
   @Post()
@@ -144,6 +146,7 @@ export class UserController {
       senderId,
       'Your friend request has been accepted.',
     );
+    this.dmGateway.handleCreateDm({ senderId, receiverId });
   }
 
   // reject friend request
@@ -185,6 +188,7 @@ export class UserController {
     const removeFriend = await this.usersService.removeFriend(friendId, id);
     if (removeFriend) {
       res.status(200).send('Friend removed');
+      this.dmGateway.handleRemoveDm({ senderId: id, receiverId: friendId });
       return removeFriend;
     }
   }

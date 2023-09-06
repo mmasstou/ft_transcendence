@@ -1,5 +1,4 @@
 import { RoomsType } from '@/types/types';
-import { useRouter } from 'next/navigation';
 import { Socket } from 'socket.io-client';
 import { create } from 'zustand';
 //

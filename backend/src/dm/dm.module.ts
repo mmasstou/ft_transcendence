@@ -8,12 +8,6 @@ import { MessagesService } from 'src/messages/messages.service';
 
 @Module({
   controllers: [DmController],
-  providers: [
-    DmService,
-    DmGateway,
-    PrismaService,
-    UserService,
-    MessagesService,
-  ],
+  providers: [DmService, PrismaService, UserService, MessagesService],
 })
 export class DmModule {}

@@ -1,24 +1,22 @@
 "use client"
 
+import { messagesType } from '@/types/types';
 import Cookies from 'js-cookie';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import toast from 'react-hot-toast';
+import { IoSend } from 'react-icons/io5';
+import { TbMessageX } from 'react-icons/tb';
 import { Socket } from 'socket.io-client';
+import FindDm from '../channels/actions/FindDm';
 import findAlldmsForLoginUser from '../channels/actions/findAlldmsForLoginUser';
-import Conversations from '../channels/components/channel.conversations';
+import Message from '../channels/components/channel.message';
+import LeftSidebarHook from '../channels/hooks/LeftSidebarHook';
 import LefttsideModaL from '../channels/modaLs/LeftsideModal';
 import { ChanneLContext } from '../channels/providers/channel.provider';
-import Conversation from '../components/Conversation';
-import { messagesType } from '@/types/types';
-import Message from '../channels/components/channel.message';
-import { TbMessageX } from 'react-icons/tb';
-import toast from 'react-hot-toast';
 import Button from '../components/Button';
-import { IoSend } from 'react-icons/io5';
-import { Changa } from 'next/font/google';
-import Image from 'next/image';
-import getChanneLMessages from '../channels/actions/getChanneLMessages';
-import FindDm from '../channels/actions/FindDm';
+import Conversation from '../components/Conversation';
 const metadata = {
     title: 'Transcendence',
     description: 'ft_transcendence',
@@ -40,6 +38,8 @@ export default function page({ params }: { params: { dmId: string } }) {
     const [messages, setMessages] = React.useState<messagesType[]>([])
     const [IsInputFocused, setIsInputFocused] = React.useState<boolean>(false)
     const [message, setMessage] = React.useState("")
+    const [reload, setReload] = React.useState<boolean>(false)
+    const leftSidebarHook = LeftSidebarHook()
 
 
 
@@ -67,10 +67,9 @@ export default function page({ params }: { params: { dmId: string } }) {
         if (!token) return;
         const res = await findAlldmsForLoginUser(token)
         if (res) setConversationList(res);
-        const dm = await FindDm(params.dmId, token)
+        const dm: any = await FindDm(params.dmId, token)
         if (!dm) return;
         setConversationInfo(dm)
-        console.table('setConversationInfo :', dm)
         setMessages(dm.Messages)
         setTimeout(() => {
             setLoadingMessages(false);
@@ -78,15 +77,13 @@ export default function page({ params }: { params: { dmId: string } }) {
         }, 900);
     }
 
-    React.useEffect(() => {
+    React.useEffect(() => { UpdateData() }, [reload])
 
-        console.log('ConversationInfo :', ConversationInfo);
+
+    React.useEffect(() => {
         if (!IsMounted || !ConversationInfo) return
-        console.log('ConversationInfo++++++ :', ConversationInfo);
         socket?.on('message', (newMessage: messagesType) => {
-            console.log('newMessage------ :', newMessage);
             if (newMessage.dmId !== ConversationInfo?.id) return
-            console.log('newMessage :', newMessage);
             setMessages((prev) => [...prev, newMessage])
             FocusedOnSendMessageInput()
             setSendingMessage(false);
@@ -95,12 +92,27 @@ export default function page({ params }: { params: { dmId: string } }) {
                 setMessage('')
             }
         })
+
+        socket?.on('createDm', (payload: { senderId: string; receiverId: string }) => {
+            setReload(prev => !prev);
+            socket.emit('accessToDm', payload);
+
+        })
+        socket?.on('deleteDm', (payload: { senderId: string; receiverId: string }) => {
+            if (payload.receiverId !== UserId && payload.senderId !== UserId) return
+            setReload(prev => !prev);
+            router.replace('/chat');
+            toast("You have been removed from this conversation", { icon: '🚫' });
+        })
         return () => {
-            socket?.off('message')
+            socket?.off('message');
+            socket?.off('createDm');
+            socket?.off('deleteDm');
         }
     }, [ConversationInfo])
 
     React.useEffect(() => {
+        leftSidebarHook.onClose()
         UpdateData();
         setIsMounted(true);
     }, [])

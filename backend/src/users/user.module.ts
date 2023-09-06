@@ -9,6 +9,8 @@ import { RoomsService } from 'src/rooms/rooms.service';
 import { MembersService } from 'src/members/members.service';
 import { MessagesService } from 'src/messages/messages.service';
 import { NotificationsGateway } from 'src/notifications/notifications.gateway';
+import { DmService } from 'src/dm/dm.service';
+import { DmGateway } from 'src/dm/dm.gateway';
 
 @Module({
   providers: [
@@ -19,6 +21,8 @@ import { NotificationsGateway } from 'src/notifications/notifications.gateway';
     MessagesService,
     UserGateway,
     RoomGateway,
+    DmService,
+    DmGateway,
     NotificationsGateway,
   ],
   controllers: [UserController],

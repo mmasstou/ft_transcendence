@@ -52,6 +52,10 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
                 token, // Pass the token as an authentication parameter
             },
         });
+        // socket?.on('createDm', () => {
+        //     console.log('--------------------- event createDm');
+        //     // socket?.emit('createDm', null);
+        // });
         (async () => {
             // get User data using userId :
             const User: userType | null = userId ? await getUserWithId(userId, token) : null;
@@ -86,6 +90,12 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
             // toast.success("connected to channel ChanneLProvider");
         });
 
+
+
+        return () => {
+            ChatSocket?.off(`ref`);
+            DmSocket?.off('createDm');
+        }
     }, [])
 
     React.useEffect(() => {
@@ -110,6 +120,8 @@ export const ChanneLProvider = ({ children }: { children: React.ReactNode }) => 
                 ChatSocket?.emit('offline-connection', channelName);
             }
         });
+
+
         return () => {
             ChatSocket?.off('offline-connection');
             ChatSocket?.off(`SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`);

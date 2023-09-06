@@ -5,7 +5,6 @@ import Cookies from 'js-cookie';
 import { Changa } from 'next/font/google';
 import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
-import toast from 'react-hot-toast';
 import { AiOutlineUsergroupAdd } from 'react-icons/ai';
 import { BsLayoutSidebarInset, BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs';
 import { FaUsers } from 'react-icons/fa';
@@ -112,7 +111,7 @@ export default function RootLayout({
                     active={pathname.includes('channels')}
                   />
                 </div>
-                <div className="flex justify-end items-center gap-2">
+                {pathname.includes('channels') && <div className="flex justify-end items-center gap-2">
                   <Button
                     icon={RiSearchLine}
                     small
@@ -125,10 +124,10 @@ export default function RootLayout({
                     outline
                     onClick={() => { channeLcreatemodaLHook.onOpen([], createRoomSocket) }}
                   />
-                </div>
+                </div>}
               </div>
               <div className="channeLbody relative h-full flex ">
-                <ChanneLProvider>
+                <ChanneLProvider >
                   {children}
                 </ChanneLProvider>
               </div>

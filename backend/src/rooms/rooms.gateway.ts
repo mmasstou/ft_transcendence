@@ -49,7 +49,6 @@ export class RoomGateway implements OnGatewayConnection {
   server: Server;
 
   async handleConnection(socket: Socket) {
-    // console.log('+> handleConnection');
     const User = await this.usersService.getUserInClientSocket(socket);
     if (!User) {
       console.log('+++++++++++++++handleConnection -> User not exist');
