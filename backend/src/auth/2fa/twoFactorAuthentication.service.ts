@@ -43,10 +43,7 @@ export class TwoFactorAuthenticationService {
       secret,
     );
 
-    await this.usersService.setTwoFactorAuthenticationSecret(
-      secret,
-      user.login,
-    );
+    await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
 
     return {
       secret,

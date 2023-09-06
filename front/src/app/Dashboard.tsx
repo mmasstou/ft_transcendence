@@ -6,7 +6,13 @@ import MyToast from '@/components/ui/Toast/MyToast';
 import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { createContext, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useEffect,
+  ReactNode,
+  useContext,
+  useState,
+} from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { Socket, io } from 'socket.io-client';
 import StartGame from './chat/channels/actions/startgame';
@@ -43,6 +49,18 @@ const SocketProvider: React.FC<SocketContextType> = ({ message, children }) => {
     </socketContext.Provider>
   );
 };
+
+export type UpdateDataProps = {
+  updated: boolean;
+  setUpdated: (c: boolean) => void;
+};
+
+export const UpdateDataContext = createContext<UpdateDataProps>({
+  updated: false,
+  setUpdated: () => {},
+});
+
+export const UpdateDataProvider = () => useContext(UpdateDataContext);
 
 const Dashboard = ({ children }: Props) => {
   const router = useRouter();
@@ -174,6 +192,7 @@ const Dashboard = ({ children }: Props) => {
       }
     });
   }, [socket]);
+  const [updated, setUpdated] = useState<boolean>(false);
 
   return (
     <>
@@ -224,11 +243,13 @@ const Dashboard = ({ children }: Props) => {
           )}
           <SocketProvider message={message}>
             <div className="dashboard bg-primary overflow-y-auto">
-              <header className="bg-transparent flex items-center justify-between px-5 ">
-                <Header socket={socket} pendingRequests={pendingRequests} />
-              </header>
+              <UpdateDataContext.Provider value={{ updated, setUpdated }}>
+                <header className="bg-transparent flex items-center justify-between px-5 ">
+                  <Header socket={socket} pendingRequests={pendingRequests} />
+                </header>
 
-              <main className="">{children}</main>
+                <main className="">{children}</main>
+              </UpdateDataContext.Provider>
 
               <div id="Sidebar" className="">
                 <Sidebar />

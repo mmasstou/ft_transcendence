@@ -13,6 +13,7 @@ import OtpModal from './OtpModal';
 import { useRouter } from 'next/navigation';
 export * from '@radix-ui/react-dialog';
 import { FaTimes, FaInfoCircle, FaCheck } from 'react-icons/fa';
+import { UpdateDataProvider } from '@/app/Dashboard';
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{5,7}$/;
 
@@ -70,11 +71,9 @@ interface Props {
 }
 
 const Settings: React.FC<Props> = ({ login }) => {
+  const { updated, setUpdated } = UpdateDataProvider();
   const userData: userType | null = getUserData();
   const users: userType[] | null = getAllUsers();
-  // useEffect(() => {
-  //   console.log(users);
-  // }, [users]);
 
   const router = useRouter();
 
@@ -193,9 +192,10 @@ const Settings: React.FC<Props> = ({ login }) => {
           (avatarResponse?.status === 200 && loginResponse?.status === 200)
         ) {
           if (login) {
-            router.push('/profile');
+            router.replace('/profile');
             toast.success('Account created successfully!');
           } else {
+            setUpdated(!updated);
             toast.success('Informations saved!');
           }
         }
