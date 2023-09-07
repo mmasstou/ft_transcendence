@@ -41,7 +41,7 @@ export default function LefttsideModaL({ children }: { children?: ReactNode }) {
   if (!leftSidebar.IsOpen)
     return null
   return <div className={`LefttsideModaL absolute top-0 left-0 flex justify-center h-full w-full border-r border-black overflow-y-scroll  bg-[#243230] max-w-full md:max-w-[320px] z-[38]`}>
-    <div className="w-full p-4">
+    <div className="w-full py-3 px-4">
       {children ? children : <div>No contacts</div>}
     </div>
   </div>

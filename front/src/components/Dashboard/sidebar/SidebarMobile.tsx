@@ -20,7 +20,7 @@ const SidebarMobile = () => {
         />
         <MenuItem
           isActive={router === '/chat'}
-          href="/chat/channels"
+          href="/chat"
           icon={AiFillWechat}
         />
         <MenuItem isActive={router === '/users'} href="/users" icon={FaUsers} />

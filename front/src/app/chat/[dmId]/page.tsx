@@ -1,10 +1,10 @@
 "use client"
 
-import { messagesType } from '@/types/types';
+import { messagesType, userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoSend } from 'react-icons/io5';
 import { TbMessageX } from 'react-icons/tb';
@@ -17,6 +17,9 @@ import LefttsideModaL from '../channels/modaLs/LeftsideModal';
 import { ChanneLContext } from '../channels/providers/channel.provider';
 import Button from '../components/Button';
 import Conversation from '../components/Conversation';
+import getUserWithId from '../channels/actions/getUserWithId';
+import { PiGameController } from 'react-icons/pi';
+import { formatDate } from '../channels/actions/formatDate';
 const metadata = {
     title: 'Transcendence',
     description: 'ft_transcendence',
@@ -40,6 +43,8 @@ export default function page({ params }: { params: { dmId: string } }) {
     const [message, setMessage] = React.useState("")
     const [reload, setReload] = React.useState<boolean>(false)
     const leftSidebarHook = LeftSidebarHook()
+    const [currentUser, setCurrentUser] = useState<userType | null>(null);
+    const [scUser, setScUser] = useState<userType | null>(null);
 
 
 
@@ -70,6 +75,7 @@ export default function page({ params }: { params: { dmId: string } }) {
         const dm: any = await FindDm(params.dmId, token)
         if (!dm) return;
         setConversationInfo(dm)
+        setScUser(dm.User.filter((us: userType) => us.id !== UserId)[0])
         setMessages(dm.Messages)
         setTimeout(() => {
             setLoadingMessages(false);
@@ -114,6 +120,12 @@ export default function page({ params }: { params: { dmId: string } }) {
     React.useEffect(() => {
         leftSidebarHook.onClose()
         UpdateData();
+        if (!token || !UserId) return router.push('/');
+        (async () => {
+            const user: userType | null = await getUserWithId(UserId, token);
+            if (user)
+                setCurrentUser(user);
+        })()
         setIsMounted(true);
     }, [])
 
@@ -154,22 +166,39 @@ export default function page({ params }: { params: { dmId: string } }) {
         setInputValue(input);
     }
 
+    const InviteToGame = () => {
+        console.log("Invite User to Game");
+    }
+
 
     if (!IsMounted) return
     document.title = `Transcendence | dm `;
     return <>
         <LefttsideModaL>
-            {
-                ConversationList && ConversationList.map((md: any, key: number) => (
-                    <Conversation md={md} />
-                ))
-            }
+            <section className='flex items-center gap-4 border-b border-primary pb-3 px-5 mb-4'>
+                {currentUser ? <Image src={currentUser.avatar} alt='avatar' width={55} height={55} className='rounded-[50%]'/> : <></>}
+                <span className='text-white'>Conversations :</span>
+            </section>
+            <section>
+                {
+                    ConversationList && ConversationList.length ? ConversationList.map((md: any, key: number) => (
+                    <Conversation md={md} key={md.id}/>
+                    )) : <span className='text-[#1EF0AE] p-4'>No Conversation</span>
+                }
+            </section>
         </LefttsideModaL>
         {/* <Conversations socket={socket} slug={params.dmId} /> */}
         <div className=" relative flex flex-col items-center w-full">
 
             {ConversationInfo
                 ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col sm:flex`}>
+                    <section className='bg-[#243230] py-3 px-8 flex gap-8 items-center'>
+                        <Image src={scUser ? scUser.avatar : ''} alt='User avatar' width={55} height={55} className='rounded-[50%]' />
+                        <section className='flex items-center justify-between w-full text-[#1EF0AE]'>
+                            <p className='text-white'>{scUser ? scUser.login : 'User'}</p>
+                            <p className='text-primary'>{formatDate(ConversationInfo.updated_at.toString())}</p>
+                        </section>
+                    </section>
                     {<div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5 ">
                         <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll flex flex-col gap-3" >
                             {

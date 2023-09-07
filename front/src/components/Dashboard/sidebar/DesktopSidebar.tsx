@@ -20,7 +20,7 @@ const DesktopSidebar = () => {
         />
         <MenuItem
           isActive={router.includes('/chat')}
-          href="/chat/channels"
+          href="/chat"
           icon={AiFillWechat}
         />
         <MenuItem
