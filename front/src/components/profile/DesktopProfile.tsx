@@ -95,15 +95,6 @@ export const DesktopProfile = (): JSX.Element => {
                   </h3>
                 </div>
               </div>
-
-              <div className="border-r-[1px] h-[51px] left-4 border-[#3D4042]"></div>
-
-              <div className="flex flex-col items-center">
-                <h3 className="text-[#E0E0E0] font-normal text-[1.5em]">
-                  Rank
-                </h3>
-                <h2 className="font-bold text-[1em]">15</h2>
-              </div>
             </div>
           </div>
         </div>

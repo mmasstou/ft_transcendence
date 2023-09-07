@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import Modal from '../modals/Modal';
 import LoginButton from './LoginButton';
+import Image from 'next/image';
+import Login from '../../../public/login.png';
 
 interface Btn {
   login: boolean;
@@ -52,6 +54,15 @@ const Button = ({ login, style, title, OnClick }: Btn) => {
         <div
           className={`flex justify-around items-center flex-col h-full min-h-[720px]`}
         >
+          <div className="">
+            <Image
+              src={Login}
+              width={350}
+              height={700}
+              alt="login image"
+              priority
+            />
+          </div>
           <LoginButton OnClick={OnClick} label="Login With 42" />
         </div>
       </Modal>

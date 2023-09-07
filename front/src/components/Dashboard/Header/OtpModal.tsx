@@ -1,4 +1,5 @@
 'use client';
+import { userType } from '@/types/types';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import React, { useEffect, useRef, useState } from 'react';
@@ -13,10 +14,18 @@ export const otpContext = React.createContext<Props | null>(null);
 
 let currentOtpIndex: number = 0;
 const Otp: React.FC<Props> = ({ setOpenModal, setTwoFA }) => {
+  const [user, setUser] = useState<userType | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(''));
   const [activeOtp, setActiveOtp] = useState<number>(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const id = Cookies.get('_id');
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`).then((res) => {
+      setUser(res.data);
+    });
+  }, [id]);
 
   const handleOnCnage = ({
     target,
@@ -129,7 +138,7 @@ const Otp: React.FC<Props> = ({ setOpenModal, setTwoFA }) => {
 
   return (
     <>
-      <h1 className="text-white font-bold">Hi, Aouhadou</h1>
+      <h1 className="text-white font-bold">Hi, {user?.login}</h1>
       <p className="text-[#cccccc] w-2/5 text-center font-medium">
         Authorization is required to access your profile.🔒
       </p>

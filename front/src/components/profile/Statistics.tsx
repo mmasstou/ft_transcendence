@@ -113,6 +113,7 @@ const Statistics: React.FC<Props> = ({ user_id }) => {
   }, [UserDataOld]);
 
   const options = {
+    responsive: true,
     scales: {
       x: {
         beginAtZero: true,
@@ -129,7 +130,11 @@ const Statistics: React.FC<Props> = ({ user_id }) => {
           text-white lg:max-h-[500px]"
     >
       {userDataNew?.labels.length > 0 && (
-        <Bar data={userDataNew} className="sm:flex-1" options={options} />
+        <Bar
+          data={userDataNew}
+          className="sm:flex-1 w-full h-full"
+          options={options}
+        />
       )}
       {userDataNew?.labels.length === 0 && (
         <div className="flex justify-center items-center w-full h-full">
