@@ -141,7 +141,7 @@ const Dashboard = ({ children }: Props) => {
     });
     setSocket(socket);
     setchatSocket(chatSocket);
-    socket && socket.on('connected', (data) => { });
+    socket && socket.on('connected', (data) => {});
     return () => {
       socket && socket.disconnect();
       chatSocket && chatSocket.disconnect();
@@ -160,7 +160,6 @@ const Dashboard = ({ children }: Props) => {
       setRequestBackUp((prevRequests: any) => [...prevRequests, request]);
       setnotifUpdate(true);
       setMessage(request);
-      toast(request, { icon: '🤗' });
     });
 
     socket?.on('GameResponse', (data: any) => {
@@ -184,7 +183,7 @@ const Dashboard = ({ children }: Props) => {
             channeLsettingsHook.onClose();
             router.push(`/game/${data.mode}/friend`);
           }
-        }, 1000)
+        }, 1000);
       }
       if (data.response === 'Deny') {
         if (data.userId === userId) {
@@ -196,9 +195,9 @@ const Dashboard = ({ children }: Props) => {
       }
     });
     return () => {
-      socket?.off('GameResponse')
-      socket?.off('notification')
-    }
+      socket?.off('GameResponse');
+      socket?.off('notification');
+    };
   }, [socket]);
   const [updated, setUpdated] = useState<boolean>(false);
 
