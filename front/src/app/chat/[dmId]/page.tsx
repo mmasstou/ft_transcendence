@@ -191,11 +191,11 @@ export default function page({ params }: { params: { dmId: string } }) {
 
             {ConversationInfo
                 ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col sm:flex`}>
-                    <section className='bg-[#243230] pb-3 px-5 flex items-center'>
+                    <section className='bg-[#243230] py-3 px-8 flex gap-8 items-center'>
                         <Image src={scUser ? scUser.avatar : ''} alt='User avatar' width={55} height={55} className='rounded-[50%]' />
-                        <section className='flex justify-between w-full'>
-                            <p>{scUser ? scUser.login : 'User'}</p>
-                            <Button icon={PiGameController} outline small onClick={() => InviteToGame()}></Button>
+                        <section className='flex items-center justify-between w-full text-[#1EF0AE]'>
+                            <p className='text-white'>{scUser ? scUser.login : 'User'}</p>
+                            <Button icon={PiGameController} outline small IsActive onClick={() => InviteToGame()}></Button>
                         </section>
                     </section>
                     {<div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5 ">
