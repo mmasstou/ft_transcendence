@@ -7,5 +7,4 @@ npm run start
 
 exec "$@"
 
-# tail -f
 

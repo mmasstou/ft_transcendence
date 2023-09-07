@@ -12,9 +12,6 @@ services:
     depends_on:
       - backend
       - database
-    volumes:
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/front:/frontend:rw
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
   backend:
     build: backend/
     container_name: backend
@@ -27,9 +24,6 @@ services:
       - APInetwork
     depends_on:
       - database
-    volumes:
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
-      - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
     image: postgres:13
     container_name: database
