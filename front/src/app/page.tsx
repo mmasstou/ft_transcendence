@@ -5,7 +5,7 @@ import Hero from '@/components/Home/Hero';
 import Showcase from '@/components/Home/Showcase';
 import Footer from '@/components/Home/Footer';
 import React, { useEffect, useState } from 'react';
-import Lottie from 'react-lottie';
+import Lottie from 'react-lottie-player';
 import data from '@/../public/lotties/pong.json';
 import { Metadata } from 'next';
 
@@ -24,20 +24,16 @@ export default function Home() {
     }, 2000);
   }, []);
 
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: data,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice',
-    },
-  };
-
   return (
     <>
       {loading && (
         <div className="bg-[#161F1E] h-screen overflow-scroll flex flex-col justify-center items-center">
-          <Lottie options={defaultOptions} height={300} width={300} />
+          <Lottie
+            loop
+            animationData={data}
+            play
+            style={{ height: 300, width: 300 }}
+          />
         </div>
       )}
       {!loading && (

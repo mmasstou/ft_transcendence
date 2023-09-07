@@ -10,6 +10,7 @@ import Statistics from '../profile/Statistics';
 import { UserInfo } from '../profile/UserInfo';
 import { UserStats } from '../profile/UserStats';
 import Button from './Button';
+import banner from '@/../public/banner.jpeg';
 
 interface ProfileProps {
   userId: string | undefined;
@@ -180,16 +181,25 @@ const PublicProfile: React.FC<ProfileProps> = ({
               alt="Banner Image"
             />
           ) : (
-            <div className="bg-[#243230] w-full h-full" />
+            <Image
+              src={banner}
+              objectFit="cover"
+              layout="fill"
+              alt="Banner Image"
+            />
           )}
           <div className="absolute -bottom-10 left-10">
-            <Image
-              className="rounded-full border border-secondary w-[120px] h-[120px]"
-              src={user?.avatar ? user.avatar : ''}
-              width={120}
-              height={120}
-              alt="avatar"
-            />
+            {user?.avatar ? (
+              <Image
+                className="rounded-full border border-secondary w-[120px] h-[120px]"
+                src={user?.avatar ? user.avatar : ''}
+                width={120}
+                height={120}
+                alt="avatar"
+              />
+            ) : (
+              <div className="rounded-full border border-secondary w-[120px] h-[120px] bg-secondary"></div>
+            )}
           </div>
         </div>
         <div className="w-full h-full">

@@ -17,10 +17,10 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-  async setTwoFactorAuthenticationSecret(secret: string, userLogin: string) {
+  async setTwoFactorAuthenticationSecret(secret: string, userId: string) {
     return this.prisma.user.update({
       where: {
-        login: userLogin,
+        id: userId,
       },
       data: {
         twoFactorAuthenticationSecret: secret,
@@ -28,18 +28,18 @@ export class UserService {
     });
   }
 
-  async turnOnTwoFactorAuthentication(userLogin: string) {
+  async turnOnTwoFactorAuthentication(userId: string) {
     return this.prisma.user.update({
-      where: { login: userLogin },
+      where: { id: userId },
       data: {
         twoFA: true,
       },
     });
   }
 
-  async turnOffTwoFactorAuthentication(userLogin: string) {
+  async turnOffTwoFactorAuthentication(userId: string) {
     return this.prisma.user.update({
-      where: { login: userLogin },
+      where: { id: userId },
       data: {
         twoFA: false,
       },

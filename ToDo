@@ -1,5 +1,4 @@
-// test non friends users endpoint
-// check if there is any pending user showed in the list
-// if there is any pending user, remove it from the list
-// return the list of non friends users
-// fix settin issues
+// add block button
+// update dashboard immediatly => done
+// fix login modal
+// try to use onw context api

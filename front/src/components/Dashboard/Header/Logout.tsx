@@ -8,10 +8,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { RiLogoutBoxFill } from 'react-icons/ri';
 
-// export interface User {
-//   login?: string;
-// }
-
 export const Logout: React.FC = (): JSX.Element => {
   const [IsMounted, setIsMounted] = useState(false);
   const router = useRouter();
@@ -23,7 +19,6 @@ export const Logout: React.FC = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    //if (!IsMounted) return;
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`).then((res) => {
       setUser(res.data);
     });
