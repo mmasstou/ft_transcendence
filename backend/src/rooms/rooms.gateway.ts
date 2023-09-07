@@ -100,6 +100,7 @@ export class RoomGateway implements OnGatewayConnection {
         roomId: data.member.roomsId,
       });
       try {
+        // set admin
         if (data.updateType === updatememberEnum.SETADMIN) {
           const type: UserType =
             __member.type === UserType.ADMIN ? UserType.USER : UserType.ADMIN;
@@ -877,7 +878,4 @@ export class RoomGateway implements OnGatewayConnection {
       mode: Resp.mode,
     });
   }
-
-  // @SubscribeMessage('askToPlayGameWith')
-  // async askToPlayGameWith(@MessageBody() data: {}) {}
 }

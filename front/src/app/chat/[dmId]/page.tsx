@@ -172,7 +172,7 @@ export default function page({ params }: { params: { dmId: string } }) {
 
 
     if (!IsMounted) return
-    document.title = `Transcendence/ dm` || metadata.title;
+    document.title = `Transcendence | dm `;
     return <>
         <LefttsideModaL>
             <section className='flex items-center gap-4 border-b border-primary pb-3 px-5 mb-4'>

@@ -1,15 +1,12 @@
 'use client'
-import Image from "next/image";
+import { membersType } from "@/types/types";
+import Cookies from "js-cookie";
 import React, { FormEvent, useState } from "react";
 import { RiSettingsLine } from "react-icons/ri";
-import { UserAvatar } from "./channel.userAvater";
-import Button from "../../components/Button";
-import ChanneLsettingsHook from "../hooks/channel.settings";
 import { Socket } from "socket.io-client";
-import { membersType } from "@/types/types";
-import { get } from "http";
+import Button from "../../components/Button";
 import getMemberWithId from "../actions/getMemberWithId";
-import Cookies from "js-cookie";
+import ChanneLsettingsHook from "../hooks/channel.settings";
 
 
 interface ConversationsTitlebarInterface {

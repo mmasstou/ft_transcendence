@@ -1,4 +1,4 @@
-import { UserTypeEnum, updatememberEnum } from "@/types/types";
+import { UserTypeEnum, membersType, updatememberEnum } from "@/types/types";
 import ChannelSettingsUserMemberItemOption from "../../channel.settings.user.memberItem.option";
 // icons :
 import { MdAdminPanelSettings } from "react-icons/md";
@@ -7,9 +7,9 @@ import { SlBan } from "react-icons/sl";
 import { FaVolumeMute } from "react-icons/fa";
 interface props {
     hasPermissions?: boolean;
-    member: any;
+    member: membersType;
     OnClick: (data: any) => void;
-    type : '';
+    type: '';
 }
 export default function ChanneLSettingsUserMemberItemActions(
     { hasPermissions, member, OnClick }: props
@@ -36,7 +36,7 @@ export default function ChanneLSettingsUserMemberItemActions(
                 OnClick({ updateType: updatememberEnum.KIKMEMBER, member: member })
             }}
         />}
-        {<ChannelSettingsUserMemberItemOption
+        {!member.ismute && <ChannelSettingsUserMemberItemOption
             icon={SlBan}
             size={24}
             label="ban member"
@@ -57,6 +57,5 @@ export default function ChanneLSettingsUserMemberItemActions(
                 OnClick({ updateType: updatememberEnum.MUTEMEMBER, member: member })
             }}
         />}
-        {/* {member.ismute && <MuteTime member={member} socket={socket} />} */}
     </div>
 }

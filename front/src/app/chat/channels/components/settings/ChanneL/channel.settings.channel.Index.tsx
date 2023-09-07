@@ -1,12 +1,12 @@
 import { RoomTypeEnum, RoomsType, membersType } from "@/types/types";
-import ChanneLsettingsProvider from "./channel.settings.chnnel.provider";
+import ChanneLsettingsBody from "./channel.settings.chnnel.body";
 import React from "react";
 import { SETTINGSTEPS } from "./channel.settings.channel";
 import { GoEyeClosed } from "react-icons/go";
 import Cookies from "js-cookie";
 import ChanneLaccessDeniedModaL from "../../../modaLs/channel.access.denied.modaL";
 import { useParams } from "next/navigation";
-import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
+import FindOneBySLug from "../../../actions/findOneBySlug";
 import ChanneLSettingsItem from "./channel.settings.channel.Item";
 import { FaChessQueen, FaUserTimes } from "react-icons/fa";
 import { Socket } from "socket.io-client";
@@ -56,7 +56,7 @@ export default function ChanneLsettingsIndex(props: props) {
         });
     }, [props.socket])
 
-    return <ChanneLsettingsProvider socket={props.socket}  >
+    return <ChanneLsettingsBody socket={props.socket}  >
         <div className="flex h-full flex-col justify-between items-start min-h-[34rem] w-full">
             <div className="flex flex-col gap-2 w-full">
                 {ChanneLinfo && ChanneLinfo.type == RoomTypeEnum.PROTECTED &&
@@ -148,5 +148,5 @@ export default function ChanneLsettingsIndex(props: props) {
                     />} */}
             </div>
         </div>
-    </ChanneLsettingsProvider>
+    </ChanneLsettingsBody>
 }

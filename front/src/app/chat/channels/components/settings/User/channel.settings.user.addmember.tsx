@@ -1,26 +1,18 @@
 'use client'
-import Input from "@/components/Input"
-import { FieldValues, RegisterOptions, UseFormRegisterReturn, useForm } from "react-hook-form";
-import Button from "../../../../components/Button";
-import { IoChevronBackOutline, IoSend } from "react-icons/io5";
-import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
-import React, { useEffect, useState } from "react";
-import { RoomsType, membersType, updatememberEnum, userType } from "@/types/types";
+import { RoomsType, updatememberEnum, userType } from "@/types/types";
 import Cookies from "js-cookie";
-import getUsers from "../../../actions/getUsers";
 import Image from "next/image";
-import getChannelMembersWithId from "../../../actions/getChannelmembers";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Socket, io } from "socket.io-client";
-import LeftSidebarHook from "../../../hooks/LeftSidebarHook";
-import ChanneLsettingsHook from "../../../hooks/channel.settings";
-import getChannelWithId from "../../../actions/getChannelWithId";
+import React from "react";
 import { RiSearchLine } from "react-icons/ri";
-import ChanneLSettingsBody from "../channel.settings.body";
-import { toast } from "react-hot-toast";
-import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
+import { Socket, io } from "socket.io-client";
+import Button from "../../../../components/Button";
+import FindOneBySLug from "../../../actions/findOneBySlug";
 import getMemberWithId from "../../../actions/getMemberWithId";
+import ChanneLsettingsHook from "../../../hooks/channel.settings";
 import Loading from "../../loading";
+import ChanneLSettingsBody from "../channel.settings.body";
+import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 
 interface IChannelSettingsMemberJoinModalProps {
     OnBack: () => void;

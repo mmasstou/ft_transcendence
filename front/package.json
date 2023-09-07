@@ -32,7 +32,7 @@
         "eslint-config-next": "13.4.4",
         "framer-motion": "^10.12.16",
         "js-cookie": "^3.0.5",
-        "next": "^13.4.12",
+        "next": "^13.4.19",
         "postcss": "^8.4.24",
         "qrcode.react": "^3.1.0",
         "query-string": "^8.1.0",

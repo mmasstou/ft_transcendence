@@ -1,14 +1,10 @@
 import { userType } from "@/types/types";
-import { set } from "date-fns";
-import Image from "next/image"
+import * as Avatar from '@radix-ui/react-avatar';
+import { useRouter } from "next/navigation";
 import React from "react";
 import { IconType } from "react-icons";
 import { PiGameControllerFill } from "react-icons/pi";
-import { RiRadioButtonFill, RiRadioButtonLine } from "react-icons/ri";
-import Loading from "./loading";
-import { useRouter } from "next/navigation";
-import MyAvatar from "@/components/profile/MyAvatar";
-import * as Avatar from '@radix-ui/react-avatar';
+import { RiRadioButtonLine } from "react-icons/ri";
 
 export function UserAvatar(
     { image, size, User, showsatatus = true }:

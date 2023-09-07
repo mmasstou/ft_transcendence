@@ -1,22 +1,10 @@
-import {
-  Body,
-  Controller,
-  Post,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-  Get,
-  Req,
-  Res,
-  BadRequestException,
-  Param,
-} from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
-import { JwtAuthGuard } from './guards/jwt-oauth.guard';
-import { UserService } from 'src/users/user.service';
 import { PrismaService } from 'src/prisma.service';
+import { UserService } from 'src/users/user.service';
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './guards/jwt-oauth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -24,28 +12,6 @@ export class AuthController {
     private readonly userService: UserService,
     private readonly prisma: PrismaService,
   ) {}
-
-  @Get('login/:username/:password')
-  async signIn(
-    @Res() res: Response,
-    @Param('username') username: string,
-    @Param('password') password: string,
-  ) {
-    const result = await this.authService.signInWithLogin(username, password);
-    if (!result) throw new BadRequestException('Unauthenticated');
-    const { token, userId } = result;
-    res.cookie('token', token, {
-      httpOnly: false,
-      sameSite: false,
-    });
-    res.cookie('_id', userId.id, {
-      httpOnly: false,
-      sameSite: false,
-    });
-    return res.redirect(`${process.env.AUTH_REDIRECT_URI}`);
-  }
-
-  // @UseGuards(AuthGuard('42'))
   @Get('42')
   async login42(@Req() req: any) {
     return req.user;

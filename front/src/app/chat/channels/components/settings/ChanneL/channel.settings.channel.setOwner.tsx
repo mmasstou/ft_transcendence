@@ -8,11 +8,11 @@ import ChanneLSettingsBody from "../channel.settings.body";
 import ChanneLConfirmActionHook from "../../../hooks/channel.confirm.action";
 import getmessage from "../../../actions/member.action.message";
 import { useEffect } from "react";
-import ChanneLsettingsProvider from "./channel.settings.chnnel.provider";
+import ChanneLsettingsBody from "./channel.settings.chnnel.body";
 import React from "react";
 import { useParams } from "next/navigation";
 import Cookies from "js-cookie";
-import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
+import FindOneBySLug from "../../../actions/findOneBySlug";
 import getMemberWithId from "../../../actions/getMemberWithId";
 import { toast } from "react-hot-toast";
 import getChannelMembersWithId from "../../../actions/getChannelmembers";
@@ -92,7 +92,7 @@ export default function ChanneLsettingsChanneLsetOwner(
 
     }, [])
 
-    return <ChanneLsettingsProvider socket={socket} label={`set Owner`} OnBack={OnBack}>
+    return <ChanneLsettingsBody socket={socket} label={`set Owner`} OnBack={OnBack}>
         <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full">
             {Members && Members.map((member, index) => (
                 <ChannelSettingsUserMemberItem
@@ -106,6 +106,6 @@ export default function ChanneLsettingsChanneLsetOwner(
                     }} />))
             }
         </div>
-    </ChanneLsettingsProvider>
+    </ChanneLsettingsBody>
 
 }

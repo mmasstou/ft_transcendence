@@ -1,35 +1,29 @@
-version: '3'
+version: "3"
 services:
-  # frontend:
-  #   build: front/
-  #   container_name: frontend
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - 8080:8080
-  #   networks:
-  #     - APInetwork
-  #   depends_on:
-  #     - backend
-  #     - database
-  #   volumes:
-  #     - /Users/mmasstou/Desktop/Projects/ft_transcendence/front:/frontend:rw
-  #     - /Users/mmasstou/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
-  # backend:
-  #   build: backend/
-  #   container_name: backend
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - 80:80
-  #     - 5555:5555
-  #   networks:
-  #     - APInetwork
-  #   depends_on:
-  #     - database
-  #   volumes:
-  #     - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
-  #     - /Users/mmasstou/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
+  frontend:
+    build: front/
+    container_name: frontend
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+    networks:
+      - APInetwork
+    depends_on:
+      - backend
+      - database
+  backend:
+    build: backend/
+    container_name: backend
+    env_file:
+      - .env
+    ports:
+      - 80:80
+      - 5555:5555
+    networks:
+      - APInetwork
+    depends_on:
+      - database
   database:
     image: postgres:13
     container_name: database
