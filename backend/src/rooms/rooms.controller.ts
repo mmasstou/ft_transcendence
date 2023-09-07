@@ -9,10 +9,9 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { RoomsService } from './rooms.service';
-import { UpdateRoomDto } from './dtos/UpdateRoomDto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
 import { Request } from 'express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
+import { RoomsService } from './rooms.service';
 
 @Controller('rooms')
 export class RoomsController {
@@ -87,12 +86,6 @@ export class RoomsController {
   @Get('slug/:slug')
   findOneBySLug(@Param('slug') slug: string) {
     return this.roomsService.findOneBySLug({ slug });
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() data: UpdateRoomDto) {
-    return this.roomsService.update({ id, data });
   }
 
   @UseGuards(JwtAuthGuard)

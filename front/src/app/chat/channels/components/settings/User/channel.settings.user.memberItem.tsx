@@ -1,29 +1,24 @@
-import Button from "../../../../components/Button";
 import { UserAvatar } from "../../channel.userAvater";
 
 
 // icons :
-import { TbDeviceGamepad2, TbUserX } from "react-icons/tb";
-import { SlBan, SlOptionsVertical } from "react-icons/sl";
-import { FaChessQueen, FaUserPlus, FaUserShield, FaVolumeMute, FaVolumeUp, FaBan } from "react-icons/fa";
-import { UserTypeEnum, membersType, updatememberEnum, updatememberType, userType } from "@/types/types";
-import React, { ReactNode } from "react";
+import { UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types";
 import Cookies from "js-cookie";
-import getUserWithId from "../../../actions/getUserWithId";
-import { GrUserAdmin } from "react-icons/gr";
-import { MdAdminPanelSettings } from "react-icons/md";
-import { Socket } from "socket.io-client";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import getMemberWithId from "../../../actions/getMemberWithId";
-import ChanneLsettingsHook from "../../../hooks/channel.settings";
-import Image from "next/image";
-import ChannelSettingsUserMemberItemOption from "../../channel.settings.user.memberItem.option";
-import MuteTime from "../../channel.settings.user.mutetime";
-import ChanneLSettingsUserMemberItemActions from "./channel.settings.user.memberItem.actions";
-import { VscPersonAdd } from "react-icons/vsc";
+import React from "react";
 import { AiFillDelete, AiOutlineUserAdd } from "react-icons/ai";
+import { FaBan, FaChessQueen, FaVolumeMute } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
-import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
+import { MdAdminPanelSettings } from "react-icons/md";
+import { SlBan } from "react-icons/sl";
+import { TbDeviceGamepad2 } from "react-icons/tb";
+import { Socket } from "socket.io-client";
+import FindOneBySLug from "../../../actions/findOneBySlug";
+import getMemberWithId from "../../../actions/getMemberWithId";
+import getUserWithId from "../../../actions/getUserWithId";
+import ChanneLsettingsHook from "../../../hooks/channel.settings";
+import ChannelSettingsUserMemberItemOption from "../../channel.settings.user.memberItem.option";
+import ChanneLSettingsUserMemberItemActions from "./channel.settings.user.memberItem.actions";
 
 
 interface IChannelSettingsUserMemberItemProps {

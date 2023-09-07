@@ -1,19 +1,13 @@
-import { IoChevronBackOutline } from "react-icons/io5";
-import { Socket } from "socket.io-client";
-import Button from "../../../../components/Button";
-import { RoomsType, UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types";
-import ChannelSettingsUserMemberItem from "../User/channel.settings.user.memberItem";
-import Image from "next/image";
-import ChanneLSettingsBody from "../channel.settings.body";
-import React, { useEffect } from "react";
-import getUserWithId from "../../../actions/getUserWithId";
+import { RoomsType, membersType, updatememberEnum, userType } from "@/types/types";
 import Cookies from "js-cookie";
-import ChanneLConfirmActionHook from "../../../hooks/channel.confirm.action";
-import ChanneLsettingsProvider from "./channel.settings.chnnel.provider";
 import { useParams } from "next/navigation";
-import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
+import React from "react";
+import { Socket } from "socket.io-client";
+import FindOneBySLug from "../../../actions/findOneBySlug";
 import getChannelMembersWithId from "../../../actions/getChannelmembers";
-import { toast } from "react-hot-toast";
+import ChanneLConfirmActionHook from "../../../hooks/channel.confirm.action";
+import ChannelSettingsUserMemberItem from "../User/channel.settings.user.memberItem";
+import ChanneLsettingsBody from "./channel.settings.chnnel.body";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;
     OnBack: () => void;
@@ -81,7 +75,7 @@ export default function ChanneLSettingsChanneLBanedMember(
         });
     }, [socket])
 
-    return <ChanneLsettingsProvider
+    return <ChanneLsettingsBody
         socket={socket}
         label={`Baned Members :${User?.login}`}
         OnBack={OnBack}
@@ -102,5 +96,5 @@ export default function ChanneLSettingsChanneLBanedMember(
             ))
             }
         </div>
-    </ChanneLsettingsProvider>
+    </ChanneLsettingsBody>
 }

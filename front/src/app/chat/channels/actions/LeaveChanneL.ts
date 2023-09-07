@@ -1,4 +1,4 @@
-import FindOneBySLug from './Channel/findOneBySlug';
+import FindOneBySLug from './findOneBySlug';
 import getChanneLOwners from './getChannelOwner';
 
 export default async function LeaveChanneL(
@@ -19,6 +19,6 @@ export default async function LeaveChanneL(
         // check if the User logeed is the only owner
         return true;
     }
-}
-return false;
+  }
+  return false;
 }

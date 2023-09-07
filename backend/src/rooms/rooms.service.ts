@@ -1,8 +1,8 @@
 import {
-  Injectable,
-  NotFoundException,
   HttpException,
   HttpStatus,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ChanneLNotifications,
@@ -13,12 +13,11 @@ import {
   User,
   UserType,
 } from '@prisma/client';
-import { PrismaService } from 'src/prisma.service';
-import { UpdateRoomDto } from './dtos/UpdateRoomDto';
 import { MembersService } from 'src/members/members.service';
 import { MessagesService } from 'src/messages/messages.service';
-import { UserTypeEnum, membersType } from 'src/users/user.type';
+import { PrismaService } from 'src/prisma.service';
 import { UserService } from 'src/users/user.service';
+import { UserTypeEnum } from 'src/users/user.type';
 
 @Injectable()
 export class RoomsService {
@@ -266,7 +265,10 @@ export class RoomsService {
     }
   }
 
-  async update(params: { id: string; data: UpdateRoomDto }): Promise<Rooms> {
+  async update(params: {
+    id: string;
+    data: { name?: string };
+  }): Promise<Rooms> {
     const { id, data } = params;
     // console.log('++update++>', id);
 

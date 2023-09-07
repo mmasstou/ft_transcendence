@@ -13,7 +13,6 @@ import Button from "../../../../components/Button";
 import getUserWithId from "../../../actions/getUserWithId";
 import StartGame from "../../../actions/startgame";
 import ChanneLsettingsHook from "../../../hooks/channel.settings";
-import SettingsProvider from "../../../providers/channel.settings.provider";
 import Loading from "../../loading";
 interface props {
     onClick: (data: any) => void;
@@ -22,20 +21,7 @@ interface props {
     player2Id: string | undefined;
     socket: Socket | null
 }
-/*
-{
-  Response: false,
-  User: {
-    id: 'd7cef41c-c2bb-4151-a9c3-8b77b10bd5ac',
-    login: 'aboulhaj',
-  },
-  sender: {
-    id: 'c2f11a8c-0fa0-4def-94d1-ca881a4cbc15',
-    login: 'aouhadou',
-  },
-  mode: 'time'
-}
-**/
+
 export default function ChanneLsettingsPlayGame(
     { onClick, player1Id, player2Id, Onback, socket }: props
 ) {
@@ -112,8 +98,7 @@ export default function ChanneLsettingsPlayGame(
         })();
     }, [PLayer01, PLayer02]);
 
-    return <SettingsProvider
-    >
+    return <>
         <div className=" flex flex-row items-center justify-start gap-3">
             {<Button
                 icon={IoChevronBackOutline}
@@ -194,7 +179,7 @@ export default function ChanneLsettingsPlayGame(
                 </div>
             </div>
         </div>}
-    </SettingsProvider>
+    </>
 
 
 

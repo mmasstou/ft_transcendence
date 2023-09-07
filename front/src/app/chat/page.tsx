@@ -49,6 +49,8 @@ export default function page() {
   React.useEffect(() => { UpdateData() }, [reload])
 
   if (!IsMounted) return
+  document.title = `Transcendence | Friends`;
+
   return (
     <>
       <LefttsideModaL>

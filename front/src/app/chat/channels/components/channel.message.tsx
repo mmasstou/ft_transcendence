@@ -1,21 +1,11 @@
-import { FC, useEffect, useRef, useState } from "react"
-import { messagesType, userType } from "@/types/types"
+import { messagesType, userType } from "@/types/types";
 import Cookies from "js-cookie";
-import Image from "next/image"
-import { BsCheck2All, BsEmojiDizzy, BsEmojiFrownFill, BsEmojiLaughing, BsEmojiSmile, BsEmojiWink } from "react-icons/bs";
-import { UserAvatar } from "./channel.userAvater";
-import { HiArrowUturnLeft } from "react-icons/hi2";
-import { MdAddReaction } from "react-icons/md";
-import { AiFillMessage, AiOutlineFieldTime } from "react-icons/ai";
-import { ChannelReactions } from "./channel.reaction";
-import { ChannelReplys } from "./channel.replys";
-import getUserWithId from "../actions/getUserWithId";
-import { CgOptions } from "react-icons/cg";
-import Button from "../../components/Button";
-import { toast } from "react-hot-toast";
-import TimeAgo from "./TimeAgo";
+import React, { FC, useEffect, useState } from "react";
+import { AiOutlineFieldTime } from "react-icons/ai";
 import { IoLocation } from "react-icons/io5";
-import React from "react";
+import getUserWithId from "../actions/getUserWithId";
+import TimeAgo from "./TimeAgo";
+import { UserAvatar } from "./channel.userAvater";
 
 
 
@@ -37,7 +27,7 @@ const Message: FC<Imessage> = ({ message, userid, isForOwner }) => {
     }, []);
     // let counter = 0;
 
-   
+
 
     useEffect(() => {
         (async function getsenderInfo(userid: string, token: string) {
@@ -79,8 +69,6 @@ const Message: FC<Imessage> = ({ message, userid, isForOwner }) => {
                 <TimeAgo timestamp={message.created_at} />
             </span>
         </div>
-        {/* <ChannelReactions />
-        <ChannelReplys /> */}
     </section>
 }
 
