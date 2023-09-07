@@ -476,8 +476,10 @@ function pongFunc(divRef: RefObject<HTMLDivElement>, router: any) {
     
     useEffect(() => {
       if (isReady && (YouWin || YouLose || YouDraw)) {
-        Cookies.remove('tableId');
-        socket.emit('deletePlayer');
+        setTimeout(()=> {
+          Cookies.remove('tableId');
+          socket.emit('deletePlayer');
+        },2000)
       }
     }, [YouWin, YouLose, YouDraw])
 

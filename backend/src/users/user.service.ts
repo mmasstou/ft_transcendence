@@ -65,11 +65,16 @@ export class UserService {
 
   async findOne(params: { id: string }): Promise<any> {
     const { id } = params;
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
-    if (!user) return null;
-    return user;
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
+      if (!user) throw new Error('user not found');
+      return user;
+    } catch (error) {
+      console.log('findOne error :', error.message);
+      return null;
+    }
   }
   async findOneLogin(params: { login: string }): Promise<User> {
     const { login } = params;
@@ -438,15 +443,10 @@ export class UserService {
 
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      const id: string = payload.id;
+      const id: string = payload.userId;
+      // console.log('payload :', payload);
       // Add your logic to fetch the direct messages for the user from the database or any other source
-      const user = await this.prisma.user.findFirst({
-        where: { id },
-        include: {
-          Rooms: true,
-          dms: true,
-        },
-      });
+      const user = await this.findOne({ id });
       if (!user) throw new NotFoundException();
       return user;
     } catch (error) {

@@ -34,7 +34,7 @@ model UserSocket {
 
 // models :
 model User {
-  id                            String                 @id @default(uuid())
+  id                            String                 @id @unique @default(uuid())
   login                         String                 @unique
   email                         String                 @unique
   password                      String?

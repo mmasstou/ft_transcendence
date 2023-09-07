@@ -56,7 +56,7 @@ export type UpdateDataProps = {
 
 export const UpdateDataContext = createContext<UpdateDataProps>({
   updated: false,
-  setUpdated: () => {},
+  setUpdated: () => { },
 });
 
 export const UpdateDataProvider = () => useContext(UpdateDataContext);

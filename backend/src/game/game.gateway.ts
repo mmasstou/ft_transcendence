@@ -661,10 +661,13 @@ class MyGateway implements OnGatewayConnection {
         }
         RandomListScore.deleteElement(UsId);
         RandomListTime.deleteElement(UsId);
-        UserMap.delete(UsId);
+        setTimeout(() => {
+          UserMap.delete(UsId);
+        }, 500);
       }
     }
   }
+
   @SubscribeMessage('deletePlayer')
   async DeletePlayer(client: Socket) {
     let type: string;
