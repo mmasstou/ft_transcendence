@@ -81,7 +81,6 @@ export class RoomsService {
       if (!room) throw new Error('');
       return room;
     } catch (error) {
-      console.log('channeL with id %s not found', id);
       return null;
     }
   }
@@ -96,7 +95,6 @@ export class RoomsService {
       if (!room) throw new Error('');
       return room;
     } catch (error) {
-      console.log('channeL with slug %s not found', slug);
       return new NotFoundException();
     }
   }
@@ -110,7 +108,6 @@ export class RoomsService {
       if (!room) throw new NotFoundException();
       return room;
     } catch (error) {
-      console.log('Rooms-findOneByName> error- +>', error.message);
       return null;
     }
   }
@@ -139,7 +136,6 @@ export class RoomsService {
       if (!_members) throw new Error('');
       return _members;
     } catch (error) {
-      console.log('Rooms-findOne> error- +>', error.message);
       throw new NotFoundException();
     }
   }
@@ -271,7 +267,6 @@ export class RoomsService {
       });
       return result;
     } catch (error) {
-      console.log('+++> error :', error);
       return null;
     }
   }
@@ -540,7 +535,6 @@ export class RoomsService {
       });
       return result;
     } catch (error) {
-      console.log('Chat - error -> joinToRoom', error);
       return null;
     }
   }
@@ -600,7 +594,6 @@ export class RoomsService {
       });
       return result;
     } catch (error) {
-      console.log('Chat - error -> LeaveChanneL');
       return null;
     }
   }
