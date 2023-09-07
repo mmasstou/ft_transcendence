@@ -1,24 +1,22 @@
-version: '3'
+version: "3"
 services:
-  # frontend:
-  #   build: front/
-  #   container_name: frontend
-  #   ports:
-  #     - 8080:8080
-  #     # - 5430:5430
-  #   # networks:
-  #   #   - APInetwork
-  #   # depends_on:
-  #   #   - backend
-  #   #   - database
-  #   volumes:
-  #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front:/frontend:rw
-  #     - /Users/aboulhaj/Desktop/Projects/ft_transcendence/front/public:/frontend/public:rw
+  frontend:
+    build: front/
+    container_name: frontend
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+    networks:
+      - APInetwork
+    depends_on:
+      - backend
+      - database
   backend:
     build: backend/
     container_name: backend
     env_file:
-      - backend/.env
+      - .env
     ports:
       - 80:80
       - 5555:5555
@@ -26,22 +24,15 @@ services:
       - APInetwork
     depends_on:
       - database
-    volumes:
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/src:/app/src:rw
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/backend/prisma:/app/prisma:rw
   database:
     image: postgres:13
     container_name: database
     env_file:
-      - backend/.env
-    networks:
-      - APInetwork
+      - .env
     ports:
       - 5432:5432
-    volumes:
-      - /Users/aboulhaj/Desktop/Projects/ft_transcendence/databases/data:/var/lib/postgresql/data
-  
+    networks:
+      - APInetwork
 networks:
   APInetwork:
     driver: bridge
-

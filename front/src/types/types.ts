@@ -9,6 +9,14 @@ export type Message = {
   content: string;
 };
 
+export type ChanneLnotificationType = {
+  id: string;
+  content: string;
+  channelId: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type membersType = {
   id: string;
   type: string;
@@ -19,11 +27,14 @@ export type membersType = {
   directmessageId: string;
   created_at: string;
   updated_at: string;
+  mute_at: string;
 };
 export type messagesType = {
   viewed: number;
   content: string;
   id: string;
+  dm: any;
+  dmId: string;
   senderId: string;
   roomsId: string;
   created_at: string;
@@ -48,9 +59,11 @@ export type RoomsType = {
   password: string;
   created_at: string;
   updated_at: string;
+  hasAccess: boolean;
   members: membersType[];
   messages: Message[];
-  accesspassword:string
+  accesspassword: string;
+  slug: string;
 };
 
 export type userType = {
@@ -61,9 +74,9 @@ export type userType = {
   name: string;
   kind: null;
   avatar: string | '';
-  bg_color: string[] | null
-  paddle_color: string | null
-  ball_color: string | null
+  bg_color: string[] | null;
+  paddle_color: string | null;
+  ball_color: string | null;
   intraId: number;
   banner: string | '';
   is_active: boolean;
@@ -71,18 +84,22 @@ export type userType = {
   updated_at: string;
   Rooms: RoomsType[];
   location: string;
-  cursus_users: cursusType[];
   twoFactorAuthenticationSecret: string;
   twoFA: boolean;
+  status: 'online' | 'offline' | 'inGame';
+  TotalWin: number;
+  TotalLose: number;
+  TotalMatch: number;
+  TotalDraw: number;
+  Level: number;
 };
-
 
 export type cursusType = {
   id: string;
-    grade: string,
-    level: Float32Array,
-    blackholed_at: string
-}
+  grade: string;
+  level: Float32Array;
+  blackholed_at: string;
+};
 export type messageSocket = {
   roomId: string;
   messageContent: string;
@@ -112,4 +129,31 @@ export enum updatememberEnum {
   PLAYGAME = 'PLAYGAME',
   SETOWNER = 'SETOWNER',
   ACCESSPASSWORD = 'ACCESSPASSWORD',
+  ADDMEMBER = 'ADDMEMBER',
+  LEAVECHANNEL = 'LEAVECHANNEL',
+  DELETECHANNEL = 'DELETECHANNEL',
+}
+
+export enum UpdateChanneLSendEnum {
+  CHANGETYPE = 'CHANGETYPE',
+  SETACCESSEPASSWORD = 'SETACCESSEPASSWORD',
+  REMOVEACCESSEPASSWORD = 'REMOVEACCESSEPASSWORD',
+  EDITACCESSEPASSWORD = 'EDITACCESSEPASSWORD',
+  CHANGEPROTACTEDPASSWORD = 'CHANGEPROTACTEDPASSWORD',
+}
+export type UpdateChanneLSendData = {
+  Updatetype: UpdateChanneLSendEnum;
+  password?: string;
+  newpassword?: string;
+  confirmpassword?: string;
+  accesspassword?: string;
+  roomtype?: RoomTypeEnum;
+  room: RoomsType;
+};
+
+export enum USERSETTINGSTEPS {
+  INDEX = 0,
+  PLAYGAME = 1,
+  MEMBERJOIN = 2,
+  FINDMEMBER = 3,
 }

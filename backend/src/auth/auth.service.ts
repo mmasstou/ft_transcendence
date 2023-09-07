@@ -15,27 +15,24 @@ export class AuthService {
     private jwtService: JwtService,
     private prisma: PrismaService,
   ) {}
-
   async signIn(user: Prisma.UserUncheckedCreateInput) {
-    // if (!user) {
-    //   throw new BadRequestException('Unauthenticated');
-    // }
-
     const userExists = await this.usersService.findOneLogin({
       login: user.login,
     });
 
     if (!userExists) {
+      console.log('************** user not exists **************');
       return await this.registerUser(user);
     }
-
     return this.generateJwt({
       login: userExists.login,
       email: userExists.email,
       avatar: userExists.avatar,
       name: userExists.name,
       banner: userExists.banner,
+      userId: userExists.id,
       intraId: userExists.intraId,
+      logedFirstTime: userExists.logedFirstTime,
     });
   }
   async registerUser(user: Prisma.UserUncheckedCreateInput) {
@@ -48,6 +45,7 @@ export class AuthService {
           name: user.name,
           banner: user.banner,
           intraId: user.intraId,
+          logedFirstTime: user.logedFirstTime,
         },
       });
       return await this.generateJwt({
@@ -55,8 +53,10 @@ export class AuthService {
         email: newUser.email,
         avatar: newUser.avatar,
         name: newUser.name,
+        userId: newUser.id,
         banner: newUser.banner,
         intraId: newUser.intraId,
+        logedFirstTime: newUser.logedFirstTime,
       });
     } catch (error) {
       console.log(error);

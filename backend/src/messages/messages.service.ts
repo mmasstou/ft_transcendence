@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Messages } from '@prisma/client';
-import { UpdateMessageDto } from 'src/Dtos/UpdateMessageDto';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -26,8 +25,15 @@ export class MessagesService {
     }
   }
 
-  async findAll(): Promise<Messages[]> {
-    return this.prisma.messages.findMany();
+  async findALLForChanneL(channeLId: string): Promise<Messages[]> {
+    return this.prisma.messages.findMany({
+      where: {
+        roomsId: channeLId,
+      },
+      orderBy: {
+        created_at: 'asc', // or 'desc' for descending order
+      },
+    });
   }
 
   async create(data: {
@@ -44,6 +50,9 @@ export class MessagesService {
             content: data.content,
             sender: {
               connect: { id: data.userId },
+            },
+            dm: {
+              connect: { id: data.DirectMessage },
             },
           },
         });
@@ -74,19 +83,6 @@ export class MessagesService {
         },
       );
     }
-  }
-
-  async update(params: {
-    id: string;
-    data: UpdateMessageDto;
-  }): Promise<Messages> {
-    const { id, data } = params;
-    // console.log('++update++>', id);
-
-    return await this.prisma.messages.update({
-      data,
-      where: { id },
-    });
   }
 
   async remove(id: string): Promise<Messages> {

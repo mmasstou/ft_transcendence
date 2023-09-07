@@ -5,6 +5,7 @@ import MyAvatar from './MyAvatar';
 interface Props {
   position: string;
   score: string;
+  level: number | undefined;
 }
 
 const AvatarProfile: React.FC<Props> = (style) => (
@@ -16,7 +17,7 @@ const AvatarProfile: React.FC<Props> = (style) => (
           className={`bg-secondary flex justify-center items-center
                 rounded-full text-[#161F1E] ${style.score}`}
         >
-          18
+          {style.level}
         </span>
       </div>
     </div>

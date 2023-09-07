@@ -1,34 +1,40 @@
 const GameThemes = [
-    {
-        name: 'Theme 1',
-        left: '#56CCF2',
-        right: '#2F80ED',
-    },
-    {
-        name: 'Theme 2',
-        left: '#B6F1E4',
-        right: '#00AEA9',
-    },
-    {
-        name: 'Theme 3',
-        left: '#89F7FE',
-        right: '#4895FF',
-    },
-    {
-        name: 'Theme 4',
-        left: '#779DBE',
-        right: '#123E64',
-    },
-    {
-        name: 'Theme 5',
-        left: '#D397FA',
-        right: '#6642DB',
-    },
-    {
-        name: 'Theme 6',
-        left: '#918CA9',
-        right: '#211F2F',
-    }
-]
+  {
+    name: 'Theme 1',
+    background: ['#56CCF2', '#2F80ED'],
+    paddle: '#000000',
+    ball: '#000000',
+  },
+  {
+    name: 'Theme 2',
+    background: ['#B6F1E4', '#00AEA9'],
+    paddle: '#000000',
+    ball: '#000000',
+  },
+  {
+    name: 'Theme 3',
+    background: ['#89F7FE', '#4895FF'],
+    paddle: '#000000',
+    ball: '#000000',
+  },
+  {
+    name: 'Theme 4',
+    background: ['#779DBE', '#123E64'],
+    paddle: '#000000',
+    ball: '#000000',
+  },
+  {
+    name: 'Theme 5',
+    background: ['#D397FA', '#6642DB'],
+    paddle: '#000000',
+    ball: '#000000',
+  },
+  {
+    name: 'Theme 6',
+    background: ['#918CA9', '#211F2F'],
+    paddle: '#ffffff',
+    ball: '#ffffff',
+  },
+];
 
-export default GameThemes
+export default GameThemes;

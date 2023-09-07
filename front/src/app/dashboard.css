@@ -4,8 +4,8 @@
     grid-template-columns: 6rem auto;
     grid-template-rows: 6vh auto;
     grid-template-areas: "header header "
-                    "Sidebar main "
-                    "Sidebar main ";
+        "Sidebar main "
+        "Sidebar main ";
 
     /* gap: 1rem; */
 }
@@ -25,13 +25,41 @@ main {
 
 
 @media (max-width: 767px) {
-    .dashboard{
+    .dashboard {
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: 6vh auto 5vh; 
+        grid-template-rows: 6vh auto 5vh;
         grid-template-areas: "header "
-                    "main "
-                    "Sidebar";
+            "main "
+            "Sidebar";
     }
-  }
+}
 
+button {
+    position: relative;
+    display: inline-block;
+    
+}
+
+button .tooltiptext {
+    visibility: hidden;
+    width: 160px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    /* Position above the button */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+button:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}

@@ -1,21 +1,46 @@
-import { RiLogoutBoxFill } from 'react-icons/ri';
-import * as Popover from '@radix-ui/react-popover';
-import { Cross2Icon } from '@radix-ui/react-icons';
-import Cookies from 'js-cookie';
+'use client';
 import MyAvatar from '@/components/profile/MyAvatar';
+import { userType } from '@/types/types';
+import * as Popover from '@radix-ui/react-popover';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
-import router from 'next/router';
+import { useEffect, useState } from 'react';
+import { RiLogoutBoxFill } from 'react-icons/ri';
 
-export const Logout: React.FC = (props): JSX.Element => {
+// export interface User {
+//   login?: string;
+// }
+
+export const Logout: React.FC = (): JSX.Element => {
+  const [IsMounted, setIsMounted] = useState(false);
+  const router = useRouter();
+  const [user, setUser] = useState<userType | null>(null);
+  const id = Cookies.get('_id');
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    //if (!IsMounted) return;
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`).then((res) => {
+      setUser(res.data);
+    });
+  }, [id]);
+
   const logoutHandle = () => {
     (async () => {
-      const resp = await fetch('http://localhost:80/api/auth/logout', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${Cookies.get('token')}`,
-        },
-      });
+      const resp = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${Cookies.get('token')}`,
+          },
+        }
+      );
       if (resp.status === 200) {
         Cookies.remove('token');
         Cookies.remove('_id');
@@ -29,36 +54,28 @@ export const Logout: React.FC = (props): JSX.Element => {
     <Popover.Root>
       <Popover.Trigger asChild aria-controls="radix-:R1mcq:">
         <button aria-label="Update dimensions">
-          <div className="cursor-pointer w-[32px] h-[32px">
-            <MyAvatar />
+          <div className="cursor-pointer w-[32px] h-[32px]">
+            {<MyAvatar User={user} />}
           </div>
         </button>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
-          className="text-white rounded p-5 w-[200px] mr-4 bg-[#2B504B] shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)] "
+          className="text-white py-6 px-2 xl:px-6 rounded w-[200px] mr-3 bg-[#2B504B] shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)] z-[60]"
           sideOffset={5}
         >
-          <div className="flex flex-col justify-center items-center gap-2.5 py-2">
-            <p className="text-[15px] leading-[19px] font-medium mt-2">
-              👋 Hey, aouhadou
-            </p>
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-sm xl:text-lg">{user && user?.login} 👋</p>
             <div className="w-3/4 border-b-[0.1vh] border-white opacity-50"></div>
             <a
               onClick={logoutHandle}
               href="/"
               className="flex justify-between items-center my-1 hover:text-red-500"
             >
-              <RiLogoutBoxFill className="mx-2" />
+              <RiLogoutBoxFill className="" />
               Logout
             </a>
           </div>
-          <Popover.Close
-            className="rounded-full h-[25px] w-[25px] mr-4 inline-flex items-center justify-center text-white absolute top-[5px] right-[5px] outline-none cursor-pointer"
-            aria-label="Close"
-          >
-            <Cross2Icon />
-          </Popover.Close>
           <Popover.Arrow className="fill-[#2B504B]" />
         </Popover.Content>
       </Popover.Portal>

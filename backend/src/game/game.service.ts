@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
@@ -13,6 +13,14 @@ export class GameService {
           where: { id },
         });
       }
+
+    async updateTotalMatches(params: { id: string; TotalWin: number, TotalLose: number, TotalDraw: number }): Promise<User> {
+        const { id, TotalWin, TotalLose, TotalDraw } = params;
+        return await this.prisma.user.update({
+          data : {TotalWin : TotalWin, TotalLose: TotalLose, TotalDraw: TotalDraw},
+          where: { id },
+        });
+      }
     
     async CreateScore(params: {Player1: string, Player2: string, score1: number, score2: number}): Promise<any> {
         const {Player1, Player2, score1, score2} = params;
@@ -24,5 +32,48 @@ export class GameService {
                 player2Score: score2,
             }
         })
+    }
+
+    async updateTotalMatch(params: { id: string; TotalMatch: number }): Promise<User> {
+        const { id, TotalMatch } = params;
+        return await this.prisma.user.update({
+          data : {TotalMatch: TotalMatch},
+          where: { id },
+        });
+      }
+    
+    async setcleanSheet(params: { id: string}): Promise<User> {
+        const { id } = params;
+        return await this.prisma.user.update({
+          data : {cleanSheet: true},
+          where: { id },
+        });
+      }
+    
+    async setMachine(params: { id: string}): Promise<User> {
+        const { id } = params;
+        return await this.prisma.user.update({
+          data : {Machine: true},
+          where: { id },
+        });
+      }
+    
+    async updateLevel(params: { id: string; level: number }): Promise<User> {
+        const { id, level } = params;
+        return await this.prisma.user.update({
+          data : {Level: level},
+          where: { id },
+        });
+      }
+    
+    async updateTheme(params: {id: string; theme: {background: string[], paddle: string, ball: string}}){
+        const {id, theme} = params;
+        if (await this.prisma.user.findUnique({where: {id}}) == null){
+            throw new NotFoundException('User not found');
+        }
+          return await this.prisma.user.update({
+              data: {bg_color: theme.background, paddle_color: theme.paddle, ball_color: theme.ball},
+              where: {id},
+          });
     }
 }

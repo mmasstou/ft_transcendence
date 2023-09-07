@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Changa:wght@300;400;500;600;700&family=VT323&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 
 .blue__gradient {
@@ -98,5 +100,23 @@
 * {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+  font-family: 'Changa', sans-serif;
 }
 
+
+
+/* Hide the clear button for all input elements */
+input[type="text"]::-ms-clear,
+input[type="text"]::-ms-reveal {
+  display: none;
+}
+
+input[type="search"]::-webkit-search-clear-button {
+  display: none;
+}
+
+/* For certain browsers like Firefox, the clear button is styled using the pseudo-element */
+/* You can style it further or hide it */
+input[type="search"]::-moz-clear {
+  display: none;
+}

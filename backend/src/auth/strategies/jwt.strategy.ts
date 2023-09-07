@@ -17,6 +17,7 @@ export type JwtPayload = {
   banner: string;
   id: number;
   intraId: number;
+  userId: string;
 };
 
 @Injectable()
@@ -40,7 +41,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   async validate(payload: JwtPayload) {
     const user = await this.prisma.user.findUnique({
-      where: { login: payload.login },
+      where: { email: payload.email },
     });
 
     if (!user) throw new UnauthorizedException('Please log in to continue');
@@ -52,7 +53,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       avatar: payload.avatar,
       name: payload.name,
       banner: payload.banner,
-      id: payload.id,
+      id: user.id,
       intraId: payload.intraId,
     };
   }

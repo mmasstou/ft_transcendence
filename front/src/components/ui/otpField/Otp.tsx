@@ -44,11 +44,15 @@ const Otp: React.FC<Props> = () => {
 
   const handlSave = () => {
     const otpSend = otp.toString().replace(/,/g, '');
+    if (otpSend.length !== 6) {
+      toast.error('Please enter a valid otp code');
+      return;
+    }
     const userData = {
       twoFactorAuthenticationCode: otpSend,
     };
     axios
-      .post('http://localhost:80/api/2fa/authenticate', userData, {
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/2fa/authenticate`, userData, {
         headers: {
           Authorization: `Bearer ${yourJwtToken}`,
           'Content-Type': 'application/json',
@@ -56,15 +60,17 @@ const Otp: React.FC<Props> = () => {
       })
       .then((response) => {
         if (response.status === 200) {
-          router.push('/profile');
+          router.replace('/profile');
           toast.success('Your profile is verified');
         }
       })
       .catch((err) => {
-        if (err.response && err.response.status === 401) {
-          toast.error(err.response.data.message);
-          return;
+        if (err.response.status === 401) {
+          toast.error('invalid otp code');
+        } else {
+          toast.error(err.message);
         }
+        console.clear();
         return;
       })
       .finally(() => {

@@ -4,15 +4,13 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { MessagesService } from './messages.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
-import { UpdateMessageDto } from 'src/Dtos/UpdateMessageDto';
 import { Request } from 'express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-oauth.guard';
+import { MessagesService } from './messages.service';
 
 @Controller('messages')
 export class MessagesController {
@@ -34,21 +32,15 @@ export class MessagesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll() {
-    return this.messageService.findAll();
+  @Get('channeL/:id')
+  findALLForChanneL(@Param('id') id: string) {
+    return this.messageService.findALLForChanneL(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.messageService.findOne({ id });
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() data: UpdateMessageDto) {
-    return this.messageService.update({ id, data });
   }
 
   @UseGuards(JwtAuthGuard)

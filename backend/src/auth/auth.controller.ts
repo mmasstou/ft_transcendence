@@ -1,34 +1,17 @@
-import {
-  Body,
-  Controller,
-  Post,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-  Get,
-  Req,
-  Res,
-} from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
-import { JwtAuthGuard } from './guards/jwt-oauth.guard';
+import { PrismaService } from 'src/prisma.service';
 import { UserService } from 'src/users/user.service';
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './guards/jwt-oauth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private readonly userService: UserService,
+    private readonly prisma: PrismaService,
   ) {}
-
-  // @HttpCode(HttpStatus.OK)
-  // @Post('login')
-  // signIn(@Body() signInDto: Record<string, any>) {
-  //   console.log('Login Data :', signInDto);
-  //   return this.authService.signIn(signInDto.username, signInDto.password);
-  // }
-
-  // @UseGuards(AuthGuard('42'))
   @Get('42')
   async login42(@Req() req: any) {
     return req.user;
@@ -48,6 +31,9 @@ export class AuthController {
         httpOnly: false,
         sameSite: false,
       });
+      if (req.user.logedFirstTime) {
+        return res.redirect(`${process.env.AUTH_REDIRECT_LOGIN}`);
+      }
       if (req.user.twoFA) {
         return res.redirect(`${process.env.AUTH_REDIRECT_2FA}`);
       } else {
@@ -61,9 +47,15 @@ export class AuthController {
   @Get('logout')
   @UseGuards(JwtAuthGuard)
   async logout(@Req() req: any, @Res() res: Response): Promise<any> {
+    await this.prisma.user.update({
+      where: { email: req.user.email },
+      data: {
+        logedFirstTime: false,
+      },
+    });
     // res.clearCookie('token');
+    // res.clearCookie('accessToken');
     // res.clearCookie('_id');
-    // res.redirect('http://localhost:8080');
     res.sendStatus(200);
   }
 

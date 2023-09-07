@@ -5,43 +5,40 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  Param,
   Post,
-  Query,
 } from '@nestjs/common';
-import { MyGateway, BallGateway } from './game.gateway';
+import { MyGateway } from './game.gateway';
+import { PrismaService } from 'src/prisma.service';
+import { GameService } from './game.service';
 
 @Controller('game')
 export class GameController {
   constructor(
     private GameGateway: MyGateway,
-    private BallGateway: BallGateway,
+    private prisma: PrismaService,
+    private GameService: GameService,
   ) {}
-  // @Post('/FriendGame')
-  // async selectFriendGame(@Body() body: any) {
-  //     const promise = this.GameGateway.CreateFriendTable(body);
-  //     promise.then((tableId) => {
-  //         console.log("tableId: ", tableId);
-  //         this.BallGateway.CreateFriendTable(body, tableId);
-  //     });
-  //
 
   @Post('/FriendGame')
-  async selectFriendGame(@Body() body: any) {
+  async selectFriendGame(@Body() body: {player1Id: string; player2Id: string; mode: string}) {
     try {
-      const tableId = await this.GameGateway.CreateFriendTable(body);
-      this.BallGateway.CreateFriendTable(body, tableId);
+      const result = await this.GameGateway.CreateFriendTable(body);
+      if (result != undefined)
+        throw new HttpException(
+          { reason: result.message },
+          HttpStatus.CONFLICT,
+        );
     } catch (err) {
-      throw new HttpException({ reason: err }, HttpStatus.CONFLICT);
+      throw new HttpException(
+        { reason: err.response.reason },
+        HttpStatus.CONFLICT,
+      );
     }
   }
-  /** {       ///////////////////////////////////////////////////////// body
-        "player1Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
-        "player2Id": "2c8f719b-ddb0-430c-bb73-42460cc33a3a",
-        "mode": "time" / "score"
-        } */
 
   @Post('/BotGame')
-  async selectBotGame(@Body() body: any) {
+  async selectBotGame(@Body() body: {playerId: string; mode: string}) {
     try {
       const result = await this.GameGateway.CreateBotTable(body);
       if (result != undefined)
@@ -52,39 +49,13 @@ export class GameController {
     } catch (err) {
       throw new HttpException(
         { reason: err.response.reason },
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.CONFLICT,
       );
     }
   }
 
-  // @Post('/BotGame')
-  // async selectBotGame(@Body() body: any) {
-  //     try {
-  //         console.log("body: ", body);
-  //         const res = await this.GameGateway.CreateBotTable(body);
-  //         this.BallGateway.CreateBotTable(body, res);
-  //     } catch (err) {
-  //         throw new HttpException({reason: err}, HttpStatus.CONFLICT);
-  //     }
-  // }
-  /** {       ///////////////////////////////////////////////////////// body
-        "player_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
-        "mode": "time"
-        } */
-
-  // @Post('/RandomGame')
-  // async selectRandomGame(@Body() body: any) {
-  //     const promise = this.GameGateway.CreateRandomTable(body);
-  //     promise.then((res) => {
-  //         this.BallGateway.CreateRandomTable(body, res);
-  //     }).catch((err) => {
-  //         console.log("+err: ", err)
-  //         return err;
-  //     });
-  // }
-
   @Post('/RandomGame')
-  async selectRandomGame(@Body() body: any) {
+  async selectRandomGame(@Body() body: {playerId: string; mode: string}) {
     try {
       const result = await this.GameGateway.CreateRandomTable(body);
       if (result != undefined) {
@@ -93,7 +64,6 @@ export class GameController {
           HttpStatus.CONFLICT,
         );
       }
-      // await this.BallGateway.CreateRandomTable(body, res);
     } catch (err) {
       throw new HttpException(
         { reason: err.response.reason },
@@ -101,19 +71,48 @@ export class GameController {
       );
     }
   }
-  /** {       ///////////////////////////////////////////////////////// body
-        "player_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
-        "mode": "time"
-        } */
 
   @Post('/leaveGame')
-  leaveGame(@Body() body: any) {
-    // console.log("body: ", body);
+  leaveGame(@Body() body: {UserId: string; TableId: string}) {
     this.GameGateway.LeaveGame(body);
-    // const promise = this.GameGateway.LeaveGame(body);
   }
 
-  /**{       ///////////////////////////////////////////////////////// body
-        "table_Id": "25deb8bc-f2f7-45eb-9079-9969696b71fe",
-        } */
+
+  @Get('/GetScore/:id')
+  async getUserScores(@Param('id') userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        MyScore: true,
+        Other: true,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const matchList = user.MyScore.concat(user.Other);
+    const sortedmatchList = matchList.sort((item1, item2) => {
+      if (item1.created_at > item2.created_at) {
+        return -1;
+      }
+      if (item1.created_at < item2.created_at) {
+        return 1;
+      }
+      return 0;
+    });
+
+    return matchList;
+  }
+
+  @Post('/UpdateTheme')
+  async updateTheme(@Body() body: {id: string; theme: {background: string[], paddle: string, ball: string;}}) {
+    try {
+      await this.GameService.updateTheme(body);
+    } catch (err) {
+      throw new HttpException(
+        { reason: 'User not found' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
 }
