@@ -25,8 +25,7 @@ export default function Conversation(props: { md: any }) {
             <section className='flex justify-between items-center w-full mr-1'>
                 <section className='flex flex-col justify-start'>
                     <h2 className='text-white '>{user?.login}</h2>
-                    {/* <span className='text-[10px] text-[#3E504D]'>{formatDate(props.md.created_at)}</span> */}
-                    <span className='text-[10px] text-[#3E504D]'>Creation Date</span>
+                    <span className='text-[10px] text-[#3E504D]'>{formatDate(props.md.updated_at.toString())}</span>
                 </section>
                 <span className='text-xs text-[#1EF0AE]'>{user ? (user?.location ? user.location : 'Unavailable') : ''}</span>
             </section>

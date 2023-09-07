@@ -19,6 +19,7 @@ import Button from '../components/Button';
 import Conversation from '../components/Conversation';
 import getUserWithId from '../channels/actions/getUserWithId';
 import { PiGameController } from 'react-icons/pi';
+import { formatDate } from '../channels/actions/formatDate';
 const metadata = {
     title: 'Transcendence',
     description: 'ft_transcendence',
@@ -195,7 +196,7 @@ export default function page({ params }: { params: { dmId: string } }) {
                         <Image src={scUser ? scUser.avatar : ''} alt='User avatar' width={55} height={55} className='rounded-[50%]' />
                         <section className='flex items-center justify-between w-full text-[#1EF0AE]'>
                             <p className='text-white'>{scUser ? scUser.login : 'User'}</p>
-                            <Button icon={PiGameController} outline small IsActive onClick={() => InviteToGame()}></Button>
+                            <p className='text-primary'>{formatDate(ConversationInfo.updated_at.toString())}</p>
                         </section>
                     </section>
                     {<div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5 ">
