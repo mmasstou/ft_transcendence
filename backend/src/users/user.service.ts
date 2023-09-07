@@ -355,7 +355,6 @@ export class UserService {
 
   // get all non friend users and non pending users
   async getNonFriends(userId: string) {
-    console.log('userId: ', userId);
     try {
       const friends = await this.prisma.friendship.findMany({
         where: {

@@ -211,10 +211,7 @@ export class RoomsService {
     channeLpassword?: string;
   }) {
     try {
-      // console.log('++create+data+>', _data);
-      // console.log('++create+userId+>', userId);
       return await this.prisma.$transaction(async (prisma) => {
-        // console.log('++data : ', _data);
         const slug = this.createSlug(_data.name);
         const room = await prisma.rooms.create({
           data: {
@@ -236,10 +233,8 @@ export class RoomsService {
             ChanneLNotifications: true,
           },
         });
-        // console.log('***** +> _data.friends.length :', _data.friends.length);
         for (let index = 0; index < _data.friends.length; index++) {
           const element: any = _data.friends[index];
-          // console.log('++_data.friends[index]+>', element);
           await prisma.user.update({
             where: { id: element.id },
             data: {
@@ -270,7 +265,6 @@ export class RoomsService {
     data: { name?: string };
   }): Promise<Rooms> {
     const { id, data } = params;
-    // console.log('++update++>', id);
 
     return await this.prisma.rooms.update({
       data,
@@ -279,8 +273,6 @@ export class RoomsService {
   }
 
   async remove(id: string): Promise<Rooms | null> {
-    // console.log('++remove++>', id);
-
     try {
       const room = await this.prisma.rooms.findUnique({
         where: { id },
@@ -295,14 +287,10 @@ export class RoomsService {
         await prisma.members.deleteMany({
           where: { roomsId: id },
         });
-        // console.log('mmrs :', mmrs);
-
         // Delete all associated Members entities first
         await prisma.messages.deleteMany({
           where: { roomsId: id },
         });
-        // console.log('rms :', rms);
-
         return await prisma.rooms.delete({
           where: { id },
         });
@@ -326,8 +314,6 @@ export class RoomsService {
       const roomIId = await this.prisma.rooms.findUnique({
         where: { id: dep.roomId },
       });
-      // console.log('User :', User);
-      // console.log('roomIId :', roomIId);
 
       const message = await this.prisma.messages.create({
         data: {
@@ -341,7 +327,6 @@ export class RoomsService {
         },
       });
 
-      // console.log('message :', message);
       const room = this.prisma.rooms.update({
         where: { id: dep.roomId },
         data: {
@@ -465,7 +450,6 @@ export class RoomsService {
           messages: true,
         },
       });
-      // console.log('message :', message);
       return message;
     } catch (error) {
       throw new HttpException(
@@ -522,18 +506,6 @@ export class RoomsService {
       !IsMember && _filterRooms.push(room);
     });
     if (!rooms) null;
-    // rooms = rooms.filter((room: Rooms) => {
-    //   const member : Members = room.members.
-
-    // });
-
-    // const _filterRooms = rooms.filter((room: Rooms) => {
-    //   const member = room.members.find(
-    //     (member: Members) => member.userId === User.id,
-    //   );
-    //   if (member) return true;
-    //   return false;
-    // });
     return _filterRooms;
   }
 
@@ -577,7 +549,6 @@ export class RoomsService {
         if (!member)
           throw new NotFoundException(`Member with ID ${memberId} not found`);
       }
-      // console.log('Chat -- joinToRoom +> :', room, User, member);
       const result = await this.prisma.$transaction(async (prisma) => {
         const room = await prisma.rooms.update({
           where: { id: roomId },
@@ -593,7 +564,6 @@ export class RoomsService {
         });
         return room;
       });
-      // console.log('Chat -- joinToRoom +> :', result);
       return result;
     } catch (error) {
       console.log('Chat - error -> joinToRoom', error);
@@ -635,7 +605,7 @@ export class RoomsService {
         throw new Error();
       const result = await this.prisma.$transaction(async (prisma) => {
         // disconnect member from room
-        const room = await prisma.rooms.update({
+        await prisma.rooms.update({
           where: { id: roomId },
           data: {
             members: { disconnect: { id: userId } },

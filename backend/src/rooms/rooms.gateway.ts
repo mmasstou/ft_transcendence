@@ -51,11 +51,10 @@ export class RoomGateway implements OnGatewayConnection {
   async handleConnection(socket: Socket) {
     const User = await this.usersService.getUserInClientSocket(socket);
     if (!User) {
-      console.log('+++++++++++++++handleConnection -> User not exist');
+      console.log('handleConnection -> User not exist');
       socket.emit('removeToken', null);
     }
     if (User) {
-      // console.log('handleConnection for %s , socket %s', User.login, socket.id);
       this.server.emit('ref', { socketId: socket.id });
       socket.emit('offline-connection');
     }
@@ -63,7 +62,6 @@ export class RoomGateway implements OnGatewayConnection {
 
   @SubscribeMessage('disconnect')
   async handleDisconnect(socket: Socket) {
-    console.log('Chat-> %s disconnected', socket.id);
     socket.disconnect();
   }
 
@@ -72,7 +70,6 @@ export class RoomGateway implements OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    console.log('Chat-> offlineConnection +> data :', data);
     try {
       const room = await this.prisma.rooms.findUnique({
         where: { slug: data },
@@ -489,7 +486,6 @@ export class RoomGateway implements OnGatewayConnection {
         data.id,
         LogedUser.id,
       );
-      // console.log('Chat-> responseMemberData- +>', responseMemberData);
       if (_isMemberInRoom !== null) {
         await client.join(room.id);
         // send response to client :
@@ -573,7 +569,6 @@ export class RoomGateway implements OnGatewayConnection {
         return;
       }
 
-      // console.log('Chat-> responseMemberData- +>', responseMemberData);
       const messages: Messages = await this.messageservice.create({
         roomId: room.id,
         content: data.content,
@@ -581,7 +576,6 @@ export class RoomGateway implements OnGatewayConnection {
       });
       // send message to all client in the room :
       this.server.to(room.id).emit('newmessage', messages);
-      // this.server.emit('message', messages);
     } catch (error) {
       if (error) {
         console.log('Chat-sendMessage> error- +>', error);
@@ -603,32 +597,9 @@ export class RoomGateway implements OnGatewayConnection {
         LogedUser.id,
       );
       if (responseMemberData.type === UserType.OWNER) {
-        // console.log('Chat-> responseMemberData- +>', responseMemberData);
         // check type of update :
         // change protacted password :
         if (data.Updatetype === UpdateChanneLSendEnum.CHANGEPROTACTEDPASSWORD) {
-          /*
-            Update protacted password
-            Chat-> updateChanneL +> updateRoom : {
-              Updatetype: 'CHANGEPROTACTEDPASSWORD',
-              room: {
-                id: 'b6b80bb0-363b-4d4e-b2ef-56da0bc44213',
-                name: 'memores',
-                type: 'PROTECTED',
-                viewedmessage: 0,
-                password: '1111',
-                hasAccess: false,
-                accesspassword: '',
-                created_at: '2023-08-26T09:21:42.629Z',
-                updated_at: '2023-08-26T09:23:09.219Z',
-                slug: 'memores',
-                members: [ [Object] ]
-              },
-              newpassword: '4',
-              password: '3',
-              confirmpassword: '3'
-            }
-          **/
           let message = 'password changed success';
           try {
             // chack if password is empty :
@@ -685,52 +656,9 @@ export class RoomGateway implements OnGatewayConnection {
             );
             return;
           }
-
-          // const dataRoom = {
-          //   name: room.name,
-          //   type: room.type,
-          //   accesspassword: room.accesspassword,
-          //   password: data.password,
-          // };
-          // const updateRoom = await this.prisma.rooms.update({
-          //   where: { id: room.id },
-          //   data: {
-          //     ...dataRoom,
-          //   },
-          // });
-          // console.log('Chat-> updateChanneL +> updateRoom :', data);
-          // client.emit(
-          //   `SOCKET_EVENT_RESPONSE_CHAT_CHANGE_PROTACTED_PASSWORD`,
-          //   { OK: true },
-          // );
         }
         // change type of room :
         if (data.Updatetype === UpdateChanneLSendEnum.CHANGETYPE) {
-          /*
-          
-            CHANGETYPE PasswordCorrect : {
-            roomtype: 'PROTECTED',
-            room: {
-              id: 'b6b80bb0-363b-4d4e-b2ef-56da0bc44213',
-              name: 'memores',
-              type: 'PUBLIC',
-              viewedmessage: 0,
-              password: null,
-              hasAccess: false,
-              accesspassword: '',
-              created_at: '2023-08-26T09:21:42.629Z',
-              updated_at: '2023-08-26T12:33:15.447Z',
-              slug: 'memores',
-              members: [ [Object] ]
-            },
-            Updatetype: 'CHANGETYPE',
-            password: '11',
-            confirmpassword: '11',
-            accesspassword: ''
-          }
-
-          **/
-
           let message = 'type changed success';
           let dataRoom: any = {};
           // check if channel is protected :
@@ -827,7 +755,6 @@ export class RoomGateway implements OnGatewayConnection {
     @MessageBody() data: { userId: string; senderId: string; mode: string },
   ) {
     try {
-      console.log('Chat-> sendGameNotification +> data :', data);
       const snderUser: User | null = await this.usersService.findOne({
         id: data.senderId,
       });

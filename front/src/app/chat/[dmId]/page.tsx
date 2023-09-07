@@ -176,13 +176,13 @@ export default function page({ params }: { params: { dmId: string } }) {
     return <>
         <LefttsideModaL>
             <section className='flex items-center gap-4 border-b border-primary pb-3 px-5 mb-4'>
-                {currentUser ? <Image src={currentUser.avatar} alt='avatar' width={55} height={55} className='rounded-[50%]'/> : <></>}
+                {currentUser ? <Image src={currentUser.avatar} alt='avatar' width={55} height={55} className='rounded-[50%]' /> : <></>}
                 <span className='text-white'>Conversations :</span>
             </section>
             <section>
                 {
                     ConversationList && ConversationList.length ? ConversationList.map((md: any, key: number) => (
-                    <Conversation md={md} key={md.id}/>
+                        <Conversation md={md} key={md.id} />
                     )) : <span className='text-[#1EF0AE] p-4'>No Conversation</span>
                 }
             </section>
@@ -243,7 +243,7 @@ export default function page({ params }: { params: { dmId: string } }) {
                                         setMessage(event.target.value);
                                     }}
                                     value={InputValue}
-                                    placeholder={`Message to @${ConversationInfo.id}`}
+                                    placeholder={`Message to @${scUser?.login}`}
                                     type="search"
                                     name=""
                                     id="" />

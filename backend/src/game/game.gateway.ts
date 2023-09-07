@@ -232,7 +232,6 @@ class BallGateway implements OnGatewayConnection {
       console.log('+> not valid token', error);
     }
     if (!_User) return;
-    console.log('++> Client', _User.login, 'connected to Game');
     if (!UserMap.has(_User.id))
       UserMap.set(_User.id, {
         User: _User,
@@ -591,12 +590,11 @@ class MyGateway implements OnGatewayConnection {
         this.GameService.updateStatus({
           id: socket.handshake.auth.UserId,
           status: 'inGame',
-        })
+        });
       }, 50);
       UserMap.get(socket.handshake.auth.UserId).Status = 'inGame';
       socket.emit('joinRoomGame', TableMap.get(socket.handshake.auth.tableId));
-    }
-    else {
+    } else {
       await this.GameService.updateStatus({
         id: socket.handshake.auth.UserId,
         status: 'online',
@@ -626,11 +624,6 @@ class MyGateway implements OnGatewayConnection {
     const UsId = client.handshake.auth.UserId;
     const TableId = UserMap.get(UsId) && UserMap.get(UsId).TableId;
     if (data[0] == 'transport close') {
-      console.log(
-        '--> Client',
-        UserMap.get(UsId).User.login,
-        'reload the game page',
-      );
       if (
         UserMap.get(UsId) &&
         UserMap.get(UsId).TableId &&
@@ -639,11 +632,6 @@ class MyGateway implements OnGatewayConnection {
         TableMap.get(TableId).Status = false;
         this.server.to(TableId).emit('setStatus', false);
         UserMap.get(UsId).timeOut = setTimeout(async () => {
-          console.log(
-            '--> Client',
-            UserMap.get(UsId).User.login,
-            'logout from the game page',
-          );
           await this.GameService.updateStatus({ id: UsId, status: 'online' });
           if (UserMap.get(UsId)) {
             this.server.to(TableId).emit('leaveGame');
@@ -661,7 +649,6 @@ class MyGateway implements OnGatewayConnection {
         }, 10000);
       }
     } else {
-      console.log('--> Client', UsId, 'logout from the game page');
       await this.GameService.updateStatus({ id: UsId, status: 'online' });
       if (UserMap.get(UsId)) {
         this.server.to(TableId).emit('leaveGame');

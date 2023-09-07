@@ -5,7 +5,7 @@ import MyToast from '@/components/ui/Toast/MyToast';
 import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { createContext, useEffect, ReactNode } from 'react';
+import React, { ReactNode, createContext, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { Socket, io } from 'socket.io-client';
 import StartGame from './chat/channels/actions/startgame';
@@ -71,12 +71,13 @@ const Dashboard = ({ children }: Props) => {
         setNotifications(data);
 
         return () => {
-          setNotifications(null);
+          setNotifications((prev: any) => null);
         };
       }
     );
     return () => {
-      socket?.off('GameNotificationResponse');};
+      socket?.off('GameNotificationResponse');
+    };
   }, [socket]);
 
   useEffect(() => {
@@ -128,24 +129,26 @@ const Dashboard = ({ children }: Props) => {
 
     socket?.on('GameResponse', (data: any) => {
       if (data.response === 'Accept') {
-        if (data.sender.id === userId) {
-          (async () => {
-            if (!token) return;
-            const body = {
-              player2Id: data.sender.id,
-              player1Id: data.userId,
-              mode: data.mode,
-            };
-            const g = await StartGame(body, token);
-            if (!g) return;
+        setTimeout(() => {
+          if (data.sender.id === userId) {
+            (async () => {
+              if (!token) return;
+              const body = {
+                player2Id: data.sender.id,
+                player1Id: data.userId,
+                mode: data.mode,
+              };
+              const g = await StartGame(body, token);
+              if (!g) return;
+              channeLsettingsHook.onClose();
+              router.push(`/game/${data.mode}/friend`);
+            })();
+          }
+          if (data.userId === userId) {
             channeLsettingsHook.onClose();
             router.push(`/game/${data.mode}/friend`);
-          })();
-        }
-        if (data.userId === userId) {
-          channeLsettingsHook.onClose();
-          router.push(`/game/${data.mode}/friend`);
-        }
+          }
+        }, 1000)
       }
       if (data.response === 'Deny') {
         if (data.userId === userId) {
@@ -156,6 +159,10 @@ const Dashboard = ({ children }: Props) => {
         }
       }
     });
+    return () => {
+      socket?.off('GameResponse')
+      socket?.off('notification')
+    }
   }, [socket]);
 
   return (
@@ -173,6 +180,7 @@ const Dashboard = ({ children }: Props) => {
       {Notifications && (
         <MyToast
           OnAccept={() => {
+            setNotifications((prev: any) => null);
             if (!params) return;
             socket?.emit('AcceptGame', {
               userId: userId,
@@ -185,7 +193,6 @@ const Dashboard = ({ children }: Props) => {
               sendTo: Notifications.sender,
               mode: Notifications.mode,
             });
-            setNotifications(null);
           }}
           OnDeny={() => {
             socket?.emit('DenyGame', {
@@ -198,7 +205,7 @@ const Dashboard = ({ children }: Props) => {
               sendTo: Notifications.sender,
               mode: Notifications.mode,
             });
-            setNotifications(null);
+            setNotifications((prev: any) => null);
           }}
           isOpen
           user={Notifications.sender.login}

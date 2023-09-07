@@ -25,14 +25,13 @@ export class DmGateway implements OnGatewayConnection {
   async handleConnection(socket: Socket) {
     const User: User = await this.usersService.getUserInClientSocket(socket);
     if (!User) {
-      console.log('+++++++++++++++handleConnection -> User not exist');
+      console.log('handleConnection -> User not exist');
       socket.emit('removeToken', null);
     }
     if (User) {
       if (!this.dmService.connectToALLDm(User, socket)) {
-        console.log('+++++++++++++++handleConnection -> error');
+        console.log('handleConnection -> error');
       }
-      // console.log('handleConnection for %s , socket %s', User.login, socket.id);
       this.server.emit('ref', { socketId: socket.id });
       socket.emit('offline-connection');
     }
@@ -58,12 +57,6 @@ export class DmGateway implements OnGatewayConnection {
         content: payload.content,
         userId: User.id,
       });
-
-      // const isInroomSocket = client.rooms.has(md.id) || false;
-      // console.log(
-      //   'DmGateway -> handleMessage -> isInroomSocket',
-      //   isInroomSocket,
-      // );
 
       this.server.to(md.id).emit('message', message);
     } catch (error) {
