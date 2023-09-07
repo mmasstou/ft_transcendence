@@ -1,10 +1,10 @@
 "use client"
 
-import { messagesType } from '@/types/types';
+import { messagesType, userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoSend } from 'react-icons/io5';
 import { TbMessageX } from 'react-icons/tb';
@@ -17,6 +17,7 @@ import LefttsideModaL from '../channels/modaLs/LeftsideModal';
 import { ChanneLContext } from '../channels/providers/channel.provider';
 import Button from '../components/Button';
 import Conversation from '../components/Conversation';
+import getUserWithId from '../channels/actions/getUserWithId';
 const metadata = {
     title: 'Transcendence',
     description: 'ft_transcendence',
@@ -40,6 +41,7 @@ export default function page({ params }: { params: { dmId: string } }) {
     const [message, setMessage] = React.useState("")
     const [reload, setReload] = React.useState<boolean>(false)
     const leftSidebarHook = LeftSidebarHook()
+    const [currentUser, setCurrentUser] = useState<userType | null>(null);
 
 
 
@@ -114,6 +116,12 @@ export default function page({ params }: { params: { dmId: string } }) {
     React.useEffect(() => {
         leftSidebarHook.onClose()
         UpdateData();
+        if (!token || !UserId) return router.push('/');
+        (async () => {
+            const user: userType | null = await getUserWithId(UserId, token);
+            if (user)
+                setCurrentUser(user);
+        })()
         setIsMounted(true);
     }, [])
 
@@ -159,11 +167,17 @@ export default function page({ params }: { params: { dmId: string } }) {
     document.title = `Transcendence/ dm` || metadata.title;
     return <>
         <LefttsideModaL>
+            <section className='flex items-center gap-4 border-b border-primary pb-3 px-5 mb-4'>
+            {currentUser ? <Image src={currentUser.avatar} alt='avatar' width={55} height={55} className='rounded-[50%]'/> : <></>}
+            <span className='text-white'>Conversations :</span>
+            </section>
+            <section>
             {
                 ConversationList && ConversationList.map((md: any, key: number) => (
-                    <Conversation md={md} />
+                <Conversation md={md} key={md.id}/>
                 ))
             }
+            </section>
         </LefttsideModaL>
         {/* <Conversations socket={socket} slug={params.dmId} /> */}
         <div className=" relative flex flex-col items-center w-full">
