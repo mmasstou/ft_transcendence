@@ -1,6 +1,5 @@
 'use client'
-import React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import { IconType } from "react-icons"
 import Button from "../../components/Button"
 
@@ -16,7 +15,7 @@ interface IChannelSettingsUserMemberItemProps {
     showLabeL?: boolean
 }
 export default function ChannelSettingsUserMemberItemOption(
-    { icon: Icon, size, IsActivate, disabled, IsLoading, background, Onclick, label , showLabeL }: IChannelSettingsUserMemberItemProps) {
+    { icon: Icon, size, IsActivate, disabled, IsLoading, background, Onclick, label, showLabeL }: IChannelSettingsUserMemberItemProps) {
     const [Ismounted, setIsmounted] = useState<boolean>(false)
 
     React.useEffect(() => setIsmounted(true))

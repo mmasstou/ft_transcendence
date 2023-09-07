@@ -1,28 +1,12 @@
 "use client"
-import ContactHook from "@/hooks/contactHook"
-import { TiArrowMinimise } from "react-icons/ti"
-import { RegisterOptions, FieldValues, UseFormRegisterReturn, useForm, SubmitHandler, useFieldArray, set } from "react-hook-form"
-import { MouseEvent, useCallback, useEffect, useRef, useState } from "react"
-import { RoomsType, userType } from "@/types/types"
+import { userType } from "@/types/types"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
+import { useEffect, useRef, useState } from "react"
 
 
-import ChanneLModal from "./channel.modal"
-import Select from "../../components/Select"
-import ChanneLcreatemodaLHook from "../hooks/channel.create.hook"
-import ChanneLmodaLheader from "../components/channel.modal.header"
-import Input from "@/components/Input"
-import getUserWithId from "../actions/getUserWithId"
-import Button from "../../components/Button"
-import { RiGitRepositoryPrivateFill } from "react-icons/ri"
-import { MdOutlinePublic } from "react-icons/md"
-import { GrSecure, GrInsecure } from "react-icons/gr"
-import { GoEyeClosed } from "react-icons/go"
-import { HiLockClosed, HiLockOpen } from "react-icons/hi"
-import getUsers from "../actions/getUsers"
 import ChanneLPasswordAccessHook from "../hooks/Channel.Access.Password.hook"
-import { toast } from "react-hot-toast"
+import ChanneLModal from "./channel.modal"
 enum RoomType {
     PUBLIC = 'PUBLIC',
     PRIVATE = 'PRIVATE',
@@ -59,26 +43,6 @@ const ChanneLPasswordAccessModaL = () => {
         onClose()
     }
 
-    // useEffect(() => {
-    //     socket?.on(
-    //         `SOCKET_EVENT_RESPONSE_CHAT_MEMBER_UPDATE`,
-    //         (data: {
-    //             message: string,
-    //             status: any,
-    //             data: RoomsType,
-    //         }) => {
-    //             console.log("RESPONSE_CHAT_MEMBER_UPDATE :", data)
-    //             if (!data) {
-    //                 toast.error('error')
-    //             }
-    //             if (data) {
-    //                 toast.success(data.message)
-    //                 route.push(`/chat/channels?r=${data.data.id}`)
-    //                 onClose()
-    //             }
-    //         });
-    // }, [socket])
-
     if (!IsMounted) return
 
     const bodyContent = (
@@ -114,7 +78,7 @@ const ChanneLPasswordAccessModaL = () => {
                 peer-focus:scale-75 peer-focus:-translate-y-4
                 ${(InputValue.length !== 0 || !InputValue) ? 'scale-75 -translate-y-4' : ''}
                 text-zinc-500`}>
-                            type Password lkk
+                            type Password
                         </label>
                     </div>
                 </div>

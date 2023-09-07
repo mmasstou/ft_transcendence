@@ -9,7 +9,7 @@ interface props {
     hasPermissions?: boolean;
     member: any;
     OnClick: (data: any) => void;
-    type : '';
+    type: '';
 }
 export default function ChanneLSettingsUserMemberItemActions(
     { hasPermissions, member, OnClick }: props
@@ -57,6 +57,5 @@ export default function ChanneLSettingsUserMemberItemActions(
                 OnClick({ updateType: updatememberEnum.MUTEMEMBER, member: member })
             }}
         />}
-        {/* {member.ismute && <MuteTime member={member} socket={socket} />} */}
     </div>
 }

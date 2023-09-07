@@ -1,8 +1,7 @@
 import { RoomsType, USERSETTINGSTEPS, UserTypeEnum, membersType, updatememberEnum, userType } from "@/types/types";
 import Cookies from "js-cookie";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React from "react";
-import { BiSolidFileFind } from "react-icons/bi";
 import { TbUserPlus } from "react-icons/tb";
 import { Socket } from "socket.io-client";
 import Button from "../../../../components/Button";
@@ -12,11 +11,9 @@ import getMemberWithId from "../../../actions/getMemberWithId";
 import getmessage from "../../../actions/member.action.message";
 import StartGame from "../../../actions/startgame";
 import ChanneLConfirmActionHook from "../../../hooks/channel.confirm.action";
-import ChanneLsettingsHook from "../../../hooks/channel.settings";
 import SettingsProvider from "../../../providers/channel.settings.provider";
 import ChanneLsettingsPlayGame from "./channel.settings.playgame";
 import ChanneLSettingsMemberJoinModaL from "./channel.settings.user.addmember";
-import ChanneLSettingsMemberFindModaL from "./channel.settings.user.findmember";
 import ChannelSettingsUserMemberItem from "./channel.settings.user.memberItem";
 
 interface ChanneLUserSettingsProps {
@@ -151,18 +148,6 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
                         }}
                     />
                 }
-                <Button
-                    icon={BiSolidFileFind}
-                    label={"Find member"}
-
-                    responsive
-                    outline
-                    size={24}
-                    labelsize={8}
-                    onClick={() => {
-                        setStep(USERSETTINGSTEPS.FINDMEMBER)
-                    }}
-                />
             </div>
             <div className="overflow-y-scroll max-h-[34rem] flex flex-col w-full gap-4">
                 {members && members.map((member: membersType, index) => (
@@ -199,12 +184,6 @@ export default function ChanneLUserSettings({ socket, member, User, room }: Chan
         bodyContent = <ChanneLSettingsMemberJoinModaL OnClick={() => { setStep(USERSETTINGSTEPS.INDEX) }} socket={socket} OnBack={() => {
             setStep(USERSETTINGSTEPS.INDEX)
         }} />
-    }
-    if (step === USERSETTINGSTEPS.FINDMEMBER) {
-        bodyContent = <ChanneLSettingsMemberFindModaL
-            OnClick={() => { setStep(USERSETTINGSTEPS.INDEX) }} socket={socket} OnBack={() => {
-                setStep(USERSETTINGSTEPS.INDEX)
-            }} />
     }
 
     return <SettingsProvider  >

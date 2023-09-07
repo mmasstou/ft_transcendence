@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 import { useParams } from "next/navigation";
 import React, { createContext } from "react";
 import { Socket } from "socket.io-client";
-import FindOneBySLug from "../actions/Channel/findOneBySlug";
+import FindOneBySLug from "../actions/findOneBySlug";
 import getMemberWithId from "../actions/getMemberWithId";
 import Loading from "../components/loading";
 import { ChanneLContext } from "./channel.provider";

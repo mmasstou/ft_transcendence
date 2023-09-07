@@ -1,19 +1,15 @@
 'use client'
 import Button from "@/app/chat/components/Button";
 import { RoomsType, UserTypeEnum, membersType } from "@/types/types";
+import Cookies from "js-cookie";
+import { useParams } from "next/navigation";
 import React from "react";
 import { IoChevronBackOutline } from "react-icons/io5";
 import { Socket } from "socket.io-client";
+import FindOneBySLug from "../../../actions/findOneBySlug";
 import getMemberWithId from "../../../actions/getMemberWithId";
-import Cookies from "js-cookie";
-import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
-import { useParams } from "next/navigation";
-import PermissionDenied from "../../channel.settings.permissiondenied";
-import { toast } from "react-hot-toast";
-import { tr } from "date-fns/locale";
-import Settings from "@/components/Dashboard/Header/Settings";
 import SettingsProvider from "../../../providers/channel.settings.provider";
-import Loading from "../../loading";
+import PermissionDenied from "../../channel.settings.permissiondenied";
 
 interface props {
     children: React.ReactNode;
@@ -24,7 +20,7 @@ interface props {
 const UserId: string | undefined = Cookies.get('_id')
 const token: string | undefined = Cookies.get('token')
 
-export default function ChanneLsettingsProvider(props: props) {
+export default function ChanneLsettingsBody(props: props) {
     const [IsMounted, setMounted] = React.useState<boolean>(false)
     const [LoggedMember, setLoggedMember] = React.useState<membersType | null>(null)
     const [ChanneLinfo, setChanneLinfo] = React.useState<RoomsType | null>(null)

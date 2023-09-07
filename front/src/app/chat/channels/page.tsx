@@ -10,7 +10,6 @@ import ChanneLSidebarItem from './components/channel.sidebar.item';
 import LefttsideModaL from './modaLs/LeftsideModal';
 // hooks :
 import LeftSidebarHook from './hooks/LeftSidebarHook';
-import RightsidebarHook from './hooks/RightSidebarHook';
 // helpers :
 import getChannels from './actions/getChanneLs';
 // icons :
@@ -24,7 +23,6 @@ export default function page() {
   const query = useParams();
   const slug: string | undefined = query.slug ? typeof query.slug === 'string' ? query.slug : query.slug[0] : undefined
   const leftSidebarHook = LeftSidebarHook();
-  const rightsidebarHook = RightsidebarHook()
   const UserId: any = Cookies.get('_id');
   const token = Cookies.get('token');
   if (!UserId || !token) return;
@@ -70,6 +68,7 @@ export default function page() {
 
   if (!IsMounted)
     return null
+  document.title = `Transcendence | Channels`;
   return (
     <>
       <LefttsideModaL>
@@ -79,7 +78,7 @@ export default function page() {
           ))
         }
       </LefttsideModaL>
-      <div className={`${(leftSidebarHook.IsOpen || rightsidebarHook.IsOpen) && 'hidden md:flex'} w-full`}>
+      <div className={`${(leftSidebarHook.IsOpen) && 'hidden md:flex'} w-full`}>
         <div className="flex flex-col justify-center items-center h-full w-full">
           <Image src="/no_conversations.svg" width={600} height={600} alt={""} />
         </div>

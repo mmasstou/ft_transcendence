@@ -16,7 +16,7 @@ import getChannelWithId from "../../../actions/getChannelWithId";
 import ChanneLConfirmActionHook from "../../../hooks/channel.confirm.action";
 import { TbLockCheck } from "react-icons/tb";
 import { on } from "events";
-import FindOneBySLug from "../../../actions/Channel/findOneBySlug";
+import FindOneBySLug from "../../../actions/findOneBySlug";
 import { sl } from "date-fns/locale";
 interface ChanneLUserSettingsProps {
     socket: Socket | null;

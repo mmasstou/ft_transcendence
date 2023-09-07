@@ -10,23 +10,21 @@ import { Socket } from "socket.io-client";
 import { RoomsType, membersType, messagesType } from "@/types/types";
 import Cookies from "js-cookie";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { IoSend } from "react-icons/io5";
+import { TbMessageX } from "react-icons/tb";
 import Button from "../../components/Button";
-import FindOneBySLug from "../actions/Channel/findOneBySlug";
+import FindOneBySLug from "../actions/findOneBySlug";
 import getChanneLMessages from "../actions/getChanneLMessages";
 import getMemberWithId from "../actions/getMemberWithId";
+import ChanneLsettingsHook from "../hooks/channel.settings";
+import { ChanneLContext } from "../providers/channel.provider";
+import ChannelConversationsMute from "./channel.conversations.mute";
+import ConversationsOffLine from "./channel.conversations.offLine";
 import ConversationsTitlebar from "./channel.conversations.titlebar";
 import Message from "./channel.message";
 import BanMember from "./channel.settings.banmember";
-import { CiVolumeMute } from "react-icons/ci";
-import { is, ro, tr } from "date-fns/locale";
-import { ChanneLContext } from "../providers/channel.provider";
-import ChannelConversationsMute from "./channel.conversations.mute";
-import ChanneLsettingsHook from "../hooks/channel.settings";
-import ConversationsOffLine from "./channel.conversations.offLine";
-import { TbMessageX } from "react-icons/tb";
 
 const token: string | undefined = Cookies.get('token')
 const UserId: string | undefined = Cookies.get('_id')

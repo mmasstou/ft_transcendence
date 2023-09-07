@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { toast } from 'react-hot-toast';
 import { Socket } from 'socket.io-client';
-import FindOneBySLug from '../actions/Channel/findOneBySlug';
+import FindOneBySLug from '../actions/findOneBySlug';
 import MemberHasPermissionToAccess from '../actions/MemberHasPermissionToAccess';
 import getChannels from '../actions/getChanneLs';
 import getChannelMembersWithId from '../actions/getChannelmembers';
@@ -102,7 +102,7 @@ export default function page({ params }: { params: { slug: string } }) {
     }, [])
 
     if (!IsMounted) return
-    document.title = `Transcendence/chat: ${ChanneLInfo?.name}` || metadata.title;
+    document.title = `Transcendence | ${ChanneLInfo?.name}` || metadata.title;
     return <>
         <LefttsideModaL>
             {

@@ -1,20 +1,16 @@
 
 "use client"
-import { RoomsType, UpdateChanneLSendData, UpdateChanneLSendEnum, membersType } from '@/types/types';
+import { RoomsType, membersType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useParams, useSearchParams } from 'next/navigation';
 import React from 'react';
-import { FieldValues, useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
 import { Socket } from 'socket.io-client';
-import FindOneBySLug from '../../../actions/Channel/findOneBySlug';
+import FindOneBySLug from '../../../actions/findOneBySlug';
 import getChannelMembersWithId from '../../../actions/getChannelmembers';
 import getMemberWithId from '../../../actions/getMemberWithId';
 import ChanneLConfirmActionHook from '../../../hooks/channel.confirm.action';
 import ChanneLaccessDeniedModaL from '../../../modaLs/channel.access.denied.modaL';
 import SettingsProvider from '../../../providers/channel.settings.provider';
-import ChanneLSettingsChanneLAccessPassword from '../../channel.settings.channel.accesspassword';
-import ChanneLSettingsChanneLDeleteChannel from '../../channel.settings.channel.deletechannel';
 import ChanneLsettingsIndex from './channel.settings.channel.Index';
 import ChanneLSettingsChanneLBanedMember from './channel.settings.channel.banedmember';
 import ChanneLSettingsChanneLChangePassword from './channel.settings.channel.changepassword';
@@ -70,31 +66,6 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         })();
     }, [])
 
-    const DeleteAccessPassword = async () => {
-        if (!ChanneLinfo) return;
-
-        const data: UpdateChanneLSendData = {
-            Updatetype: UpdateChanneLSendEnum.REMOVEACCESSEPASSWORD,
-            room: ChanneLinfo,
-        }
-        // chack if  password is not empty and if password is not equal to confirm password
-        const __message = 'are you sure you whon to access password`s for this channel';
-        __message && channeLConfirmActionHook.onOpen(
-            <button
-                onClick={() => {
-                    socket?.emit(`SOCKET_EVENT_CHAT_UPDATE`, data)
-                }}
-                className="text-balck hover:text-danger  border border-secondary bg-secondary text-sm font-bold lowercase  px-7 py-3 rounded-[12px]  w-full">
-                remove Access password
-            </button>
-            , __message
-        )
-        // send data to server
-        // socket?.emit(`SOCKET_EVENT_CHAT_UPDATE`, data)
-        //   reset data for password
-        // reset()
-    }
-
     React.useEffect(() => {
         // get channel info :
         const token: any = Cookies.get('token');
@@ -137,109 +108,14 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
     }, [socket])
 
 
-    const {
-        control,
-        register,
-        handleSubmit,
-        setValue,
-        watch,
-        reset,
-        formState: { errors },
-    } = useForm<FieldValues>({
-        defaultValues: {
-            ChanneLpassword: "",
-            newChanneLpassword: "",
-            confirmChanneLpassword: "",
-            channeLtype: ""
-        },
-    });
-    const _channeLpassword = watch('ChanneLpassword')
-    const _newChanneLpassword = watch('newChanneLpassword')
-    const _confirmChanneLpassword = watch('confirmChanneLpassword')
-    const _channeLtype = watch('channeLtype')
-    const setcustomvalue = (key: any, value: any) => {
-        setValue(key, value, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
-    }
-    const OnEditPassword = () => {
-        setStep(SETTINGSTEPS.EDITPASSWORD)
-    }
-    const OnChangeChannel = () => {
-        setStep(SETTINGSTEPS.CHANGECHANNEL)
-    }
-    const OnBanedMembers = () => {
-        setStep(SETTINGSTEPS.BANEDMEMBERS)
-    }
-    const OnSetOwner = () => {
-        setStep(SETTINGSTEPS.SETOWNER)
-    }
     const OnBack = () => {
         setStep(SETTINGSTEPS.CHOICE)
     }
-    const OnEditAccessPassword = () => {
-        setStep(SETTINGSTEPS.EDITACCESSPASSWORD)
-    }
-    const OnAccessPassword = () => {
-        setStep(SETTINGSTEPS.ACCESSPASSWORD)
-    }
-    const OnRemoveAccessPassword = () => { }
-    const OnLeave = () => { }
-    const OnDeleteChannel = () => { setStep(SETTINGSTEPS.DELETECHANNEL) }
 
 
-
-    // let _body = (
-    //     <div className="flex h-full flex-col justify-between items-start min-h-[34rem] ">
-    //         <div className="flex flex-col gap-2 w-full">
-    //             {ChanneLinfo && ChanneLinfo.type == RoomTypeEnum.PROTECTED &&
-    //                 <ChanneLSettingsOptionItem
-    //                     onClick={function (): void { OnEditPassword(); }}
-    //                     icon={GoEyeClosed}
-    //                     label={"Change password"}
-    //                 />
-    //             }
-    //             <ChanneLSettingsOptionItem
-    //                 onClick={OnChangeChannel}
-    //                 icon={CgEditFlipH}
-    //                 label={"Change Type"}
-    //             />
-    //             <ChanneLSettingsOptionItem
-    //                 onClick={OnBanedMembers}
-    //                 icon={FaUserTimes}
-    //                 label={"Baned members"}
-    //             />
-    //             <ChanneLSettingsOptionItem
-    //                 onClick={OnSetOwner}
-    //                 icon={FaChessQueen}
-    //                 label={"set owner"}
-    //             />
-    //             {!ChanneLinfo?.hasAccess &&
-    //                 <ChanneLSettingsOptionItem
-    //                     onClick={OnAccessPassword}
-    //                     icon={TbPassword}
-    //                     label={"set access password"}
-    //                 />}
-    //             {ChanneLinfo?.hasAccess &&
-    //                 <ChanneLSettingsOptionItem
-    //                     onClick={OnEditAccessPassword}
-    //                     icon={PiPasswordBold}
-    //                     label={"set access password"}
-    //                 />}
-    //             {ChanneLinfo?.hasAccess &&
-    //                 <ChanneLSettingsOptionItem
-    //                     onClick={DeleteAccessPassword}
-    //                     icon={IoBagRemove}
-    //                     label={"remove access password"}
-    //                 />}
-    //         </div>
-    //     </div>
-    // )
     let _body = <ChanneLsettingsIndex socket={socket} onClick={(data: { to: SETTINGSTEPS }) => {
         setStep(data.to)
     }} />
-
-    // if (LogedMember?.type !== UserTypeEnum.OWNER) {
-    //     _body = (<PermissionDenied />)
-    // }
 
     if (step === SETTINGSTEPS.BANEDMEMBERS) {
         _body = members
@@ -257,26 +133,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
             OnBack={OnBack} LogedMember={LogedMember} members={members}
         /> : (<div></div >)
     }
-    if (step === SETTINGSTEPS.ACCESSPASSWORD && !ChanneLinfo?.hasAccess) {
-        _body = <ChanneLSettingsChanneLAccessPassword
 
-            setUpdate={setUpdate}
-            socket={socket}
-            OnBack={OnBack}
-            LogedMember={LogedMember}
-            members={members}
-        />
-    }
-    if (step === SETTINGSTEPS.EDITACCESSPASSWORD && ChanneLinfo?.hasAccess) {
-        _body = <ChanneLSettingsChanneLAccessPassword
-            setUpdate={setUpdate}
-            socket={socket}
-            title="Edit Access Password"
-            OnBack={OnBack}
-            LogedMember={LogedMember}
-            members={members}
-        />
-    }
     if (step === SETTINGSTEPS.CHANGECHANNEL) {
         _body = <ChanneLSettingsChanneLChangeType
             setUpdate={setUpdate}
@@ -296,9 +153,7 @@ export default function ChanneLChatSettings({ socket }: ChanneLChatSettingsProps
         />
 
     }
-    if (step === SETTINGSTEPS.DELETECHANNEL) {
-        _body = <ChanneLSettingsChanneLDeleteChannel room={ChanneLinfo} OnBack={OnBack} socket={socket} />
-    }
+
     return <SettingsProvider >
         {_body}
     </SettingsProvider>

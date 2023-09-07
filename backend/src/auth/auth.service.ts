@@ -15,29 +15,6 @@ export class AuthService {
     private jwtService: JwtService,
     private prisma: PrismaService,
   ) {}
-
-  async signInWithLogin(login: string, password: string) {
-    const userExists = await this.usersService.findOneLogin({
-      login,
-    });
-    if (!userExists) {
-      return null;
-    }
-    if (userExists.password === password) {
-      const token = await this.generateJwt({
-        login: userExists.login,
-        email: userExists.email,
-        avatar: userExists.avatar,
-        name: userExists.name,
-        banner: userExists.banner,
-        intraId: userExists.intraId,
-      });
-      return {
-        userId: userExists,
-        token: token.accessToken,
-      };
-    }
-  }
   async signIn(user: Prisma.UserUncheckedCreateInput) {
     const userExists = await this.usersService.findOneLogin({
       login: user.login,

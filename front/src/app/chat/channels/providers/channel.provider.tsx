@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Socket, io } from 'socket.io-client';
-import FindOneBySLug from '../actions/Channel/findOneBySlug';
+import FindOneBySLug from '../actions/findOneBySlug';
 import getMemberWithId from '../actions/getMemberWithId';
 import getUserWithId from '../actions/getUserWithId';
 import { de, sl } from 'date-fns/locale';

@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Messages } from '@prisma/client';
-import { UpdateMessageDto } from 'src/Dtos/UpdateMessageDto';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -84,19 +83,6 @@ export class MessagesService {
         },
       );
     }
-  }
-
-  async update(params: {
-    id: string;
-    data: UpdateMessageDto;
-  }): Promise<Messages> {
-    const { id, data } = params;
-    // console.log('++update++>', id);
-
-    return await this.prisma.messages.update({
-      data,
-      where: { id },
-    });
   }
 
   async remove(id: string): Promise<Messages> {

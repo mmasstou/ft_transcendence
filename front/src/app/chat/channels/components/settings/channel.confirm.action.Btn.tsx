@@ -1,14 +1,12 @@
-import { Socket } from "socket.io-client"
-import ChanneLConfirmActionHook from "../../hooks/channel.confirm.action"
-import { RoomsType, userType } from "@/types/types";
-import { IoLogOut } from "react-icons/io5";
-import React from "react";
-import getChanneLOwners from "../../actions/getChannelOwner";
+import { RoomsType } from "@/types/types";
 import Cookies from "js-cookie";
-import FindOneBySLug from "../../actions/Channel/findOneBySlug";
-import { toast } from "react-hot-toast";
 import { useParams } from "next/navigation";
+import React from "react";
+import { toast } from "react-hot-toast";
+import { IoLogOut } from "react-icons/io5";
+import { Socket } from "socket.io-client";
 import LeaveChanneL from "../../actions/LeaveChanneL";
+import ChanneLConfirmActionHook from "../../hooks/channel.confirm.action";
 
 interface ChanneLConfirmActionBtnProps {
     socket: Socket | null;
