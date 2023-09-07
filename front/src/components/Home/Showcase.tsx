@@ -1,25 +1,16 @@
 'use client';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import show from '../../../public/show.svg';
 import data from '../../../public/lotties/show.json';
 import Button from './CTA';
 import styles from './style';
 import { useRouter } from 'next/navigation';
-import Lottie from 'react-lottie';
+import Lottie from 'react-lottie-player';
 
 const Showcase = () => {
   const router = useRouter();
   const AnimatedImage = motion(Image);
 
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: data,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice',
-    },
-  };
   return (
     <div>
       <section
@@ -59,7 +50,12 @@ const Showcase = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <Lottie options={defaultOptions} height={600} width={600} />
+            <Lottie
+              loop
+              animationData={data}
+              play
+              style={{ height: 600, width: 600 }}
+            />
           </motion.div>
           <div className="absolute z-[3] right-20 top-0 w-[50%] h-[50%] rounded-full white__gradient" />
           <div className="absolute z-[0] right-20 bottom-20 w-[50%] h-[50%] rounded-full pink__gradient" />

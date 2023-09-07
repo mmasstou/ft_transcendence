@@ -2,11 +2,11 @@ FROM node:buster
 
 WORKDIR /frontend
 
-RUN npm install -f  next --save
+RUN npm install -g next
 COPY ./package.json .
 
 
-RUN npm i -f
+RUN npm i 
 
 COPY . .
 

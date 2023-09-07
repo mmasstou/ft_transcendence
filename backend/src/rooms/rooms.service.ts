@@ -115,32 +115,6 @@ export class RoomsService {
     }
   }
 
-  async findNotifications(params: {
-    login: string;
-    channeLId: string;
-  }): Promise<ChanneLNotifications[]> {
-    try {
-      const { login, channeLId } = params;
-      const User = await this.userService.findOneLogin({ login });
-      const ChanneL = await this.prisma.rooms.findUnique({
-        where: {
-          id: channeLId,
-        },
-      });
-      if (!User || !ChanneL) return;
-      const notifications = await this.prisma.channeLNotifications.findMany({
-        where: {
-          channelId: ChanneL.id,
-        },
-      });
-      if (!notifications) throw new Error();
-      return notifications;
-    } catch (error) {
-      console.log('Rooms-findOne> error- +>', error.message);
-      throw new NotFoundException();
-    }
-  }
-
   async findOwners(params: { channeLId: string }): Promise<User[]> {
     try {
       const { channeLId } = params;
@@ -481,9 +455,9 @@ export class RoomsService {
     return newMember;
   }
 
-  async findPublicAndProtected(login: string) {
+  async findPublicAndProtected(id: string) {
     // git user :
-    const User = await this.userService.findOneLogin({ login });
+    const User = await this.userService.findOne({ id });
     // check if user is member
     const rooms = await this.prisma.rooms.findMany({
       where: {

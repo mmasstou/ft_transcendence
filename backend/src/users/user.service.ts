@@ -16,10 +16,10 @@ import { UpdateUserDto } from './dtos/UpdateUserDto';
 export class UserService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-  async setTwoFactorAuthenticationSecret(secret: string, userLogin: string) {
+  async setTwoFactorAuthenticationSecret(secret: string, userId: string) {
     return this.prisma.user.update({
       where: {
-        login: userLogin,
+        id: userId,
       },
       data: {
         twoFactorAuthenticationSecret: secret,
@@ -27,18 +27,18 @@ export class UserService {
     });
   }
 
-  async turnOnTwoFactorAuthentication(userLogin: string) {
+  async turnOnTwoFactorAuthentication(userId: string) {
     return this.prisma.user.update({
-      where: { login: userLogin },
+      where: { id: userId },
       data: {
         twoFA: true,
       },
     });
   }
 
-  async turnOffTwoFactorAuthentication(userLogin: string) {
+  async turnOffTwoFactorAuthentication(userId: string) {
     return this.prisma.user.update({
-      where: { login: userLogin },
+      where: { id: userId },
       data: {
         twoFA: false,
       },
@@ -86,9 +86,6 @@ export class UserService {
       },
     });
   }
-
-  // Friends Actions
-
   // send friend request
   async sendFriendRequest(senderId: string, receiverId: string): Promise<void> {
     try {
@@ -405,9 +402,6 @@ export class UserService {
   // End Friends Actions
 
   async create(data: Prisma.UserCreateInput): Promise<User> {
-    const Req_Data: Prisma.UserCreateInput = data;
-    if (Req_Data.is_active === true && Req_Data.login !== 'aboulhaj')
-      data.is_active = false;
     return await this.prisma.user.create({
       data,
     });
@@ -444,10 +438,10 @@ export class UserService {
 
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      const login: string = payload.login;
+      const id: string = payload.id;
       // Add your logic to fetch the direct messages for the user from the database or any other source
-      const user = await this.prisma.user.findUnique({
-        where: { login },
+      const user = await this.prisma.user.findFirst({
+        where: { id },
         include: {
           Rooms: true,
           dms: true,
@@ -507,6 +501,7 @@ export class UserService {
       },
     });
   }
+
   isLoginValid(login: string): boolean {
     if (login.length < 6) return false;
     if (login.length > 8) return false;

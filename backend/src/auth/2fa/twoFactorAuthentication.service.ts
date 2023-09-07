@@ -18,7 +18,7 @@ export class TwoFactorAuthenticationService {
     twoFactorAuthenticationCode: string,
     user: Prisma.UserUncheckedCreateInput,
   ) {
-    const _user = await this.usersService.findOneLogin({ login: user.login });
+    const _user = await this.usersService.findOne({ id: user.id });
     if (!_user || !twoFactorAuthenticationCode) return false;
 
     try {
@@ -43,10 +43,7 @@ export class TwoFactorAuthenticationService {
       secret,
     );
 
-    await this.usersService.setTwoFactorAuthenticationSecret(
-      secret,
-      user.login,
-    );
+    await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
 
     return {
       secret,

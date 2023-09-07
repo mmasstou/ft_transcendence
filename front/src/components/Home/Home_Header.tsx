@@ -26,8 +26,6 @@ const Home_Header = () => {
           className="lg:top-[20px] lg:left-[33px] mt-4 left-2.5 w-[100px] h-[32px] 
                       lg:w-[250px] lg:h-[42px] ml-5"
           src={logo}
-          width={100}
-          height={100}
           alt="pong game logo"
           priority
         />

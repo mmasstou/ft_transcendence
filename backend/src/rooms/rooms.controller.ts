@@ -33,24 +33,13 @@ export class RoomsController {
   @Get('public&protected')
   findPublicAndProtected(@Req() request: Request) {
     const userIds: any = request.user;
-    const login: string = userIds.login;
-    return this.roomsService.findPublicAndProtected(login);
+    const id: string = userIds.id;
+    return this.roomsService.findPublicAndProtected(id);
   }
   @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.roomsService.findAll();
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('notification/:channeLId')
-  findNotifications(
-    @Req() request: Request,
-    @Param('channeLId') channeLId: string,
-  ) {
-    const userIds: any = request.user;
-    const login: string = userIds.login;
-    return this.roomsService.findNotifications({ login, channeLId });
   }
 
   @UseGuards(JwtAuthGuard)

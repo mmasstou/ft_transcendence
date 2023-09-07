@@ -6,13 +6,11 @@ import { userType } from '@/types/types';
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import { UpdateDataProvider } from '@/app/Dashboard';
 
-interface Props {
-  user: userType | null;
-}
-
-function getUserData(): userType | null {
+export const DesktopProfile = (): JSX.Element => {
   const [user, setUser] = useState<userType | null>(null);
+  const { updated, setUpdated } = UpdateDataProvider();
 
   useEffect(() => {
     const jwtToken = Cookies.get('token');
@@ -36,12 +34,7 @@ function getUserData(): userType | null {
         console.log(error);
         return null;
       });
-  }, []);
-  return user;
-}
-
-export const DesktopProfile = (): JSX.Element => {
-  const userData = getUserData();
+  }, [updated]);
 
   return (
     <div className="flex flex-col gap-10 mx-[20px]">
@@ -54,7 +47,7 @@ export const DesktopProfile = (): JSX.Element => {
               className={`bg-secondary flex justify-center items-center
                       rounded-full text-[#161F1E] text-[1.25em] font-bold  h-[40px] w-[40px]`}
             >
-              {userData?.Level}
+              {user?.Level}
             </span>
           </div>
         </div>
@@ -67,19 +60,19 @@ export const DesktopProfile = (): JSX.Element => {
             <div className="flex items-center justify-between py-8 w-1/3">
               <Statis
                 title="Total game"
-                total={userData?.TotalMatch ? userData?.TotalMatch : 0}
+                total={user?.TotalMatch ? user?.TotalMatch : 0}
                 line={true}
                 style="text-[1.5em] md:text-[1.1em]"
               />
               <Statis
                 title="Wins"
-                total={userData?.TotalWin ? userData?.TotalWin : 0}
+                total={user?.TotalWin ? user?.TotalWin : 0}
                 line={true}
                 style="text-[1.5em] md:text-[1.1em]"
               />
               <Statis
                 title="Loses"
-                total={userData?.TotalLose ? userData?.TotalLose : 0}
+                total={user?.TotalLose ? user?.TotalLose : 0}
                 line={false}
                 style="text-[1.5em] md:text-[1.1em]"
               />
@@ -87,7 +80,7 @@ export const DesktopProfile = (): JSX.Element => {
 
             <div className="w-1/3 flex justify-center items-center">
               <h2 className="text-[2em] md:text-[1.5em] text-white font-bold mt-12">
-                {userData?.login}
+                {user?.login}
               </h2>
             </div>
 
@@ -98,7 +91,7 @@ export const DesktopProfile = (): JSX.Element => {
                 </h3>
                 <div className="flex justify-center items-center">
                   <h3 className="uppercase text-white text-[1.5m] md:text-[1.1em] font-bold pl-2">
-                    {userData?.location ? userData?.location : 'Unvailable'}
+                    {user?.location ? user?.location : 'Unvailable'}
                   </h3>
                 </div>
               </div>

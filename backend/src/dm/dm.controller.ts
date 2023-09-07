@@ -10,7 +10,7 @@ export class DmController {
   @Get()
   findAll(@Req() request: Request) {
     const userIds: any = request.user;
-    const login: string = userIds.login;
+    const login: string = userIds.id;
     return this.dmService.findAll(login);
   }
   @UseGuards(JwtAuthGuard)
