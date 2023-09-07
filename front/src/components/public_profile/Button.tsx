@@ -115,7 +115,7 @@ const Button: React.FC<ButtonProps> = ({
           className={`flex justify-evenly items-center border-2 border-[#D9D9D9] rounded-full
        p-2 text-[#D9D9D9] hover:opacity-70 w-[10rem] ${
          isPending ? 'cursor-not-allowed' : ''
-       }`}
+       } ${isFriend ? 'text-red-500 border-red-500' : ''}`}
         >
           {isPending ? (
             <>
@@ -125,7 +125,7 @@ const Button: React.FC<ButtonProps> = ({
           ) : isFriend ? (
             <>
               <BiUserX />
-              <span>Remove Friend</span>
+              <span>Unfriend</span>
             </>
           ) : (
             <>

@@ -33,14 +33,14 @@ const CardRank: React.FC<Props> = ({ user, rank }) => {
         <div className="w-[100%] h-[100%] bg-black/60 absolute top-0 left-0" />
       )}
       <div
-        className={`flex flex-col justify-center h-[100%] bg-[#3E504D] rounded-md mx-2 my-3 md:mx-9`}
+        className={`flex flex-col justify-center lg:h-[8vh] bg-[#3E504D] rounded-md mx-2 my-3 md:mx-9`}
       >
         <div className="flex flex-row justify-between items-center mx-2">
           <div className="flex flex-row justify-between items-center gap-5 mx-5">
             <span className="text-[1em] font-semibold sm:text-[1.3em] sm:font-bold">
               {rank}
             </span>
-            <div className="flex flex-row items-center gap-1 md:gap-2 h-full w-full">
+            <div className="flex flex-row items-center gap-1 md:gap-2 h-[10vh] w-full">
               <div className="relative w-12 h-12">
                 <Image
                   onClick={handlePublicProfile}
@@ -50,7 +50,7 @@ const CardRank: React.FC<Props> = ({ user, rank }) => {
                       : 'cursor-pointer'
                   } border border-secondary`}
                   src={user?.avatar ? user.avatar : ''}
-                  sizes="100%"
+                  sizes="100vh 100vw"
                   fill={true}
                   alt="leaderboard icon"
                   priority
@@ -66,7 +66,7 @@ const CardRank: React.FC<Props> = ({ user, rank }) => {
               {user?.TotalWin}
             </span>
             <span className="text-[1em] font-semibold sm:text-[1.3em] sm:font-bold">
-              {user?.TotalLose}
+              {user?.Level}
             </span>
           </div>
         </div>

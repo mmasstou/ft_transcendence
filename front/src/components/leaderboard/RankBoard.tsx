@@ -58,7 +58,7 @@ const RankBoard = () => {
             Wins
           </h1>
           <h1 className="text-[1em] font-semibold text-[#D9D9D9] sm:text-[1.3em] sm:font-bold">
-            Loses
+            Level
           </h1>
         </div>
       </div>
