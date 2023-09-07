@@ -18,6 +18,7 @@ import { ChanneLContext } from '../channels/providers/channel.provider';
 import Button from '../components/Button';
 import Conversation from '../components/Conversation';
 import getUserWithId from '../channels/actions/getUserWithId';
+import { PiGameController } from 'react-icons/pi';
 const metadata = {
     title: 'Transcendence',
     description: 'ft_transcendence',
@@ -42,6 +43,7 @@ export default function page({ params }: { params: { dmId: string } }) {
     const [reload, setReload] = React.useState<boolean>(false)
     const leftSidebarHook = LeftSidebarHook()
     const [currentUser, setCurrentUser] = useState<userType | null>(null);
+    const [scUser, setScUser] = useState<userType | null>(null);
 
 
 
@@ -72,6 +74,7 @@ export default function page({ params }: { params: { dmId: string } }) {
         const dm: any = await FindDm(params.dmId, token)
         if (!dm) return;
         setConversationInfo(dm)
+        setScUser(dm.User.filter((us: userType) => us.id !== UserId)[0])
         setMessages(dm.Messages)
         setTimeout(() => {
             setLoadingMessages(false);
@@ -162,6 +165,10 @@ export default function page({ params }: { params: { dmId: string } }) {
         setInputValue(input);
     }
 
+    const InviteToGame = () => {
+        console.log("Invite User to Game");
+    }
+
 
     if (!IsMounted) return
     document.title = `Transcendence/ dm` || metadata.title;
@@ -184,9 +191,13 @@ export default function page({ params }: { params: { dmId: string } }) {
 
             {ConversationInfo
                 ? <div className={`Conversations relative w-full  h-[83vh] md:h-[88vh] flex flex-col sm:flex`}>
-                    {/* // **************************************** */}
-                    {/* // ** Header of the conversation */}
-                    {/* // **************************************** */}
+                    <section className='bg-[#243230] pb-3 px-5 flex items-center'>
+                        <Image src={scUser ? scUser.avatar : ''} alt='User avatar' width={55} height={55} className='rounded-[50%]' />
+                        <section className='flex justify-between w-full'>
+                            <p>{scUser ? scUser.login : 'User'}</p>
+                            <Button icon={PiGameController} outline small onClick={() => InviteToGame()}></Button>
+                        </section>
+                    </section>
                     {<div className="flex flex-col justify-between  h-[78vh] md:h-[83vh] pb-5 ">
                         <div ref={chatContainerRef} className="ConversationsMessages relative p-4 overflow-y-scroll flex flex-col gap-3" >
                             {
