@@ -243,7 +243,9 @@ export default function Conversations({ socket, slug }: { socket: Socket | null,
                         </div>
                         {<div className="w-full relative px-6">
 
-                            {SendingMessage && <div className=" text-secondary text-[10px] capitalize absolute -top-4 left-4 bg-[#161F1E] ">sending ....</div>}
+                            {!IsOffLine
+                                ? SendingMessage && <div className=" text-secondary text-[10px] capitalize absolute -top-4 left-4 bg-[#161F1E] ">sending ....</div>
+                                : <div className=" text-secondary text-[10px] capitalize absolute -top-4 left-4 bg-[#ED6C03] ">offline</div>}
                             <div className="ConversationsInput w-full h-[54px] bg-[#24323044] text-[#ffffff]  text-[16px]  rounded-[12px] flex justify-end items-center">
                                 <input
                                     ref={InputRef}
