@@ -75,6 +75,8 @@ const Dashboard = ({ children }: Props) => {
         };
       }
     );
+    return () => {
+      socket?.off('GameNotificationResponse');};
   }, [socket]);
 
   useEffect(() => {

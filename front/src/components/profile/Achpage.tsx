@@ -62,7 +62,7 @@ const Achpage = () => {
         icon="fifty-frenzy"
         description="play 50 games."
         hasProgression
-        progression={user.TotalMatch! * 2}
+        progression={user.TotalMatch! > 50 ? 100 : user.TotalMatch! * 2}
       />
     </div>
   );
