@@ -83,7 +83,6 @@ export class UserGateway implements OnGatewayConnection {
     this.roomGateway.server
       .to(data.senderSocketId)
       .emit('GameResponse', Response);
-    console.log('++handleAcceptGame++Response>');
     client.emit('GameResponse', Response);
   }
 

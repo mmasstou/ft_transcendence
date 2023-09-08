@@ -21,7 +21,9 @@ export class GameController {
   ) {}
 
   @Post('/FriendGame')
-  async selectFriendGame(@Body() body: {player1Id: string; player2Id: string; mode: string}) {
+  async selectFriendGame(
+    @Body() body: { player1Id: string; player2Id: string; mode: string },
+  ) {
     try {
       const result = await this.GameGateway.CreateFriendTable(body);
       if (result != undefined)
@@ -38,7 +40,7 @@ export class GameController {
   }
 
   @Post('/BotGame')
-  async selectBotGame(@Body() body: {playerId: string; mode: string}) {
+  async selectBotGame(@Body() body: { playerId: string; mode: string }) {
     try {
       const result = await this.GameGateway.CreateBotTable(body);
       if (result != undefined)
@@ -55,7 +57,7 @@ export class GameController {
   }
 
   @Post('/RandomGame')
-  async selectRandomGame(@Body() body: {playerId: string; mode: string}) {
+  async selectRandomGame(@Body() body: { playerId: string; mode: string }) {
     try {
       const result = await this.GameGateway.CreateRandomTable(body);
       if (result != undefined) {
@@ -73,10 +75,9 @@ export class GameController {
   }
 
   @Post('/leaveGame')
-  leaveGame(@Body() body: {UserId: string; TableId: string}) {
+  leaveGame(@Body() body: { UserId: string; TableId: string }) {
     this.GameGateway.LeaveGame(body);
   }
-
 
   @Get('/GetScore/:id')
   async getUserScores(@Param('id') userId: string) {
@@ -105,7 +106,13 @@ export class GameController {
   }
 
   @Post('/UpdateTheme')
-  async updateTheme(@Body() body: {id: string; theme: {background: string[], paddle: string, ball: string;}}) {
+  async updateTheme(
+    @Body()
+    body: {
+      id: string;
+      theme: { background: string[]; paddle: string; ball: string };
+    },
+  ) {
     try {
       await this.GameService.updateTheme(body);
     } catch (err) {

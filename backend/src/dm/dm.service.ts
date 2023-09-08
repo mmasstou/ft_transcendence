@@ -12,8 +12,8 @@ export class DmService {
     private messageservice: MessagesService,
     private readonly userService: UserService,
   ) {}
-  async findAll(login: string) {
-    const user = await this.userService.findOneLogin({ login });
+  async findAll(id: string) {
+    const user = await this.userService.findOne({ id });
     // find all dms that the user is in :
     return await this.prisma.directMessage.findMany({
       where: {

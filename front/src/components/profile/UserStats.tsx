@@ -45,10 +45,9 @@ export const UserStats: React.FC<userInfo> = ({ user }) => {
       <Statis
         title="Loses"
         total={user?.TotalLose ? user?.TotalLose : 0}
-        line={true}
+        line={false}
         style="text-[1em]"
       />
-      <Statis title="Rank" total={14} line={false} style="text-[1em]" />
     </div>
   );
 };

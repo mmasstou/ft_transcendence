@@ -1,5 +1,5 @@
 import { BsSend } from 'react-icons/bs';
-import { BiUserPlus, BiUserX } from 'react-icons/bi';
+import { BiBlock, BiUserPlus, BiUserX } from 'react-icons/bi';
 import { useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { socketContext } from '@/app/Dashboard';
@@ -99,42 +99,31 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <>
-      {text === 'Message' ? (
-        <button
-          onClick={() => {}}
-          className="flex justify-evenly items-center border-2 border-[#D9D9D9] rounded-full
-       p-2 text-[#D9D9D9] hover:opacity-70 w-[10rem]"
-        >
-          <BsSend />
-          <span>{text}</span>
-        </button>
-      ) : (
-        <button
-          onClick={handleFriendRequest}
-          disabled={isPending}
-          className={`flex justify-evenly items-center border-2 border-[#D9D9D9] rounded-full
+      <button
+        onClick={handleFriendRequest}
+        disabled={isPending}
+        className={`flex justify-evenly items-center border-2 border-[#D9D9D9] rounded-full
        p-2 text-[#D9D9D9] hover:opacity-70 w-[10rem] ${
          isPending ? 'cursor-not-allowed' : ''
-       }`}
-        >
-          {isPending ? (
-            <>
-              <MdPendingActions />
-              <span>Pending Request</span>
-            </>
-          ) : isFriend ? (
-            <>
-              <BiUserX />
-              <span>Remove Friend</span>
-            </>
-          ) : (
-            <>
-              <BiUserPlus />
-              <span>Add Friend</span>
-            </>
-          )}
-        </button>
-      )}
+       } ${isFriend ? 'text-red-500 border-red-500' : ''}`}
+      >
+        {isPending ? (
+          <>
+            <MdPendingActions />
+            <span>Pending Request</span>
+          </>
+        ) : isFriend ? (
+          <>
+            <BiUserX />
+            <span>Unfriend</span>
+          </>
+        ) : (
+          <>
+            <BiUserPlus />
+            <span>Add Friend</span>
+          </>
+        )}
+      </button>
     </>
   );
 };

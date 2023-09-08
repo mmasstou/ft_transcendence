@@ -75,10 +75,7 @@ export class UserController {
   findAll() {
     return this.usersService.findAll();
   }
-  @Get('login/:login')
-  getUserWithLogin(@Param('login') login: string) {
-    return this.usersService.findOneLogin({ login });
-  }
+
   // @UseGuards(JwtAuthGuard)
   @Get('login')
   getLoginUser(@Req() request: Request) {

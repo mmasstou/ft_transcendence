@@ -7,8 +7,10 @@ import { userType } from '@/types/types';
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import { UpdateDataProvider } from '@/app/Dashboard';
 
 function getUserData(): userType | null {
+  const { updated, setUpdated } = UpdateDataProvider();
   const [user, setUser] = useState<userType | null>(null);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ function getUserData(): userType | null {
         console.log(error);
         return null;
       });
-  }, []);
+  }, [updated]);
   return user;
 }
 

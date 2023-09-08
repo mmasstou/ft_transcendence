@@ -59,12 +59,9 @@ export class AuthController {
     res.sendStatus(200);
   }
 
-  @Get('status')
+  @Get('verifyUser')
   @UseGuards(JwtAuthGuard)
-  async status(@Req() req: any) {
-    const _user = await this.userService.findOneLogin({
-      login: req.user.login,
-    });
-    return _user;
+  async verifyUser(@Req() req: any, @Res() res: Response): Promise<any> {
+    res.sendStatus(200);
   }
 }

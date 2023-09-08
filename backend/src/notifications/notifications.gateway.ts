@@ -37,7 +37,6 @@ export class NotificationsGateway {
         const receiverSocket = clientOnLigne.get(UserTOSendTo?.id);
         if (receiverSocket) {
           receiverSocket.forEach((socket) => {
-            console.log(socket.id);
             socket.emit('notification', message);
           });
         }

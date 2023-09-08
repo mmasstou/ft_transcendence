@@ -14,7 +14,6 @@ export class MessagesService {
   async findOne(params: { id: string }): Promise<Messages> {
     try {
       const { id } = params;
-      // console.log('++findOne||++>', id);
       const message = await this.prisma.messages.findUnique({
         where: { id },
       });
@@ -86,15 +85,12 @@ export class MessagesService {
   }
 
   async remove(id: string): Promise<Messages> {
-    // console.log('++remove++>', id);
-
     return await this.prisma.messages.delete({
       where: { id },
     });
   }
 
   async removeALL(id: string) {
-    // console.log('++removeALL++>', id);
     return await this.prisma.messages.deleteMany({
       where: { roomsId: id },
     });

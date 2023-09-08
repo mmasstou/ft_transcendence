@@ -16,8 +16,8 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
   async signIn(user: Prisma.UserUncheckedCreateInput) {
-    const userExists = await this.usersService.findOneLogin({
-      login: user.login,
+    const userExists = await this.usersService.findOne({
+      id: user.id,
     });
 
     if (!userExists) {

@@ -4,19 +4,11 @@ import data from '../../../public/lotties/about.json';
 import Button from './CTA';
 import styles from './style';
 import { useRouter } from 'next/navigation';
-import Lottie from 'react-lottie';
+import Lottie from 'react-lottie-player';
 
 const About = () => {
   const router = useRouter();
 
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: data,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice',
-    },
-  };
   return (
     <section
       className={` ${styles.paddingY} ${styles.flexCenter}  flex-col md:p-5 
@@ -55,7 +47,12 @@ const About = () => {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
         >
-          <Lottie options={defaultOptions} height={600} width={600} />
+          <Lottie
+            loop
+            animationData={data}
+            play
+            style={{ height: 600, width: 600 }}
+          />
         </motion.div>
         <div className="absolute z-[3] -left-1/2 top-0 w-[50%] h-[50%] rounded-full white__gradient" />
         <div className="absolute z-[0] -left-1/2 bottom-0 w-[50%] h-[50%] rounded-full pink__gradient" />
