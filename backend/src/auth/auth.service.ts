@@ -21,7 +21,6 @@ export class AuthService {
     });
 
     if (!userExists) {
-      console.log('************** user not exists **************');
       return await this.registerUser(user);
     }
     return this.generateJwt({

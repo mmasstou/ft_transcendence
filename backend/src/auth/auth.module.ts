@@ -7,6 +7,7 @@ import { UserService } from 'src/users/user.service';
 import { PrismaService } from 'src/prisma.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { IntraStrategy } from './strategies/intra-oauth.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { IntraStrategy } from './strategies/intra-oauth.strategy';
     PrismaService,
     JwtStrategy,
     IntraStrategy,
+    GoogleStrategy,
   ],
   controllers: [AuthController],
   exports: [AuthService],
