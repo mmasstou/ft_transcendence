@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 import { UserService } from 'src/users/user.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-oauth.guard';
+import { GoogleOauthGuard } from './guards/google-oauth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -15,6 +16,38 @@ export class AuthController {
   @Get('42')
   async login42(@Req() req: any) {
     return req.user;
+  }
+
+  @Get('google')
+  async loginGoogle(@Req() req: any) {
+    return req.user;
+  }
+
+  @Get('google/callback')
+  @UseGuards(GoogleOauthGuard)
+  async GoogleAuthCallback(@Req() req: any, @Res() res: Response) {
+    try {
+      const result = await this.authService.signIn(req.user);
+      const { accessToken } = result;
+      res.cookie('token', accessToken, {
+        httpOnly: false,
+        sameSite: false,
+      });
+      res.cookie('_id', req.user.id, {
+        httpOnly: false,
+        sameSite: false,
+      });
+      if (req.user.logedFirstTime) {
+        return res.redirect(`${process.env.AUTH_REDIRECT_LOGIN}`);
+      }
+      if (req.user.twoFA) {
+        return res.redirect(`${process.env.AUTH_REDIRECT_2FA}`);
+      } else {
+        return res.redirect(`${process.env.AUTH_REDIRECT_URI}`);
+      }
+    } catch (error) {
+      res.status(400).json(error);
+    }
   }
 
   @UseGuards(AuthGuard('42'))
