@@ -86,9 +86,19 @@ export class AuthController {
         logedFirstTime: false,
       },
     });
-    // res.clearCookie('token');
-    // res.clearCookie('accessToken');
-    // res.clearCookie('_id');
+
+    const user = await this.userService.findOne({ id: req.user.id });
+    if (user.twoFA) {
+      await this.prisma.user.update({
+        where: { email: req.user.email },
+        data: {
+          isSecondFactorAuthenticated: true,
+        },
+      });
+    }
+    res.clearCookie('token');
+    res.clearCookie('accessToken');
+    res.clearCookie('_id');
     res.sendStatus(200);
   }
 

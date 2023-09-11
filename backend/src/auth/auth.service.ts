@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
@@ -31,7 +27,6 @@ export class AuthService {
       banner: userExists.banner,
       userId: userExists.id,
       intraId: userExists.intraId,
-      logedFirstTime: userExists.logedFirstTime,
     });
   }
   async registerUser(user: Prisma.UserUncheckedCreateInput) {
@@ -44,7 +39,6 @@ export class AuthService {
           name: user.name,
           banner: user.banner,
           intraId: user.intraId,
-          logedFirstTime: user.logedFirstTime,
         },
       });
       return await this.generateJwt({
@@ -55,7 +49,6 @@ export class AuthService {
         userId: newUser.id,
         banner: newUser.banner,
         intraId: newUser.intraId,
-        logedFirstTime: newUser.logedFirstTime,
       });
     } catch (error) {
       console.log(error);

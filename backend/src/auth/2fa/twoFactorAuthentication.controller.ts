@@ -27,6 +27,7 @@ export class TwoFactorAuthenticationController {
     private readonly twoFactorAuthenticationService: TwoFactorAuthenticationService,
     private readonly usersService: UserService,
     private readonly authService: AuthService,
+    private readonly TwoFactorAuthenticationService: TwoFactorAuthenticationService,
   ) {}
 
   @Post('/authenticate')
@@ -48,8 +49,12 @@ export class TwoFactorAuthenticationController {
 
     const accessTokenData = await this.authService.generateJwt(request.user);
     const accessTokenCookie = accessTokenData.accessToken;
-
     request.res.setHeader('Set-Cookie', [accessTokenCookie]);
+    // update isTwoFactorAuthenticationEnabled to true
+    await this.TwoFactorAuthenticationService.isSecondFactorAuthenticated(
+      request.user.id,
+      false,
+    );
 
     return request.user;
   }
@@ -69,6 +74,10 @@ export class TwoFactorAuthenticationController {
     if (!isCodeValid) {
       throw new HttpException('Wrong authentication code', 401);
     }
+    await this.TwoFactorAuthenticationService.isSecondFactorAuthenticated(
+      request.user.id,
+      true,
+    );
     await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
   }
 
@@ -77,6 +86,10 @@ export class TwoFactorAuthenticationController {
   @UseGuards(JwtAuthGuard)
   async turnOffTwoFactorAuthentication(@Req() request: RequestWithUser) {
     await this.usersService.turnOffTwoFactorAuthentication(request.user.id);
+    await this.TwoFactorAuthenticationService.isSecondFactorAuthenticated(
+      request.user.id,
+      false,
+    );
   }
 
   @Get('/generate')

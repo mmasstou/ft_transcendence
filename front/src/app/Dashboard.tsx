@@ -25,6 +25,7 @@ import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL'
 import './dashboard.css';
 import Lottie from 'react-lottie-player';
 import data from '@/../public/lotties/pong.json';
+import { getUserData } from '@/components/Dashboard/Header/Settings';
 
 interface Props {
   children: React.ReactNode;
@@ -56,7 +57,7 @@ export type UpdateDataProps = {
 
 export const UpdateDataContext = createContext<UpdateDataProps>({
   updated: false,
-  setUpdated: () => { },
+  setUpdated: () => {},
 });
 
 export const UpdateDataProvider = () => useContext(UpdateDataContext);
@@ -71,11 +72,16 @@ const Dashboard = ({ children }: Props) => {
   const channeLsettingsHook = ChanneLsettingsHook();
   const userId = Cookies.get('_id');
   const token: any = Cookies.get('token');
+  const user: userType | null = getUserData();
   const [notifUpdate, setnotifUpdate] = React.useState<boolean>(false);
 
   const [pendingRequests, setPendingRequests] = React.useState<any>([]);
   const [requestBackUp, setRequestBackUp] = React.useState<any>([]);
   const [message, setMessage] = React.useState<string>('');
+
+  useEffect(() => {
+    console.log('user => :', user);
+  }, [user]);
 
   useEffect(() => {
     (async () => {
@@ -91,7 +97,11 @@ const Dashboard = ({ children }: Props) => {
           }
         );
         if (res.status === 200) {
-          setAuthenticated(true);
+          if (user.isSecondFactorAuthenticated === true) {
+            router.replace('/2fa');
+          } else {
+            setAuthenticated(true);
+          }
         }
         if (res.status === 401) {
           setAuthenticated(false);
@@ -102,7 +112,7 @@ const Dashboard = ({ children }: Props) => {
         console.clear();
       }
     })();
-  }, [token, userId]);
+  }, [token, userId, user]);
 
   React.useEffect(() => {
     socket?.on(

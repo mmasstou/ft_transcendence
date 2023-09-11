@@ -1,5 +1,6 @@
 'use client';
-import Settings from '@/components/Dashboard/Header/Settings';
+import Settings, { getUserData } from '@/components/Dashboard/Header/Settings';
+import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -10,6 +11,7 @@ const Login = () => {
   const userId = Cookies.get('_id');
   const token = Cookies.get('token');
   const [authenticated, setAuthenticated] = useState<boolean>();
+  const user: userType | null = getUserData();
 
   useEffect(() => {
     (async () => {
@@ -25,7 +27,11 @@ const Login = () => {
           }
         );
         if (res.status === 200) {
-          setAuthenticated(true);
+          if (user.isSecondFactorAuthenticated === true) {
+            router.replace('/2fa');
+          } else {
+            setAuthenticated(true);
+          }
         }
         if (res.status === 401) {
           setAuthenticated(false);
@@ -36,7 +42,7 @@ const Login = () => {
         console.clear();
       }
     })();
-  }, [token, userId]);
+  }, [token, userId, user]);
   return (
     <>
       {authenticated ? (

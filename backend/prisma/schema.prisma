@@ -68,6 +68,7 @@ model User {
   ChanneLNotifications          ChanneLNotifications[]
   twoFactorAuthenticationSecret String?
   twoFA                         Boolean                @default(false)
+  isSecondFactorAuthenticated   Boolean                @default(false)
   logedFirstTime                Boolean                @default(false)
   friends                       Friendship[]
   dms                           DirectMessage[]
