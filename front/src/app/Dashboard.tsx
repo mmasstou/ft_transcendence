@@ -25,6 +25,7 @@ import ChanneLSettingsModaL from './chat/channels/modaLs/channel.settings.modaL'
 import './dashboard.css';
 import Lottie from 'react-lottie-player';
 import data from '@/../public/lotties/pong.json';
+import { getUserData } from '@/components/Dashboard/Header/Settings';
 
 interface Props {
   children: React.ReactNode;
@@ -56,7 +57,7 @@ export type UpdateDataProps = {
 
 export const UpdateDataContext = createContext<UpdateDataProps>({
   updated: false,
-  setUpdated: () => { },
+  setUpdated: () => {},
 });
 
 export const UpdateDataProvider = () => useContext(UpdateDataContext);
@@ -71,11 +72,13 @@ const Dashboard = ({ children }: Props) => {
   const channeLsettingsHook = ChanneLsettingsHook();
   const userId = Cookies.get('_id');
   const token: any = Cookies.get('token');
+  const user: userType | null = getUserData();
   const [notifUpdate, setnotifUpdate] = React.useState<boolean>(false);
 
   const [pendingRequests, setPendingRequests] = React.useState<any>([]);
   const [requestBackUp, setRequestBackUp] = React.useState<any>([]);
   const [message, setMessage] = React.useState<string>('');
+  const [errMsg, setErrMsg] = React.useState<string>('');
 
   useEffect(() => {
     (async () => {
@@ -91,9 +94,17 @@ const Dashboard = ({ children }: Props) => {
           }
         );
         if (res.status === 200) {
-          setAuthenticated(true);
+          if (user?.isSecondFactorAuthenticated === true) {
+            setErrMsg(
+              "You don't have access to this page Two Factor Authentication is required."
+            );
+            setAuthenticated(false);
+          } else {
+            setAuthenticated(true);
+          }
         }
         if (res.status === 401) {
+          setErrMsg('You are not authorized.');
           setAuthenticated(false);
           console.clear();
         }
@@ -102,7 +113,7 @@ const Dashboard = ({ children }: Props) => {
         console.clear();
       }
     })();
-  }, [token, userId]);
+  }, [token, userId, user]);
 
   React.useEffect(() => {
     socket?.on(
@@ -201,6 +212,19 @@ const Dashboard = ({ children }: Props) => {
   }, [socket]);
   const [updated, setUpdated] = useState<boolean>(false);
 
+  const handleNotAuthenticated = () => {
+    console.log(errMsg);
+    if (
+      errMsg ===
+      "You don't have access to this page Two Factor Authentication is required."
+    ) {
+      router.replace('/2fa');
+      return;
+    } else if (errMsg == 'You are not authorized.') {
+      router.replace('/');
+    }
+  };
+
   return (
     <>
       {authenticated ? (
@@ -269,13 +293,11 @@ const Dashboard = ({ children }: Props) => {
             className="bg-[#3E867C] w-4/ sm:w-1/2 min-h-[35vh] rounded-lg
             flex flex-col justify-center items-center gap-4 py-4"
           >
-            <h1 className="text-[#D9D9D9] text-2xl font-bold">
-              You are not authenticated
+            <h1 className="text-[#D9D9D9] text-xl font-medium text-center">
+              {errMsg ? errMsg : 'You are not authorized.'}
             </h1>
             <button
-              onClick={() => {
-                router.replace('/');
-              }}
+              onClick={handleNotAuthenticated}
               className="bg-[#D9D9D9] text-[#3E867C] px-4 py-2 rounded-lg"
             >
               Go back

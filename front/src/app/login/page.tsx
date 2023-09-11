@@ -1,5 +1,6 @@
 'use client';
-import Settings from '@/components/Dashboard/Header/Settings';
+import Settings, { getUserData } from '@/components/Dashboard/Header/Settings';
+import { userType } from '@/types/types';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -10,6 +11,8 @@ const Login = () => {
   const userId = Cookies.get('_id');
   const token = Cookies.get('token');
   const [authenticated, setAuthenticated] = useState<boolean>();
+  const user: userType | null = getUserData();
+  const [errMsg, setErrMsg] = useState<string>('');
 
   useEffect(() => {
     (async () => {
@@ -25,9 +28,17 @@ const Login = () => {
           }
         );
         if (res.status === 200) {
-          setAuthenticated(true);
+          if (user?.isSecondFactorAuthenticated === true) {
+            setErrMsg(
+              "You don't have access to this page Two Factor Authentication is required."
+            );
+            setAuthenticated(false);
+          } else {
+            setAuthenticated(true);
+          }
         }
         if (res.status === 401) {
+          setErrMsg('You are not authorized.');
           setAuthenticated(false);
           console.clear();
         }
@@ -36,7 +47,19 @@ const Login = () => {
         console.clear();
       }
     })();
-  }, [token, userId]);
+  }, [token, userId, user]);
+
+  const handleNotAuthenticated = () => {
+    if (
+      errMsg ===
+      "You don't have access to this page Two Factor Authentication is required."
+    ) {
+      router.replace('/2fa');
+      return;
+    } else if (errMsg === 'You are not authorized.') {
+      router.replace('/');
+    }
+  };
   return (
     <>
       {authenticated ? (
@@ -49,13 +72,11 @@ const Login = () => {
             className="bg-[#3E867C] w-4/ sm:w-1/2 min-h-[35vh] rounded-lg
             flex flex-col justify-center items-center gap-4 py-4"
           >
-            <h1 className="text-[#D9D9D9] text-2xl font-bold">
-              You are not authenticated
+            <h1 className="text-[#D9D9D9] text-xl font-medium text-center">
+              {errMsg ? errMsg : 'You are not authorized.'}
             </h1>
             <button
-              onClick={() => {
-                router.replace('/');
-              }}
+              onClick={handleNotAuthenticated}
               className="bg-[#D9D9D9] text-[#3E867C] px-4 py-2 rounded-lg"
             >
               Go back

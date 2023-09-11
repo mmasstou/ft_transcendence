@@ -54,4 +54,11 @@ export class TwoFactorAuthenticationService {
   public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
     return toFileStream(stream, otpauthUrl);
   }
+
+  async isSecondFactorAuthenticated(id: string, status: boolean) {
+    return await this.prisma.user.update({
+      where: { id },
+      data: { isSecondFactorAuthenticated: status },
+    });
+  }
 }
