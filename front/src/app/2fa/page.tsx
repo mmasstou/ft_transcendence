@@ -56,7 +56,7 @@ const page = () => {
             flex flex-col justify-center items-center gap-4 py-4"
           >
             <h1 className="text-[#D9D9D9] text-2xl font-bold">
-              You are not authenticated
+              You are not authorized.
             </h1>
             <button
               onClick={() => {
