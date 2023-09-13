@@ -1,5 +1,7 @@
 # ft_transcendence - Pong Game 42 Project
 
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-img/Transcendence-e1629765085487.jpeg" width="1000" height="500" alt="Pong Image" >
+
 Playing video games is good. Programming them is better. But then… setting up tournaments is even better! With ft_transcendence, We will modernly recreate the 1979 classic Pong, integrate it into a website, and turn it into a competitive gaming platform. The website must be able to offer tournaments between players, so it has to manage registrations, victories, progression in rankings, and a chat. This ambitious project is the last project we must complete to be able to leave the core curriculum and access internships and fields of expertise.
 
 ## Index
@@ -71,4 +73,60 @@ This project is all about creating a Pong game using Next.js and React.js in the
 
 ## Showcase :sparkler:
 
-Soon ...
+Let's dive in and discover what our project has to offer!:
+
+### Login </br>
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-img/login.png" alt="image" width="700" height="auto">
+</br>
+
+### Two-Factor Authentication </br>
+</br></br>
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/TwoFa.png" alt="image">
+
+### Dashboard and profile pages
+</br></br>
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/dashboard.png" alt="image">
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/Friends.png" alt="image">
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/History.png" alt="image">
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/Achievement-.png" alt="image">
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/profile-setting.png" alt="image">
+
+
+
+### Users page
+</br></br>
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/Users.png" alt="image">
+</br>
+
+### Chat pages
+</br></br>
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/first%20-%20page%20-%20Direct%20Messages.png" alt="image">
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/page%20-%20Chat-direct-messages.png" alt="image">
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/page%20-%20%20Chat-room-messages.png" alt="image">
+</br>
+
+### Game pages
+</br></br>
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/Game%20Page.png" alt="image">
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/Game%20Modes.png" alt="image">
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/Play%20with%20friends.png" alt="image">
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/Game.png" alt="image">
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/Game%20themes.png" alt="image">
+
+</br>
+
+### Leaderboard
+</br></br>
+
+<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/Leader-Board.png" alt="image">
