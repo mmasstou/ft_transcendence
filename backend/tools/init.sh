@@ -2,10 +2,10 @@
 
 sleep 5
 
-npx prisma migrate dev --name init
+npx prisma db push
 
 
-npx prisma generate --schema=../prisma/schema.prisma
+npx prisma pull --schema=../prisma/schema.prisma
 
 sleep 5
 
@@ -16,3 +16,4 @@ npm run start:dev
 # tail -f
 
 exec "$@"
+
