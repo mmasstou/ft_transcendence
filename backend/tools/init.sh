@@ -16,4 +16,3 @@ npm run start:dev
 # tail -f
 
 exec "$@"
-
