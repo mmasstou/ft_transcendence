@@ -29,7 +29,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const { id, name, emails, photos, login, location, intraId, kind } =
       profile;
 
-    if (!login && !location && !intraId && !kind) {
+    if (!login && !location && !intraId && !kind || !login) {
       const newLogin: string = generateRandomUsername(
         profile._json.given_name,
         profile._json.family_name,

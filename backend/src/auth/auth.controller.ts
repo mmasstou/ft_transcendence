@@ -96,9 +96,9 @@ export class AuthController {
         },
       });
     }
-    res.clearCookie('token');
-    res.clearCookie('accessToken');
-    res.clearCookie('_id');
+    // res.clearCookie('token');
+    // res.clearCookie('accessToken');
+    // res.clearCookie('_id');
     res.sendStatus(200);
   }
 
