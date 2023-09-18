@@ -30,7 +30,7 @@ const CardRank: React.FC<Props> = ({ user, rank }) => {
         />
       )}
       {showPublicProfile && (
-        <div className="w-[100%] h-[100%] bg-black/60 absolute top-0 left-0" />
+        <div className="w-[100%] h-[100%] bg-black/60 absolute top-0 left-0 z-50" />
       )}
       <div
         className={`flex flex-col justify-center lg:h-[8vh] bg-[#3E504D] rounded-md mx-2 my-3 md:mx-9`}
