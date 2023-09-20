@@ -105,11 +105,10 @@ Let's dive in and discover what our project has to offer!:
 
 ### Chat pages
 </br></br>
-<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/first%20-%20page%20-%20Direct%20Messages.png" alt="image">
+<img src="https://github.com/mmasstou/ft_transcendence/blob/master/showcase-images/chat1.png" alt="image">
 
-<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/page%20-%20Chat-direct-messages.png" alt="image">
+<img src="https://github.com/mmasstou/ft_transcendence/blob/master/showcase-images/chat2.png" alt="image">
 
-<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-images/page%20-%20%20Chat-room-messages.png" alt="image">
 </br>
 
 ### Game pages
