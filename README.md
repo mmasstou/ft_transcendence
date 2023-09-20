@@ -1,6 +1,6 @@
 # ft_transcendence - Pong Game 42 Project
 
-<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-img/Transcendence-e1629765085487.jpeg" width="1000" height="500" alt="Pong Image" >
+<img src="https://github.com/mmasstou/ft_transcendence/blob/master/showcase-images/Transcendence-e1629765085487.jpeg" width="1000" height="500" alt="Pong Image" >
 
 Playing video games is good. Programming them is better. But then… setting up tournaments is even better! With ft_transcendence, We will modernly recreate the 1979 classic Pong, integrate it into a website, and turn it into a competitive gaming platform. The website must be able to offer tournaments between players, so it has to manage registrations, victories, progression in rankings, and a chat. This ambitious project is the last project we must complete to be able to leave the core curriculum and access internships and fields of expertise.
 
@@ -77,7 +77,7 @@ Let's dive in and discover what our project has to offer!:
 
 ### Login </br>
 
-<img src="https://github.com/Xperaz/ft_transcendence/blob/master/showcase-img/login.png" alt="image" width="700" height="auto">
+<img src="https://github.com/mmasstou/ft_transcendence/blob/master/showcase-images/login.png" alt="image" width="700" height="auto">
 </br>
 
 ### Two-Factor Authentication </br>
